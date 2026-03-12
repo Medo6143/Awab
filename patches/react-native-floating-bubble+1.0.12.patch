@@ -1,0 +1,518 @@
+diff --git a/node_modules/react-native-floating-bubble/android/build.gradle b/node_modules/react-native-floating-bubble/android/build.gradle
+index 2173e8d..ad1fdb8 100644
+--- a/node_modules/react-native-floating-bubble/android/build.gradle
++++ b/node_modules/react-native-floating-bubble/android/build.gradle
+@@ -13,12 +13,12 @@ buildscript {
+ apply plugin: 'com.android.library'
+ 
+ android {
+-    compileSdkVersion 23
+-    buildToolsVersion "23.0.1"
++    compileSdkVersion 34
++    buildToolsVersion "34.0.0"
+ 
+     defaultConfig {
+-        minSdkVersion 16
+-        targetSdkVersion 22
++        minSdkVersion 24
++        targetSdkVersion 34
+         versionCode 1
+         versionName "1.0"
+     }
+@@ -40,7 +40,6 @@ allprojects {
+ 
+ dependencies {
+     implementation 'com.facebook.react:react-native:+'
+-    //compile 'com.txusballesteros:bubbles:1.2.1',
+-    implementation 'com.github.txusballesteros:bubbles-for-android:develop-SNAPSHOT'
++    implementation 'com.github.txusballesteros:bubbles-for-android:1.2.1'
+ }
+   
+\ No newline at end of file
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/RNFloatingBubbleModule.java b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/RNFloatingBubbleModule.java
+index cde29db..3a30443 100644
+--- a/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/RNFloatingBubbleModule.java
++++ b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/RNFloatingBubbleModule.java
+@@ -14,35 +14,41 @@ import android.os.Bundle;
+ import android.os.Build;
+ import android.view.LayoutInflater;
+ import android.view.View;
++import android.view.WindowManager;
++import android.view.Gravity;
++import android.view.MotionEvent;
++import android.graphics.PixelFormat;
++import android.widget.TextView;
+ import android.content.Intent;
++import android.content.Context;
+ import android.provider.Settings;
+ import android.net.Uri;
+ 
+-import com.txusballesteros.bubbles.BubbleLayout;
+-import com.txusballesteros.bubbles.BubblesManager;
+-import com.txusballesteros.bubbles.OnInitializedCallback;
+-
+ public class RNFloatingBubbleModule extends ReactContextBaseJavaModule {
+ 
+-  private BubblesManager bubblesManager;
+   private final ReactApplicationContext reactContext;
+-  private BubbleLayout bubbleView;
++  private View bubbleView;
++  private WindowManager windowManager;
++  private WindowManager.LayoutParams params;
++  private int tasbeehCount = 0;
++
++  // For dragging
++  private int initialX;
++  private int initialY;
++  private float initialTouchX;
++  private float initialTouchY;
+ 
+   public RNFloatingBubbleModule(ReactApplicationContext reactContext) {
+     super(reactContext);
+     this.reactContext = reactContext;
+-
+-    // try {
+-    //   initializeBubblesManager();
+-    // } catch (Exception e) {
+-
+-    // }
++    this.windowManager = (WindowManager) reactContext.getSystemService(Context.WINDOW_SERVICE);
+   }
+ 
+   @ReactMethod
+   public void reopenApp(){
+     Intent launchIntent = reactContext.getPackageManager().getLaunchIntentForPackage(reactContext.getPackageName());
+     if (launchIntent != null) {
++      launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+       reactContext.startActivity(launchIntent);
+     }
+   }
+@@ -52,72 +58,193 @@ public class RNFloatingBubbleModule extends ReactContextBaseJavaModule {
+     return "RNFloatingBubble";
+   }
+ 
+-  @ReactMethod // Notates a method that should be exposed to React
++  @ReactMethod
+   public void showFloatingBubble(int x, int y, final Promise promise) {
+     try {
+-      this.addNewBubble(x, y);
+-      promise.resolve("");
++      this.reactContext.runOnUiQueueThread(new Runnable() {
++        @Override
++        public void run() {
++          try {
++            addNewBubble(x, y);
++            promise.resolve("");
++          } catch (Exception e) {
++            promise.reject("Error", e.getMessage());
++          }
++        }
++      });
+     } catch (Exception e) {
+-      promise.reject("");
++      promise.reject("Error", e.getMessage());
+     }
+   }  
+ 
+-  @ReactMethod // Notates a method that should be exposed to React
++  @ReactMethod
+   public void hideFloatingBubble(final Promise promise) {
+     try {
+-      this.removeBubble();
+-      promise.resolve("");
++      this.reactContext.runOnUiQueueThread(new Runnable() {
++        @Override
++        public void run() {
++          removeBubble();
++          promise.resolve("");
++        }
++      });
+     } catch (Exception e) {
+-      promise.reject("");
++      promise.reject("Error", e.getMessage());
+     }
+   }  
+   
+-  @ReactMethod // Notates a method that should be exposed to React
++  @ReactMethod
+   public void requestPermission(final Promise promise) {
+     try {
+       this.requestPermissionAction(promise);
+     } catch (Exception e) {
++       promise.reject("Error", e.getMessage());
+     }
+   }  
+   
+-  @ReactMethod // Notates a method that should be exposed to React
++  @ReactMethod
+   public void checkPermission(final Promise promise) {
+     try {
+       promise.resolve(hasPermission());
+     } catch (Exception e) {
+-      promise.reject("");
++      promise.reject("Error", e.getMessage());
+     }
+   }  
+   
+-  @ReactMethod // Notates a method that should be exposed to React
++  @ReactMethod
+   public void initialize(final Promise promise) {
+-    try {
+-      this.initializeBubblesManager();
+-      promise.resolve("");
+-    } catch (Exception e) {
+-      promise.reject("");
++    // No-op for direct window manager implementation, but kept for compatibility
++    if (promise != null) promise.resolve("");
++  }  
++
++  @ReactMethod
++  public void updateTasbeehCount(int count) {
++    tasbeehCount = count;
++    updateCounterDisplay();
++  }
++  
++  private void updateCounterDisplay() {
++    if (bubbleView != null) {
++      bubbleView.post(new Runnable() {
++        @Override
++        public void run() {
++          if (bubbleView != null) {
++             TextView tv = (TextView) bubbleView.findViewById(R.id.tasbeeh_count_text);
++             if (tv != null) tv.setText(String.valueOf(tasbeehCount));
++          }
++        }
++      });
+     }
+   }
+ 
+   private void addNewBubble(int x, int y) {
+-    this.removeBubble();
+-    bubbleView = (BubbleLayout) LayoutInflater.from(reactContext).inflate(R.layout.bubble_layout, null);
+-    bubbleView.setOnBubbleRemoveListener(new BubbleLayout.OnBubbleRemoveListener() {
+-      @Override
+-      public void onBubbleRemoved(BubbleLayout bubble) {
+-        bubbleView = null;
+-        sendEvent("floating-bubble-remove");
+-      }
+-    });
+-    bubbleView.setOnBubbleClickListener(new BubbleLayout.OnBubbleClickListener() {
++    removeBubble();
+     
+-      @Override
+-      public void onBubbleClick(BubbleLayout bubble) {
+-        sendEvent("floating-bubble-press");
+-      }
++    if (!hasPermission()) return;
++
++    LayoutInflater inflater = (LayoutInflater) reactContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
++    bubbleView = inflater.inflate(R.layout.bubble_layout, null);
++
++    int layoutType;
++    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
++        layoutType = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
++    } else {
++        layoutType = WindowManager.LayoutParams.TYPE_PHONE;
++    }
++
++    params = new WindowManager.LayoutParams(
++        WindowManager.LayoutParams.WRAP_CONTENT,
++        WindowManager.LayoutParams.WRAP_CONTENT,
++        layoutType,
++        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
++        PixelFormat.TRANSLUCENT);
++
++    params.gravity = Gravity.TOP | Gravity.LEFT;
++    params.x = x;
++    params.y = y;
++
++    // Set dragging logic
++    bubbleView.setOnTouchListener(new View.OnTouchListener() {
++        private static final int TOUCH_MAX_OFFSET = 10;
++
++        @Override
++        public boolean onTouch(View v, MotionEvent event) {
++            switch (event.getAction()) {
++                case MotionEvent.ACTION_DOWN:
++                    initialX = params.x;
++                    initialY = params.y;
++                    initialTouchX = event.getRawX();
++                    initialTouchY = event.getRawY();
++                    return true;
++                case MotionEvent.ACTION_MOVE:
++                    int deltaX = (int) (event.getRawX() - initialTouchX);
++                    int deltaY = (int) (event.getRawY() - initialTouchY);
++                    
++                    params.x = initialX + deltaX;
++                    params.y = initialY + deltaY;
++                    windowManager.updateViewLayout(bubbleView, params);
++                    return true;
++                case MotionEvent.ACTION_UP:
++                    int upDeltaX = (int) (event.getRawX() - initialTouchX);
++                    int upDeltaY = (int) (event.getRawY() - initialTouchY);
++                    
++                    if (Math.abs(upDeltaX) < TOUCH_MAX_OFFSET && Math.abs(upDeltaY) < TOUCH_MAX_OFFSET) {
++                        // Manual hit testing for buttons since root consumes touches
++                        View btnCount = bubbleView.findViewById(R.id.btn_count_tasbeeh);
++                        View btnReset = bubbleView.findViewById(R.id.btn_reset_tasbeeh);
++                        
++                        if (isViewTouched(btnCount, event.getRawX(), event.getRawY())) {
++                            btnCount.performClick();
++                        } else if (isViewTouched(btnReset, event.getRawX(), event.getRawY())) {
++                            btnReset.performClick();
++                        }
++                    }
++                    return true;
++            }
++            return false;
++        }
+     });
+-    bubbleView.setShouldStickToWall(true);
+-    bubblesManager.addBubble(bubbleView, x, y);
++
++    TextView tvCount = (TextView) bubbleView.findViewById(R.id.tasbeeh_count_text);
++    if(tvCount != null) {
++        tvCount.setText(String.valueOf(tasbeehCount));
++    }
++
++    View btnCount = bubbleView.findViewById(R.id.btn_count_tasbeeh);
++    if (btnCount != null) {
++        btnCount.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                tasbeehCount++;
++                updateCounterDisplay();
++                sendEvent("floating-bubble-press");
++            }
++        });
++    }
++
++    View btnReset = bubbleView.findViewById(R.id.btn_reset_tasbeeh);
++    if (btnReset != null) {
++        btnReset.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                tasbeehCount = 0;
++                updateCounterDisplay();
++                sendEvent("floating-bubble-reset");
++            }
++        });
++    }
++
++    windowManager.addView(bubbleView, params);
++  }
++
++  private boolean isViewTouched(View view, float x, float y) {
++    if (view == null) return false;
++    int[] location = new int[2];
++    view.getLocationOnScreen(location);
++    int left = location[0];
++    int top = location[1];
++    int right = left + view.getWidth();
++    int bottom = top + view.getHeight();
++    return x >= left && x <= right && y >= top && y <= bottom;
+   }
+ 
+   private boolean hasPermission(){
+@@ -130,42 +257,33 @@ public class RNFloatingBubbleModule extends ReactContextBaseJavaModule {
+   private void removeBubble() {
+     if(bubbleView != null){
+       try{
+-        bubblesManager.removeBubble(bubbleView);
++        windowManager.removeView(bubbleView);
+       } catch(Exception e){
+-
+       }
++      bubbleView = null;
++      sendEvent("floating-bubble-remove");
+     }
+   }
+ 
+-
+   public void requestPermissionAction(final Promise promise) {
+     if (!hasPermission()) {
+       Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + reactContext.getPackageName()));
+-      Bundle bundle = new Bundle();
+-      reactContext.startActivityForResult(intent, 0, bundle);
++      intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
++      reactContext.startActivity(intent);
+     } 
+     if (hasPermission()) {
+       promise.resolve("");
+     } else {
+-      promise.reject("");
++      promise.reject("Error", "Permission not granted");
+     }
+   }
+ 
+-  private void initializeBubblesManager() {
+-    bubblesManager = new BubblesManager.Builder(reactContext).setTrashLayout(R.layout.bubble_trash_layout)
+-        .setInitializationCallback(new OnInitializedCallback() {
+-          @Override
+-          public void onInitialized() {
+-            // addNewBubble();
+-          }
+-        }).build();
+-    bubblesManager.initialize();
+-  }
+-
+   private void sendEvent(String eventName) {
+     WritableMap params = Arguments.createMap();
+-    reactContext
+-      .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+-      .emit(eventName, params);
++    try {
++      reactContext
++        .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
++        .emit(eventName, params);
++    } catch (Exception e) {}
+   }
+ }
+\ No newline at end of file
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_count.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_count.xml
+new file mode 100644
+index 0000000..e3d525b
+--- /dev/null
++++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_count.xml
+@@ -0,0 +1,5 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
++    <gradient android:startColor="#FFFFFF" android:endColor="#AAAAAA" android:type="radial" android:gradientRadius="25dp" />
++    <stroke android:width="3dp" android:color="#777777" />
++</shape>
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_reset.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_reset.xml
+new file mode 100644
+index 0000000..a6123a2
+--- /dev/null
++++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_reset.xml
+@@ -0,0 +1,5 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
++    <gradient android:startColor="#FFFFFF" android:endColor="#888888" android:type="radial" android:gradientRadius="10dp" />
++    <stroke android:width="1dp" android:color="#555555" />
++</shape>
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_body.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_body.xml
+new file mode 100644
+index 0000000..ee39f91
+--- /dev/null
++++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_body.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
++    <gradient android:startColor="#2A48A5" android:endColor="#112563" android:angle="270" />
++    <corners android:radius="45dp" />
++    <stroke android:width="2dp" android:color="#0D1D50" />
++</shape>
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_screen.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_screen.xml
+new file mode 100644
+index 0000000..9b75133
+--- /dev/null
++++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_screen.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
++    <solid android:color="#8DA186" />
++    <corners android:radius="5dp" />
++    <stroke android:width="2dp" android:color="#2A2A2A" />
++</shape>
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_layout.xml b/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_layout.xml
+index d2a8762..12d0bb4 100644
+--- a/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_layout.xml
++++ b/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_layout.xml
+@@ -1,17 +1,73 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <com.txusballesteros.bubbles.BubbleLayout
+     xmlns:android="http://schemas.android.com/apk/res/android"
+-    android:layout_width="wrap_content"
+-    android:layout_height="wrap_content"
++    android:layout_width="85dp"
++    android:layout_height="115dp"
+     android:clipChildren="false"
+     android:clipToPadding="false">
+ 
+-    <ImageView
+-        android:id="@+id/avatar"
+-        android:layout_width="70dp"
+-        android:layout_height="70dp"
+-        android:layout_gravity="center"
+-        android:background="@drawable/profile_decorator"
+-        android:src="@drawable/bubble_icon"
+-        android:scaleType="centerCrop"/>
++    <RelativeLayout
++        android:layout_width="match_parent"
++        android:layout_height="match_parent"
++        android:background="@drawable/bg_tasbeeh_body"
++        android:padding="5dp">
++
++        <!-- Screen background & text -->
++        <FrameLayout
++            android:id="@+id/screen_container"
++            android:layout_width="match_parent"
++            android:layout_height="32dp"
++            android:layout_marginHorizontal="8dp"
++            android:layout_marginTop="8dp"
++            android:background="@drawable/bg_tasbeeh_screen"
++            android:layout_centerHorizontal="true">
++
++            <TextView
++                android:id="@+id/tasbeeh_count_text"
++                android:layout_width="match_parent"
++                android:layout_height="match_parent"
++                android:gravity="center|end"
++                android:paddingEnd="6dp"
++                android:text="0"
++                android:textColor="#222222"
++                android:textSize="18sp"
++                android:textStyle="bold"
++                android:fontFamily="sans-serif-condensed" />
++        </FrameLayout>
++
++        <!-- Labels below screen (removed to save space and reduce clutter as requested) -->
++        <LinearLayout
++            android:id="@+id/labels_container"
++            android:layout_width="match_parent"
++            android:layout_height="4dp"
++            android:layout_below="@id/screen_container"
++            android:orientation="horizontal">
++        </LinearLayout>
++
++        <!-- Reset Button -->
++        <View
++            android:id="@+id/btn_reset_tasbeeh"
++            android:layout_width="16dp"
++            android:layout_height="16dp"
++            android:layout_below="@id/labels_container"
++            android:layout_alignRight="@id/screen_container"
++            android:layout_marginRight="4dp"
++            android:layout_marginTop="2dp"
++            android:background="@drawable/bg_btn_reset"
++            android:clickable="true"
++            android:focusable="true"/>
++
++        <!-- Count Button -->
++        <View
++            android:id="@+id/btn_count_tasbeeh"
++            android:layout_width="45dp"
++            android:layout_height="45dp"
++            android:layout_centerHorizontal="true"
++            android:layout_alignParentBottom="true"
++            android:layout_marginBottom="8dp"
++            android:background="@drawable/bg_btn_count"
++            android:clickable="true"
++            android:focusable="true"/>
++
++    </RelativeLayout>
+ </com.txusballesteros.bubbles.BubbleLayout>
+\ No newline at end of file
+diff --git a/node_modules/react-native-floating-bubble/index.js b/node_modules/react-native-floating-bubble/index.js
+index b5eb113..73ba0c4 100644
+--- a/node_modules/react-native-floating-bubble/index.js
++++ b/node_modules/react-native-floating-bubble/index.js
+@@ -9,5 +9,6 @@ export const hideFloatingBubble = () => RNFloatingBubble.hideFloatingBubble();
+ export const checkPermission = () => RNFloatingBubble.checkPermission();
+ export const requestPermission = () => RNFloatingBubble.requestPermission();
+ export const initialize = () => RNFloatingBubble.initialize();
++export const updateTasbeehCount = (count = 0) => RNFloatingBubble.updateTasbeehCount(count);
+ 
+-export default { showFloatingBubble, hideFloatingBubble, requestPermission, checkPermission, initialize, reopenApp };
++export default { showFloatingBubble, hideFloatingBubble, requestPermission, checkPermission, initialize, reopenApp, updateTasbeehCount };

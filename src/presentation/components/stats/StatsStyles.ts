@@ -1,0 +1,89 @@
+import { StyleSheet } from 'react-native';
+
+export const s = StyleSheet.create({
+  root: { flex: 1, backgroundColor: '#0c0805' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 15 },
+  glassBtn: { width: 45, height: 45, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.05)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  headerTitle: { fontFamily: 'Tajawal_700Bold', fontSize: 20, color: '#fff' },
+  headerSub: { fontFamily: 'Tajawal_400Regular', fontSize: 12, color: '#94a3b8' },
+
+  tabContainer: { flexDirection: 'row', paddingHorizontal: 20, gap: 10, marginBottom: 20, marginTop: 10 },
+  tab: { flex: 1, paddingVertical: 12, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.05)', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  tabText: { fontFamily: 'Tajawal_700Bold', fontSize: 14, color: '#94a3b8' },
+
+  scrollContent: { paddingHorizontal: 20 },
+  mainStatsRow: { flexDirection: 'row', gap: 15, marginBottom: 20 },
+  premiumCard: { flex: 1, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 24, padding: 18, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  pCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
+  pCardIcon: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  pCardVal: { fontFamily: 'Tajawal_700Bold', fontSize: 24 },
+  pCardLab: { fontFamily: 'Tajawal_500Medium', fontSize: 13, color: '#94a3b8', marginBottom: 12 },
+  pCardProgressBg: { height: 4, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 2, overflow: 'hidden' },
+  pCardProgressFill: { height: '100%', borderRadius: 2 },
+
+  heroCard: { borderRadius: 30, padding: 25, marginBottom: 25, elevation: 10, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 10 },
+  heroContent: { flexDirection: 'row', alignItems: 'center' },
+  heroTextSide: { flex: 1 },
+  heroLabel: { fontFamily: 'Tajawal_700Bold', fontSize: 16, color: '#000', opacity: 0.7, marginBottom: 10 },
+  heroValue: { fontFamily: 'Tajawal_800ExtraBold', fontSize: 44, color: '#000' },
+  insightBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,255,255,0.4)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, alignSelf: 'flex-start', marginTop: 15 },
+  insightText: { fontFamily: 'Tajawal_700Bold', fontSize: 12, color: '#000' },
+  heroIconSide: { opacity: 0.8 },
+
+  sectionGlass: { backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 28, padding: 20, marginBottom: 25, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 25 },
+  headerDot: { width: 8, height: 8, borderRadius: 4 },
+  sectionTitle: { fontFamily: 'Tajawal_700Bold', fontSize: 17, color: '#fff' },
+  chartContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', height: 140, paddingHorizontal: 5 },
+  barWrapper: { alignItems: 'center', gap: 10 },
+  barBackground: { width: 14, height: 100, backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 7, justifyContent: 'flex-end', overflow: 'hidden' },
+  barFill: { width: '100%', borderRadius: 7 },
+  barLabel: { fontFamily: 'Tajawal_500Medium', fontSize: 11, color: '#64748b' },
+
+  historySection: { marginBottom: 30 },
+  navigatorGlass: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.05)', padding: 10, borderRadius: 20, marginBottom: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  monthDisplay: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  monthLabel: { fontFamily: 'Tajawal_700Bold', fontSize: 16, color: '#fff' },
+  navBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+
+  historyCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.04)', padding: 18, borderRadius: 24, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
+  historyDatePart: { width: 65, alignItems: 'center', borderRightWidth: 1, borderRightColor: 'rgba(255,255,255,0.05)' },
+  historyDayNum: { fontFamily: 'Tajawal_700Bold', fontSize: 24, color: '#fff' },
+  historyDayShort: { fontFamily: 'Tajawal_500Medium', fontSize: 11, color: '#64748b', marginTop: 2 },
+  historyContentPart: { flex: 1, paddingHorizontal: 15 },
+  historyBadgeRow: { flexDirection: 'row', gap: 8, marginBottom: 8 },
+  hBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
+  hBadgeText: { fontFamily: 'Tajawal_700Bold', fontSize: 10 },
+  historySummaryText: { fontFamily: 'Tajawal_500Medium', fontSize: 13, color: '#94a3b8' },
+
+  emptyState: { alignItems: 'center', padding: 40 },
+  emptyStateText: { fontFamily: 'Tajawal_400Regular', fontSize: 14, color: '#475569' },
+
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'flex-end' },
+  modalGlass: { backgroundColor: '#130f0c', borderTopLeftRadius: 40, borderTopRightRadius: 40, height: '80%', padding: 25, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)' },
+  modalIndicator: { width: 40, height: 4, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 2, alignSelf: 'center', marginBottom: 20 },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 },
+  modalTopLabel: { fontFamily: 'Tajawal_500Medium', fontSize: 13, color: '#94a3b8' },
+  modalTitleText: { fontFamily: 'Tajawal_700Bold', fontSize: 24, color: '#fff' },
+  closeCircle: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' },
+  
+  modalBody: { gap: 20 },
+  detailBlock: { backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 25, padding: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
+  detailBlockHead: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 15 },
+  detailBlockTitle: { fontFamily: 'Tajawal_700Bold', fontSize: 17, color: '#fff' },
+  detailBlockBadgeText: { fontFamily: 'Tajawal_700Bold', fontSize: 14 },
+  detailBlockContent: { fontFamily: 'Tajawal_400Regular', fontSize: 14, color: '#94a3b8', lineHeight: 22 },
+
+  // New Chart Components Styles
+  dhikrChartContainer: { marginTop: 10 },
+  dhikrBarRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 15, gap: 12 },
+  dhikrBarLabel: { fontFamily: 'Tajawal_500Medium', fontSize: 14, color: '#fff', width: 90 },
+  dhikrBarTrack: { flex: 1, height: 12, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 6, overflow: 'hidden' },
+  dhikrBarFill: { height: '100%', borderRadius: 6 },
+  dhikrBarValue: { fontFamily: 'Tajawal_700Bold', fontSize: 14, color: '#94a3b8', width: 40, textAlign: 'right' },
+  
+  legendRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 15, marginTop: 10 },
+  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  legendDot: { width: 8, height: 8, borderRadius: 4 },
+  legendText: { fontFamily: 'Tajawal_500Medium', fontSize: 12, color: '#64748b' }
+});
