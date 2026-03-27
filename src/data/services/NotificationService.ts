@@ -1,18 +1,31 @@
-import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+// We avoid top-level imports of expo-notifications to prevent early JSI binding attempts
+const getNotifications = () => require('expo-notifications');
 
 export class NotificationService {
+  static init() {
+    const isExpoGo = Constants.appOwnership === 'expo';
+    if (isExpoGo) {
+      console.warn('NotificationService: Skipping setNotificationHandler in Expo Go');
+      return;
+    }
+
+    try {
+      getNotifications().setNotificationHandler({
+        handleNotification: async () => ({
+          shouldPlaySound: true,
+          shouldSetBadge: false,
+          shouldShowBanner: true,
+          shouldShowList: true,
+        }),
+      });
+    } catch (e) {
+      console.warn('NotificationService: init failed', e);
+    }
+  }
+
   static async requestPermissions() {
     console.log('NotificationService: Requesting permissions...');
     try {
@@ -26,11 +39,11 @@ export class NotificationService {
       // Initialize Android Channels first
       await this.initializeChannels();
 
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      const { status: existingStatus } = await getNotifications().getPermissionsAsync();
       let finalStatus = existingStatus;
       
       if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
+        const { status } = await getNotifications().requestPermissionsAsync();
         finalStatus = status;
       }
       
@@ -43,34 +56,35 @@ export class NotificationService {
   }
 
   static async initializeChannels() {
-    if (Platform.OS === 'android') {
-      try {
-        await Notifications.setNotificationChannelAsync('azan', {
-          name: 'Azan Notifications',
-          importance: Notifications.AndroidImportance.MAX,
-          sound: 'azan.mp3',
-          vibrationPattern: [0, 250, 250, 250],
-          lightColor: '#FF231F7C',
-          lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
-          //@ts-ignore
-          fullScreenIntent: true,
-        });
+    const isExpoGo = Constants.appOwnership === 'expo';
+    if (isExpoGo || Platform.OS !== 'android') return;
 
-        await Notifications.setNotificationChannelAsync('spiritual', {
-          name: 'Spiritual Reminders',
-          importance: Notifications.AndroidImportance.HIGH,
-          sound: 'sali_ala_nabii.mp3',
-          vibrationPattern: [0, 250, 250, 250],
-        });
+    try {
+      await getNotifications().setNotificationChannelAsync('azan', {
+        name: 'Azan Notifications',
+        importance: getNotifications().AndroidImportance.MAX,
+        sound: 'azan.mp3',
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+        lockscreenVisibility: getNotifications().AndroidNotificationVisibility.PUBLIC,
+        //@ts-ignore
+        fullScreenIntent: true,
+      });
 
-        await Notifications.setNotificationChannelAsync('default', {
-          name: 'General Notifications',
-          importance: Notifications.AndroidImportance.DEFAULT,
-        });
-        console.log('NotificationService: Android Azan, Spiritual, and default channels initialized.');
-      } catch (e) {
-        console.warn('NotificationService: Failed to initialize channels:', e);
-      }
+      await getNotifications().setNotificationChannelAsync('spiritual', {
+        name: 'Spiritual Reminders',
+        importance: getNotifications().AndroidImportance.HIGH,
+        sound: 'sali_ala_nabii.mp3',
+        vibrationPattern: [0, 250, 250, 250],
+      });
+
+      await getNotifications().setNotificationChannelAsync('default', {
+        name: 'General Notifications',
+        importance: getNotifications().AndroidImportance.DEFAULT,
+      });
+      console.log('NotificationService: Android Azan, Spiritual, and default channels initialized.');
+    } catch (e) {
+      console.warn('NotificationService: Failed to initialize channels:', e);
     }
   }
 
@@ -86,11 +100,27 @@ export class NotificationService {
       ];
       
       for (const id of idsToCancel) {
-        await Notifications.cancelScheduledNotificationAsync(id).catch(() => {});
+        await getNotifications().cancelScheduledNotificationAsync(id).catch(() => {});
+      }
+
+      // Cancel encouragement IDs
+      for (let i = 0; i < 10; i++) {
+        await getNotifications().cancelScheduledNotificationAsync(`encouragement-${i}`).catch(() => {});
       }
       
       // 2. Global cancel as fallback
-      await Notifications.cancelAllScheduledNotificationsAsync();
+      await getNotifications().cancelAllScheduledNotificationsAsync();
+
+      // 3. Cancel Native Azan Alarms
+      if (Platform.OS === 'android') {
+        const { AzanModule } = require('react-native').NativeModules;
+        if (AzanModule) {
+          const prayers = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+          for (const id of prayers) {
+            AzanModule.cancelAzan(id);
+          }
+        }
+      }
       console.log('NotificationService: Cleanup completed.');
     } catch (e) {
       console.error('NotificationService: Cleanup failed:', e);
@@ -99,14 +129,14 @@ export class NotificationService {
 
   static async purgeAll() {
     console.warn('NotificationService: EMERGENCY PURGE REQUESTED');
-    await Notifications.cancelAllScheduledNotificationsAsync();
+    await getNotifications().cancelAllScheduledNotificationsAsync();
     const count = await this.getScheduledCount();
     console.log('NotificationService: Post-purge count:', count);
   }
 
   static async getScheduledCount() {
     try {
-      const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+      const scheduled = await getNotifications().getAllScheduledNotificationsAsync();
       return scheduled.length;
     } catch (e) {
       console.error('NotificationService: Failed to get scheduled count:', e);
@@ -116,9 +146,9 @@ export class NotificationService {
 
   static async logScheduledNotifications() {
     try {
-      const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+      const scheduled = await getNotifications().getAllScheduledNotificationsAsync();
       console.log(`NotificationService: Total scheduled notifications: ${scheduled.length}`);
-      scheduled.forEach(n => {
+      scheduled.forEach((n: any) => {
         console.log(` - [${n.identifier}] ${n.content.title} (${(n.trigger as any)?.hour}:${(n.trigger as any)?.minute})`);
       });
     } catch (e) {
@@ -128,7 +158,6 @@ export class NotificationService {
 
   private static parseTime(timeStr: string): { hours: number, minutes: number } | null {
     if (!timeStr) return null;
-    // Extract only the digits for HH:mm, ignoring everything else (e.g., "(EEST)")
     const match = timeStr.match(/(\d{1,2}):(\d{1,2})/);
     if (!match) return null;
     
@@ -144,81 +173,78 @@ export class NotificationService {
     console.log('NotificationService: Scheduling prayer notifications with timings:', JSON.stringify(timings));
 
     const prayers = [
-      { id: 'Fajr', name: 'الفجر', body: '\u200f🕋 حان الآن وقت صلاة الفجر' },
-      { id: 'Dhuhr', name: 'الظهر', body: '\u200f🕋 حان الآن وقت صلاة الظهر' },
-      { id: 'Asr', name: 'العصر', body: '\u200f🕋 حان الآن وقت صلاة العصر' },
-      { id: 'Maghrib', name: 'المغرب', body: '\u200f🕋 حان الآن وقت صلاة المغرب' },
-      { id: 'Isha', name: 'العشاء', body: '\u200f🕋 حان الآن وقت صلاة العشاء' },
+      { id: 'Fajr', name: 'الفجر', body: '\u200f🕌 نداء الحق: صلاة الفجر تناديكم.. الصلاة خير من النوم' },
+      { id: 'Dhuhr', name: 'الظهر', body: '\u200f🕌 حان الآن وقت اللقاء بخالقك.. نداء صلاة الظهر' },
+      { id: 'Asr', name: 'العصر', body: '\u200f🕌 حافظوا على الصلوات والصلاة الوسطى.. نداء صلاة العصر' },
+      { id: 'Maghrib', name: 'المغرب', body: '\u200f🕌 أقبلت نفحات المغرب.. نداء الصلاة' },
+      { id: 'Isha', name: 'العشاء', body: '\u200f🕌 اختم يومك ساجداً لله.. نداء صلاة العشاء' },
     ];
 
     for (const prayer of prayers) {
       try {
         const timeStr = timings[prayer.id];
         const parsed = this.parseTime(timeStr);
-        if (!parsed) {
-          console.warn(`NotificationService: Could not parse time for ${prayer.id}: "${timeStr}"`);
-          continue;
-        }
+        if (!parsed) continue;
 
         const { hours, minutes } = parsed;
-        
-        // Use azan channel if type is not 'none', otherwise default
-        const useAzanSound = prefs?.azanSettings?.type !== 'none'; 
+        const azanType = prefs?.azanSettings?.type || 'full';
+        const useAzanSound = azanType !== 'none'; 
         const channelId = useAzanSound ? 'azan' : 'default';
 
-        console.log(`NotificationService: Scheduling ${prayer.id} at ${hours}:${minutes} on channel ${channelId}`);
+        if (useAzanSound && Platform.OS === 'android') {
+          // Robust Native Azan
+          const { AzanModule } = require('react-native').NativeModules;
+          if (AzanModule) {
+            console.log(`NotificationService: Scheduling ROBUST Azan for ${prayer.id} at ${hours}:${minutes}`);
+            AzanModule.scheduleAzan(prayer.id, prayer.name, hours, minutes, azanType);
+          }
+        } else {
+          // Standard expo-notification fallback
+          await getNotifications().scheduleNotificationAsync({
+            identifier: `prayer-${prayer.id}`,
+            content: {
+              title: `\u200fصلاة ${prayer.name}`,
+              body: prayer.body,
+              sound: true, 
+              priority: getNotifications().AndroidNotificationPriority.MAX,
+              //@ts-ignore
+              fullScreenIntent: true,
+              data: { prayerId: prayer.id, type: 'prayer' },
+            },
+            trigger: {
+              type: getNotifications().SchedulableTriggerInputTypes.DAILY,
+              hour: hours,
+              minute: minutes,
+              channelId: channelId,
+            },
+          });
+        }
 
-        await Notifications.scheduleNotificationAsync({
-          identifier: `prayer-${prayer.id}`,
-          content: {
-            title: `\u200fصلاة ${prayer.name}`,
-            body: prayer.body,
-            sound: useAzanSound ? 'azan.mp3' : true,
-            priority: Notifications.AndroidNotificationPriority.MAX,
-            //@ts-ignore
-            fullScreenIntent: true,
-            data: { prayerName: prayer.name, type: 'prayer' },
-          },
-          trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.DAILY,
-            hour: hours,
-            minute: minutes,
-            channelId: channelId,
-          } as Notifications.NotificationTriggerInput,
-        });
-
-        // Add Pre-Prayer Reminder
         if (prefs?.prePrayerReminderEnabled) {
           const offset = prefs.prePrayerReminderOffset || 10;
           let rHours = hours;
           let rMinutes = minutes - offset;
-          
-          if (rMinutes < 0) {
-            rMinutes += 60;
-            rHours = (rHours - 1 + 24) % 24;
-          }
+          if (rMinutes < 0) { rMinutes += 60; rHours = (rHours - 1 + 24) % 24; }
 
-          console.log(`NotificationService: Scheduling pre-prayer reminder for ${prayer.id} at ${rHours}:${rMinutes}`);
-
-          await Notifications.scheduleNotificationAsync({
+          await getNotifications().scheduleNotificationAsync({
             identifier: `pre-prayer-${prayer.id}`,
             content: {
               title: `\u200fتنبيه: صلاة ${prayer.name}`,
               body: `\u200f⏰ بقيت ${offset} دقائق على صلاة ${prayer.name}.. توضأ واستعد`,
               sound: true,
-              priority: Notifications.AndroidNotificationPriority.HIGH,
+              priority: getNotifications().AndroidNotificationPriority.HIGH,
               data: { prayerName: prayer.name, type: 'reminder' },
             },
             trigger: {
-              type: Notifications.SchedulableTriggerInputTypes.DAILY,
+              type: getNotifications().SchedulableTriggerInputTypes.DAILY,
               hour: rHours,
               minute: rMinutes,
               channelId: 'default',
-            } as Notifications.NotificationTriggerInput,
+            },
           });
         }
       } catch (e) {
-        console.error(`NotificationService: Fatal error scheduling ${prayer.id}:`, e);
+        console.error(`NotificationService: Error scheduling ${prayer.id}:`, e);
       }
     }
   }
@@ -226,145 +252,122 @@ export class NotificationService {
   static async scheduleAthkarReminders(prefs: any) {
     if (prefs && prefs.athkar) {
       try {
-        // Morning Athkar at 7:00 AM
-        await Notifications.scheduleNotificationAsync({
+        await getNotifications().scheduleNotificationAsync({
           identifier: 'athkar-morning',
-          content: {
-            title: '\u200fأذكار الصباح',
-            body: '\u200f📖 "ألا بذكر الله تطمئن القلوب".. حان وقت أذكار الصباح',
-          },
-          trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.DAILY,
-            hour: 7, 
-            minute: 0,
-            channelId: 'default',
-          } as Notifications.NotificationTriggerInput,
+          content: { title: '\u200fأذكار الصباح', body: '\u200f📖 "ألا بذكر الله تطمئن القلوب".. حان وقت أذكار الصباح' },
+          trigger: { type: getNotifications().SchedulableTriggerInputTypes.DAILY, hour: 7, minute: 0, channelId: 'default' },
         });
-
-        // Evening Athkar at 5:00 PM
-        await Notifications.scheduleNotificationAsync({
+        await getNotifications().scheduleNotificationAsync({
           identifier: 'athkar-evening',
-          content: {
-            title: '\u200fأذكار المساء',
-            body: '\u200f🌙 حان وقت أذكار المساء.. حفظك الله في يومك وليلتك',
-          },
-          trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.DAILY,
-            hour: 17, 
-            minute: 0,
-            channelId: 'default',
-          } as Notifications.NotificationTriggerInput,
+          content: { title: '\u200fأذكار المساء', body: '\u200f🌙 حان وقت أذكار المساء.. حفظك الله في يومك وليلتك' },
+          trigger: { type: getNotifications().SchedulableTriggerInputTypes.DAILY, hour: 17, minute: 0, channelId: 'default' },
         });
-      } catch (e) {
-        console.debug('NotificationService: Failed to schedule athkar:', e);
-      }
+      } catch (e) { console.debug('NotificationService: Athkar failure', e); }
     }
   }
 
   static async scheduleSpiritualReminders(prefs: any) {
     if (prefs && prefs.qiyam) {
       try {
-        // Qiyam at 2:00 AM
-        await Notifications.scheduleNotificationAsync({
+        await getNotifications().scheduleNotificationAsync({
           identifier: 'spiritual-qiyam',
-          content: {
-            title: '\u200fرسالة من أوّاب: قيام الليل',
-            body: '\u200f🌌 قيام الليل شرف المؤمن.. لا تنسَ نصيبك من صلاة الليل',
-            sound: 'sali_ala_nabii.mp3',
-          },
-          trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.DAILY,
-            hour: 2, 
-            minute: 0,
-            channelId: 'spiritual',
-          } as Notifications.NotificationTriggerInput,
+          content: { title: '\u200fرسالة من أوّاب: قيام الليل', body: '\u200f🌌 قيام الليل شرف المؤمن.. لا تنسَ نصيبك من صلاة الليل', sound: 'sali_ala_nabii.mp3' },
+          trigger: { type: getNotifications().SchedulableTriggerInputTypes.DAILY, hour: 2, minute: 0, channelId: 'spiritual' },
         });
-      } catch (e) {
-        console.debug('NotificationService: Failed to schedule qiyam:', e);
-      }
+      } catch (e) {}
     }
-
     if (prefs && prefs.duha) {
       try {
-        // Duha at 9:00 AM
-        await Notifications.scheduleNotificationAsync({
+        await getNotifications().scheduleNotificationAsync({
           identifier: 'spiritual-duha',
-          content: {
-            title: '\u200fصلاة الضحى',
-            body: '\u200f☀️ صلاة الأوابين.. ركعتي الضحى تجزئ عن صدقة كل سلامى من عظامك',
-            sound: 'sali_ala_nabii.mp3',
-          },
-          trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.DAILY,
-            hour: 9, 
-            minute: 0,
-            channelId: 'spiritual',
-          } as Notifications.NotificationTriggerInput,
+          content: { title: '\u200fصلاة الضحى', body: '\u200f☀️ صلاة الأوابين.. ركعتي الضحى تجزئ عن صدقة كل سلامى من عظامك', sound: 'sali_ala_nabii.mp3' },
+          trigger: { type: getNotifications().SchedulableTriggerInputTypes.DAILY, hour: 9, minute: 0, channelId: 'spiritual' },
         });
-      } catch (e) {
-        console.debug('NotificationService: Failed to schedule duha:', e);
-      }
+      } catch (e) {}
     }
   }
 
   static async scheduleDailyWard(prefs: any) {
     if (!prefs?.dailyWardEnabled || !prefs?.dailyWardTime) return;
-
     try {
       const parsed = this.parseTime(prefs.dailyWardTime);
       if (!parsed) return;
-
-      await Notifications.scheduleNotificationAsync({
+      await getNotifications().scheduleNotificationAsync({
         identifier: 'spiritual-ward',
-        content: {
-          title: '\u200fموعد الورد اليومي',
-          body: '\u200f📖 حان الآن موعد وردك اليومي.. نصيبك من كتاب الله نجاة لك',
-          sound: 'sali_ala_nabii.mp3',
-          data: { type: 'ward' },
+        content: { 
+          title: '\u200fموعد الورد اليومي', 
+          body: '\u200f📖 "وَتَرَىٰ كُلَّ أُمَّةٍ جَاثِيَةً كُلُّ أُمَّةٍ تُدْعَىٰ إِلَىٰ كِتَابِهَا".. حان الآن موعد وردك اليومي نورا لقلبك', 
+          sound: 'sali_ala_nabii.mp3', 
+          data: { type: 'ward' } 
         },
-        trigger: {
-          type: Notifications.SchedulableTriggerInputTypes.DAILY,
-          hour: parsed.hours,
-          minute: parsed.minutes,
-          channelId: 'spiritual',
-        } as Notifications.NotificationTriggerInput,
+        trigger: { type: getNotifications().SchedulableTriggerInputTypes.DAILY, hour: parsed.hours, minute: parsed.minutes, channelId: 'spiritual' },
       });
-      console.log(`NotificationService: Daily Ward scheduled at ${prefs.dailyWardTime}`);
+    } catch (e) {}
+  }
+
+  private static ENCOURAGEMENT_MESSAGES = [
+    { title: 'صلِّ على النبي ﷺ', body: 'اللهم صل وسلم وبارك على نبينا محمد.. لا تنس الصلاة عليه في هذه اللحظة ❤️' },
+    { title: 'رسالة تشجيع', body: 'جدد نيتك.. "ما تقرب إلي عبدي بشيء أحب إلي مما افترضته عليه".. تقبل الله طاعتك' },
+    { title: 'سبحان الله وبحمده', body: '"كلمتان خفيفتان على اللسان، ثقيلتان في الميزان".. سبحان الله وبحمده، سبحان الله العظيم' },
+    { title: 'استغفر الله', body: 'طهر لسانك وقلبك بالاستغفار.. أستغفر الله العظيم وأتوب إليه' },
+    { title: 'بشرى لك', body: '"من قال سبحان الله وبحمده في يوم مائة مرة حطت خطاياه وإن كانت مثل زبد البحر"' },
+    { title: 'تذكير بالهدف', body: 'طريق الجنة يبدأ بخطوة.. اجعل خطواتك اليوم كلها لله' },
+    { title: 'لا حول ولا قوة إلا بالله', body: 'كنز من كنوز الجنة.. لا حول ولا قوة إلا بالله العلي العظيم' },
+  ];
+
+  static async scheduleEncouragementReminders(prefs: any) {
+    if (!prefs?.encouragementEnabled) return;
+    try {
+      const interval = prefs.encouragementInterval || 3;
+      // Schedule 10 daily notifications spaced by interval
+      let startHour = 8; // Start at 8 AM
+      for (let i = 0; i < 10; i++) {
+        const totalMinutes = i * interval * 60;
+        const hour = (startHour + Math.floor(totalMinutes / 60)) % 24;
+        const minute = totalMinutes % 60;
+        
+        const msg = this.ENCOURAGEMENT_MESSAGES[i % this.ENCOURAGEMENT_MESSAGES.length];
+        
+        await getNotifications().scheduleNotificationAsync({
+          identifier: `encouragement-${i}`,
+          content: { 
+            title: `\u200f${msg.title}`, 
+            body: `\u200f${msg.body}`, 
+            sound: 'sali_ala_nabii.mp3',
+            priority: getNotifications().AndroidNotificationPriority.HIGH,
+            data: { type: 'encouragement' } 
+          },
+          trigger: { 
+            type: getNotifications().SchedulableTriggerInputTypes.DAILY, 
+            hour: hour, 
+            minute: minute, 
+            channelId: 'spiritual' 
+          },
+        });
+      }
+      console.log(`NotificationService: Scheduled 10 encouragement reminders with ${interval}h interval.`);
     } catch (e) {
-      console.error('NotificationService: Failed to schedule Daily Ward:', e);
+      console.warn('NotificationService: Failed to schedule encouragement', e);
     }
   }
 
   static async testNotification() {
-    console.log('NotificationService: Starting manual test notification...');
     try {
-      // Ensure we have permissions
       const hasPermission = await this.requestPermissions();
-      if (!hasPermission) {
-        console.warn('NotificationService: Cannot test notification - Permission Denied');
-        return false;
-      }
-
-      // Explicitly initialize channels for Android
+      if (!hasPermission) return false;
       await this.initializeChannels();
-
-      console.log('NotificationService: Scheduling immediate test notification...');
-      const id = await Notifications.scheduleNotificationAsync({
+      await getNotifications().scheduleNotificationAsync({
         content: {
           title: '\u200fصلاة التجربة',
           body: '\u200fالمهمة تمت بنجاح! الإشعارات والفيديو يعملان بشكل سليم الآن.',
           sound: 'azan.mp3',
-          priority: Notifications.AndroidNotificationPriority.MAX,
+          priority: getNotifications().AndroidNotificationPriority.MAX,
           data: { prayerName: 'تجربة', type: 'prayer', test: true },
         },
-        trigger: null, // Immediate
+        trigger: null,
       });
-      
-      console.log('NotificationService: Test notification scheduled successfully. ID:', id);
+      console.log('NotificationService: Test notification scheduled via expo-notifications');
       return true;
-    } catch (e) {
-      console.error('NotificationService: Fatal error in testNotification:', e);
-      return false;
-    }
+    } catch (e) { return false; }
   }
 }

@@ -15,14 +15,14 @@ import {
 import { logDhikr } from '../store/slices/statsSlice';
 
 // Tasbeeh Components & Constants
-import { TasbeehCounter, TargetSelector } from '../components/tasbeeh/TasbeehComponents';
+import { TasbeehCounter, TargetCarousel } from '../components/tasbeeh/TasbeehComponents';
 import { TasbeehModals } from '../components/tasbeeh/TasbeehModals';
 import { s } from '../components/tasbeeh/TasbeehStyles';
 import { toAr } from '../components/tasbeeh/TasbeehConstants';
 
 const TasbeehScreen = ({ hideHeader }: any) => {
   const dispatch = useDispatch();
-  const { count, target, targets, totalCount, selectedDhikr, dhikrList } = useSelector((state: RootState) => state.tasbeeh);
+  const { count, target, targets, totalCount, selectedDhikr, dhikrList, floatingBubbleColor } = useSelector((state: RootState) => state.tasbeeh);
   const accentTheme = useSelector((state: RootState) => state.settings.accentTheme);
   
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
@@ -84,14 +84,21 @@ const TasbeehScreen = ({ hideHeader }: any) => {
         </ScrollView>
       </View>
 
-      <TargetSelector 
-        targets={targets} currentTarget={target} 
+      <TargetCarousel
+        targets={targets} currentTarget={target}
         onSelect={(t: number) => { dispatch(setTarget(t)); resetToday(); }}
         onCustom={() => setShowCustomTarget(true)}
         onManual={() => setShowManualAdd(true)}
       />
 
-      <TasbeehCounter count={count} target={target} selectedDhikr={selectedDhikr} scaleAnim={scaleAnim} onPress={handlePress} />
+      <TasbeehCounter 
+        count={count} 
+        target={target} 
+        selectedDhikr={selectedDhikr} 
+        scaleAnim={scaleAnim} 
+        onPress={handlePress} 
+        accentColor={floatingBubbleColor}
+      />
 
       <TasbeehModals 
         showAddDhikr={showAddDhikr} setShowAddDhikr={setShowAddDhikr} newDhikr={newDhikr} setNewDhikr={setNewDhikr} 

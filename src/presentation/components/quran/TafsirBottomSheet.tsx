@@ -16,7 +16,7 @@ interface Props {
   bookmarks: number[];
   onClose: () => void;
   onToggleBookmark: () => void;
-  onPlayAyah: (surah: number, ayah: number) => void;
+  onPlayAyah: (surah: number, ayah: number, surahName?: string) => void;
 }
 
 export const TafsirBottomSheet = ({
@@ -116,7 +116,7 @@ export const TafsirBottomSheet = ({
             </TouchableOpacity>
             <TouchableOpacity 
               style={s.sheetToolBtn} 
-              onPress={() => selectedAyah && onPlayAyah(selectedAyah.surah.number, selectedAyah.numberInSurah)}
+              onPress={() => selectedAyah && onPlayAyah(selectedAyah.surah.number, selectedAyah.numberInSurah, selectedAyah.surah.name)}
             >
               <Play size={24} color="#b45309" />
               <Text style={s.sheetToolLab}>الصوت</Text>

@@ -15,24 +15,41 @@ const QiblaScreen = ({ navigation, hideHeader }: any) => {
   const headingAnim = useRef(new Animated.Value(0)).current;
   const qiblaAnim = useRef(new Animated.Value(0)).current;
 
-  const qiblaRotation = qiblaDir - heading;
+  const prevHeadingRaw = useRef(0);
+  const prevQiblaRaw = useRef(0);
+
+  // Shortest path rotation helper
+  const getShortestPath = (current: number, previousRaw: number) => {
+    let diff = current - (previousRaw % 360);
+    if (diff > 180) diff -= 360;
+    if (diff < -180) diff += 360;
+    return previousRaw + diff;
+  };
+
+  const qiblaRotation = (qiblaDir - heading + 360) % 360;
   
   useEffect(() => {
+    const targetHeading = getShortestPath(-heading, prevHeadingRaw.current);
+    const targetQibla = getShortestPath(qiblaRotation, prevQiblaRaw.current);
+
+    prevHeadingRaw.current = targetHeading;
+    prevQiblaRaw.current = targetQibla;
+
     Animated.parallel([
-      Animated.timing(headingAnim, { toValue: -heading, duration: 150, useNativeDriver: true }),
-      Animated.timing(qiblaAnim, { toValue: qiblaRotation, duration: 150, useNativeDriver: true }),
+      Animated.timing(headingAnim, { toValue: targetHeading, duration: 100, useNativeDriver: true }),
+      Animated.timing(qiblaAnim, { toValue: targetQibla, duration: 100, useNativeDriver: true }),
     ]).start();
   }, [heading, qiblaRotation]);
 
   useEffect(() => {
-    const absDiff = Math.abs(qiblaRotation % 360);
+    const absDiff = Math.abs((qiblaDir - heading + 360) % 360);
     if ((absDiff < 3 || absDiff > 357) && heading !== 0) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
-  }, [qiblaRotation]);
+  }, [qiblaDir, heading]);
 
-  const rotateDisk = headingAnim.interpolate({ inputRange: [-360, 360], outputRange: ['-360deg', '360deg'] });
-  const rotateQibla = qiblaAnim.interpolate({ inputRange: [-360, 360], outputRange: ['-360deg', '360deg'] });
+  const rotateDisk = headingAnim.interpolate({ inputRange: [-10000, 10000], outputRange: ['-10000deg', '10000deg'] });
+  const rotateQibla = qiblaAnim.interpolate({ inputRange: [-10000, 10000], outputRange: ['-10000deg', '10000deg'] });
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0c0805' }}>
@@ -64,7 +81,7 @@ const QiblaScreen = ({ navigation, hideHeader }: any) => {
             </View>
 
             <View style={s.statusBanner}>
-              <Text style={s.statusText}>{heading === 0 ? 'جاري معايرة الحساسات...' : (Math.abs(qiblaRotation % 360) < 5 || Math.abs(qiblaRotation % 360) > 355 ? 'تم تحديد القبلة بدقة' : 'قم بتدوير الهاتف باتجاه الكعبة')}</Text>
+              <Text style={s.statusText}>{heading === 0 ? 'جاري معايرة الحساسات...' : (Math.abs((qiblaDir - heading + 360) % 360) < 5 || Math.abs((qiblaDir - heading + 360) % 360) > 355 ? 'تم تحديد القبلة بدقة' : 'قم بتدوير الهاتف باتجاه الكعبة')}</Text>
               <View style={s.accuracyBadge}><View style={s.onlinePulse} /><Text style={s.accuracyLabel}>دقة عالية (True North)</Text></View>
             </View>
           </>

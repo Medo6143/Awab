@@ -22,6 +22,8 @@ interface SettingsState {
     prePrayerReminderOffset: number; // in minutes
     dailyWardEnabled: boolean;
     dailyWardTime: string; // HH:mm
+    encouragementEnabled: boolean;
+    encouragementInterval: number; // in hours
   };
   calculationMethod: number;
   azanSettings: {
@@ -50,6 +52,8 @@ const initialState: SettingsState = {
     prePrayerReminderOffset: 10,
     dailyWardEnabled: true,
     dailyWardTime: '05:00',
+    encouragementEnabled: true,
+    encouragementInterval: 3,
   },
   calculationMethod: 5, // Egyptian General Authority of Survey
   azanSettings: {
@@ -112,6 +116,11 @@ export const settingsSlice = createSlice({
         state.notificationPrefs.dailyWardTime = action.payload;
       }
     },
+    setEncouragementInterval: (state, action: PayloadAction<number>) => {
+      if (state.notificationPrefs) {
+        state.notificationPrefs.encouragementInterval = action.payload;
+      }
+    },
   },
 });
 
@@ -128,7 +137,8 @@ export const {
   setCalculationMethod,
   setAzanSettings,
   setPrePrayerReminderOffset,
-  setDailyWardTime
+  setDailyWardTime,
+  setEncouragementInterval
 } = settingsSlice.actions;
 
 export default settingsSlice.reducer;

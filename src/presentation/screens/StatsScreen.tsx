@@ -22,6 +22,12 @@ import { s } from '../components/stats/StatsStyles';
 
 const StatsScreen = ({ navigation }: any) => {
   const toAr = (n: number | string) => n.toLocaleString('ar-EG');
+  const getLocalToday = (d = new Date()) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
   const [activeTab, setActiveTab] = useState<'day' | 'month'>('day');
   const [expandedMonths, setExpandedMonths] = useState<Record<string, boolean>>({});
   const [reportVisible, setReportVisible] = useState(false);
@@ -33,7 +39,7 @@ const StatsScreen = ({ navigation }: any) => {
   
   const accentColor = (THEME.colors as any)[accentTheme] || THEME.colors.primary;
   
-  const todayKey = new Date().toDateString();
+  const todayKey = getLocalToday();
   const todayStats = (dailyRecords || {})[todayKey] || { prayers: [], dhikrCount: 0, quranPages: [] };
 
   const getRangeStats = (days: number) => {
@@ -76,7 +82,7 @@ const StatsScreen = ({ navigation }: any) => {
     }
 
     for (const _ of sortedDates) { 
-        const d = checkDate.toDateString();
+        const d = getLocalToday(checkDate);
         if (records[d]) {
             streak++;
             checkDate.setDate(checkDate.getDate() - 1);
@@ -140,10 +146,10 @@ const StatsScreen = ({ navigation }: any) => {
   const chartData = Array.from({ length: 7 }).map((_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - (6 - i));
-    const k = d.toDateString(); // Or handle legacy keys if needed
+    const k = getLocalToday(d);
     
-    // Check if we have standard keys or toDateString keys
-    const val = (dailyRecords || {})[k]?.dhikrCount || (dailyRecords || {})[d.toISOString().split('T')[0]]?.dhikrCount || 0;
+    // Check if we have standard keys or legacy keys
+    const val = (dailyRecords || {})[k]?.dhikrCount || (dailyRecords || {})[d.toDateString()]?.dhikrCount || (dailyRecords || {})[d.toISOString().split('T')[0]]?.dhikrCount || 0;
     return val;
   });
 

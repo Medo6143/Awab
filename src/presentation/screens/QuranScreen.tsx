@@ -164,7 +164,10 @@ const QuranScreen = ({ navigation }: any) => {
                   surahId: a.surah.number,
                   ayahNumber: a.numberInSurah
                 })) ?? [];
-                if (itemsToPlay.length > 0) await playSequence(itemsToPlay);
+                if (itemsToPlay.length > 0) {
+                  const sName = itemsToPlay[0].surahId ? surahsList.find(s => s.number === itemsToPlay[0].surahId)?.name : '';
+                  await playSequence(itemsToPlay, sName ? `صفحة ${currentPage} - ${sName}` : `صفحة ${currentPage}`);
+                }
               }
             }} 
             style={s.iconBtn}
@@ -270,7 +273,8 @@ const QuranScreen = ({ navigation }: any) => {
         currentSurahId={currentSurahId}
         isPlaying={isPlaying}
         isBuffering={isBuffering}
-        onPlaySurah={playSurah}
+        onPlaySurah={(id: number, name: string) => { playSurah(id, name); }}
+        togglePlayback={togglePlayback}
         onShowReciterPicker={() => setShowReciterPicker(true)}
         surahsList={surahsList}
       />

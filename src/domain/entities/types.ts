@@ -61,4 +61,5 @@ export type AudioState = {
   currentSurahId: number | null;
   currentPosition: number;
   duration: number;
+  playMode?: 'surah' | 'ayah' | 'sequence';
 };

@@ -27,7 +27,11 @@
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "USE_FULL_SCREEN_INTENT",
-        "SCHEDULE_EXACT_ALARM"
+        "SCHEDULE_EXACT_ALARM",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_SPECIAL_USE",
+        "SYSTEM_ALERT_WINDOW",
+        "POST_NOTIFICATIONS"
       ],
       "package": "com.mohamewael66sorganization.owwab"
     },
@@ -45,21 +49,23 @@
             "./assets/audio/azan.mp3",
             "./assets/audio/sali_ala_nabii.mp3"
           ],
-          "mode": "production"
+          "mode": "production",
+          "android": {
+            "useNextNotificationsApi": true
+          }
         }
-      ]
+      ],
+      "expo-video",
+      "./plugins/withAndroidWakeScreen.js",
+      "./plugins/withFloatingBubble.js"
     ],
-    "updates": {
-      "url": "https://u.expo.dev/d85079ae-1708-450f-be3c-e5ed7349aa01"
-    },
     "runtimeVersion": {
       "policy": "appVersion"
     },
     "extra": {
       "eas": {
-        "projectId": "d85079ae-1708-450f-be3c-e5ed7349aa01"
+        "projectId": "2f847531-2e0f-4a14-867d-bdcaa7e74dca"
       }
-    },
-    "owner": "mohamewael66s-organization"
+    }
   }
 }

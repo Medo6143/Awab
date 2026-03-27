@@ -108,7 +108,7 @@ export const MushafPageContent = React.memo(({
                 <View style={s.bannerPatternRight} />
               </View>
 
-              {group.surahNum !== 1 && group.surahNum !== 9 && group.ayahs[0]?.numberInSurah === 1 && (
+              {group.surahNum !== 9 && group.ayahs[0]?.numberInSurah === 1 && (
                 <View style={s.basmalaContainer}>
                   <Text style={s.mushafBasmala}>بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</Text>
                 </View>
@@ -117,12 +117,29 @@ export const MushafPageContent = React.memo(({
               <Text style={s.textFlow}>
                 {group.ayahs.map(a => {
                    let text = a.text.trim();
-                   if (a.numberInSurah === 1 && a.surah.number !== 1 && a.surah.number !== 9) {
-                     const b1 = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ";
-                     const b2 = "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ";
-                     if (text.startsWith(b1)) text = text.replace(b1, "").trim();
-                     else if (text.startsWith(b2)) text = text.replace(b2, "").trim();
+                   
+                   // Robust Basmala removal for Ayah 1
+                   if (a.numberInSurah === 1 && a.surah.number !== 9) {
+                     const basmalaPatterns = [
+                       "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ",
+                       "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ",
+                       "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ"
+                     ];
+                     
+                     // If it's Surah 1 and the text IS the basmala, we just clear it or keep only the difference
+                     // In Fatiha, Ayah 1 IS Basmala. The user wants it as a header.
+                     for (const pattern of basmalaPatterns) {
+                       if (text.startsWith(pattern)) {
+                         text = text.replace(pattern, "").trim();
+                         break;
+                       }
+                     }
                    }
+
+                   // If after cleaning, text is empty (common in Fatiha Ayah 1), 
+                   // we still want to show the marker OR skip if it's Fatiha and we have a header
+                   if (!text && a.surah.number !== 1) return null; 
+
                    return (
                     <Text
                       key={a.number}

@@ -6,7 +6,12 @@ import { View, Platform } from 'react-native';
 import { 
   LayoutGrid, BookOpen, CircleDot, Clock, Compass, Mic, CheckSquare, Settings 
 } from 'lucide-react-native';
-import { FontAwesome5, FontAwesome } from '@expo/vector-icons';
+import { FontAwesome5, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useDispatch, useSelector } from 'react-redux';
+import { useAudio } from '../hooks/useAudio';
+import { AudioPlayerBar } from '../components/quran/AudioPlayerBar';
+import { RootState } from '../store';
+import { useSurahs } from '../hooks/useQuran';
 
 import HomeScreen from '../screens/HomeScreen';
 import QuranScreen from '../screens/QuranScreen';
@@ -20,7 +25,6 @@ import PrayerTimesScreen from '../screens/PrayerTimesScreen';
 import ZakatScreen from '../screens/ZakatScreen';
 import IbadaTodoScreen from '../screens/IbadaTodoScreen';
 import PrayerHubScreen from '../screens/PrayerHubScreen';
-import DhikrHubScreen from '../screens/DhikrHubScreen';
 import StatsScreen from '../screens/StatsScreen';
 import { THEME } from '../../shared/theme/constants';
 
@@ -56,6 +60,8 @@ const TabNavigator = () => (
         fontFamily: 'Tajawal_500Medium',
         fontSize: 11,
         marginTop: -5,
+        textAlign: 'center',
+        writingDirection: 'rtl'
       }
     }}
   >
@@ -70,7 +76,7 @@ const TabNavigator = () => (
       name="القرآن"
       component={QuranScreen}
       options={{
-        tabBarIcon: ({ color, size }: any) => <FontAwesome5 name="quran" color={color} size={size} />,
+        tabBarIcon: ({ color, size }: any) => <MaterialCommunityIcons name="book-open-page-variant" color={color} size={size + 2} />,
         tabBarStyle: { display: 'none' }
       }}
     />
@@ -82,29 +88,60 @@ const TabNavigator = () => (
       }}
     />
     <Tab.Screen
-      name="الذكر"
-      component={DhikrHubScreen}
+      name="الأذكار"
+      component={AthkarScreen}
       options={{
-        tabBarIcon: ({ color, size }: any) => <FontAwesome5 name="praying-hands" color={color} size={size} />,
+        tabBarIcon: ({ color, size }: any) => <MaterialCommunityIcons name="star-crescent" color={color} size={size + 2} />,
       }}
     />
   </Tab.Navigator>
 );
 
 const AppNavigation = () => {
+  const dispatch = useDispatch();
+  const { 
+    isPlaying, isBuffering, currentSurahId, activeReciter,
+    currentPosition, duration, playMode,
+    togglePlayback, seekTo, stopPlayback 
+  } = useAudio();
+  
+  const { data: surahsData } = useSurahs();
+  const surahsList = (surahsData as any[]) ?? [];
+
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="MainTabs" component={TabNavigator} />
-        <Stack.Screen name="الأذكار" component={AthkarScreen} />
-        <Stack.Screen name="نور_القلب" component={HeartJourneyScreen} />
-        <Stack.Screen name="القبلة" component={QiblaScreen} />
-        <Stack.Screen name="الصلاة" component={PrayerTimesScreen} />
-        <Stack.Screen name="الزكاة" component={ZakatScreen} />
-        <Stack.Screen name="العبادات" component={IbadaTodoScreen} />
-        <Stack.Screen name="الإعدادات" component={SettingsScreen} />
-        <Stack.Screen name="الإحصائيات" component={StatsScreen} />
-      </Stack.Navigator>
+      <View style={{ flex: 1 }}>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="MainTabs" component={TabNavigator} />
+          <Stack.Screen name="الأذكار" component={AthkarScreen} />
+          <Stack.Screen name="المسبحة" component={TasbeehScreen} />
+          <Stack.Screen name="الأدعية" component={DuaScreen} />
+          <Stack.Screen name="نور_القلب" component={HeartJourneyScreen} />
+          <Stack.Screen name="القبلة" component={QiblaScreen} />
+          <Stack.Screen name="الصلاة" component={PrayerTimesScreen} />
+          <Stack.Screen name="الزكاة" component={ZakatScreen} />
+          <Stack.Screen name="العبادات" component={IbadaTodoScreen} />
+          <Stack.Screen name="الإعدادات" component={SettingsScreen} />
+          <Stack.Screen name="الإحصائيات" component={StatsScreen} />
+        </Stack.Navigator>
+
+        {/* Global Audio Player Bar - Hidden to rely on system notification only */}
+        {/* {playMode === 'surah' && (
+          <AudioPlayerBar
+            isPlaying={isPlaying}
+            isBuffering={isBuffering}
+            currentPosition={currentPosition}
+            duration={duration}
+            onTogglePlayback={togglePlayback}
+            onSeek={seekTo}
+            onClose={stopPlayback}
+            onForward={() => seekTo(currentPosition + 15000)}
+            onBackward={() => seekTo(Math.max(0, currentPosition - 15000))}
+            surahName={surahsList.find(sur => sur.number === currentSurahId)?.name}
+            reciterName={activeReciter?.name}
+          />
+        )} */}
+      </View>
     </NavigationContainer>
   );
 };

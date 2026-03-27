@@ -1,0 +1,1401 @@
+diff --git a/node_modules/react-native-floating-bubble/android/build.gradle b/node_modules/react-native-floating-bubble/android/build.gradle
+index 2173e8d..511598e 100644
+--- a/node_modules/react-native-floating-bubble/android/build.gradle
++++ b/node_modules/react-native-floating-bubble/android/build.gradle
+@@ -13,12 +13,12 @@ buildscript {
+ apply plugin: 'com.android.library'
+ 
+ android {
+-    compileSdkVersion 23
+-    buildToolsVersion "23.0.1"
++    compileSdkVersion 34
++    buildToolsVersion "34.0.0"
+ 
+     defaultConfig {
+-        minSdkVersion 16
+-        targetSdkVersion 22
++        minSdkVersion 24
++        targetSdkVersion 34
+         versionCode 1
+         versionName "1.0"
+     }
+@@ -41,6 +41,5 @@ allprojects {
+ dependencies {
+     implementation 'com.facebook.react:react-native:+'
+     //compile 'com.txusballesteros:bubbles:1.2.1',
+-    implementation 'com.github.txusballesteros:bubbles-for-android:develop-SNAPSHOT'
++    implementation 'com.github.txusballesteros:bubbles-for-android:1.2.1'
+ }
+\ No newline at end of file
+-  
+\ No newline at end of file
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml b/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml
+index 41a92ab..8a476d0 100644
+--- a/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml
++++ b/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml
+@@ -1,6 +1,14 @@
+-
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+           package="com.reactlibrary">
+ 
++    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
++    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
++
++    <application>
++        <service android:name=".FloatingBubbleService" android:foregroundServiceType="specialUse" android:stopWithTask="false">
++            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_REASON" android:value="Floating Tasbeeh counter and dhikr reminders that must remain active over other apps."/>
++        </service>
++    </application>
++
+ </manifest>
+   
+\ No newline at end of file
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/FloatingBubbleService.java b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/FloatingBubbleService.java
+new file mode 100644
+index 0000000..68e05eb
+--- /dev/null
++++ b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/FloatingBubbleService.java
+@@ -0,0 +1,669 @@
++package com.reactlibrary;
++
++import android.app.AlarmManager;
++import android.app.Notification;
++import android.app.NotificationChannel;
++import android.app.NotificationManager;
++import android.app.PendingIntent;
++import android.app.Service;
++import android.content.Context;
++import android.content.Intent;
++import android.graphics.Color;
++import android.graphics.PixelFormat;
++import android.graphics.drawable.GradientDrawable;
++import android.os.Build;
++import android.os.Handler;
++import android.os.IBinder;
++import android.os.SystemClock;
++import android.content.pm.ServiceInfo;
++import android.provider.Settings;
++import android.util.Log;
++import android.util.TypedValue;
++import android.view.Gravity;
++import android.view.LayoutInflater;
++import android.view.MotionEvent;
++import android.view.View;
++import android.view.WindowManager;
++import android.widget.TextView;
++import androidx.core.app.NotificationCompat;
++
++public class FloatingBubbleService extends Service {
++    private static final String TAG = "FloatingBubbleService";
++    private static final int NOTIFICATION_ID = 54321;
++    private static final String CHANNEL_ID = "floating_bubble_service";
++    private static final int RESTART_REQUEST_CODE = 12345;
++    public static final String ACTION_BUBBLE_PRESS = "com.reactlibrary.ACTION_BUBBLE_PRESS";
++    public static final String ACTION_BUBBLE_RESET = "com.reactlibrary.ACTION_BUBBLE_RESET";
++    public static final String ACTION_BUBBLE_REMOVE = "com.reactlibrary.ACTION_BUBBLE_REMOVE";
++
++    private static FloatingBubbleService instance;
++    private Handler handler = new Handler();
++    private String currentDhikr = "سبحان الله";
++    private View reminderView;
++    private View bubbleView;
++    private WindowManager windowManager;
++    private WindowManager.LayoutParams params;
++    private SharedPrefsHelper prefs;
++    private boolean isBeingKilledBySystem = true; // Track if destruction is from system kill vs user action
++
++    // config variables
++    private volatile int tasbeehCount = 0;
++    private volatile double bubbleScale = 1.0;
++    private volatile String accentColor = "#B8860B";
++    private volatile boolean showBorder = true;
++    private volatile boolean showReset = true;
++    private volatile int reminderInterval = 10;
++    private int initialX, initialY;
++    private float initialTouchX, initialTouchY;
++
++    private Runnable timerRunnable = new Runnable() {
++        @Override
++        public void run() {
++            showReminder();
++            handler.postDelayed(this, reminderInterval * 60 * 1000);
++        }
++    };
++
++    public static FloatingBubbleService getInstance() {
++        return instance;
++    }
++
++    public static String lastError = "";
++    public static String lastEvent = "never_started";
++
++    public boolean hasBubbleView() {
++        return bubbleView != null;
++    }
++
++    @Override
++    public void onCreate() {
++        super.onCreate();
++        lastEvent = "onCreate_started";
++        instance = this;
++        try {
++            windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
++            prefs = new SharedPrefsHelper(this);
++            loadConfigFromPrefs();
++            Log.d(TAG, "Service created, shouldShow=" + prefs.getShouldShow());
++            lastEvent = "onCreate_finished";
++        } catch (Exception e) {
++            lastError = "onCreate crash: " + e.getMessage();
++            Log.e(TAG, "Crash in onCreate", e);
++        }
++    }
++
++    private void loadConfigFromPrefs() {
++        tasbeehCount = prefs.getCount();
++        bubbleScale = prefs.getScale();
++        accentColor = prefs.getAccentColor();
++        showBorder = prefs.getShowBorder();
++        showReset = prefs.getShowReset();
++        reminderInterval = prefs.getReminderInterval();
++        currentDhikr = prefs.getDhikr();
++    }
++
++    @Override
++    public int onStartCommand(Intent intent, int flags, int startId) {
++        lastEvent = "onStartCommand_started";
++        try {
++            createNotificationChannel();
++            int iconResId = getResources().getIdentifier("notification_icon", "drawable", getPackageName());
++            if (iconResId == 0)
++                iconResId = android.R.drawable.ic_dialog_info;
++
++            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
++                    .setContentTitle("المسبحة العائمة تعمل")
++                    .setContentText("المسبحة العائمة نشطة الآن فوق التطبيقات.")
++                    .setSmallIcon(iconResId)
++                    .setPriority(NotificationCompat.PRIORITY_HIGH)
++                    .setOngoing(true)
++                    .setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
++                    .build();
++
++            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
++                startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
++            } else {
++                startForeground(NOTIFICATION_ID, notification);
++            }
++
++            if (intent != null && intent.hasExtra("dhikr")) {
++                currentDhikr = intent.getStringExtra("dhikr");
++                prefs.saveConfig(prefs.getSize(), bubbleScale, accentColor, showBorder, showReset, reminderInterval,
++                        currentDhikr);
++            }
++
++            if (intent != null) {
++                if (intent.hasExtra("action")) {
++                    String action = intent.getStringExtra("action");
++                    if ("show".equals(action)) {
++                        int x = intent.getIntExtra("x", -1);
++                        int y = intent.getIntExtra("y", -1);
++                        
++                        // Use saved position if incoming is default/reset (-1)
++                        if (x == -1) x = prefs.getX();
++                        if (y == -1) y = prefs.getY();
++                        
++                        prefs.setShouldShow(true);
++                        prefs.savePosition(x, y);
++                        isBeingKilledBySystem = true;
++                        showFloatingBubble(x, y);
++                    } else if ("hide".equals(action)) {
++                        prefs.setShouldShow(false);
++                        isBeingKilledBySystem = false;
++                        hideFloatingBubble();
++                    } else if ("config".equals(action)) {
++                        loadConfigFromPrefs();
++                        if (bubbleView != null) {
++                            applyConfigToBubble();
++                        }
++                    } else if ("updateCount".equals(action)) {
++                        tasbeehCount = intent.getIntExtra("count", tasbeehCount);
++                        prefs.saveCount(tasbeehCount);
++                        updateCounterDisplay();
++                    }
++                } else if (prefs.getShouldShow()) {
++                    Log.d(TAG, "Restoring bubble after system restart");
++                    showFloatingBubble(prefs.getX(), prefs.getY());
++                }
++            } else if (prefs.getShouldShow()) {
++                Log.d(TAG, "Null intent - restoring bubble after system restart");
++                showFloatingBubble(prefs.getX(), prefs.getY());
++            }
++
++            handler.removeCallbacks(timerRunnable);
++            handler.postDelayed(timerRunnable, reminderInterval * 60 * 1000);
++
++            lastEvent = "onStartCommand_finished";
++        } catch (Exception e) {
++            lastError = "onStartCommand crash: " + e.getMessage();
++            Log.e(TAG, "Crash in onStartCommand", e);
++        }
++
++        return START_STICKY;
++    }
++
++    private boolean hasPermission() {
++        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
++            return Settings.canDrawOverlays(this);
++        }
++        return true;
++    }
++
++    public void showFloatingBubble(int x, int y) {
++        Log.d(TAG, "showFloatingBubble called. x=" + x + " y=" + y + " hasPermission=" + hasPermission()
++                + " bubbleView=" + (bubbleView != null));
++        if (!hasPermission()) {
++            Log.e(TAG, "showFloatingBubble: NO OVERLAY PERMISSION! Cannot show bubble.");
++            return;
++        }
++        if (bubbleView != null) {
++            Log.w(TAG, "showFloatingBubble: bubbleView already exists, skipping.");
++            return;
++        }
++
++        try {
++            LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
++            bubbleView = inflater.inflate(R.layout.bubble_layout, null);
++            Log.d(TAG, "showFloatingBubble: Layout inflated OK");
++
++            int layoutType;
++            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
++                layoutType = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
++            } else {
++                layoutType = WindowManager.LayoutParams.TYPE_PHONE;
++            }
++
++            // Base dimensions
++            int baseWidthDp = 85;
++            int baseHeightDp = 115;
++            Log.d(TAG, "showFloatingBubble: bubbleScale=" + bubbleScale);
++            int widthPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
++                    (float) (baseWidthDp * bubbleScale), getResources().getDisplayMetrics());
++            int heightPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
++                    (float) (baseHeightDp * bubbleScale), getResources().getDisplayMetrics());
++            Log.d(TAG, "showFloatingBubble: widthPx=" + widthPx + " heightPx=" + heightPx);
++
++            params = new WindowManager.LayoutParams(
++                    widthPx, heightPx, layoutType,
++                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
++                    PixelFormat.TRANSLUCENT);
++            params.gravity = Gravity.TOP | Gravity.LEFT;
++            params.x = x;
++            params.y = y;
++
++            applyConfigToBubble();
++            setupBubbleTouchListener();
++
++            View btnCount = bubbleView.findViewById(R.id.btn_count_tasbeeh);
++            if (btnCount != null) {
++                btnCount.setOnClickListener(new View.OnClickListener() {
++                    @Override
++                    public void onClick(View v) {
++                        hideReminder();
++                        tasbeehCount++;
++                        prefs.saveCount(tasbeehCount);
++                        updateCounterDisplay();
++                        sendBroadcast(new Intent(ACTION_BUBBLE_PRESS));
++                    }
++                });
++            }
++
++            View btnReset = bubbleView.findViewById(R.id.btn_reset_tasbeeh);
++            if (btnReset != null) {
++                btnReset.setOnClickListener(new View.OnClickListener() {
++                    @Override
++                    public void onClick(View v) {
++                        hideReminder();
++                        tasbeehCount = 0;
++                        prefs.saveCount(tasbeehCount);
++                        updateCounterDisplay();
++                        sendBroadcast(new Intent(ACTION_BUBBLE_RESET));
++                    }
++                });
++            }
++
++            windowManager.addView(bubbleView, params);
++            Log.d(TAG, "showFloatingBubble: ✅ addView SUCCESS - bubble should be visible now!");
++        } catch (IllegalStateException e) {
++            Log.w(TAG, "showFloatingBubble: View already added! Attempting cleanup.");
++            try {
++                windowManager.removeViewImmediate(bubbleView);
++                windowManager.addView(bubbleView, params);
++            } catch (Exception ignored) {}
++        } catch (Exception e) {
++            Log.e(TAG, "showFloatingBubble: ❌ FAILED to add bubble view!", e);
++            bubbleView = null; // Reset so it can be retried
++        }
++    }
++
++    public void setTasbeehCount(final int count) {
++        handler.post(new Runnable() {
++            @Override
++            public void run() {
++                tasbeehCount = count;
++                updateCounterDisplay();
++            }
++        });
++    }
++
++    public void setCurrentDhikr(final String label) {
++        handler.post(new Runnable() {
++            @Override
++            public void run() {
++                currentDhikr = label;
++                if (bubbleView != null) {
++                    applyConfigToBubble();
++                }
++            }
++        });
++    }
++
++    public void setConfig(final double scale, final String accentColor, final boolean showBorder, final boolean showReset, final int interval) {
++        handler.post(new Runnable() {
++            @Override
++            public void run() {
++                boolean needsReLayout = (bubbleScale != scale);
++                bubbleScale = scale;
++                FloatingBubbleService.this.accentColor = accentColor;
++                FloatingBubbleService.this.showBorder = showBorder;
++                FloatingBubbleService.this.showReset = showReset;
++                FloatingBubbleService.this.reminderInterval = interval;
++
++                if (bubbleView != null) {
++                    if (needsReLayout) {
++                        // Resize bubble
++                        int baseWidthDp = 85;
++                        int baseHeightDp = 115;
++                        int widthPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
++                                (float) (baseWidthDp * bubbleScale), getResources().getDisplayMetrics());
++                        int heightPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
++                                (float) (baseHeightDp * bubbleScale), getResources().getDisplayMetrics());
++                        params.width = widthPx;
++                        params.height = heightPx;
++                        windowManager.updateViewLayout(bubbleView, params);
++                    }
++                    applyConfigToBubble();
++                }
++
++                handler.removeCallbacks(timerRunnable);
++                handler.postDelayed(timerRunnable, reminderInterval * 60 * 1000);
++            }
++        });
++    }
++
++    private void setupBubbleTouchListener() {
++        if (bubbleView == null)
++            return;
++        bubbleView.setOnTouchListener(new View.OnTouchListener() {
++            private static final int TOUCH_MAX_OFFSET = 30;
++
++            @Override
++            public boolean onTouch(View v, MotionEvent event) {
++                hideReminder();
++                switch (event.getAction()) {
++                    case MotionEvent.ACTION_DOWN:
++                        initialX = params.x;
++                        initialY = params.y;
++                        initialTouchX = event.getRawX();
++                        initialTouchY = event.getRawY();
++                        return true;
++                    case MotionEvent.ACTION_MOVE:
++                        int deltaX = (int) (event.getRawX() - initialTouchX);
++                        int deltaY = (int) (event.getRawY() - initialTouchY);
++                        params.x = initialX + deltaX;
++                        params.y = initialY + deltaY;
++                        windowManager.updateViewLayout(bubbleView, params);
++                        return true;
++                    case MotionEvent.ACTION_UP:
++                        prefs.savePosition(params.x, params.y);
++                        int upDeltaX = (int) (event.getRawX() - initialTouchX);
++                        int upDeltaY = (int) (event.getRawY() - initialTouchY);
++
++                        if (Math.abs(upDeltaX) < TOUCH_MAX_OFFSET && Math.abs(upDeltaY) < TOUCH_MAX_OFFSET) {
++                            View btnCount = bubbleView.findViewById(R.id.btn_count_tasbeeh);
++                            View btnReset = bubbleView.findViewById(R.id.btn_reset_tasbeeh);
++
++                            if (isViewTouched(btnCount, event.getRawX(), event.getRawY())) {
++                                btnCount.performClick();
++                            } else if (isViewTouched(btnReset, event.getRawX(), event.getRawY())) {
++                                btnReset.performClick();
++                            }
++                        }
++                        return true;
++                }
++                return false;
++            }
++        });
++    }
++
++    private void applyConfigToBubble() {
++        if (bubbleView == null) return;
++        handler.post(new Runnable() {
++            @Override
++            public void run() {
++                try {
++                    if (bubbleView == null) return;
++                    
++                    // Ensure accentColor is valid
++                    String colorStr = accentColor;
++                    if (colorStr == null || colorStr.isEmpty() || !colorStr.startsWith("#")) {
++                        colorStr = "#B8860B"; // Default Gold
++                    }
++                    boolean isBlack = colorStr.equalsIgnoreCase("#000000");
++                    
++                    Log.d(TAG, "applyConfigToBubble: scale=" + bubbleScale + " accent=" + colorStr + " isBlack=" + isBlack);
++
++                    // 1. Root Container Size
++                    int widthPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float) (85 * bubbleScale),
++                            getResources().getDisplayMetrics());
++                    int heightPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float) (115 * bubbleScale),
++                            getResources().getDisplayMetrics());
++                    params.width = widthPx;
++                    params.height = heightPx;
++
++                    // 2. Body Background & Stroke
++                    View body = bubbleView.findViewById(R.id.tasbeeh_body_container);
++                    if (body != null) {
++                        body.setLayoutParams(new android.widget.FrameLayout.LayoutParams(widthPx, heightPx));
++                        try {
++                            android.graphics.drawable.Drawable bg = body.getBackground();
++                            if (bg instanceof GradientDrawable) {
++                                GradientDrawable gd = (GradientDrawable) bg.mutate();
++                                int bodyColor = Color.parseColor(colorStr);
++                                gd.setColors(new int[]{bodyColor, bodyColor});
++                                // Use a visible Grey stroke for Black theme, otherwise a dark thin stroke.
++                                gd.setStroke(4, Color.parseColor(isBlack ? "#475569" : "#1a140f"));
++                            }
++                        } catch (Exception e) { Log.e(TAG, "Error updating body bg", e); }
++                    }
++
++                    // 3. Reset Button
++                    View resetBtn = bubbleView.findViewById(R.id.btn_reset_tasbeeh);
++                    if (resetBtn != null) {
++                        int rSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float) (14 * bubbleScale), getResources().getDisplayMetrics());
++                        resetBtn.getLayoutParams().width = rSize;
++                        resetBtn.getLayoutParams().height = rSize;
++                        resetBtn.setVisibility(showReset ? View.VISIBLE : View.GONE);
++                    }
++
++                    // 4. Count Button Area
++                    View countBtn = bubbleView.findViewById(R.id.btn_count_tasbeeh);
++                    if (countBtn != null) {
++                        int cSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float) (45 * bubbleScale), getResources().getDisplayMetrics());
++                        countBtn.getLayoutParams().width = cSize;
++                        countBtn.getLayoutParams().height = cSize;
++                    }
++
++                    // 5. Screen Frame (Border Display)
++                    View screenFrame = bubbleView.findViewById(R.id.screen_frame);
++                    if (screenFrame != null) {
++                        int sW = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float) (66 * bubbleScale), getResources().getDisplayMetrics());
++                        int sH = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float) (40 * bubbleScale), getResources().getDisplayMetrics());
++                        screenFrame.getLayoutParams().width = sW;
++                        screenFrame.getLayoutParams().height = sH;
++                        try {
++                            android.graphics.drawable.Drawable fbg = screenFrame.getBackground();
++                            if (fbg instanceof GradientDrawable) {
++                                GradientDrawable fgd = (GradientDrawable) fbg.mutate();
++                                // For Black theme, make the outer screen frame border White for visibility
++                                fgd.setStroke(showBorder ? 4 : 0, Color.parseColor(isBlack ? "#FFFFFF" : colorStr));
++                                fgd.setAlpha(showBorder ? 255 : 0);
++                            }
++                        } catch (Exception e) { Log.e(TAG, "Error updating screen frame", e); }
++                    }
++
++                    // 6. Count Text & Inner Screen
++                    TextView tv = bubbleView.findViewById(R.id.tasbeeh_count_text);
++                    if (tv != null) {
++                        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) (19 * bubbleScale));
++                        // Special case for Black: White numbers. Otherwise use accent color.
++                        tv.setTextColor(Color.parseColor(isBlack ? "#FFFFFF" : colorStr));
++                        try {
++                            android.graphics.drawable.Drawable sbg = tv.getBackground();
++                            if (sbg instanceof GradientDrawable) {
++                                GradientDrawable sgd = (GradientDrawable) sbg.mutate();
++                                // Inner screen should be Grey for Black theme, Black for others.
++                                int sColor = Color.parseColor(isBlack ? "#475569" : "#000000");
++                                sgd.setColors(new int[]{sColor, sColor});
++                            }
++                        } catch (Exception e) { Log.e(TAG, "Error updating inner screen", e); }
++                    }
++
++                    // 7. Finalize Layout Update
++                    updateCounterDisplay();
++                    try {
++                        if (bubbleView.getParent() != null) {
++                            windowManager.updateViewLayout(bubbleView, params);
++                        }
++                    } catch (Exception e) {}
++
++                } catch (Exception e) {
++                    Log.e(TAG, "Fatal error in applyConfigToBubble", e);
++                }
++            }
++        });
++    }
++
++    private void updateCounterDisplay() {
++        if (bubbleView != null) {
++            handler.post(new Runnable() {
++                @Override
++                public void run() {
++                    TextView tv = bubbleView.findViewById(R.id.tasbeeh_count_text);
++                    if (tv != null)
++                        tv.setText(String.valueOf(tasbeehCount));
++                }
++            });
++        }
++    }
++
++    private boolean isViewTouched(View view, float x, float y) {
++        if (view == null)
++            return false;
++        int[] location = new int[2];
++        view.getLocationOnScreen(location);
++        int left = location[0];
++        int top = location[1];
++        int right = left + view.getWidth();
++        int bottom = top + view.getHeight();
++        return x >= left && x <= right && y >= top && y <= bottom;
++    }
++
++    public void hideFloatingBubble() {
++        if (bubbleView != null) {
++            try {
++                if (bubbleView.getParent() != null) {
++                    windowManager.removeViewImmediate(bubbleView);
++                }
++            } catch (Exception e) {
++                Log.e(TAG, "Error removing bubble view", e);
++            }
++            bubbleView = null;
++            sendBroadcast(new Intent(ACTION_BUBBLE_REMOVE));
++        }
++    }
++
++
++    public void setReminderInterval(int minutes) {
++        if (minutes < 1)
++            minutes = 1;
++        if (this.reminderInterval != minutes) {
++            this.reminderInterval = minutes;
++            prefs.saveConfig(prefs.getSize(), bubbleScale, accentColor, showBorder, showReset, reminderInterval,
++                    currentDhikr);
++            handler.removeCallbacks(timerRunnable);
++            handler.postDelayed(timerRunnable, reminderInterval * 60 * 1000);
++        }
++    }
++
++    public void showReminder() {
++        if (reminderView != null)
++            return;
++        if (!hasPermission())
++            return;
++
++        handler.post(new Runnable() {
++            @Override
++            public void run() {
++                try {
++                    LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
++                    reminderView = inflater.inflate(R.layout.reminder_layout, null);
++
++                    TextView tv = (TextView) reminderView.findViewById(R.id.reminder_text);
++                    if (tv != null)
++                        tv.setText(currentDhikr);
++
++                    int layoutType;
++                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
++                        layoutType = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
++                    } else {
++                        layoutType = WindowManager.LayoutParams.TYPE_PHONE;
++                    }
++
++                    WindowManager.LayoutParams params = new WindowManager.LayoutParams(
++                            WindowManager.LayoutParams.WRAP_CONTENT,
++                            WindowManager.LayoutParams.WRAP_CONTENT,
++                            layoutType,
++                            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
++                            PixelFormat.TRANSLUCENT);
++
++                    params.gravity = Gravity.CENTER;
++                    windowManager.addView(reminderView, params);
++                } catch (Exception e) {
++                }
++            }
++        });
++    }
++
++    public void hideReminder() {
++        handler.post(new Runnable() {
++            @Override
++            public void run() {
++                try {
++                    if (reminderView != null) {
++                        windowManager.removeViewImmediate(reminderView);
++                    }
++                } catch (Exception e) {
++                } finally {
++                    reminderView = null;
++                }
++            }
++        });
++    }
++
++    public boolean isReminderVisible() {
++        return reminderView != null;
++    }
++
++    private void createNotificationChannel() {
++        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
++            NotificationChannel serviceChannel = new NotificationChannel(
++                    CHANNEL_ID,
++                    "Floating Tasbeeh Service",
++                    NotificationManager.IMPORTANCE_HIGH);
++            serviceChannel.setShowBadge(false);
++            NotificationManager manager = getSystemService(NotificationManager.class);
++            if (manager != null) {
++                manager.createNotificationChannel(serviceChannel);
++            }
++        }
++    }
++
++    /**
++     * Called when the user swipes away the app from recent tasks.
++     * We schedule a restart of the service so the bubble reappears.
++     */
++    @Override
++    public void onTaskRemoved(Intent rootIntent) {
++        Log.d(TAG, "onTaskRemoved called, shouldShow=" + prefs.getShouldShow());
++        if (prefs.getShouldShow()) {
++            scheduleServiceRestart();
++        }
++        super.onTaskRemoved(rootIntent);
++    }
++
++    private void scheduleServiceRestart() {
++        try {
++            Intent restartServiceIntent = new Intent(getApplicationContext(), FloatingBubbleService.class);
++            restartServiceIntent.setPackage(getPackageName());
++
++            int flags = PendingIntent.FLAG_ONE_SHOT;
++            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
++                flags |= PendingIntent.FLAG_IMMUTABLE;
++            }
++
++            PendingIntent restartServicePendingIntent = PendingIntent.getService(
++                    getApplicationContext(), RESTART_REQUEST_CODE, restartServiceIntent, flags);
++
++            AlarmManager alarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
++            if (alarmService != null) {
++                alarmService.set(
++                        AlarmManager.ELAPSED_REALTIME,
++                        SystemClock.elapsedRealtime() + 1000, // Restart after 1 second
++                        restartServicePendingIntent);
++            }
++            Log.d(TAG, "Service restart scheduled");
++        } catch (Exception e) {
++            Log.e(TAG, "Failed to schedule restart", e);
++        }
++    }
++
++    @Override
++    public void onDestroy() {
++        Log.d(TAG, "onDestroy called, shouldShow=" + prefs.getShouldShow() + ", isBeingKilledBySystem="
++                + isBeingKilledBySystem);
++
++        // Always clean up the views since they can't survive process death
++        hideFloatingBubble();
++        hideReminder();
++        handler.removeCallbacks(timerRunnable);
++
++        instance = null;
++        super.onDestroy();
++    }
++
++    @Override
++    public IBinder onBind(Intent intent) {
++        return null;
++    }
++}
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/RNFloatingBubbleModule.java b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/RNFloatingBubbleModule.java
+index cde29db..5d33e33 100644
+--- a/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/RNFloatingBubbleModule.java
++++ b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/RNFloatingBubbleModule.java
+@@ -1,49 +1,73 @@
+-
+ package com.reactlibrary;
+ 
+ import com.facebook.react.bridge.ReactApplicationContext;
+ import com.facebook.react.bridge.ReactContextBaseJavaModule;
+ import com.facebook.react.bridge.ReactMethod;
+-import com.facebook.react.bridge.Callback;
+ import com.facebook.react.bridge.Promise;
+ import com.facebook.react.bridge.Arguments;
+ import com.facebook.react.bridge.WritableMap;
++import com.facebook.react.bridge.ReadableMap;
+ import com.facebook.react.modules.core.DeviceEventManagerModule;
+ 
+-import android.os.Bundle;
+-import android.os.Build;
+-import android.view.LayoutInflater;
+-import android.view.View;
++import android.content.BroadcastReceiver;
++import android.content.Context;
+ import android.content.Intent;
++import android.content.IntentFilter;
++import android.os.Build;
+ import android.provider.Settings;
+ import android.net.Uri;
+ 
+-import com.txusballesteros.bubbles.BubbleLayout;
+-import com.txusballesteros.bubbles.BubblesManager;
+-import com.txusballesteros.bubbles.OnInitializedCallback;
+-
+ public class RNFloatingBubbleModule extends ReactContextBaseJavaModule {
+-
+-  private BubblesManager bubblesManager;
+   private final ReactApplicationContext reactContext;
+-  private BubbleLayout bubbleView;
++  private SharedPrefsHelper prefs;
+ 
+   public RNFloatingBubbleModule(ReactApplicationContext reactContext) {
+     super(reactContext);
+     this.reactContext = reactContext;
++    this.prefs = new SharedPrefsHelper(reactContext);
+ 
+-    // try {
+-    //   initializeBubblesManager();
+-    // } catch (Exception e) {
++    // Register receiver for button presses from the service
++    BroadcastReceiver receiver = new BroadcastReceiver() {
++      @Override
++      public void onReceive(Context context, Intent intent) {
++        String action = intent.getAction();
++        if (FloatingBubbleService.ACTION_BUBBLE_PRESS.equals(action)) {
++          sendEvent("floating-bubble-press");
++        } else if (FloatingBubbleService.ACTION_BUBBLE_RESET.equals(action)) {
++          sendEvent("floating-bubble-reset");
++        } else if (FloatingBubbleService.ACTION_BUBBLE_REMOVE.equals(action)) {
++          sendEvent("floating-bubble-remove");
++        }
++      }
++    };
++    
++    IntentFilter filter = new IntentFilter();
++    filter.addAction(FloatingBubbleService.ACTION_BUBBLE_PRESS);
++    filter.addAction(FloatingBubbleService.ACTION_BUBBLE_RESET);
++    filter.addAction(FloatingBubbleService.ACTION_BUBBLE_REMOVE);
++    
++    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
++      reactContext.registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED);
++    } else {
++      reactContext.registerReceiver(receiver, filter);
++    }
++  }
+ 
+-    // }
++  private void startServiceWithAction(Intent intent) throws Exception {
++    intent.setClass(reactContext, FloatingBubbleService.class);
++    try {
++        androidx.core.content.ContextCompat.startForegroundService(reactContext, intent);
++    } catch (Exception e) {
++        throw new Exception("startService failed: " + e.getMessage());
++    }
+   }
+ 
+   @ReactMethod
+   public void reopenApp(){
+     Intent launchIntent = reactContext.getPackageManager().getLaunchIntentForPackage(reactContext.getPackageName());
+     if (launchIntent != null) {
+-      reactContext.startActivity(launchIntent);
++      launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
++      reactContext.getApplicationContext().startActivity(launchIntent);
+     }
+   }
+ 
+@@ -52,120 +76,222 @@ public class RNFloatingBubbleModule extends ReactContextBaseJavaModule {
+     return "RNFloatingBubble";
+   }
+ 
+-  @ReactMethod // Notates a method that should be exposed to React
++  @ReactMethod
+   public void showFloatingBubble(int x, int y, final Promise promise) {
+     try {
+-      this.addNewBubble(x, y);
+-      promise.resolve("");
++      this.reactContext.runOnUiQueueThread(new Runnable() {
++        @Override
++        public void run() {
++          try {
++            Intent intent = new Intent();
++            intent.putExtra("action", "show");
++            intent.putExtra("x", x);
++            intent.putExtra("y", y);
++            startServiceWithAction(intent);
++            promise.resolve("");
++          } catch (Exception e) {
++            promise.reject("Error", e.getMessage());
++          }
++        }
++      });
+     } catch (Exception e) {
+-      promise.reject("");
++      promise.reject("Error", e.getMessage());
+     }
+   }  
+ 
+-  @ReactMethod // Notates a method that should be exposed to React
++  @ReactMethod
+   public void hideFloatingBubble(final Promise promise) {
+     try {
+-      this.removeBubble();
+-      promise.resolve("");
++      this.reactContext.runOnUiQueueThread(new Runnable() {
++        @Override
++        public void run() {
++          try {
++            Intent intent = new Intent();
++            intent.putExtra("action", "hide");
++            startServiceWithAction(intent);
++            
++            promise.resolve("");
++          } catch (Exception e) {
++            promise.reject("Error", e.getMessage());
++          }
++        }
++      });
+     } catch (Exception e) {
+-      promise.reject("");
++      promise.reject("Error", e.getMessage());
+     }
+   }  
+ 
+-  @ReactMethod // Notates a method that should be exposed to React
++  @ReactMethod
+   public void requestPermission(final Promise promise) {
+     try {
+-      this.requestPermissionAction(promise);
++      if (!hasPermission()) {
++        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + reactContext.getPackageName()));
++        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
++        reactContext.startActivity(intent);
++      } 
++      promise.resolve("");
+     } catch (Exception e) {
++       promise.reject("Error", e.getMessage());
+     }
+   }  
+ 
+-  @ReactMethod // Notates a method that should be exposed to React
++  @ReactMethod
+   public void checkPermission(final Promise promise) {
+     try {
+       promise.resolve(hasPermission());
+     } catch (Exception e) {
+-      promise.reject("");
++      promise.reject("Error", e.getMessage());
+     }
+   }  
+ 
+-  @ReactMethod // Notates a method that should be exposed to React
++  @ReactMethod
+   public void initialize(final Promise promise) {
+-    try {
+-      this.initializeBubblesManager();
+-      promise.resolve("");
+-    } catch (Exception e) {
+-      promise.reject("");
+-    }
++    if (promise != null) promise.resolve("");
+   }  
+ 
+-  private void addNewBubble(int x, int y) {
+-    this.removeBubble();
+-    bubbleView = (BubbleLayout) LayoutInflater.from(reactContext).inflate(R.layout.bubble_layout, null);
+-    bubbleView.setOnBubbleRemoveListener(new BubbleLayout.OnBubbleRemoveListener() {
+-      @Override
+-      public void onBubbleRemoved(BubbleLayout bubble) {
+-        bubbleView = null;
+-        sendEvent("floating-bubble-remove");
+-      }
+-    });
+-    bubbleView.setOnBubbleClickListener(new BubbleLayout.OnBubbleClickListener() {
++  @ReactMethod
++  public void config(ReadableMap config) {
++    String size = prefs.getSize();
++    double scale = prefs.getScale();
++    String accentColor = prefs.getAccentColor();
++    boolean showBorder = prefs.getShowBorder();
++    boolean showReset = prefs.getShowReset();
++    int reminderInterval = prefs.getReminderInterval();
+ 
+-      @Override
+-      public void onBubbleClick(BubbleLayout bubble) {
+-        sendEvent("floating-bubble-press");
+-      }
+-    });
+-    bubbleView.setShouldStickToWall(true);
+-    bubblesManager.addBubble(bubbleView, x, y);
+-  }
++    if (config.hasKey("size")) size = config.getString("size");
++    if (config.hasKey("scale")) {
++      scale = config.getDouble("scale");
++      if (scale < 0.5) scale = 0.5;
++      if (scale > 3.0) scale = 3.0;
++      if (Double.isNaN(scale)) scale = 1.0;
++    }
++    if (config.hasKey("accentColor")) accentColor = config.getString("accentColor");
++    if (config.hasKey("showBorder")) showBorder = config.getBoolean("showBorder");
++    if (config.hasKey("showReset")) showReset = config.getBoolean("showReset");
++    if (config.hasKey("reminderInterval")) reminderInterval = config.getInt("reminderInterval");
+ 
+-  private boolean hasPermission(){
+-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+-      return Settings.canDrawOverlays(reactContext);
++    prefs.saveConfig(size, scale, accentColor, showBorder, showReset, reminderInterval, prefs.getDhikr());
++
++    // Only forward config to the running service instance — do NOT start the service
++    // just for a config update (would crash on Android 12+ from background)
++    FloatingBubbleService service = FloatingBubbleService.getInstance();
++    if (service != null) {
++        service.setConfig(scale, accentColor, showBorder, showReset, reminderInterval);
+     }
+-    return true;
++    // If the service is not running, the prefs are already saved above.
++    // The service will read them via loadConfigFromPrefs() when it starts next time.
+   }
+ 
+-  private void removeBubble() {
+-    if(bubbleView != null){
+-      try{
+-        bubblesManager.removeBubble(bubbleView);
+-      } catch(Exception e){
+-
+-      }
++  @ReactMethod
++  public void updateTasbeehCount(int count) {
++    prefs.saveCount(count);
++    FloatingBubbleService service = FloatingBubbleService.getInstance();
++    if (service != null && service.hasBubbleView()) {
++        service.setTasbeehCount(count);
++    } else {
++        Intent intent = new Intent();
++        intent.putExtra("action", "updateCount");
++        intent.putExtra("count", count);
++        try {
++            startServiceWithAction(intent);
++        } catch (Exception e) {
++            // ignore
++        }
+     }
+   }
+ 
++  @ReactMethod
++  public void showDhikrReminder(final String label, final Promise promise) {
++    FloatingBubbleService service = FloatingBubbleService.getInstance();
++    if (service != null) {
++        service.setCurrentDhikr(label);
++        service.showReminder();
++        if (promise != null) promise.resolve(true);
++    } else {
++        if (promise != null) promise.resolve(false);
++    }
++  }
+ 
+-  public void requestPermissionAction(final Promise promise) {
+-    if (!hasPermission()) {
+-      Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + reactContext.getPackageName()));
+-      Bundle bundle = new Bundle();
+-      reactContext.startActivityForResult(intent, 0, bundle);
++  @ReactMethod
++  public void hideDhikrReminder(final Promise promise) {
++    FloatingBubbleService service = FloatingBubbleService.getInstance();
++    if (service != null) {
++        service.hideReminder();
+     }
+-    if (hasPermission()) {
+-      promise.resolve("");
++    if (promise != null) promise.resolve("");
++  }
++
++  @ReactMethod
++  public void isReminderActive(final Promise promise) {
++    FloatingBubbleService service = FloatingBubbleService.getInstance();
++    if (service != null) {
++        promise.resolve(service.isReminderVisible());
+     } else {
+-      promise.reject("");
++        promise.resolve(false);
+     }
+   }
+ 
+-  private void initializeBubblesManager() {
+-    bubblesManager = new BubblesManager.Builder(reactContext).setTrashLayout(R.layout.bubble_trash_layout)
+-        .setInitializationCallback(new OnInitializedCallback() {
+-          @Override
+-          public void onInitialized() {
+-            // addNewBubble();
++  @ReactMethod
++  public void updateTasbeehLabel(final String label) {
++     prefs.saveConfig(prefs.getSize(), prefs.getScale(), prefs.getAccentColor(), prefs.getShowBorder(), prefs.getShowReset(), prefs.getReminderInterval(), label);
++     FloatingBubbleService service = FloatingBubbleService.getInstance();
++     if (service != null) {
++         service.setCurrentDhikr(label);
++     }
++  }
++  
++  @ReactMethod
++  public void getSavedTasbeehCount(final Promise promise) {
++      if (promise != null) {
++          promise.resolve(prefs.getCount());
++      }
++  }
++
++  @ReactMethod
++  public void isBubbleVisible(final Promise promise) {
++      try {
++          FloatingBubbleService service = FloatingBubbleService.getInstance();
++          WritableMap result = Arguments.createMap();
++          
++          if (service != null) {
++              boolean hasView = service.hasBubbleView();
++              boolean hasPerm = Settings.canDrawOverlays(reactContext);
++              result.putBoolean("serviceRunning", true);
++              result.putBoolean("bubbleViewExists", hasView);
++              result.putBoolean("overlayPermission", hasPerm);
++              result.putString("lastEvent", FloatingBubbleService.lastEvent);
++              result.putString("lastError", FloatingBubbleService.lastError);
++          } else {
++              result.putBoolean("serviceRunning", false);
++              result.putBoolean("bubbleViewExists", false);
++              result.putBoolean("overlayPermission", Settings.canDrawOverlays(reactContext));
++              result.putString("lastEvent", FloatingBubbleService.lastEvent);
++              result.putString("lastError", FloatingBubbleService.lastError);
+           }
+-        }).build();
+-    bubblesManager.initialize();
++          promise.resolve(result);
++      } catch (Exception e) {
++          promise.reject("Error", e.getMessage());
++      }
++  }
++
++  private boolean hasPermission(){
++    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
++      return Settings.canDrawOverlays(reactContext);
++    }
++    return true;
+   }
+ 
+   private void sendEvent(String eventName) {
+-    WritableMap params = Arguments.createMap();
+-    reactContext
+-      .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+-      .emit(eventName, params);
++    try {
++      if (reactContext == null || !reactContext.hasActiveCatalystInstance()) {
++        return;
++      }
++      WritableMap params = Arguments.createMap();
++      reactContext
++        .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
++        .emit(eventName, params);
++    } catch (Exception e) {
++      // Silently ignore
++    }
+   }
+ }
+\ No newline at end of file
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/SharedPrefsHelper.java b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/SharedPrefsHelper.java
+new file mode 100644
+index 0000000..0d991ae
+--- /dev/null
++++ b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/SharedPrefsHelper.java
+@@ -0,0 +1,44 @@
++package com.reactlibrary;
++
++import android.content.Context;
++import android.content.SharedPreferences;
++
++public class SharedPrefsHelper {
++    private static final String PREF_NAME = "FloatingBubblePrefs";
++    private SharedPreferences prefs;
++
++    public SharedPrefsHelper(Context context) {
++        prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
++    }
++
++    public void saveCount(int count) { prefs.edit().putInt("tasbeehCount", count).apply(); }
++    public int getCount() { return prefs.getInt("tasbeehCount", 0); }
++
++    public void savePosition(int x, int y) {
++        prefs.edit().putInt("x", x).putInt("y", y).apply();
++    }
++    public int getX() { return prefs.getInt("x", 10); }
++    public int getY() { return prefs.getInt("y", 10); }
++
++    public void saveConfig(String size, double scale, String accentColor, boolean showBorder, boolean showReset, int reminderInterval, String dhikr) {
++        prefs.edit()
++            .putString("size", size)
++            .putFloat("scale", (float)scale)
++            .putString("accentColor", accentColor)
++            .putBoolean("showBorder", showBorder)
++            .putBoolean("showReset", showReset)
++            .putInt("reminderInterval", reminderInterval)
++            .putString("dhikr", dhikr)
++            .apply();
++    }
++    public String getSize() { return prefs.getString("size", "medium"); }
++    public double getScale() { return prefs.getFloat("scale", 1.0f); }
++    public String getAccentColor() { return prefs.getString("accentColor", "#B8860B"); }
++    public boolean getShowBorder() { return prefs.getBoolean("showBorder", true); }
++    public boolean getShowReset() { return prefs.getBoolean("showReset", true); }
++    public int getReminderInterval() { return prefs.getInt("reminderInterval", 10); }
++    public String getDhikr() { return prefs.getString("dhikr", "سبحان الله"); }
++    
++    public void setShouldShow(boolean show) { prefs.edit().putBoolean("shouldShow", show).apply(); }
++    public boolean getShouldShow() { return prefs.getBoolean("shouldShow", false); }
++}
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_count.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_count.xml
+new file mode 100644
+index 0000000..9ec0bcd
+--- /dev/null
++++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_count.xml
+@@ -0,0 +1,5 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
++    <gradient android:startColor="#FFFFFF" android:centerColor="#F1F3F5" android:endColor="#DEE2E6" android:type="radial" android:gradientRadius="20dp" />
++    <stroke android:width="1dp" android:color="#ADB5BD" />
++</shape>
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_reset.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_reset.xml
+new file mode 100644
+index 0000000..830c869
+--- /dev/null
++++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_reset.xml
+@@ -0,0 +1,5 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
++    <gradient android:startColor="#FCD34D" android:centerColor="#EAB308" android:endColor="#D97706" android:type="radial" android:gradientRadius="10dp" />
++    <stroke android:width="1dp" android:color="#92400E" />
++</shape>
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_reminder_card.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_reminder_card.xml
+new file mode 100644
+index 0000000..157f96b
+--- /dev/null
++++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_reminder_card.xml
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android"
++    android:shape="rectangle">
++    <gradient
++        android:startColor="#CC000000"
++        android:endColor="#EE1a140f"
++        android:angle="270" />
++    <corners android:radius="20dp" />
++    <stroke
++        android:width="1.5dp"
++        android:color="#B8860B" />
++</shape>
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_body.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_body.xml
+new file mode 100644
+index 0000000..2e97b4c
+--- /dev/null
++++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_body.xml
+@@ -0,0 +1,13 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
++    <corners android:radius="37.5dp" />
++    <gradient
++        android:startColor="#F8F9FA"
++        android:centerColor="#E9ECEF"
++        android:endColor="#CED4DA"
++        android:angle="270"
++        android:type="linear" />
++    <stroke
++        android:width="1dp"
++        android:color="#ADB5BD" />
++</shape>
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_inner_screen.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_inner_screen.xml
+new file mode 100644
+index 0000000..7d1f40e
+--- /dev/null
++++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_inner_screen.xml
+@@ -0,0 +1,5 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
++    <solid android:color="#000000" />
++    <corners android:radius="8dp" />
++</shape>
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_screen.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_screen.xml
+new file mode 100644
+index 0000000..9b75133
+--- /dev/null
++++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_screen.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
++    <solid android:color="#8DA186" />
++    <corners android:radius="5dp" />
++    <stroke android:width="2dp" android:color="#2A2A2A" />
++</shape>
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_screen_border.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_screen_border.xml
+new file mode 100644
+index 0000000..5f758fc
+--- /dev/null
++++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_screen_border.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
++    <solid android:color="#000000" />
++    <corners android:radius="10dp" />
++    <stroke android:width="2dp" android:color="#A08040" />
++</shape>
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_layout.xml b/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_layout.xml
+index d2a8762..af8943b 100644
+--- a/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_layout.xml
++++ b/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_layout.xml
+@@ -1,17 +1,65 @@
+ <?xml version="1.0" encoding="utf-8"?>
+-<com.txusballesteros.bubbles.BubbleLayout
++<FrameLayout
+     xmlns:android="http://schemas.android.com/apk/res/android"
+-    android:layout_width="wrap_content"
+-    android:layout_height="wrap_content"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent"
+     android:clipChildren="false"
+-    android:clipToPadding="false">
++    android:clipToPadding="false"
++    android:clickable="false"
++    android:focusable="false">
+ 
+-    <ImageView
+-        android:id="@+id/avatar"
+-        android:layout_width="70dp"
+-        android:layout_height="70dp"
+-        android:layout_gravity="center"
+-        android:background="@drawable/profile_decorator"
+-        android:src="@drawable/bubble_icon"
+-        android:scaleType="centerCrop"/>
+-</com.txusballesteros.bubbles.BubbleLayout>
+\ No newline at end of file
++    <LinearLayout
++        android:id="@+id/tasbeeh_body_container"
++        android:layout_width="match_parent"
++        android:layout_height="match_parent"
++        android:background="@drawable/bg_tasbeeh_body"
++        android:orientation="vertical"
++        android:gravity="center_horizontal"
++        android:padding="8dp">
++
++        <View
++            android:id="@+id/btn_reset_tasbeeh"
++            android:layout_width="14dp"
++            android:layout_height="14dp"
++            android:layout_marginTop="2dp"
++            android:background="@drawable/bg_btn_reset"
++            android:clickable="true"
++            android:focusable="true"/>
++
++        <FrameLayout
++            android:id="@+id/screen_frame"
++            android:layout_width="match_parent"
++            android:layout_height="0dp"
++            android:layout_weight="1.3"
++            android:layout_marginTop="2dp"
++            android:layout_marginStart="8dp"
++            android:layout_marginEnd="8dp"
++            android:background="@drawable/bg_tasbeeh_screen_border">
++
++            <TextView
++                android:id="@+id/tasbeeh_count_text"
++                android:layout_width="match_parent"
++                android:layout_height="match_parent"
++                android:gravity="center"
++                android:text="33"
++                android:textColor="#FF9800"
++                android:textSize="18sp"
++                android:textStyle="bold"
++                android:includeFontPadding="false"
++                android:fontFamily="monospace"
++                android:background="@drawable/bg_tasbeeh_inner_screen" />
++        </FrameLayout>
++
++        <View
++            android:id="@+id/btn_count_tasbeeh"
++            android:layout_width="0dp"
++            android:layout_height="0dp"
++            android:layout_weight="1.8"
++            android:layout_marginTop="6dp"
++            android:layout_marginBottom="4dp"
++            android:background="@drawable/bg_btn_count"
++            android:clickable="true"
++            android:focusable="true" />
++
++    </LinearLayout>
++</FrameLayout>
+\ No newline at end of file
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/layout/reminder_layout.xml b/node_modules/react-native-floating-bubble/android/src/main/res/layout/reminder_layout.xml
+new file mode 100644
+index 0000000..c069c7b
+--- /dev/null
++++ b/node_modules/react-native-floating-bubble/android/src/main/res/layout/reminder_layout.xml
+@@ -0,0 +1,49 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    android:id="@+id/reminder_container"
++    android:layout_width="wrap_content"
++    android:layout_height="wrap_content"
++    android:orientation="vertical"
++    android:padding="16dp"
++    android:gravity="center"
++    android:background="@android:color/transparent">
++
++    <LinearLayout
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:background="@drawable/bg_reminder_card"
++        android:orientation="vertical"
++        android:padding="24dp"
++        android:elevation="10dp"
++        android:gravity="center">
++
++        <TextView
++            android:id="@+id/reminder_header"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:text="✨ تذكير بالذكر ✨"
++            android:textColor="#B8860B"
++            android:textSize="13sp"
++            android:fontFamily="serif"
++            android:layout_marginBottom="12dp" />
++
++        <TextView
++            android:id="@+id/reminder_text"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:text="سبحان الله وبحمده"
++            android:textColor="#FFFFFF"
++            android:textSize="22sp"
++            android:textStyle="bold"
++            android:gravity="center" />
++
++        <TextView
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:text="انقر على السبحة للإخفاء"
++            android:textColor="#88FFFFFF"
++            android:textSize="10sp"
++            android:layout_marginTop="12dp" />
++            
++    </LinearLayout>
++</LinearLayout>
+

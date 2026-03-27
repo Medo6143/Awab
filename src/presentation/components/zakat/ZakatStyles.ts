@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#0c0805' },
   header: { 
-    flexDirection: 'row', 
+    flexDirection: 'row-reverse', 
     justifyContent: 'space-between', 
     alignItems: 'center', 
     padding: 20
@@ -25,14 +25,14 @@ export const s = StyleSheet.create({
   },
   resultLabel: { fontFamily: 'Tajawal_500Medium', fontSize: 16, color: '#94a3b8', marginBottom: 10 },
   resultValue: { fontFamily: 'Tajawal_700Bold', fontSize: 42, color: '#fcd34d' },
-  nisabBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 15, backgroundColor: 'rgba(255,255,255,0.05)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12 },
+  nisabBadge: { flexDirection: 'row-reverse', alignItems: 'center', gap: 6, marginTop: 15, backgroundColor: 'rgba(255,255,255,0.05)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12 },
   nisabText: { fontFamily: 'Tajawal_400Regular', fontSize: 12, color: '#94a3b8' },
 
   form: { padding: 20, gap: 20 },
   inputWrapper: { gap: 10 },
   inputLabel: { fontFamily: 'Tajawal_700Bold', fontSize: 16, color: '#fcd34d', textAlign: 'right' },
   inputRow: { 
-    flexDirection: 'row', 
+    flexDirection: 'row-reverse', 
     alignItems: 'center', 
     backgroundColor: '#1a140f', 
     borderRadius: 20, 

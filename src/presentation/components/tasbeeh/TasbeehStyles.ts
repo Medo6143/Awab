@@ -24,11 +24,40 @@ export const s = StyleSheet.create({
   dhikrChipText: { fontFamily: 'Tajawal_500Medium', fontSize: 15, color: '#94a3b8' },
   dhikrChipTextActive: { color: '#fcd34d', fontFamily: 'Tajawal_700Bold' },
 
+  // ── Legacy (kept for fallback) ──
   targetRow: { flexDirection: 'row', justifyContent: 'center', gap: 12, marginTop: 25 },
   targetBtn: { width: 60, height: 45, borderRadius: 14, backgroundColor: '#1a140f', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#2b1f15' },
   targetBtnActive: { backgroundColor: '#B8860B', borderColor: '#fcd34d' },
   targetBtnText: { fontFamily: 'Tajawal_700Bold', fontSize: 16, color: '#94a3b8' },
   targetBtnTextActive: { color: '#fff' },
+
+  // ── Carousel ──
+  carouselWrapper: { marginTop: 18, paddingBottom: 6 },
+  carouselContent: { paddingHorizontal: 20, gap: 10 },
+  carouselItem: {
+    minWidth: 68, height: 52, borderRadius: 16,
+    backgroundColor: '#1a140f', alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1.5, borderColor: '#2b1f15',
+    paddingHorizontal: 14,
+  },
+  carouselItemActive: {
+    backgroundColor: '#2b1f15',
+    borderColor: '#d4af37',
+    shadowColor: '#d4af37',
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  carouselItemText: { fontFamily: 'Tajawal_700Bold', fontSize: 17, color: '#64748b' },
+  carouselItemTextActive: { color: '#fcd34d', fontSize: 18 },
+  carouselIconItem: {
+    width: 52, height: 52, borderRadius: 16,
+    backgroundColor: '#1a140f', alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1.5, borderColor: '#2b1f15',
+  },
+  dotsRow: { flexDirection: 'row', justifyContent: 'center', gap: 6, marginTop: 8 },
+  dot: { width: 5, height: 5, borderRadius: 3, backgroundColor: '#2b1f15' },
+  dotActive: { backgroundColor: '#B8860B', width: 14 },
 
   counterBody: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   mainCircle: {

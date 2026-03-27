@@ -7,6 +7,7 @@ export type AccuracyLevel = 'low' | 'medium' | 'high' | 'unknown';
 
 export const useLocation = () => {
   const [coords, setCoords] = useState<Coordinates | null>(null);
+  const [countryCode, setCountryCode] = useState<string | null>(null);
   const [heading, setHeading] = useState(0);
   const [qiblaDir, setQiblaDir] = useState(0);
   const [accuracy, setAccuracy] = useState<AccuracyLevel>('unknown');
@@ -19,10 +20,12 @@ export const useLocation = () => {
     let isMounted = true;
     const fetchLocation = async () => {
       try {
-        const location = await LocationService.getCurrentLocation();
-        if (isMounted && location) {
-          setCoords(location);
-          const qibla = LocationService.calculateQiblaDirection(location.latitude, location.longitude);
+        const result = await LocationService.getCurrentLocation();
+        if (isMounted && result) {
+          const { coords: fetchedCoords, countryCode: fetchedCountry } = result;
+          setCoords(fetchedCoords);
+          setCountryCode(fetchedCountry);
+          const qibla = LocationService.calculateQiblaDirection(fetchedCoords.latitude, fetchedCoords.longitude);
           setQiblaDir(qibla);
         } else if (isMounted) {
           setError('Location permission denied or unavailable');
@@ -55,7 +58,7 @@ export const useLocation = () => {
           setAccuracy(acc);
 
           // Smoother transition logic
-          const smoothed = lastHeading.current * 0.6 + trueHeading * 0.4;
+          const smoothed = lastHeading.current * 0.3 + trueHeading * 0.7;
           lastHeading.current = smoothed;
           
           setHeading(smoothed);
@@ -72,5 +75,5 @@ export const useLocation = () => {
     };
   }, []);
 
-  return { coords, heading, qiblaDir, accuracy, error };
+  return { coords, countryCode, heading, qiblaDir, accuracy, error };
 };

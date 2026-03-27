@@ -16,7 +16,12 @@ const initialState: StatsState = {
   dailyRecords: {},
 };
 
-const getToday = () => new Date().toISOString().split('T')[0];
+const getLocalToday = (d = new Date()) => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 export const statsSlice = createSlice({
   name: 'stats',
@@ -24,13 +29,13 @@ export const statsSlice = createSlice({
   reducers: {
     logPrayer: (state, action: PayloadAction<{ prayerId: string; isCompleted: boolean }>) => {
       if (!state.dailyRecords) state.dailyRecords = {};
-      let today = getToday();
       
       const d = new Date();
+      // For night prayers before 6 AM, log them as part of the previous day
       if ((action.payload.prayerId === 'qiyam_al_layl' || action.payload.prayerId === 'qiyan_al_layl') && d.getHours() < 6) {
         d.setDate(d.getDate() - 1);
-        today = d.toDateString();
       }
+      const today = getLocalToday(d);
 
       if (!state.dailyRecords[today]) {
         state.dailyRecords[today] = { prayers: [], dhikrCount: 0, dhikrDetails: {}, quranPages: [], minutesSpent: 0 };
@@ -47,7 +52,7 @@ export const statsSlice = createSlice({
     },
     logDhikr: (state, action: PayloadAction<{ name: string; count: number }>) => {
       if (!state.dailyRecords) state.dailyRecords = {};
-      const today = getToday();
+      const today = getLocalToday();
       if (!state.dailyRecords[today]) {
         state.dailyRecords[today] = { prayers: [], dhikrCount: 0, dhikrDetails: {}, quranPages: [], minutesSpent: 0 };
       }
@@ -62,7 +67,7 @@ export const statsSlice = createSlice({
     },
     logQuranPage: (state, action: PayloadAction<number>) => {
       if (!state.dailyRecords) state.dailyRecords = {};
-      const today = getToday();
+      const today = getLocalToday();
       if (!state.dailyRecords[today]) {
         state.dailyRecords[today] = { prayers: [], dhikrCount: 0, dhikrDetails: {}, quranPages: [], minutesSpent: 0 };
       }

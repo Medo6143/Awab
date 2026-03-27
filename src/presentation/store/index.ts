@@ -14,6 +14,8 @@ import ibadaReducer from './slices/ibadaSlice';
 import statsReducer from './slices/statsSlice';
 import tasbeehReducer from './slices/tasbeehSlice';
 import uiReducer from './slices/uiSlice';
+import prayerReducer from './slices/prayerSlice';
+import audioReducer from './slices/audioSlice';
 
 const STORE_VERSION = 6;
 
@@ -33,6 +35,8 @@ const rootReducer = combineReducers({
   stats: statsReducer,
   tasbeeh: tasbeehReducer,
   ui: uiReducer,
+  prayer: prayerReducer,
+  audio: audioReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

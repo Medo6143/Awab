@@ -1,19 +1,29 @@
-import { Audio } from 'expo-av';
+import TrackPlayer from 'react-native-track-player';
+import { initializeTrackPlayer } from './TrackPlayerService';
+import { Image } from 'react-native';
 
-export const RECITER_MAP: Record<string, { folder: string, server: string, name: string }> = {
-  'alafasy': { folder: 'Alafasy_128kbps', server: 'afs', name: 'مشاري العفاسي' },
-  'abdulbasit': { folder: 'Abdul_Basit_Murattal_64kbps', server: 'basit', name: 'عبد الباسط (مرتل)' },
-  'husary': { folder: 'Husary_128kbps', server: 'husr', name: 'الحصري' },
-  'sudais': { folder: 'Abdurrahmaan_As-Sudais_192kbps', server: 'sds', name: 'السديس' },
-  'ghamdi': { folder: 'Ghamadi_40kbps', server: 'ghm', name: 'سعد الغامدي' },
+const DEFAULT_ARTWORK = Image.resolveAssetSource(require('../../../assets/images/mosque_bg.png')).uri;
+
+export const RECITER_MAP: Record<string, { folder: string, server: string, serverNum: string, name: string }> = {
+  'alafasy': { folder: 'Alafasy_128kbps', server: 'afs', serverNum: '8', name: 'مشاري العفاسي' },
+  'abdulbasit': { folder: 'Abdul_Basit_Murattal_64kbps', server: 'basit', serverNum: '7', name: 'عبد الباسط (مرتل)' },
+  'husary': { folder: 'Husary_128kbps', server: 'husr', serverNum: '13', name: 'الحصري' },
+  'sudais': { folder: 'Abdurrahmaan_As-Sudais_192kbps', server: 'sds', serverNum: '11', name: 'السديس' },
 };
 
+
+
 export class AudioService {
-  private static sound: Audio.Sound | null = null;
+  private static sound: any | null = null;
+  private static isTrackPlayerInitialized: boolean = false;
   private static currentSequence: { surahId: number, ayahNumber: number }[] = [];
   private static currentIndex: number = -1;
   private static activeReciterId: string = 'alafasy';
   private static onSequenceFinish?: () => void;
+
+  private static getAudio() {
+    return require('expo-av').Audio;
+  }
 
   static setReciter(id: string) {
     if (RECITER_MAP[id]) {
@@ -25,78 +35,87 @@ export class AudioService {
     return RECITER_MAP[this.activeReciterId];
   }
 
-  static async playSurah(surahId: number, onPlaybackStatusUpdate?: (status: any) => void) {
-    this.stopSequence();
-    try {
-      if (this.sound) {
-        await this.sound.unloadAsync();
-      }
-
-      const reciter = RECITER_MAP[this.activeReciterId];
-      const surahStr = surahId.toString().padStart(3, '0');
-      const audioUrl = `https://server8.mp3quran.net/${reciter.server}/${surahStr}.mp3`;
-
-      const { sound } = await Audio.Sound.createAsync(
-        { uri: audioUrl },
-        { shouldPlay: true },
-        onPlaybackStatusUpdate
-      );
-      
-      this.sound = sound;
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        staysActiveInBackground: true,
-        playsInSilentModeIOS: true,
-      });
-      
-      return sound;
-    } catch (error) {
-      console.error('Error playing surah:', error);
-      return null;
+  private static async ensureTrackPlayer() {
+    if (!this.isTrackPlayerInitialized) {
+      this.isTrackPlayerInitialized = await initializeTrackPlayer();
     }
   }
 
-  static async playAyah(surahId: number, ayahNumber: number, onPlaybackStatusUpdate?: (status: any) => void) {
-    this.stopSequence();
-    return this._playAyahInternal(surahId, ayahNumber, onPlaybackStatusUpdate);
+  static async playSurah(surahId: number, surahName?: string) {
+    this.stopSequence(); // Stop any AV ayahs/pages
+    if (this.sound) { try { await this.sound.unloadAsync(); } catch {} this.sound = null; }
+
+    try {
+      await this.ensureTrackPlayer();
+      await TrackPlayer.reset();
+      
+      const reciter = RECITER_MAP[this.activeReciterId];
+      const surahStr = surahId.toString().padStart(3, '0');
+      const audioUrl = `https://server${reciter.serverNum}.mp3quran.net/${reciter.server}/${surahStr}.mp3`;
+
+      console.log(`AudioService: Playing surah ${surahId} from ${audioUrl} (With Notification)`);
+
+      await TrackPlayer.add({
+        id: `surah-${surahId}`,
+        url: audioUrl,
+        title: surahName || `سورة رقم ${surahId}`,
+        artist: reciter.name,
+        artwork: require('../../../assets/images/mosque_bg.png'), // Use direct require
+      });
+
+      await TrackPlayer.play();
+      return true;
+    } catch (error) {
+      console.error('AudioService: Error playing surah:', error);
+      return false;
+    }
   }
 
-  private static async _playAyahInternal(surahId: number, ayahNumber: number, onPlaybackStatusUpdate?: (status: any) => void) {
-    try {
-      if (this.sound) {
-        await this.sound.unloadAsync();
-      }
 
+  static async playAyah(surahId: number, ayahNumber: number, surahName?: string) {
+    this.stopSequence();
+    return this._playAyahInternal(surahId, ayahNumber, surahName);
+  }
+
+  private static async _playAyahInternal(surahId: number, ayahNumber: number, surahName?: string) {
+    // 1. Reset TrackPlayer to remove any notification bar
+    try { await TrackPlayer.reset(); } catch {}
+
+    try {
       const reciter = RECITER_MAP[this.activeReciterId];
       const surahStr = surahId.toString().padStart(3, '0');
       const ayahStr = ayahNumber.toString().padStart(3, '0');
       const audioUrl = `https://everyayah.com/data/${reciter.folder}/${surahStr}${ayahStr}.mp3`;
 
-      const { sound } = await Audio.Sound.createAsync(
+      console.log(`AudioService: Playing ayah ${surahId}:${ayahNumber} (No Notification)`);
+
+      if (this.sound) { try { await this.sound.unloadAsync(); } catch {} }
+
+      const { sound } = await this.getAudio().Sound.createAsync(
         { uri: audioUrl },
-        { shouldPlay: true },
-        (status) => {
-          if (onPlaybackStatusUpdate) onPlaybackStatusUpdate(status);
-          if (status.isLoaded && status.didJustFinish && !status.isLooping) {
-            this._handleAyahFinish();
-          }
-        }
+        { shouldPlay: true, volume: 1.0 }
       );
-      
       this.sound = sound;
-      return sound;
+
+      sound.setOnPlaybackStatusUpdate((status: any) => {
+        if (status.didJustFinish) {
+          this._handleAyahFinish();
+        }
+      });
+      return true;
     } catch (error) {
-      console.error('Error playing ayah:', error);
-      return null;
+      console.error('AudioService: Error playing ayah:', error);
+      return false;
     }
   }
 
-  static async playSequence(items: { surahId: number, ayahNumber: number }[], onFinish?: () => void) {
+
+  static async playSequence(items: { surahId: number, ayahNumber: number }[], title?: string, onFinish?: () => void) {
     this.currentSequence = items;
     this.currentIndex = 0;
     this.onSequenceFinish = onFinish;
     if (items.length > 0) {
-      await this._playAyahInternal(items[0].surahId, items[0].ayahNumber);
+      await this._playAyahInternal(items[0].surahId, items[0].ayahNumber, title);
     }
   }
 
@@ -119,31 +138,59 @@ export class AudioService {
   }
 
   static async pause() {
-    if (this.sound) {
-      await this.sound.pauseAsync();
-    }
+    try { await TrackPlayer.pause(); } catch {}
+    if (this.sound) { try { await this.sound.pauseAsync(); } catch {} }
   }
 
   static async resume() {
+    // If we have a sound (AV), it means we were in a sequence/ayah
     if (this.sound) {
-      await this.sound.playAsync();
+      try { await this.sound.playAsync(); } catch {}
+    } else {
+      // Otherwise try TrackPlayer
+      try { 
+        await this.ensureTrackPlayer();
+        await TrackPlayer.play(); 
+      } catch {}
+    }
+  }
+
+  static async seek(positionMillis: number) {
+    try {
+      await this.ensureTrackPlayer();
+      await TrackPlayer.seekTo(positionMillis / 1000);
+    } catch {}
+    if (this.sound) {
+      try { await this.sound.setPositionAsync(positionMillis); } catch {}
     }
   }
 
   static async stop() {
     this.stopSequence();
+    try { await TrackPlayer.reset(); } catch {}
     if (this.sound) {
-      await this.sound.stopAsync();
-      await this.sound.unloadAsync();
+      try {
+        await this.sound.stopAsync();
+        await this.sound.unloadAsync();
+      } catch {}
       this.sound = null;
     }
   }
 
+
   static async playAzan(type: 'takbir' | 'full') {
     console.log('AudioService: playAzan called with type:', type);
     try {
-      // 1. Prepare system BEFORE loading
-      await Audio.setAudioModeAsync({
+      // 1. Fully reset TrackPlayer to remove the notification bar for non-recitations
+      try { 
+        await TrackPlayer.reset(); 
+        console.log('AudioService: TrackPlayer reset for Azan');
+      } catch (e) {
+        console.log('AudioService: Error resetting TP for Azan:', e);
+      }
+
+      // 2. Prepare system BEFORE loading expo-av
+      await this.getAudio().setAudioModeAsync({
         allowsRecordingIOS: false,
         staysActiveInBackground: true,
         playsInSilentModeIOS: true,
@@ -154,24 +201,19 @@ export class AudioService {
       });
 
       if (this.sound) {
-        console.log('AudioService: Unloading existing sound...');
         await this.sound.unloadAsync();
       }
 
-      console.log('AudioService: Loading azan.mp3 asset...');
       const azanAsset = require('../../../assets/audio/azan.mp3');
-
-      const { sound } = await Audio.Sound.createAsync(
+      const { sound } = await this.getAudio().Sound.createAsync(
         azanAsset,
         { shouldPlay: true, volume: 1.0 }
       );
       
       this.sound = sound;
-      console.log('AudioService: Sound loaded and playing at volume 1.0');
-
       return sound;
     } catch (error) {
-      console.error('AudioService: Fatal error in playAzan:', error);
+      console.error('AudioService: Error in playAzan:', error);
       return null;
     }
   }

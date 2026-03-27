@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Modal, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
-import { Video, ResizeMode } from 'expo-av';
 import { X, Volume2 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AudioService } from '../../../data/services/AudioService';
@@ -13,8 +12,19 @@ interface AzanVideoModalProps {
   prayerName: string;
 }
 
-export const AzanVideoModal: React.FC<AzanVideoModalProps> = ({ visible, onClose, prayerName }) => {
+const videoSource = require('../../../../assets/video/azan_video.mp4');
+
+const AzanVideoContent: React.FC<{ onClose: () => void, prayerName: string }> = ({ onClose, prayerName }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Move expo-video logic inside the component using require to avoid top-level JSI init
+  const { useVideoPlayer, VideoView } = require('expo-video');
+
+  const player = useVideoPlayer(videoSource, (player: any) => {
+    player.loop = true;
+    player.muted = true;
+    player.play();
+  });
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -27,48 +37,66 @@ export const AzanVideoModal: React.FC<AzanVideoModalProps> = ({ visible, onClose
   };
 
   return (
+    <View style={s.container}>
+      <VideoView
+        player={player}
+        style={s.video}
+        contentFit="cover"
+        nativeControls={false}
+      />
+      
+      <LinearGradient
+        colors={['rgba(0,0,0,0.6)', 'transparent', 'rgba(0,0,0,0.8)']}
+        style={s.overlay}
+      >
+        <View style={s.header}>
+          <TouchableOpacity style={s.closeBtn} onPress={handleClose}>
+            <X color="#fff" size={28} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={s.content}>
+          <Text style={s.timeText}>
+            {currentTime.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}
+          </Text>
+          <View style={s.prayerBadge}>
+            <Text style={s.prayerLabel}>نداء الحق: حان الآن موعد</Text>
+            <Text style={s.prayerName}>{prayerName}</Text>
+          </View>
+          
+          <View style={s.statusRow}>
+            <Volume2 color="#d4af37" size={20} />
+            <Text style={s.statusText}>الله أكبر.. الله أكبر.. نداء الصلاة يرفع الآن</Text>
+          </View>
+        </View>
+
+        <View style={s.footer}>
+          <Text style={s.quote}>"يا أيها الذين آمنوا إذا نودِي للصلاة من يوم الجمعة فاسعوا إلى ذكر الله"</Text>
+        </View>
+      </LinearGradient>
+    </View>
+  );
+};
+
+export const AzanVideoModal: React.FC<AzanVideoModalProps> = ({ visible, onClose, prayerName }) => {
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    if (visible) {
+      const timer = setTimeout(() => setShouldRender(true), 500);
+      return () => clearTimeout(timer);
+    } else {
+      setShouldRender(false);
+    }
+  }, [visible]);
+
+  return (
     <Modal visible={visible} animationType="fade" transparent statusBarTranslucent>
-      <View style={s.container}>
-        <Video
-          source={require('../../../../assets/video/azan_video.mp4')} 
-          style={s.video}
-          shouldPlay={visible}
-          isLooping
-          resizeMode={ResizeMode.COVER}
-          isMuted={true} // Audio handled by AudioService
-          onError={(error) => console.error('AzanVideoModal: Local Video Error:', error)}
-        />
-        
-        <LinearGradient
-          colors={['rgba(0,0,0,0.6)', 'transparent', 'rgba(0,0,0,0.8)']}
-          style={s.overlay}
-        >
-          <View style={s.header}>
-            <TouchableOpacity style={s.closeBtn} onPress={handleClose}>
-              <X color="#fff" size={28} />
-            </TouchableOpacity>
-          </View>
-
-          <View style={s.content}>
-            <Text style={s.timeText}>
-              {currentTime.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}
-            </Text>
-            <View style={s.prayerBadge}>
-              <Text style={s.prayerLabel}>حان الآن وقت</Text>
-              <Text style={s.prayerName}>{prayerName}</Text>
-            </View>
-            
-            <View style={s.statusRow}>
-              <Volume2 color="#d4af37" size={20} />
-              <Text style={s.statusText}>صوت الآذان يرفع الآن...</Text>
-            </View>
-          </View>
-
-          <View style={s.footer}>
-            <Text style={s.quote}>"يا أيها الذين آمنوا إذا نودِي للصلاة من يوم الجمعة فاسعوا إلى ذكر الله"</Text>
-          </View>
-        </LinearGradient>
-      </View>
+      {shouldRender ? (
+        <AzanVideoContent onClose={onClose} prayerName={prayerName} />
+      ) : (
+        <View style={{ flex: 1, backgroundColor: '#000' }} />
+      )}
     </Modal>
   );
 };

@@ -33,9 +33,14 @@ const INITIAL_TASKS: IbadaTask[] = [
   { id: 'silat_al_rahm', name: 'صلة الرحم', category: 'voluntary', isCompleted: false },
 ];
 
+const getLocalToday = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
 const initialState: IbadaState = {
   tasks: INITIAL_TASKS,
-  lastResetDate: new Date().toDateString(),
+  lastResetDate: getLocalToday(),
 };
 
 const ibadaSlice = createSlice({
@@ -49,7 +54,7 @@ const ibadaSlice = createSlice({
       }
     },
     syncIbadaDailyReset: (state) => {
-      const today = new Date().toDateString();
+      const today = getLocalToday();
       if (state.lastResetDate !== today) {
         state.tasks = state.tasks.map(t => ({ ...t, isCompleted: false }));
         state.lastResetDate = today;

@@ -71,7 +71,8 @@ export const s = StyleSheet.create({
   detailBlock: { backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 25, padding: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
   detailBlockHead: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 15 },
   detailBlockTitle: { fontFamily: 'Tajawal_700Bold', fontSize: 17, color: '#fff' },
-  detailBlockBadgeText: { fontFamily: 'Tajawal_700Bold', fontSize: 14 },
+  detailBlockBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+  detailBlockBadgeText: { fontFamily: 'Tajawal_700Bold', fontSize: 13 },
   detailBlockContent: { fontFamily: 'Tajawal_400Regular', fontSize: 14, color: '#94a3b8', lineHeight: 22 },
 
   // New Chart Components Styles

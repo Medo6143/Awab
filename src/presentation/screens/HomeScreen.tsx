@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, View, I18nManager } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { syncIbadaDailyReset } from '../store/slices/ibadaSlice';
@@ -42,7 +42,7 @@ const HomeScreen = ({ navigation }: any) => {
     const order = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
     
     for (const name of order) {
-      const [h, m] = (timings[name] || '00:00').split(':').map(Number);
+      const [h, m] = ((timings as any)[name] || '00:00').split(':').map(Number);
       const prayerTime = new Date();
       prayerTime.setHours(h, m, 0);
       
@@ -52,23 +52,22 @@ const HomeScreen = ({ navigation }: any) => {
         const mins = diff % 60;
         return {
           name: prayerNamesAr[name],
-          time: timings[name],
+          time: (timings as any)[name],
           countdown: hours > 0 ? `${hours}س و ${mins}د` : `${mins} دقيقة`
         };
       }
     }
-    // If all prayers passed, next is tomorrow's Fajr (simplified for UI)
     return { name: 'الفجر', time: timings.Fajr, countdown: 'غداً' };
   };
 
   const getDynamicContent = () => {
     if (!hijri) return { title: 'أوّاب', sub: 'تقبل الله منا ومنكم صالح الأعمال', isHoliday: false };
 
-    const day = parseInt(hijri.day);
-    const month = parseInt(hijri.month.number);
+    const day = parseInt(String(hijri.day));
+    const month = parseInt(String(hijri.month.number));
     const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
 
-    if (month === 9) return { title: 'أوّاب • رمضان', sub: 'شهر القرآن والتقوى', isHoliday: true, holidayName: 'رمضان' };
+    if (month === 9) return { title: ' • رمضان', sub: 'شهر القرآن والتقوى', isHoliday: true, holidayName: 'رمضان' };
     if (month === 10 && day <= 3) return { title: 'عيد فطر مبارك', sub: 'كل عام وأنتم بخير', isHoliday: true, holidayName: 'عيد الفطر' };
     if (month === 12 && day >= 10 && day <= 13) return { title: 'عيد أضحى مبارك', sub: 'أعاده الله علينا باليمن والبركات', isHoliday: true, holidayName: 'عيد الأضحى' };
     if (dayName === 'Friday') return { title: 'جمعة مباركة', sub: 'نور ما بين الجمعتين', isHoliday: false };
@@ -88,7 +87,7 @@ const HomeScreen = ({ navigation }: any) => {
   const completedSurahsCount = useSelector((state: RootState) => state.quran.completedSurahs?.length || 0);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#0c0805' }}>
+    <SafeAreaView style={styles.root}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         
         <HomeHeader 
@@ -116,8 +115,6 @@ const HomeScreen = ({ navigation }: any) => {
         />
 
         <HomeGrid onNavigate={navigation.navigate} />
-
-        <AthkarQuickSection onNavigate={navigation.navigate} />
 
         <DailyVerseCarousel />
 

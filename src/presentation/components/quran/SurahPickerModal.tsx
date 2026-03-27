@@ -21,7 +21,8 @@ interface Props {
   currentSurahId: number | null;
   isPlaying: boolean;
   isBuffering: boolean;
-  onPlaySurah: (n: number) => void;
+  onPlaySurah: (n: number, name: string) => void;
+  togglePlayback: () => void;
   onShowReciterPicker: () => void;
   surahsList: SurahMeta[];
 }
@@ -29,7 +30,7 @@ interface Props {
 export const SurahPickerModal = ({
   visible, onClose, pickerTab, setPickerTab, searchQuery, setSearchQuery,
   filteredSurahs, surahsLoading, onSurahSelect, onJuzSelect,
-  activeReciter, currentSurahId, isPlaying, isBuffering, onPlaySurah,
+  activeReciter, currentSurahId, isPlaying, isBuffering, onPlaySurah, togglePlayback,
   onShowReciterPicker, surahsList
 }: Props) => {
 
@@ -133,7 +134,13 @@ export const SurahPickerModal = ({
               keyExtractor={(item) => String(item.number)}
               renderItem={({ item }) => (
                 <TouchableOpacity 
-                   onPress={() => onPlaySurah(item.number)} 
+                   onPress={() => {
+                     if (currentSurahId === item.number) {
+                       togglePlayback();
+                     } else {
+                       onPlaySurah(item.number, item.name || '');
+                     }
+                   }} 
                    style={[s.surahEntry, currentSurahId === item.number && { borderColor: '#fcd34d', backgroundColor: '#2b1f15' }]}
                 >
                   <View style={s.surahNumHex}>
