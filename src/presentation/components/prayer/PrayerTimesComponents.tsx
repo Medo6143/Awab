@@ -1,45 +1,61 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Calendar, Bell, Clock } from 'lucide-react-native';
+import { View, Text } from 'react-native';
+import { Calendar, Bell, BellOff } from 'lucide-react-native';
 import { s } from './PrayerTimesStyles';
-import { formatRemaining, toAr, PRAYER_NAME_MAP } from './PrayerTimesConstants';
+import { toAr, PRAYER_NAME_MAP } from './PrayerTimesConstants';
+import { Card, StatNumber, Skeleton } from '../ui';
+import { colors, icon } from '../../../shared/theme/tokens';
+import { useAccent } from '../../../shared/theme/useAccent';
+import { formatCountdown } from '../../../shared/utils/format';
 
-export const PrayerCountdown = ({ nextPrayer, date }: any) => (
-  <View style={s.countdownContainer}>
-    <LinearGradient colors={['#1e293b', '#0c0805']} style={s.glassCard}>
-      <Text style={s.nextLabel}>الصلاة القادمة: {nextPrayer?.arName}</Text>
-      <Text style={s.remainingTime}>{formatRemaining(nextPrayer?.remaining || 0)}</Text>
-      <View style={s.dateRow}>
-        <Calendar size={16} color="#94a3b8" />
-        <Text style={s.dateText}>{date?.hijri?.day} {date?.hijri?.month?.ar} {date?.hijri?.year} هـ</Text>
+type NextPrayer = { name: string; arName: string; time: string; remaining: number } | null;
+
+export const PrayerCountdown = ({ nextPrayer, date }: { nextPrayer: NextPrayer; date?: any }) => {
+  const hijri = date?.hijri;
+  const isTomorrow = !!nextPrayer && nextPrayer.remaining < 0;
+  return (
+    <Card padding={0}>
+      <View style={s.hero}>
+        <Text style={s.heroEyebrow}>الصلاة القادمة</Text>
+        <Text style={s.heroName}>{nextPrayer?.arName ?? '—'}</Text>
+        <StatNumber
+          value={nextPrayer ? (isTomorrow ? 'غداً' : formatCountdown(nextPrayer.remaining)) : '—'}
+          caption={nextPrayer ? `تبدأ ${toAr(nextPrayer.time)}` : undefined}
+          size="display"
+          align="right"
+          color={colors.goldText}
+        />
+        {hijri ? (
+          <View style={s.heroDateRow}>
+            <Text style={s.heroDate}>{hijri.day} {hijri.month?.ar} {hijri.year} هـ</Text>
+            <Calendar size={icon.size.sm} color={colors.textMuted} strokeWidth={icon.stroke} />
+          </View>
+        ) : null}
       </View>
-    </LinearGradient>
-  </View>
-);
+    </Card>
+  );
+};
 
-export const PrayerTimeRow = ({ name, time, isActive }: any) => (
-  <View style={[s.timeRow, isActive && s.activeRow]}>
-    <View style={s.timeInfo}>
-      <Text style={[s.timeName, isActive && s.activeText]}>{PRAYER_NAME_MAP[name] || name}</Text>
-      <Text style={s.timeValue}>{toAr(time)}</Text>
+export const PrayerTimeRow = ({ name, time, isActive, notify }: { name: string; time: string; isActive: boolean; notify: boolean }) => {
+  const accent = useAccent();
+  const BellIcon = notify ? Bell : BellOff;
+  return (
+    <View style={[s.row, isActive && s.rowActive]} accessibilityLabel={`${PRAYER_NAME_MAP[name] || name} ${time}`}>
+      <View style={s.rowLeft}>
+        <BellIcon size={icon.size.md} color={notify ? (isActive ? accent.accent : colors.textFaint) : colors.textFaint} strokeWidth={icon.stroke} />
+        <Text style={[s.rowTime, isActive && s.rowTimeActive]}>{toAr(time)}</Text>
+      </View>
+      <View style={s.rowRight}>
+        {isActive ? <View style={s.nowPill}><Text style={s.nowPillText}>القادمة</Text></View> : null}
+        <Text style={[s.rowName, isActive && s.rowNameActive]}>{PRAYER_NAME_MAP[name] || name}</Text>
+        <View style={[s.dot, isActive && { backgroundColor: accent.accent }]} />
+      </View>
     </View>
-    <TouchableOpacity>
-      <Bell size={20} color={isActive ? '#fcd34d' : '#475569'} />
-    </TouchableOpacity>
-  </View>
-);
+  );
+};
 
-export const ImsakiyaCTA = () => (
-  <TouchableOpacity style={s.imsakiyaBtn}>
-    <LinearGradient
-      colors={['#B8860B', '#8B4513']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 0 }}
-      style={s.imsakiyaGradient}
-    >
-      <Clock color="#fff" size={20} />
-      <Text style={s.imsakiyaBtnText}>عرض إمساكية الشهر الكاملة</Text>
-    </LinearGradient>
-  </TouchableOpacity>
+export const PrayerListSkeleton = () => (
+  <View style={s.list}>
+    {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} height={64} radius={20} />)}
+  </View>
 );

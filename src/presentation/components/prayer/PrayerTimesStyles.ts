@@ -1,52 +1,34 @@
 import { StyleSheet } from 'react-native';
+import { colors, radius, space, type } from '../../../shared/theme/tokens';
 
 export const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#0c0805' },
-  center: { alignItems: 'center', justifyContent: 'center' },
-  header: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    padding: 20
-  },
-  backBtn: { padding: 10, backgroundColor: '#1a140f', borderRadius: 12 },
-  headerTitle: { fontFamily: 'Tajawal_700Bold', fontSize: 22, color: '#fcd34d' },
+  // ── Hero ──
+  hero: { padding: space[5], alignItems: 'flex-end' },
+  heroEyebrow: { ...type.label, color: colors.textMuted },
+  heroName: { ...type.h1, color: colors.text, marginTop: 2 },
+  heroDateRow: { flexDirection: 'row', alignItems: 'center', gap: space[2], marginTop: space[3] },
+  heroDate: { ...type.caption, color: colors.textMuted },
 
-  countdownContainer: { padding: 20 },
-  glassCard: { 
-    padding: 30, 
-    borderRadius: 32, 
-    alignItems: 'center', 
-    borderWidth: 1, 
-    borderColor: 'rgba(255,255,255,0.1)',
-    shadowColor: '#000',
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10
+  // ── Rows ──
+  list: { gap: space[2], marginTop: space[4] },
+  row: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: space[4], paddingVertical: space[4],
+    borderRadius: radius.card, backgroundColor: colors.surface,
   },
-  nextLabel: { fontFamily: 'Tajawal_700Bold', fontSize: 18, color: '#fcd34d', marginBottom: 10 },
-  remainingTime: { fontFamily: 'Tajawal_700Bold', fontSize: 48, color: '#fff', marginBottom: 15 },
-  dateRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  dateText: { fontFamily: 'Tajawal_400Regular', fontSize: 14, color: '#94a3b8' },
+  rowActive: { backgroundColor: colors.surfaceRaised },
+  rowRight: { flexDirection: 'row', alignItems: 'center', gap: space[3] },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: 'transparent' },
+  rowName: { ...type.bodyMedium, color: colors.textMuted },
+  rowNameActive: { color: colors.text, fontFamily: 'Tajawal_700Bold' },
+  rowTime: { ...type.h2, color: colors.text, fontVariant: ['tabular-nums'] },
+  rowTimeActive: { color: colors.goldText },
+  rowLeft: { flexDirection: 'row', alignItems: 'center', gap: space[3] },
+  nowPill: { backgroundColor: colors.goldSoft, paddingHorizontal: space[2], paddingVertical: 3, borderRadius: radius.pill },
+  nowPillText: { ...type.caption, color: colors.goldText },
 
-  listContainer: { paddingHorizontal: 20, gap: 12 },
-  timeRow: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    padding: 20, 
-    backgroundColor: '#1a140f', 
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: '#2b1f15'
-  },
-  activeRow: { borderColor: '#B8860B', backgroundColor: '#2b1f15' },
-  timeInfo: { flexDirection: 'row', alignItems: 'center', gap: 20 },
-  timeName: { fontFamily: 'Tajawal_700Bold', fontSize: 18, color: '#94a3b8' },
-  activeText: { color: '#fcd34d' },
-  timeValue: { fontFamily: 'Tajawal_700Bold', fontSize: 20, color: '#fff' },
+  skeletonRow: { height: 64, borderRadius: radius.card, marginBottom: space[2] },
 
-  imsakiyaBtn: { margin: 20, borderRadius: 20, overflow: 'hidden' },
-  imsakiyaGradient: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 18, gap: 12 },
-  imsakiyaBtnText: { fontFamily: 'Tajawal_700Bold', fontSize: 16, color: '#fff' }
+  // ── Hub ──
+  hubTabs: { flexDirection: 'row', gap: space[2], paddingHorizontal: 20, paddingBottom: space[3] },
 });

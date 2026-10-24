@@ -1,49 +1,60 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { MapPin, ChevronRight } from 'lucide-react-native';
+import { View } from 'react-native';
+import { MapPin } from 'lucide-react-native';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 import { usePrayerTimes } from '../hooks/usePrayerTimes';
-
-// Prayer Components & Styles
-import { PrayerCountdown, PrayerTimeRow, ImsakiyaCTA } from '../components/prayer/PrayerTimesComponents';
+import { Screen, ScreenHeader, ErrorState, EmptyState, Skeleton } from '../components/ui';
+import { PrayerCountdown, PrayerTimeRow, PrayerListSkeleton } from '../components/prayer/PrayerTimesComponents';
 import { s } from '../components/prayer/PrayerTimesStyles';
+import { space } from '../../shared/theme/tokens';
 
-const PrayerTimesScreen = ({ navigation, hideHeader }: any) => {
-  const { timings, date, nextPrayer, loading } = usePrayerTimes();
+const HIDDEN = ['Imsak', 'Midnight', 'Firstthird', 'Lastthird'];
 
-  if (loading) {
-    return (
-      <View style={[s.root, s.center]}>
-        <ActivityIndicator color="#fcd34d" size="large" />
-      </View>
+/** Standalone (stack) or embedded in PrayerHub with `hideHeader` + `tab`. */
+const PrayerTimesScreen = ({ navigation, hideHeader, tab }: any) => {
+  const { timings, date, nextPrayer, loading, error, hasLocation, retry } = usePrayerTimes();
+  const notificationsEnabled = useSelector((st: RootState) => st.settings.notificationsEnabled);
+  const prayersPref = useSelector((st: RootState) => (st.settings.notificationPrefs as any)?.prayers ?? true);
+  const notify = !!notificationsEnabled && !!prayersPref;
+
+  let body: React.ReactNode;
+  if (!hasLocation && !loading) {
+    body = <EmptyState icon={MapPin} title="حدّد موقعك" message="نحتاج الموقع لحساب مواقيت الصلاة في مدينتك" action={{ label: 'تفعيل الموقع', onPress: retry }} />;
+  } else if (error) {
+    body = <ErrorState message="تعذّر تحميل مواقيت الصلاة. تأكد من الاتصال بالإنترنت." onRetry={retry} />;
+  } else if (loading || !timings) {
+    body = (
+      <>
+        <Skeleton height={180} radius={20} />
+        <View style={{ height: space[4] }} />
+        <PrayerListSkeleton />
+      </>
+    );
+  } else {
+    body = (
+      <>
+        <PrayerCountdown nextPrayer={nextPrayer as any} date={date} />
+        <View style={s.list}>
+          {Object.entries(timings)
+            .filter(([k]) => !HIDDEN.includes(k))
+            .map(([name, time]) => (
+              <PrayerTimeRow key={name} name={name} time={time as string} isActive={nextPrayer?.name === name} notify={notify} />
+            ))}
+        </View>
+      </>
     );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#0c0805' }}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {!hideHeader && (
-          <View style={s.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn}><ChevronRight color="#fcd34d" size={24} /></TouchableOpacity>
-            <Text style={s.headerTitle}>مواقيت الصلاة</Text>
-            <TouchableOpacity style={s.backBtn}><MapPin color="#fcd34d" size={20} /></TouchableOpacity>
-          </View>
-        )}
-
-        <PrayerCountdown nextPrayer={nextPrayer} date={date} />
-
-        <View style={s.listContainer}>
-          {timings && Object.entries(timings)
-            .filter(([k]) => !['Imsak', 'Midnight', 'Firstthird', 'Lastthird'].includes(k))
-            .map(([name, time]) => (
-              <PrayerTimeRow key={name} name={name} time={time as string} isActive={nextPrayer?.name === name} />
-            ))}
-        </View>
-
-        <ImsakiyaCTA />
-        <View style={{ height: 40 }} />
-      </ScrollView>
-    </SafeAreaView>
+    <Screen
+      scroll
+      tab={tab}
+      edges={hideHeader ? [] : ['top']}
+      header={!hideHeader ? <ScreenHeader title="مواقيت الصلاة" onBack={() => navigation.goBack()} /> : undefined}
+    >
+      {body}
+    </Screen>
   );
 };
 

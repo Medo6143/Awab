@@ -1,45 +1,48 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Sunrise, Compass } from 'lucide-react-native';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store';
-import { THEME } from '../../shared/theme/constants';
+import { ScreenHeader, Chip } from '../components/ui';
+import { colors, icon } from '../../shared/theme/tokens';
+import { useAccent } from '../../shared/theme/useAccent';
+import { s } from '../components/prayer/PrayerTimesStyles';
 
 import PrayerTimesScreen from './PrayerTimesScreen';
 import QiblaScreen from './QiblaScreen';
-import { s } from '../components/prayer/PrayerHubStyles';
+
+type Tab = 'times' | 'qibla';
 
 const PrayerHubScreen = ({ route }: any) => {
-  const [activeTab, setActiveTab] = useState<'times' | 'qibla'>(route?.params?.screen === 'qibla' ? 'qibla' : 'times');
+  const [activeTab, setActiveTab] = useState<Tab>(route?.params?.screen === 'qibla' ? 'qibla' : 'times');
+  const accent = useAccent();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (route?.params?.screen) setActiveTab(route.params.screen);
   }, [route?.params?.screen]);
 
-  const { accentTheme } = useSelector((state: RootState) => state.settings);
-  const accentColor = (THEME.colors as any)[accentTheme] || THEME.colors.primary;
-
-  const Tab = ({ id, icon: Icon, label }: any) => (
-    <TouchableOpacity style={[s.tab, activeTab === id && s.activeTab]} onPress={() => setActiveTab(id)}>
-      <Icon size={20} color={activeTab === id ? accentColor : '#94a3b8'} />
-      <Text style={[s.tabLabel, activeTab === id && { color: accentColor }]}>{label}</Text>
-    </TouchableOpacity>
-  );
+  const iconColor = (id: Tab) => (activeTab === id ? accent.accentText : colors.textMuted);
 
   return (
-    <View style={s.root}>
-      <SafeAreaView style={[s.header, { backgroundColor: '#0c0805' }]}>
-        <View style={s.tabContainer}>
-          <Tab id="times" icon={Sunrise} label="المواقيت" />
-          <Tab id="qibla" icon={Compass} label="القبلة" />
-        </View>
-      </SafeAreaView>
-
-      <View style={s.content}>
-        {activeTab === 'times' ? <PrayerTimesScreen hideHeader /> : <QiblaScreen hideHeader />}
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
+      <ScreenHeader title="الصلاة" large />
+      <View style={s.hubTabs}>
+        <Chip
+          label="المواقيت"
+          selected={activeTab === 'times'}
+          onPress={() => setActiveTab('times')}
+          icon={<Sunrise size={icon.size.md} color={iconColor('times')} strokeWidth={icon.stroke} />}
+        />
+        <Chip
+          label="القبلة"
+          selected={activeTab === 'qibla'}
+          onPress={() => setActiveTab('qibla')}
+          icon={<Compass size={icon.size.md} color={iconColor('qibla')} strokeWidth={icon.stroke} />}
+        />
       </View>
-    </View>
+      <View style={{ flex: 1 }}>
+        {activeTab === 'times' ? <PrayerTimesScreen hideHeader tab /> : <QiblaScreen hideHeader tab />}
+      </View>
+    </SafeAreaView>
   );
 };
 
