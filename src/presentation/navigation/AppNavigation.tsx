@@ -1,17 +1,11 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { NavigationContainer } from '@react-navigation/native';
-import { View, Platform } from 'react-native';
-import { 
-  LayoutGrid, BookOpen, CircleDot, Clock, Compass, Mic, CheckSquare, Settings 
-} from 'lucide-react-native';
-import { FontAwesome5, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useDispatch, useSelector } from 'react-redux';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import { View } from 'react-native';
 import { useAudio } from '../hooks/useAudio';
-import { AudioPlayerBar } from '../components/quran/AudioPlayerBar';
-import { RootState } from '../store';
-import { useSurahs } from '../hooks/useQuran';
+import { colors } from '../../shared/theme/tokens';
+import { GlassTabBar } from './GlassTabBar';
 
 import HomeScreen from '../screens/HomeScreen';
 import QuranScreen from '../screens/QuranScreen';
@@ -26,95 +20,53 @@ import ZakatScreen from '../screens/ZakatScreen';
 import IbadaTodoScreen from '../screens/IbadaTodoScreen';
 import PrayerHubScreen from '../screens/PrayerHubScreen';
 import StatsScreen from '../screens/StatsScreen';
-import { THEME } from '../../shared/theme/constants';
 
-const Tab = createBottomTabNavigator();
+/**
+ * Route names:
+ *  - Tabs use stable ids (TabHome…); their Arabic labels live in `options.title`.
+ *  - Stack routes keep their Arabic names (used all over the app for navigate()).
+ *  - Tasbeeh is a tab now; `navigate('TabTasbeeh')` works from any nested screen.
+ */
+export type TabParamList = {
+  TabHome: undefined;
+  TabPrayer: undefined;
+  TabQuran: undefined;
+  TabTasbeeh: undefined;
+  TabAthkar: { type?: 'morning' | 'evening' } | undefined;
+};
+
+const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createStackNavigator();
 
 const TabNavigator = () => (
   <Tab.Navigator
-    screenOptions={{
-      headerShown: false,
-      tabBarStyle: {
-        position: 'absolute',
-        bottom: 25,
-        left: 20,
-        right: 20,
-        backgroundColor: '#1a140f',
-        borderRadius: 25,
-        height: 70,
-        borderTopWidth: 0,
-        elevation: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3,
-        shadowRadius: 15,
-        paddingBottom: Platform.OS === 'ios' ? 20 : 10,
-        paddingTop: 10,
-        borderWidth: 1,
-        borderColor: '#2b1f15',
-      },
-      tabBarActiveTintColor: THEME.colors.gold,
-      tabBarInactiveTintColor: '#64748b',
-      tabBarLabelStyle: {
-        fontFamily: 'Tajawal_500Medium',
-        fontSize: 11,
-        marginTop: -5,
-        textAlign: 'center',
-        writingDirection: 'rtl'
-      }
-    }}
+    tabBar={(props) => <GlassTabBar {...props} />}
+    screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: colors.bg } }}
   >
-    <Tab.Screen
-      name="الرئيسية"
-      component={HomeScreen}
-      options={{
-        tabBarIcon: ({ color, size }: any) => <FontAwesome5 name="home" color={color} size={size} />,
-      }}
-    />
-    <Tab.Screen
-      name="القرآن"
-      component={QuranScreen}
-      options={{
-        tabBarIcon: ({ color, size }: any) => <MaterialCommunityIcons name="book-open-page-variant" color={color} size={size + 2} />,
-        tabBarStyle: { display: 'none' }
-      }}
-    />
-    <Tab.Screen
-      name="الصلاة"
-      component={PrayerHubScreen}
-      options={{
-        tabBarIcon: ({ color, size }: any) => <FontAwesome5 name="mosque" color={color} size={size} />,
-      }}
-    />
-    <Tab.Screen
-      name="الأذكار"
-      component={AthkarScreen}
-      options={{
-        tabBarIcon: ({ color, size }: any) => <MaterialCommunityIcons name="star-crescent" color={color} size={size + 2} />,
-      }}
-    />
+    <Tab.Screen name="TabHome" component={HomeScreen} options={{ title: 'الرئيسية' }} />
+    <Tab.Screen name="TabPrayer" component={PrayerHubScreen} options={{ title: 'الصلاة' }} />
+    <Tab.Screen name="TabQuran" component={QuranScreen} options={{ title: 'القرآن', tabBarStyle: { display: 'none' } }} />
+    <Tab.Screen name="TabTasbeeh" component={TasbeehScreen} options={{ title: 'المسبحة' }} />
+    <Tab.Screen name="TabAthkar" component={AthkarScreen} options={{ title: 'الأذكار' }} />
   </Tab.Navigator>
 );
 
+const navTheme = {
+  ...DefaultTheme,
+  dark: true,
+  colors: { ...DefaultTheme.colors, background: colors.bg, card: colors.bg, text: colors.text, primary: colors.gold, border: 'transparent' },
+};
+
 const AppNavigation = () => {
-  const dispatch = useDispatch();
-  const { 
-    isPlaying, isBuffering, currentSurahId, activeReciter,
-    currentPosition, duration, playMode,
-    togglePlayback, seekTo, stopPlayback 
-  } = useAudio();
-  
-  const { data: surahsData } = useSurahs();
-  const surahsList = (surahsData as any[]) ?? [];
+  // Keeps the global audio state in sync with TrackPlayer while any screen is mounted.
+  useAudio();
 
   return (
-    <NavigationContainer>
-      <View style={{ flex: 1 }}>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <NavigationContainer theme={navTheme}>
+      <View style={{ flex: 1, backgroundColor: colors.bg }}>
+        <Stack.Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: colors.bg } }}>
           <Stack.Screen name="MainTabs" component={TabNavigator} />
           <Stack.Screen name="الأذكار" component={AthkarScreen} />
-          <Stack.Screen name="المسبحة" component={TasbeehScreen} />
           <Stack.Screen name="الأدعية" component={DuaScreen} />
           <Stack.Screen name="نور_القلب" component={HeartJourneyScreen} />
           <Stack.Screen name="القبلة" component={QiblaScreen} />
@@ -124,23 +76,6 @@ const AppNavigation = () => {
           <Stack.Screen name="الإعدادات" component={SettingsScreen} />
           <Stack.Screen name="الإحصائيات" component={StatsScreen} />
         </Stack.Navigator>
-
-        {/* Global Audio Player Bar - Hidden to rely on system notification only */}
-        {/* {playMode === 'surah' && (
-          <AudioPlayerBar
-            isPlaying={isPlaying}
-            isBuffering={isBuffering}
-            currentPosition={currentPosition}
-            duration={duration}
-            onTogglePlayback={togglePlayback}
-            onSeek={seekTo}
-            onClose={stopPlayback}
-            onForward={() => seekTo(currentPosition + 15000)}
-            onBackward={() => seekTo(Math.max(0, currentPosition - 15000))}
-            surahName={surahsList.find(sur => sur.number === currentSurahId)?.name}
-            reciterName={activeReciter?.name}
-          />
-        )} */}
       </View>
     </NavigationContainer>
   );

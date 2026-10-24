@@ -114,7 +114,7 @@ const HomeScreen = ({ navigation }: any) => {
           onPress={() => navigation.navigate('نور_القلب')}
         />
 
-        <HomeGrid onNavigate={navigation.navigate} />
+        <HomeGrid onNavigate={(name: string, params?: any) => navigation.navigate(name === 'المسبحة' ? 'TabTasbeeh' : name, params)} />
 
         <DailyVerseCarousel />
 

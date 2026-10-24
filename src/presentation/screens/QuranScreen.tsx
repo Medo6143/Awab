@@ -143,7 +143,7 @@ const QuranScreen = ({ navigation }: any) => {
       {/* Top Navigation Bar */}
       <View style={s.topBar}>
         <View style={s.topActions}>
-          <TouchableOpacity onPress={() => navigation.navigate('الرئيسية')} style={s.iconBtn}>
+          <TouchableOpacity onPress={() => navigation.navigate('TabHome')} style={s.iconBtn}>
             <Home size={21} color="#fbbf24" />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setShowBookmarks(true)} style={s.iconBtn}>
