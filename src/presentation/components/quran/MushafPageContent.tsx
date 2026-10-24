@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { AlertTriangle } from 'lucide-react-native';
+import { colors } from '../../../shared/theme/tokens';
 import { Bookmark } from 'lucide-react-native';
 import { pageCache, toAr, TOTAL_PAGES, Ayah } from './QuranConstants';
 import { s } from './QuranStyles';
@@ -21,6 +23,8 @@ export const MushafPageContent = React.memo(({
 }: Props) => {
   const [ayahs, setAyahs] = useState<Ayah[]>(pageCache.get(pageNum) ?? []);
   const [loading, setLoading] = useState(!pageCache.has(pageNum));
+  const [error, setError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const [prevPageNum, setPrevPageNum] = useState(pageNum);
   const scrollRef = useRef<ScrollView>(null);
 
@@ -61,18 +65,20 @@ export const MushafPageContent = React.memo(({
       return;
     }
     setLoading(true);
+    setError(false);
     fetch(`https://api.alquran.cloud/v1/page/${pageNum}/quran-uthmani`)
       .then(r => r.json())
       .then(json => {
         const data = json?.data?.ayahs ?? [];
+        if (!data.length) throw new Error('empty page');
         pageCache.set(pageNum, data);
         setAyahs(data);
         setLoading(false);
         prefetch(pageNum + 1);
         prefetch(pageNum - 1);
       })
-      .catch(() => setLoading(false));
-  }, [pageNum, prefetch]);
+      .catch(() => { setLoading(false); setError(true); });
+  }, [pageNum, prefetch, attempt]);
 
   const surahGroups = useMemo(() => {
     const groups: { surahNum: number; surahName: string; ayahs: Ayah[] }[] = [];
@@ -95,7 +101,7 @@ export const MushafPageContent = React.memo(({
           <View style={s.ornateLine} />
         </View>
         <TouchableOpacity onPress={onToggleBookmark} style={s.headerBookmark}>
-          <Bookmark size={22} color={isBookmarked ? '#78350f' : '#d4af37'} fill={isBookmarked ? '#78350f' : 'none'} />
+          <Bookmark size={22} color={colors.paperInk} fill={isBookmarked ? colors.paperInk : 'none'} />
         </TouchableOpacity>
         <View style={s.headerCornerRight} />
       </View>
@@ -103,8 +109,16 @@ export const MushafPageContent = React.memo(({
       <ScrollView ref={scrollRef} contentContainerStyle={s.ayahList} showsVerticalScrollIndicator={false}>
         {loading ? (
           <View style={s.centerLoader}>
-            <ActivityIndicator size="large" color="#d4af37" />
+            <ActivityIndicator size="large" color={colors.gold} />
             <Text style={s.loaderSub}>يتم جلب الآيات...</Text>
+          </View>
+        ) : error ? (
+          <View style={s.pageError}>
+            <AlertTriangle size={32} color={colors.goldDeep} style={{ alignSelf: 'center' }} />
+            <Text style={s.pageErrorText}>تعذّر تحميل الصفحة. تأكد من الاتصال بالإنترنت.</Text>
+            <TouchableOpacity style={s.pageRetryBtn} onPress={() => setAttempt((a) => a + 1)} accessibilityRole="button">
+              <Text style={s.pageRetryText}>إعادة المحاولة</Text>
+            </TouchableOpacity>
           </View>
         ) : (
           surahGroups.map(group => (

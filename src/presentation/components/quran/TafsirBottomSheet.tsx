@@ -3,6 +3,7 @@ import { View, Text, Modal, Pressable, Animated, ScrollView, TouchableOpacity, S
 import { Share2, Copy, Star, Play, X } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import { s } from './QuranStyles';
+import { colors } from '../../../shared/theme/tokens';
 import { toAr, Ayah } from './QuranConstants';
 
 interface Props {
@@ -43,7 +44,7 @@ export const TafsirBottomSheet = ({
     if (tafsirLoading) {
       return (
         <View style={s.tafsirLoader}>
-          <ActivityIndicator color="#C8771E" />
+          <ActivityIndicator color={colors.goldDeep} />
           <Text style={s.loadingTextSmall}>إحضار التفسير...</Text>
         </View>
       );
@@ -111,22 +112,22 @@ export const TafsirBottomSheet = ({
           </View>
           <View style={s.sheetToolBar}>
             <TouchableOpacity style={s.sheetToolBtn} onPress={onToggleBookmark}>
-              <Star size={24} color="#b45309" fill={selectedAyah && bookmarks.includes(selectedAyah.number) ? "#b45309" : "transparent"} />
+              <Star size={24} color={colors.paperInk} fill={selectedAyah && bookmarks.includes(selectedAyah.number) ? colors.paperInk : "transparent"} />
               <Text style={s.sheetToolLab}>حفظ</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={s.sheetToolBtn} 
               onPress={() => selectedAyah && onPlayAyah(selectedAyah.surah.number, selectedAyah.numberInSurah, selectedAyah.surah.name)}
             >
-              <Play size={24} color="#b45309" />
+              <Play size={24} color={colors.paperInk} />
               <Text style={s.sheetToolLab}>الصوت</Text>
             </TouchableOpacity>
             <TouchableOpacity style={s.sheetToolBtn} onPress={handleShare}>
-              <Share2 size={24} color="#b45309" />
+              <Share2 size={24} color={colors.paperInk} />
               <Text style={s.sheetToolLab}>مشاركة</Text>
             </TouchableOpacity>
             <TouchableOpacity style={s.sheetToolBtn} onPress={handleCopy}>
-              <Copy size={24} color="#b45309" />
+              <Copy size={24} color={colors.paperInk} />
               <Text style={s.sheetToolLab}>نسخ</Text>
             </TouchableOpacity>
           </View>

@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, Text, Modal, TouchableOpacity, TextInput, FlatList, ActivityIndicator, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { X, Search, Play, Pause, User, Star } from 'lucide-react-native';
+import { X, Search, Play, Pause, User, BookOpen, Star } from 'lucide-react-native';
+import { Chip, ErrorState, EmptyState, ScreenHeader } from '../ui';
+import { colors } from '../../../shared/theme/tokens';
 import { s } from './QuranStyles';
 import { toAr, SurahMeta, JUZ_PAGES } from './QuranConstants';
 import { RECITER_MAP } from '../../../data/services/AudioService';
@@ -15,6 +17,8 @@ interface Props {
   setSearchQuery: (q: string) => void;
   filteredSurahs: SurahMeta[];
   surahsLoading: boolean;
+  surahsError?: boolean;
+  onRetrySurahs?: () => void;
   onSurahSelect: (n: number) => void;
   onJuzSelect: (n: number) => void;
   activeReciter: any;
@@ -29,53 +33,49 @@ interface Props {
 
 export const SurahPickerModal = ({
   visible, onClose, pickerTab, setPickerTab, searchQuery, setSearchQuery,
-  filteredSurahs, surahsLoading, onSurahSelect, onJuzSelect,
+  filteredSurahs, surahsLoading, surahsError, onRetrySurahs, onSurahSelect, onJuzSelect,
   activeReciter, currentSurahId, isPlaying, isBuffering, onPlaySurah, togglePlayback,
   onShowReciterPicker, surahsList
 }: Props) => {
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#0c0805' }}>
-        <View style={s.modalHead}>
-          <TouchableOpacity onPress={onClose}><X size={26} color="#fcd34d" /></TouchableOpacity>
-          <Text style={s.modalHeadTitle}>فهرس القرآن</Text>
-          <View style={{ width: 26 }} />
-        </View>
-        
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
+        <ScreenHeader
+          title="فهرس القرآن"
+          right={<TouchableOpacity onPress={onClose} style={s.iconBtn} accessibilityLabel="إغلاق"><X size={22} color={colors.text} /></TouchableOpacity>}
+        />
+
         <View style={s.pickerTabs}>
-          <TouchableOpacity onPress={() => setPickerTab('surah')} style={[s.pickerTab, pickerTab === 'surah' && s.pickerTabActive]}>
-            <Text style={[s.tabLabel, pickerTab === 'surah' && s.tabLabelActive]}>السور</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setPickerTab('juz')} style={[s.pickerTab, pickerTab === 'juz' && s.pickerTabActive]}>
-            <Text style={[s.tabLabel, pickerTab === 'juz' && s.tabLabelActive]}>الأجزاء</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setPickerTab('audio')} style={[s.pickerTab, pickerTab === 'audio' && s.pickerTabActive]}>
-            <Text style={[s.tabLabel, pickerTab === 'audio' && s.tabLabelActive]}>تلاوة كاملة</Text>
-          </TouchableOpacity>
+          <Chip label="السور" selected={pickerTab === 'surah'} onPress={() => setPickerTab('surah')} />
+          <Chip label="الأجزاء" selected={pickerTab === 'juz'} onPress={() => setPickerTab('juz')} />
+          <Chip label="تلاوة كاملة" selected={pickerTab === 'audio'} onPress={() => setPickerTab('audio')} />
         </View>
 
         {pickerTab === 'surah' ? (
           <>
             <View style={s.searchFieldWrap}>
-              <Search size={20} color="#d4af37" />
+              <Search size={18} color={colors.textMuted} />
               <TextInput 
                 style={s.searchInput} 
                 placeholder="ابحث باسم السورة..." 
                 value={searchQuery} 
                 onChangeText={setSearchQuery} 
                 textAlign="right" 
-                placeholderTextColor="#94a3b8" 
+                placeholderTextColor={colors.textFaint}
               />
             </View>
-            {surahsLoading ? <ActivityIndicator size="large" color="#fcd34d" /> : (
+            {surahsLoading ? <ActivityIndicator size="large" color={colors.gold} style={{ marginTop: 40 }} /> : surahsError ? (
+              <ErrorState message="تعذّر تحميل فهرس السور" onRetry={onRetrySurahs} />
+            ) : (
               <FlatList
                 key="surah-list"
                 data={filteredSurahs}
                 keyExtractor={(item) => String(item.number)}
+                ListEmptyComponent={<EmptyState icon={BookOpen} title="لا توجد نتائج" message="جرّب اسماً آخر أو رقم السورة" />}
                 renderItem={({ item }) => (
                   <TouchableOpacity onPress={() => onSurahSelect(item.number)} style={s.surahEntry}>
-                    <View style={s.surahNumHex}><Text style={s.surahNumHexText}>{item.number}</Text></View>
+                    <View style={s.surahNumHex}><Text style={s.surahNumHexText}>{toAr(item.number)}</Text></View>
                     <View style={s.surahTextSection}>
                       <View style={s.surahRowTop}>
                         <Text style={s.surahEntryName}>{item.name}</Text>
@@ -124,7 +124,7 @@ export const SurahPickerModal = ({
                 <Text style={s.reciterActiveName}>{activeReciter?.name}</Text>
               </View>
               <TouchableOpacity onPress={onShowReciterPicker} style={s.changeReciterBtn}>
-                <User size={18} color="#fcd34d" />
+                <User size={18} color={colors.goldText} />
                 <Text style={s.changeReciterText}>تغيير القارئ</Text>
               </TouchableOpacity>
             </View>
@@ -141,13 +141,13 @@ export const SurahPickerModal = ({
                        onPlaySurah(item.number, item.name || '');
                      }
                    }} 
-                   style={[s.surahEntry, currentSurahId === item.number && { borderColor: '#fcd34d', backgroundColor: '#2b1f15' }]}
+                   style={[s.surahEntry, currentSurahId === item.number && s.surahEntryActive]}
                 >
                   <View style={s.surahNumHex}>
                     {currentSurahId === item.number && isPlaying ? (
-                      <Pause size={18} color="#fcd34d" fill="#fcd34d" />
+                      <Pause size={18} color={colors.goldText} fill={colors.goldText} />
                     ) : (
-                      <Play size={18} color="#fcd34d" fill="#fcd34d" />
+                      <Play size={18} color={colors.goldText} fill={colors.goldText} />
                     )}
                   </View>
                   <View style={s.surahTextSection}>
@@ -155,7 +155,7 @@ export const SurahPickerModal = ({
                     <Text style={s.surahEntrySub}>تلاوة كاملة لـ {item.englishName}</Text>
                   </View>
                   {currentSurahId === item.number && isBuffering && (
-                    <ActivityIndicator size="small" color="#fcd34d" />
+                    <ActivityIndicator size="small" color={colors.goldText} />
                   )}
                 </TouchableOpacity>
               )}

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Modal, ScrollView, TouchableOpacity } from 'react-native';
 import { X, Star } from 'lucide-react-native';
 import { s } from './QuranStyles';
+import { colors } from '../../../shared/theme/tokens';
 import { RECITER_MAP } from '../../../data/services/AudioService';
 
 interface Props {
@@ -19,7 +20,7 @@ export const ReciterPickerModal = ({ visible, onClose, activeReciter, onReciterC
           <View style={s.reciterModalHead}>
             <Text style={s.reciterModalTitle}>اختر القارئ</Text>
             <TouchableOpacity onPress={onClose}>
-              <X size={24} color="#fcd34d" />
+              <X size={24} color={colors.goldText} />
             </TouchableOpacity>
           </View>
           <ScrollView>
@@ -32,7 +33,7 @@ export const ReciterPickerModal = ({ visible, onClose, activeReciter, onReciterC
                 <Text style={[s.reciterItemName, activeReciter?.name === r.name && s.reciterItemNameActive]}>
                   {r.name}
                 </Text>
-                {activeReciter?.name === r.name && <Star size={18} color="#fcd34d" fill="#fcd34d" />}
+                {activeReciter?.name === r.name && <Star size={18} color={colors.goldText} fill={colors.goldText} />}
               </TouchableOpacity>
             ))}
           </ScrollView>

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Text, ActivityIndicator, TouchableOpacity, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PagerView from 'react-native-pager-view';
+import { colors } from '../../shared/theme/tokens';
 import { useDispatch, useSelector } from 'react-redux';
 import { Bookmark, BookOpen, ChevronLeft, ChevronRight, Play, Pause, Settings, Home } from 'lucide-react-native';
 import { useAudio } from '../hooks/useAudio';
@@ -50,7 +51,7 @@ const QuranScreen = ({ navigation }: any) => {
   } = useAudio();
 
   const bottomSheetAnim = useRef(new Animated.Value(H)).current;
-  const { data: surahsData, isLoading: surahsLoading } = useSurahs();
+  const { data: surahsData, isLoading: surahsLoading, isError: surahsError, refetch: refetchSurahs } = useSurahs() as any;
   
   const surahsList = (surahsData as SurahMeta[] | undefined) ?? [];
   const filteredSurahs = surahsList.filter(s =>
@@ -139,18 +140,18 @@ const QuranScreen = ({ navigation }: any) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#0c0805' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
       {/* Top Navigation Bar */}
       <View style={s.topBar}>
         <View style={s.topActions}>
           <TouchableOpacity onPress={() => navigation.navigate('TabHome')} style={s.iconBtn}>
-            <Home size={21} color="#fbbf24" />
+            <Home size={21} color={colors.gold} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setShowBookmarks(true)} style={s.iconBtn}>
-            <Bookmark size={21} color={bookmarkedPages.length > 0 ? '#fbbf24' : '#d4af37'} fill={bookmarkedPages.length > 0 ? '#fbbf24' : 'none'} />
+            <Bookmark size={21} color={colors.gold} fill={bookmarkedPages.length > 0 ? colors.gold : 'none'} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('الإعدادات')} style={s.iconBtn}>
-            <Settings size={21} color="#fbbf24" />
+            <Settings size={21} color={colors.gold} />
           </TouchableOpacity>
         </View>
         <Text style={s.topTitle}>المصحف الشريف</Text>
@@ -173,15 +174,15 @@ const QuranScreen = ({ navigation }: any) => {
             style={s.iconBtn}
           >
             {isBuffering ? (
-              <ActivityIndicator size="small" color="#fbbf24" />
+              <ActivityIndicator size="small" color={colors.gold} />
             ) : isPlaying ? (
-              <Pause size={21} color="#fbbf24" fill="#fbbf24" />
+              <Pause size={21} color={colors.gold} fill={colors.gold} />
             ) : (
-              <Play size={21} color="#fbbf24" fill="#fbbf24" />
+              <Play size={21} color={colors.gold} fill={colors.gold} />
             )}
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setShowSurahPicker(true)} style={s.iconBtn}>
-            <BookOpen size={21} color="#fbbf24" />
+            <BookOpen size={21} color={colors.gold} />
           </TouchableOpacity>
         </View>
       </View>
@@ -222,7 +223,7 @@ const QuranScreen = ({ navigation }: any) => {
           style={[s.navBtn, currentPage <= 1 && s.btnDisabled]}
           disabled={currentPage <= 1}
         >
-          <ChevronRight size={22} color="#fcd34d" />
+          <ChevronRight size={22} color={colors.text} />
           <Text style={s.navBtnText}>السابقة</Text>
         </TouchableOpacity>
 
@@ -236,7 +237,7 @@ const QuranScreen = ({ navigation }: any) => {
           disabled={currentPage >= TOTAL_PAGES}
         >
           <Text style={s.navBtnText}>التالية</Text>
-          <ChevronLeft size={22} color="#fcd34d" />
+          <ChevronLeft size={22} color={colors.text} />
         </TouchableOpacity>
       </View>
 
@@ -264,6 +265,8 @@ const QuranScreen = ({ navigation }: any) => {
         setSearchQuery={setSearchQuery}
         filteredSurahs={filteredSurahs}
         surahsLoading={surahsLoading}
+        surahsError={!!surahsError}
+        onRetrySurahs={() => refetchSurahs?.()}
         onSurahSelect={handleSurahSelect}
         onJuzSelect={(n) => {
             dispatch(setCurrentPage(JUZ_PAGES[n-1]));

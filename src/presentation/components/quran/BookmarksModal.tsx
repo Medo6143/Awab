@@ -3,6 +3,7 @@ import { View, Text, Modal, TouchableOpacity, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { X, Bookmark } from 'lucide-react-native';
 import { s } from './QuranStyles';
+import { colors } from '../../../shared/theme/tokens';
 import { toAr } from './QuranConstants';
 
 interface Props {
@@ -15,9 +16,9 @@ interface Props {
 export const BookmarksModal = ({ visible, onClose, bookmarkedPages, onPageSelect }: Props) => {
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#0c0805' }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
         <View style={s.modalHead}>
-          <TouchableOpacity onPress={onClose}><X size={26} color="#fcd34d" /></TouchableOpacity>
+          <TouchableOpacity onPress={onClose}><X size={26} color={colors.goldText} /></TouchableOpacity>
           <Text style={s.modalHeadTitle}>العلامات المرجعية</Text>
           <View style={{ width: 26 }} />
         </View>
@@ -26,7 +27,7 @@ export const BookmarksModal = ({ visible, onClose, bookmarkedPages, onPageSelect
           keyExtractor={p => String(p)}
           renderItem={({ item }) => (
             <TouchableOpacity onPress={() => onPageSelect(item)} style={s.bookmarkRow}>
-              <Bookmark size={22} color="#fcd34d" fill="#fcd34d" />
+              <Bookmark size={22} color={colors.goldText} fill={colors.goldText} />
               <Text style={s.bookmarkRowLabel}>صفحة {toAr(item)}</Text>
             </TouchableOpacity>
           )}
