@@ -116,5 +116,5 @@ const s = StyleSheet.create({
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 40 },
   statusText: { fontFamily: 'Tajawal_500Medium', fontSize: 16, color: '#d4af37' },
   footer: { alignItems: 'center' },
-  quote: { fontFamily: 'Amiri_400Regular', fontSize: 18, color: '#94a3b8', textAlign: 'center', fontStyle: 'italic' },
+  quote: { fontFamily: 'Amiri_400Regular', fontSize: 18, color: '#a89f93', textAlign: 'center', fontStyle: 'italic' },
 });
