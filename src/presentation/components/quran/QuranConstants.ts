@@ -8,9 +8,7 @@ export const JUZ_PAGES = [
   402, 422, 442, 462, 482, 502, 522, 542, 562, 582
 ];
 
-export function toAr(n: number) {
-  return n.toString().replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[+d]);
-}
+export { toAr } from '../../../shared/utils/format';
 
 export function stripHtml(html: string) {
   return html.replace(/<[^>]*>?/gm, '').trim();

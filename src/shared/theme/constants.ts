@@ -1,27 +1,23 @@
+// Legacy THEME object kept for existing imports. New code should import from ./tokens.
+// Values are derived from the design tokens so the two can never drift apart.
+import { colors, font, space, ACCENTS } from './tokens';
+
 export const THEME = {
   colors: {
-    primary: '#B8860B',
+    primary: colors.gold,
     secondary: '#8B0000',
-    background: '#0c0805',
-    surface: '#1a140f',
-    border: '#2b1f15',
-    text: '#fff',
-    textMuted: '#94a3b8',
-    gold: '#fcd34d',
-    emerald: '#065f46',
-    midnight: '#1e1b4b',
+    background: colors.bg,
+    surface: colors.surface,
+    border: colors.hairline,
+    text: colors.text,
+    textMuted: colors.textMuted,
+    // Flipped to the single accent gold at the end of the redesign (was #fcd34d).
+    gold: ACCENTS.gold.accent,
+    emerald: ACCENTS.emerald.accent,
+    midnight: ACCENTS.midnight.accent,
   },
-  spacing: {
-    xs: 4,
-    sm: 8,
-    md: 16,
-    lg: 24,
-    xl: 32,
-  },
-  fonts: {
-    regular: 'Tajawal_400Regular',
-    medium: 'Tajawal_500Medium',
-    bold: 'Tajawal_700Bold',
-    quran: 'Amiri_700Bold',
-  }
+  spacing: { xs: space[1], sm: space[2], md: space[4], lg: space[6], xl: space[8] },
+  fonts: { regular: font.regular, medium: font.medium, bold: font.bold, quran: font.quran },
 };
+
+export { tokens, colors, radius, space, font, type, elevation, icon, layout, ACCENTS } from './tokens';

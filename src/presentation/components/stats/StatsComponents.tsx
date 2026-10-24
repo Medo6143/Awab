@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { TrendingUp } from 'lucide-react-native';
 import { s } from './StatsStyles';
 
-const toAr = (n: number | string) => n.toLocaleString('ar-EG');
+import { toAr } from '../../../shared/utils/format';
 
 export const PremiumStatCard = ({ icon, label, value, percentage, color }: any) => (
   <View style={s.premiumCard}>

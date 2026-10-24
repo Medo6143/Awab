@@ -9,4 +9,4 @@ export const DEFAULT_DHIKR = [
   "اللهم صل وسلم على نبينا محمد"
 ];
 
-export const toAr = (n: number) => n.toString().replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[+d]);
+export { toAr } from '../../../shared/utils/format';

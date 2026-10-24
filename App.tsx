@@ -13,7 +13,6 @@ import {
   Tajawal_800ExtraBold
 } from '@expo-google-fonts/tajawal';
 import { Amiri_400Regular, Amiri_700Bold } from '@expo-google-fonts/amiri';
-import { Lateef_400Regular, Lateef_700Bold } from '@expo-google-fonts/lateef';
 import * as SplashScreen from 'expo-splash-screen';
 
 import './global.css'; // NativeWind
@@ -110,8 +109,6 @@ export default function App() {
     Tajawal_800ExtraBold,
     Amiri_400Regular,
     Amiri_700Bold,
-    Lateef_400Regular,
-    Lateef_700Bold
   });
 
   // Timeout safety: if fonts haven't loaded after 8 seconds, proceed anyway

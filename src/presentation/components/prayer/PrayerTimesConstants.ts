@@ -1,4 +1,5 @@
-export const toAr = (n: number | string) => n.toString().replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[+d]);
+import { toAr } from '../../../shared/utils/format';
+export { toAr };
 
 export const formatRemaining = (mins: number) => {
   const h = Math.floor(mins / 60);
