@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, Alert, Platform, NativeModules, StyleSheet, DeviceEventEmitter, AppState } from 'react-native';
-import { FontAwesome5 } from '@expo/vector-icons';
+import { Layers } from 'lucide-react-native';
+import { colors, radius, space, type } from '../../../shared/theme/tokens';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { incrementCount, resetCount, setFloatingActive } from '../../store/slices/tasbeehSlice';
@@ -414,16 +415,16 @@ export const FloatingTasbeehToggle = ({ accentTheme }: any) => {
     };
 
     const statusLabel = !isPermitted ? 'تحتاج صلاحية' : isFloatingActive ? 'مفعلة الآن' : 'جاهزة للتفعيل';
-    const statusColor = !isPermitted ? '#ef4444' : isFloatingActive ? '#22c55e' : '#f59e0b';
+    const statusColor = !isPermitted ? '#ff8a80' : isFloatingActive ? colors.success : colors.goldText;
 
     return (
         <View style={styles.card}>
             <TouchableOpacity
-                style={[styles.actionBtn, { backgroundColor: isFloatingActive ? '#7f1d1d' : accentColor, opacity: isToggling ? 0.6 : 1 }]}
+                style={[styles.actionBtn, { backgroundColor: isFloatingActive ? colors.dangerSoft : accentColor, opacity: isToggling ? 0.6 : 1 }]}
                 onPress={handleToggle}
                 disabled={isToggling}
             >
-                <Text style={styles.actionText}>{isFloatingActive ? 'إيقاف' : 'تفعيل'}</Text>
+                <Text style={[styles.actionText, isFloatingActive && { color: '#ff8a80' }]}>{isFloatingActive ? 'إيقاف' : 'تفعيل'}</Text>
             </TouchableOpacity>
 
             <View style={styles.textCol}>
@@ -436,21 +437,21 @@ export const FloatingTasbeehToggle = ({ accentTheme }: any) => {
             </View>
 
             <View style={[styles.iconWrap, { backgroundColor: accentColor + '20' }]}>
-                <FontAwesome5 name="layer-group" color={accentColor} size={20} />
+                <Layers color={accentColor} size={20} strokeWidth={1.75} />
             </View>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    card: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 18, backgroundColor: '#1a140f', borderWidth: 1, borderColor: '#2b1f15' },
-    iconWrap: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+    card: { flexDirection: 'row', alignItems: 'center', gap: space[3], padding: space[4], borderRadius: radius.card, backgroundColor: colors.surface },
+    iconWrap: { width: 44, height: 44, borderRadius: radius.tile, alignItems: 'center', justifyContent: 'center' },
     textCol: { flex: 1 },
-    title: { fontFamily: 'Tajawal_700Bold', fontSize: 16, color: '#fff', textAlign: 'right' },
-    subtitle: { fontFamily: 'Tajawal_400Regular', fontSize: 12.5, color: '#94a3b8', marginTop: 2, textAlign: 'right' },
+    title: { ...type.bodyMedium, fontFamily: 'Tajawal_700Bold', color: colors.text, textAlign: 'right' },
+    subtitle: { ...type.caption, color: colors.textMuted, marginTop: 2, textAlign: 'right' },
     statusRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: 6, marginTop: 6, justifyContent: 'flex-start' },
     statusDot: { width: 8, height: 8, borderRadius: 4 },
-    statusText: { fontFamily: 'Tajawal_500Medium', fontSize: 12 },
-    actionBtn: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, minWidth: 80, alignItems: 'center' },
-    actionText: { fontFamily: 'Tajawal_700Bold', fontSize: 13.5, color: '#fff' },
+    statusText: { ...type.caption },
+    actionBtn: { paddingHorizontal: space[4], height: 40, borderRadius: radius.pill, minWidth: 80, alignItems: 'center', justifyContent: 'center' },
+    actionText: { ...type.label, color: colors.onGold },
 });

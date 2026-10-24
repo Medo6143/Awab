@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Modal, TextInput, TouchableOpacity, ScrollView, FlatList } from 'react-native';
 import { s } from './TasbeehStyles';
-import { MORNING_ATHKAR, EVENING_ATHKAR } from '../../../shared/constants/athkar';
+import { colors } from '../../../shared/theme/tokens';
 
 interface ModalProps {
   visible: boolean;
@@ -26,7 +26,7 @@ const CustomModal = ({ visible, onClose, onConfirm, title, subtitle, placeholder
         <TextInput 
           style={s.modalInput} 
           placeholder={placeholder} 
-          placeholderTextColor="#94a3b8"
+          placeholderTextColor={colors.textFaint}
           value={value}
           onChangeText={setValue}
           keyboardType={keyboardType}
@@ -35,15 +35,15 @@ const CustomModal = ({ visible, onClose, onConfirm, title, subtitle, placeholder
 
         {suggestions && suggestions.length > 0 && (
           <View style={{ maxHeight: 150, marginBottom: 20 }}>
-            <Text style={{ fontFamily: 'Tajawal_700Bold', fontSize: 13, color: '#B8860B', marginBottom: 10 }}>مقترحات:</Text>
+            <Text style={s.suggestionsLabel}>مقترحات:</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
               {suggestions.map((sug, idx) => (
                 <TouchableOpacity 
                   key={idx} 
                   onPress={() => setValue(sug)}
-                  style={{ backgroundColor: 'rgba(184, 134, 11, 0.1)', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(184, 134, 11, 0.3)' }}
+                  style={s.suggestionChip}
                 >
-                  <Text style={{ color: '#fcd34d', fontFamily: 'Tajawal_500Medium', fontSize: 13 }}>{sug}</Text>
+                  <Text style={s.suggestionText}>{sug}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -55,7 +55,7 @@ const CustomModal = ({ visible, onClose, onConfirm, title, subtitle, placeholder
             <Text style={s.modalBtnText}>إلغاء</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => onConfirm(value)} style={s.modalBtnAdd}>
-            <Text style={s.modalBtnText}>تأكيد</Text>
+            <Text style={s.modalBtnTextPrimary}>تأكيد</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -68,11 +68,6 @@ export const TasbeehModals = ({
   showManualAdd, setShowManualAdd, manualCountVal, setManualCountVal, onManualAdd,
   showCustomTarget, setShowCustomTarget, customTargetVal, setCustomTargetVal, onCustomTarget
 }: any) => {
-  const allSuggested = [
-    ...MORNING_ATHKAR.map(a => a.text.substring(0, 30) + (a.text.length > 30 ? '...' : '')),
-    ...EVENING_ATHKAR.map(a => a.text.substring(0, 30) + (a.text.length > 30 ? '...' : ''))
-  ];
-  
   // Actually let's use the full text but display shortened
   const suggestions = [
     "سبحان الله", "الحمد لله", "لا إله إلا الله", "الله أكبر", 

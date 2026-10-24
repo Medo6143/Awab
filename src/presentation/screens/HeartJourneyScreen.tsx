@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, ScrollView, View, TouchableOpacity } from 'react-native';
+import { Animated, View, TouchableOpacity } from 'react-native';
 import { Maximize2 } from 'lucide-react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Screen } from '../components/ui';
+import { colors } from '../../shared/theme/tokens';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import { toggleSurahCompleted, setCompletedSurahs, finishKhatma } from '../store/slices/quranSlice';
@@ -73,13 +74,10 @@ const HeartJourneyScreen = ({ navigation }: any) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#0c0805' }}>
-      <HeartJourneyHeader onBack={() => navigation.goBack()} completedCount={completedSurahs.length} />
-
-      <ScrollView contentContainerStyle={s.scrollContent} showsVerticalScrollIndicator={false}>
+    <Screen scroll padded={false} header={<HeartJourneyHeader onBack={() => navigation.goBack()} completedCount={completedSurahs.length} />}>
         <View style={s.heartContainer}>
           <TouchableOpacity onPress={openZoom} style={s.heartZoomBtn} accessibilityLabel="تكبير القلب">
-            <Maximize2 color="#fcd34d" size={18} />
+            <Maximize2 color={colors.gold} size={18} />
           </TouchableOpacity>
           <AnatomicalHeart
             pulseAnim={pulseAnim}
@@ -99,7 +97,6 @@ const HeartJourneyScreen = ({ navigation }: any) => {
         />
 
         <SurahChecklist completedSurahs={completedSurahs} onToggle={handleToggle} />
-      </ScrollView>
 
       <JuzSelectionModal visible={showJuzModal} onClose={() => setShowJuzModal(false)} onSelectJuz={markJuz} />
       <BulkMarkModal visible={showBulkModal} onClose={() => setShowBulkModal(false)} onSelectSurah={markUntilSurah} />
@@ -110,7 +107,7 @@ const HeartJourneyScreen = ({ navigation }: any) => {
         progress={heartProgress}
         onToggleSurah={handleToggle}
       />
-    </SafeAreaView>
+    </Screen>
   );
 };
 

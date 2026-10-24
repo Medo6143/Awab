@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Modal, ScrollView, TouchableOpacity, FlatList } from 'react-native';
 import { X } from 'lucide-react-native';
 import { s } from './HeartJourneyStyles';
+import { colors } from '../../../shared/theme/tokens';
 import { toAr } from './HeartJourneyConstants';
 import { SURAH_NAMES } from '../../../shared/constants/surahs';
 
@@ -11,7 +12,7 @@ export const JuzSelectionModal = ({ visible, onClose, onSelectJuz }: any) => (
       <View style={s.modalContent}>
         <View style={s.modalHeader}>
           <Text style={s.modalTitle}>اختر الجزء الذي أتممته</Text>
-          <TouchableOpacity onPress={onClose}><X size={24} color="#fcd34d" /></TouchableOpacity>
+          <TouchableOpacity onPress={onClose}><X size={24} color={colors.goldText} /></TouchableOpacity>
         </View>
         <ScrollView contentContainerStyle={s.juzGrid}>
           {Array.from({ length: 30 }, (_, i) => i + 1).map(j => (
@@ -31,7 +32,7 @@ export const BulkMarkModal = ({ visible, onClose, onSelectSurah }: any) => (
       <View style={s.modalContent}>
         <View style={s.modalHeader}>
           <Text style={s.modalTitle}>تحديد سريع حتى سورة</Text>
-          <TouchableOpacity onPress={onClose}><X size={24} color="#fcd34d" /></TouchableOpacity>
+          <TouchableOpacity onPress={onClose}><X size={24} color={colors.goldText} /></TouchableOpacity>
         </View>
         <FlatList 
           data={SURAH_NAMES}

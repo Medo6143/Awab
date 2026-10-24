@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput } from 'react-native';
 import { CheckCircle2, Circle, Search, X } from 'lucide-react-native';
 import { s } from './HeartJourneyStyles';
+import { colors } from '../../../shared/theme/tokens';
 import { toAr } from './HeartJourneyConstants';
 import { SURAH_NAMES } from '../../../shared/constants/surahs';
 
@@ -34,16 +35,16 @@ export const SurahChecklist = ({ completedSurahs, onToggle }: any) => {
       <View style={s.searchBox}>
         {query.length > 0 ? (
           <TouchableOpacity onPress={() => setQuery('')} accessibilityLabel="مسح البحث" hitSlop={8}>
-            <X size={18} color="#94a3b8" />
+            <X size={18} color={colors.textMuted} />
           </TouchableOpacity>
         ) : (
-          <Search size={18} color="#94a3b8" />
+          <Search size={18} color={colors.textMuted} />
         )}
         <TextInput
           value={query}
           onChangeText={setQuery}
           placeholder="ابحث باسم السورة أو رقمها"
-          placeholderTextColor="#5c554b"
+          placeholderTextColor={colors.textFaint}
           style={s.searchInput}
           returnKeyType="search"
           accessibilityLabel="بحث عن سورة"
@@ -68,7 +69,7 @@ export const SurahChecklist = ({ completedSurahs, onToggle }: any) => {
               <Text style={s.surahNum}>{toAr(id)}</Text>
               <Text style={[s.surahName, isDone && s.surahNameDone]}>{name}</Text>
             </View>
-            {isDone ? <CheckCircle2 color="#fcd34d" size={24} /> : <Circle color="#2b1f15" size={24} />}
+            {isDone ? <CheckCircle2 color={colors.goldText} size={24} /> : <Circle color={colors.textFaint} size={24} />}
           </TouchableOpacity>
         );
       })}

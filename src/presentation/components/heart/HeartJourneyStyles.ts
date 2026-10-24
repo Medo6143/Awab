@@ -1,98 +1,59 @@
 import { StyleSheet, Dimensions } from 'react-native';
+import { colors, radius, space, type } from '../../../shared/theme/tokens';
 
 const { width } = Dimensions.get('window');
 
 export const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#0c0805' },
-  header: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1a140f'
-  },
-  backBtn: { padding: 10, backgroundColor: '#1a140f', borderRadius: 14 },
-  headerTitle: { fontFamily: 'Tajawal_700Bold', fontSize: 20, color: '#fcd34d' },
-  progressBadge: { backgroundColor: '#8B0000', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 10 },
-  progressBadgeText: { color: '#fff', fontFamily: 'Tajawal_700Bold', fontSize: 13 },
+  root: { flex: 1, backgroundColor: colors.bg },
+  backBtn: { width: 44, height: 44, borderRadius: radius.tile, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
+  progressBadge: { backgroundColor: colors.goldSoft, paddingHorizontal: space[3], paddingVertical: 6, borderRadius: radius.pill },
+  progressBadgeText: { ...type.label, color: colors.goldText },
 
-  scrollContent: { paddingBottom: 50 },
-  heartContainer: { 
-    height: width * 0.9 * 1.1, 
-    alignItems: 'center', 
-    justifyContent: 'center',
-    marginTop: 4
-  },
-
-  heartZoomBtn: { position: 'absolute', top: 8, left: 20, padding: 10, backgroundColor: '#1a140f', borderRadius: 14, zIndex: 2 },
+  scrollContent: { paddingBottom: space[10] },
+  heartContainer: { height: width * 0.9 * 1.1, alignItems: 'center', justifyContent: 'center', marginTop: space[1] },
+  heartZoomBtn: { position: 'absolute', top: 8, left: 20, width: 44, height: 44, borderRadius: radius.tile, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', zIndex: 2 },
 
   // ── Zoom modal ──
-  zoomRoot: { flex: 1, backgroundColor: '#0c0805' },
-  zoomHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 12 },
-  zoomTitle: { fontFamily: 'Tajawal_700Bold', fontSize: 18, color: '#fcd34d' },
-  zoomHint: { fontFamily: 'Tajawal_400Regular', fontSize: 12.5, color: '#94a3b8', textAlign: 'center', paddingVertical: 10 },
-  zoomCaption: {
-    position: 'absolute', bottom: 56, alignSelf: 'center',
-    backgroundColor: '#1a120b', borderRadius: 999, paddingHorizontal: 18, paddingVertical: 10,
-    borderWidth: 1, borderColor: '#d4af37',
-  },
-  zoomCaptionText: { fontFamily: 'Tajawal_700Bold', fontSize: 16, color: '#fff' },
+  zoomRoot: { flex: 1, backgroundColor: colors.bg },
+  zoomHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingVertical: space[3] },
+  zoomTitle: { ...type.h2, color: colors.text },
+  zoomHint: { ...type.caption, color: colors.textMuted, textAlign: 'center', paddingVertical: space[2] },
+  zoomCaption: { position: 'absolute', bottom: 56, alignSelf: 'center', backgroundColor: colors.surfaceRaised, borderRadius: radius.pill, paddingHorizontal: space[5], paddingVertical: space[3] },
+  zoomCaptionText: { ...type.bodyMedium, fontFamily: 'Tajawal_700Bold', color: colors.text },
 
-  narrative: { paddingHorizontal: 24, marginTop: -20, marginBottom: 20 },
-  narrativeTitle: { fontFamily: 'Amiri_700Bold', fontSize: 28, color: '#fcd34d' },
-  narrativeSub: { fontFamily: 'Tajawal_400Regular', fontSize: 14, color: '#94a3b8', marginTop: 5 },
-
-  checklistContainer: { paddingHorizontal: 20 },
-  searchBox: {
-    flexDirection: 'row-reverse', alignItems: 'center', gap: 10,
-    backgroundColor: '#14100b', borderRadius: 16, paddingHorizontal: 14, height: 48,
-    marginBottom: 12, borderWidth: 1, borderColor: '#2b1f15',
-  },
-  searchInput: { flex: 1, color: '#fff', fontFamily: 'Tajawal_500Medium', fontSize: 15, textAlign: 'right', paddingVertical: 0 },
-  searchEmpty: { fontFamily: 'Tajawal_400Regular', fontSize: 14, color: '#94a3b8', textAlign: 'center', paddingVertical: 20 },
-  checkItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#1a140f',
-    padding: 16,
-    borderRadius: 20,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#2b1f15'
-  },
-  checkItemDone: { borderColor: '#8B0000', backgroundColor: '#2b1f15' },
-  checkRight: { flexDirection: 'row', alignItems: 'center', gap: 15 },
-  surahNum: { fontFamily: 'Tajawal_700Bold', fontSize: 14, color: '#B8860B', width: 25 },
-  surahName: { fontFamily: 'Tajawal_700Bold', fontSize: 18, color: '#fff' },
-  surahNameDone: { color: '#fcd34d' },
-
+  // ── Narrative ──
+  narrative: { paddingHorizontal: 20, marginTop: -space[2], marginBottom: space[4] },
+  narrativeTitle: { ...type.h1, fontFamily: 'Amiri_700Bold', color: colors.text },
+  narrativeSub: { ...type.body, color: colors.textMuted, marginTop: 2 },
   narrativeHeader: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'flex-start' },
-  khatmaBadge: { 
-    flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#fcd34d', 
-    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12, borderWidth: 1, borderColor: '#451a03' 
-  },
-  khatmaBadgeText: { fontFamily: 'Tajawal_700Bold', fontSize: 12, color: '#451a03' },
-  
-  controlsRow: { flexDirection: 'row-reverse', gap: 12, marginTop: 15 },
-  controlBtn: { 
-    flexDirection: 'row-reverse', alignItems: 'center', gap: 8, backgroundColor: '#1a140f', 
-    paddingHorizontal: 15, paddingVertical: 10, borderRadius: 15, borderWidth: 1, borderColor: '#2b1f15' 
-  },
-  controlBtnText: { fontFamily: 'Tajawal_700Bold', fontSize: 14, color: '#fcd34d' },
-  finishBtn: { backgroundColor: '#8B0000', borderColor: '#451a03' },
+  khatmaBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.goldSoft, paddingHorizontal: space[3], paddingVertical: 6, borderRadius: radius.pill },
+  khatmaBadgeText: { ...type.label, color: colors.goldText },
+  controlsRow: { flexDirection: 'row-reverse', gap: space[2], marginTop: space[4] },
+  controlBtn: { flexDirection: 'row-reverse', alignItems: 'center', gap: space[2], backgroundColor: colors.surface, paddingHorizontal: space[4], height: 44, borderRadius: radius.pill },
+  controlBtnText: { ...type.label, fontSize: 14, color: colors.goldText },
+  finishBtn: { backgroundColor: colors.gold },
 
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', alignItems: 'center' },
-  modalContent: { width: width * 0.9, maxHeight: '80%', backgroundColor: '#1a120b', borderRadius: 25, padding: 20, borderWidth: 2, borderColor: '#d4af37' },
-  modalHeader: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottomWidth: 1, borderBottomColor: '#2b1f15', paddingBottom: 15 },
-  modalTitle: { fontFamily: 'Tajawal_700Bold', fontSize: 18, color: '#fcd34d' },
-  
-  juzGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 10 },
-  juzChip: { backgroundColor: '#2b1f15', paddingHorizontal: 15, paddingVertical: 10, borderRadius: 12, borderWidth: 1, borderColor: '#451a03', width: '30%', alignItems: 'center' },
-  juzChipText: { fontFamily: 'Tajawal_500Medium', fontSize: 14, color: '#fff' },
+  // ── Checklist ──
+  checklistContainer: { paddingHorizontal: 20 },
+  searchBox: { flexDirection: 'row-reverse', alignItems: 'center', gap: space[2], backgroundColor: colors.surface, borderRadius: radius.field, paddingHorizontal: space[4], height: 48, marginBottom: space[3] },
+  searchInput: { flex: 1, color: colors.text, ...type.body, textAlign: 'right', paddingVertical: 0 },
+  searchEmpty: { ...type.body, color: colors.textMuted, textAlign: 'center', paddingVertical: space[5] },
+  checkItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.surface, padding: space[4], borderRadius: radius.card, marginBottom: space[2] },
+  checkItemDone: { backgroundColor: colors.surfaceRaised },
+  checkRight: { flexDirection: 'row', alignItems: 'center', gap: space[4] },
+  surahNum: { ...type.label, color: colors.textFaint, width: 28 },
+  surahName: { ...type.bodyMedium, fontSize: 17, color: colors.text },
+  surahNameDone: { color: colors.goldText },
 
-  bulkItem: { flexDirection: 'row-reverse', justifyContent: 'space-between', padding: 15, backgroundColor: '#2b1f15', marginBottom: 8, borderRadius: 12 },
-  bulkItemText: { fontFamily: 'Tajawal_700Bold', fontSize: 18, color: '#fff' },
-  bulkItemNum: { fontFamily: 'Tajawal_500Medium', fontSize: 14, color: '#fcd34d' }
+  // ── Modals ──
+  modalOverlay: { flex: 1, backgroundColor: colors.overlay, justifyContent: 'center', alignItems: 'center' },
+  modalContent: { width: width * 0.9, maxHeight: '80%', backgroundColor: colors.surface, borderRadius: radius.sheet, padding: space[5] },
+  modalHeader: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: space[4] },
+  modalTitle: { ...type.h2, color: colors.text },
+  juzGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: space[2] },
+  juzChip: { backgroundColor: colors.surfaceRaised, paddingHorizontal: space[3], paddingVertical: space[3], borderRadius: radius.pill, width: '30%', alignItems: 'center' },
+  juzChipText: { ...type.bodyMedium, color: colors.text },
+  bulkItem: { flexDirection: 'row-reverse', justifyContent: 'space-between', padding: space[4], backgroundColor: colors.surfaceRaised, marginBottom: space[2], borderRadius: radius.field },
+  bulkItemText: { ...type.bodyMedium, fontSize: 17, color: colors.text },
+  bulkItemNum: { ...type.label, color: colors.goldText },
 });

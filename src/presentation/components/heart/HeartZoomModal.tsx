@@ -6,6 +6,7 @@ import { AnatomicalHeart, HEART_VB_H, HEART_VB_W } from './AnatomicalHeart';
 import { SURAH_NAMES } from '../../../shared/constants/surahs';
 import { toAr } from './HeartJourneyConstants';
 import { s } from './HeartJourneyStyles';
+import { colors } from '../../../shared/theme/tokens';
 
 type Props = {
   visible: boolean;
@@ -50,11 +51,11 @@ export const HeartZoomModal = ({ visible, onClose, completedSurahs, progress, on
       <SafeAreaView style={s.zoomRoot}>
         <View style={s.zoomHeader}>
           <TouchableOpacity onPress={onClose} style={s.backBtn} accessibilityLabel="إغلاق">
-            <X color="#fcd34d" size={22} />
+            <X color={colors.goldText} size={22} />
           </TouchableOpacity>
           <Text style={s.zoomTitle}>القلب · عرض مكبّر</Text>
           <TouchableOpacity onPress={() => setZoomed((z) => !z)} style={s.backBtn} accessibilityLabel={zoomed ? 'ملاءمة الشاشة' : 'تكبير'}>
-            {zoomed ? <Minimize2 color="#fcd34d" size={22} /> : <Maximize2 color="#fcd34d" size={22} />}
+            {zoomed ? <Minimize2 color={colors.goldText} size={22} /> : <Maximize2 color={colors.goldText} size={22} />}
           </TouchableOpacity>
         </View>
 

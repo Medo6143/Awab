@@ -4,6 +4,7 @@ import { Target, Plus } from 'lucide-react-native';
 import { s } from './TasbeehStyles';
 import { toAr } from './TasbeehConstants';
 import { SebhaSvg } from './SebhaSvg';
+import { colors } from '../../../shared/theme/tokens';
 
 const { width } = Dimensions.get('window');
 
@@ -100,7 +101,7 @@ export const TargetCarousel = ({
     if (item.type === 'custom') {
       return (
         <TouchableOpacity activeOpacity={0.75} onPress={onCustom} style={s.carouselIconItem}>
-          <Target size={20} color="#d4af37" />
+          <Target size={20} color={colors.gold} />
         </TouchableOpacity>
       );
     }
@@ -110,9 +111,9 @@ export const TargetCarousel = ({
       <TouchableOpacity
         activeOpacity={0.75}
         onPress={onManual}
-        style={[s.carouselIconItem, { backgroundColor: '#2b1f15' }]}
+        style={s.carouselIconItem}
       >
-        <Plus size={20} color="#fcd34d" />
+        <Plus size={20} color={colors.goldText} />
       </TouchableOpacity>
     );
   }, [currentTarget, targets]);
