@@ -1,50 +1,38 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
-import { ChevronLeft, Wallet, Info, Calculator, Coins, TrendingUp } from 'lucide-react-native';
-
-// Zakat Components & Constants
+import { View, Text } from 'react-native';
+import { Wallet, Info } from 'lucide-react-native';
+import { Screen, ScreenHeader, Card, StatNumber } from '../components/ui';
 import { ZakatInput, ZakatInfoBox } from '../components/zakat/ZakatComponents';
 import { s } from '../components/zakat/ZakatStyles';
 import { NISAB_GOLD, GOLD_PRICE_GRAM, toAr } from '../components/zakat/ZakatConstants';
+import { colors, icon } from '../../shared/theme/tokens';
 
 const ZakatScreen = ({ navigation }: any) => {
   const [cash, setCash] = useState('');
-  const [gold, setGold] = useState('');
-  const [silver, setSilver] = useState('');
-  const [stocks, setStocks] = useState('');
-
-  const calculateZakat = () => (Number(cash) || 0) * 0.025;
+  const amount = Number(cash) || 0;
+  const nisab = NISAB_GOLD * GOLD_PRICE_GRAM;
+  const reached = amount >= nisab;
+  const zakat = reached ? amount * 0.025 : 0;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#0c0805' }}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={s.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn}><ChevronLeft color="#fcd34d" size={24} /></TouchableOpacity>
-          <Text style={s.headerTitle}>زكاة المال</Text>
-          <View style={{ width: 44 }} />
+    <Screen scroll header={<ScreenHeader title="زكاة المال" onBack={() => navigation.goBack()} />}>
+      <Card padding={5}>
+        <View style={s.hero}>
+          <StatNumber value={`${toAr(zakat)} ج.م`} caption="الزكاة المستحقة (٢.٥٪)" size="display" />
+          <View style={s.nisabBadge}>
+            <Info size={icon.size.sm} color={colors.textMuted} strokeWidth={icon.stroke} />
+            <Text style={s.nisabText}>النصاب تقديراً: {toAr(nisab)} ج.م</Text>
+          </View>
+          {amount > 0 && !reached ? <Text style={s.belowNisab}>المبلغ أقل من النصاب، فلا زكاة عليه</Text> : null}
         </View>
+      </Card>
 
-        <View style={s.resultContainer}>
-          <LinearGradient colors={['#1e293b', '#0c0805']} style={s.resultCard}>
-            <Text style={s.resultLabel}>قيمة الزكاة المستحقة (٢.٥٪)</Text>
-            <Text style={s.resultValue}>{toAr(calculateZakat())}</Text>
-            <View style={s.nisabBadge}>
-              <Info size={14} color="#94a3b8" />
-              <Text style={s.nisabText}>النصاب الحالي تقديراً: {toAr(NISAB_GOLD * GOLD_PRICE_GRAM)}</Text>
-            </View>
-          </LinearGradient>
-        </View>
+      <View style={s.form}>
+        <ZakatInput label="إجمالي المبلغ المالي (كاش / بنك)" value={cash} onChange={setCash} icon={Wallet} unit="ج.م" />
+      </View>
 
-        <View style={s.form}>
-           <ZakatInput label="إجمالي المبلغ المالي (كاش / بنك)" value={cash} onChange={setCash} icon={Wallet} unit="ج.م" />
-        </View>
-
-        <ZakatInfoBox />
-        <View style={{ height: 40 }} />
-      </ScrollView>
-    </SafeAreaView>
+      <ZakatInfoBox />
+    </Screen>
   );
 };
 

@@ -1,51 +1,20 @@
 import { StyleSheet } from 'react-native';
+import { colors, radius, space, type } from '../../../shared/theme/tokens';
 
 export const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#0c0805' },
-  header: { 
-    flexDirection: 'row-reverse', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    padding: 20
-  },
-  backBtn: { padding: 10, backgroundColor: '#1a140f', borderRadius: 12 },
-  headerTitle: { fontFamily: 'Tajawal_700Bold', fontSize: 22, color: '#fcd34d' },
+  root: { flex: 1, backgroundColor: colors.bg },
+  hero: { alignItems: 'center', paddingVertical: space[6] },
+  nisabBadge: { flexDirection: 'row-reverse', alignItems: 'center', gap: 6, marginTop: space[4], backgroundColor: colors.surfaceRaised, paddingHorizontal: space[3], paddingVertical: 6, borderRadius: radius.pill },
+  nisabText: { ...type.caption, color: colors.textMuted },
+  belowNisab: { ...type.caption, color: colors.textMuted, marginTop: space[2], textAlign: 'center' },
 
-  resultContainer: { padding: 20 },
-  resultCard: { 
-    padding: 30, 
-    borderRadius: 32, 
-    alignItems: 'center', 
-    borderWidth: 1, 
-    borderColor: 'rgba(255,255,255,0.1)',
-    shadowColor: '#B8860B',
-    shadowOpacity: 0.2,
-    shadowRadius: 15,
-    elevation: 8
-  },
-  resultLabel: { fontFamily: 'Tajawal_500Medium', fontSize: 16, color: '#94a3b8', marginBottom: 10 },
-  resultValue: { fontFamily: 'Tajawal_700Bold', fontSize: 42, color: '#fcd34d' },
-  nisabBadge: { flexDirection: 'row-reverse', alignItems: 'center', gap: 6, marginTop: 15, backgroundColor: 'rgba(255,255,255,0.05)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12 },
-  nisabText: { fontFamily: 'Tajawal_400Regular', fontSize: 12, color: '#94a3b8' },
+  form: { gap: space[4], marginTop: space[4] },
+  inputWrapper: { gap: space[2] },
+  inputLabel: { ...type.label, color: colors.textMuted, textAlign: 'right' },
+  inputRow: { flexDirection: 'row-reverse', alignItems: 'center', backgroundColor: colors.surfaceRaised, borderRadius: radius.field, paddingHorizontal: space[3], height: 56, gap: space[2] },
+  input: { flex: 1, ...type.h2, color: colors.text, paddingVertical: 0, fontVariant: ['tabular-nums'] },
+  unitText: { ...type.label, color: colors.textFaint },
 
-  form: { padding: 20, gap: 20 },
-  inputWrapper: { gap: 10 },
-  inputLabel: { fontFamily: 'Tajawal_700Bold', fontSize: 16, color: '#fcd34d', textAlign: 'right' },
-  inputRow: { 
-    flexDirection: 'row-reverse', 
-    alignItems: 'center', 
-    backgroundColor: '#1a140f', 
-    borderRadius: 20, 
-    paddingHorizontal: 16,
-    height: 60,
-    borderWidth: 1,
-    borderColor: '#2b1f15'
-  },
-  iconBox: { width: 40, alignItems: 'center' },
-  input: { flex: 1, fontFamily: 'Tajawal_700Bold', fontSize: 18, color: '#fff', paddingHorizontal: 10 },
-  unitText: { fontFamily: 'Tajawal_500Medium', fontSize: 14, color: '#64748b' },
-
-  infoBox: { margin: 20, padding: 24, backgroundColor: '#1a140f', borderRadius: 24, borderWidth: 1, borderColor: '#2b1f15' },
-  infoTitle: { fontFamily: 'Tajawal_700Bold', fontSize: 18, color: '#fcd34d', marginBottom: 10, textAlign: 'right' },
-  infoDesc: { fontFamily: 'Tajawal_400Regular', fontSize: 14, color: '#94a3b8', textAlign: 'justify', lineHeight: 24 }
+  infoTitle: { ...type.h2, color: colors.text, marginBottom: space[2], textAlign: 'right' },
+  infoDesc: { ...type.body, color: colors.textMuted, textAlign: 'right' },
 });
