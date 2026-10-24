@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import { Animated, View, Dimensions } from 'react-native';
+import { Animated, View, Dimensions, Text, StyleSheet } from 'react-native';
 import Svg, {
   Path, Rect, G, Ellipse, Defs, ClipPath,
-  LinearGradient, RadialGradient, Stop, Text as SvgText, TSpan,
+  LinearGradient, RadialGradient, Stop,
 } from 'react-native-svg';
 import { HEART_CELLS } from './heartCells';
 import { SURAH_NAMES } from '../../../shared/constants/surahs';
@@ -91,25 +91,30 @@ const HeartCell = React.memo(
   ),
 );
 
+/**
+ * Labels are React Native <Text>, not SVG <Text>: react-native-svg on Android renders
+ * glyphs one by one without Arabic shaping (letters come out disconnected and reversed).
+ * They are absolutely positioned over the SVG in the same coordinate space and ignore touches.
+ */
 const HeartLabel = React.memo(
-  ({ cx, cy, lines, fontSize, done }: { cx: number; cy: number; lines: string[]; fontSize: number; done: boolean }) => {
-    const firstY = cy - ((lines.length - 1) * fontSize) / 2 + fontSize * 0.35;
+  ({ cx, cy, lines, fontSize, done, scale }: { cx: number; cy: number; lines: string[]; fontSize: number; done: boolean; scale: number }) => {
+    const fs = fontSize * scale;
+    const boxW = fs * 7.5;
+    const lineH = fs * 1.15;
+    const boxH = lineH * lines.length;
     return (
-      <SvgText
-        x={cx}
-        y={firstY}
-        fill={done ? '#fff5f5' : '#a8757b'}
-        fontSize={fontSize}
-        fontFamily="Tajawal_700Bold"
-        fontWeight="bold"
-        textAnchor="middle"
-        opacity={done ? 0.95 : 0.9}
-        pointerEvents="none"
-      >
+      <View pointerEvents="none" style={{ position: 'absolute', left: cx * scale - boxW / 2, top: cy * scale - boxH / 2, width: boxW, height: boxH, alignItems: 'center', justifyContent: 'center' }}>
         {lines.map((line, i) => (
-          <TSpan key={i} x={cx} dy={i === 0 ? 0 : fontSize}>{line}</TSpan>
+          <Text
+            key={i}
+            numberOfLines={1}
+            allowFontScaling={false}
+            style={{ fontFamily: 'Tajawal_700Bold', fontSize: fs, lineHeight: lineH, color: done ? '#fff5f5' : '#b58a90', opacity: done ? 0.95 : 0.9, textAlign: 'center', includeFontPadding: false }}
+          >
+            {line}
+          </Text>
         ))}
-      </SvgText>
+      </View>
     );
   },
 );
@@ -126,6 +131,7 @@ type Props = {
 export const AnatomicalHeart = ({ pulseAnim, completedSurahs, progress, size, onToggleSurah, onZoomRequest }: Props) => {
   const width = size ?? Dimensions.get('window').width * 0.9;
   const height = (width * HEART_VB_H) / HEART_VB_W;
+  const scale = width / HEART_VB_W; // viewBox units → px, for the RN label overlay
   const clamped = Math.max(0, Math.min(1, progress));
   const glowOpacity = Math.round((0.35 * (0.3 + clamped * 0.7)) * 20) / 20;
   const doneSet = useMemo(() => new Set(completedSurahs), [completedSurahs]);
@@ -207,17 +213,16 @@ export const AnatomicalHeart = ({ pulseAnim, completedSurahs, progress, size, on
               <HeartCell key={cell.id} id={cell.id} d={cell.d} done={doneSet.has(cell.id)} onToggle={onToggleSurah} onZoom={onZoomRequest} />
             ))}
 
-            <G pointerEvents="none">
-              {CELL_LAYOUT.map((cell) => (
-                <HeartLabel key={`l${cell.id}`} cx={cell.cx} cy={cell.cy} lines={cell.lines} fontSize={cell.fontSize} done={doneSet.has(cell.id)} />
-              ))}
-            </G>
-
             <Rect x={0} y={0} width={HEART_VB_W} height={HEART_VB_H} fill="url(#sheen)" pointerEvents="none" />
           </G>
 
           {coronaries}
         </Svg>
+        <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+          {CELL_LAYOUT.map((cell) => (
+            <HeartLabel key={`l${cell.id}`} cx={cell.cx} cy={cell.cy} lines={cell.lines} fontSize={cell.fontSize} done={doneSet.has(cell.id)} scale={scale} />
+          ))}
+        </View>
       </Animated.View>
     </View>
   );
