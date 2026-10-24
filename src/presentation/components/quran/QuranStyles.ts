@@ -11,11 +11,11 @@ export const s = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: space[4], paddingVertical: space[3], backgroundColor: colors.bg,
   },
-  topTitle: { ...type.h2, color: colors.text },
+  topTitle: { ...type.h2, fontSize: 18, color: colors.text, flex: 1, textAlign: 'center' },
   topActions: { flexDirection: 'row', gap: space[2], alignItems: 'center' },
-  iconBtn: { width: 42, height: 42, borderRadius: radius.tile, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
+  iconBtn: { width: 38, height: 38, borderRadius: radius.tile, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
 
-  mushafOuter: { flex: 1, paddingHorizontal: space[3], paddingTop: space[1] },
+  mushafOuter: { flex: 1 },
   frameGoldLayer: { flex: 1, borderWidth: 4, borderColor: colors.gold, backgroundColor: colors.surface, borderRadius: radius.field, padding: 4 },
   frameCreamLayer: { flex: 1, backgroundColor: colors.paper, borderRadius: 8, overflow: 'hidden' },
 

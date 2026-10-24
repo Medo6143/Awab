@@ -9,7 +9,7 @@ import { PrayerCountdown, PrayerTimeRow, PrayerListSkeleton } from '../component
 import { s } from '../components/prayer/PrayerTimesStyles';
 import { space } from '../../shared/theme/tokens';
 
-const HIDDEN = ['Imsak', 'Midnight', 'Firstthird', 'Lastthird'];
+const HIDDEN = ['Imsak', 'Sunset', 'Midnight', 'Firstthird', 'Lastthird'];
 
 /** Standalone (stack) or embedded in PrayerHub with `hideHeader` + `tab`. */
 const PrayerTimesScreen = ({ navigation, hideHeader, tab }: any) => {

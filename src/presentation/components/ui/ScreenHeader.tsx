@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     minHeight: 60,
   },
   rowLarge: { paddingTop: space[4], paddingBottom: space[5] },
-  side: { width: 48, flexDirection: 'row', alignItems: 'center' },
+  side: { minWidth: 48, flexDirection: 'row', alignItems: 'center' },
   sideEnd: { justifyContent: 'flex-end' },
   center: { flex: 1, alignItems: 'center' },
   title: { ...type.h2, color: colors.text },

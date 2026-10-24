@@ -6,8 +6,8 @@ const { width } = Dimensions.get('window');
 export const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
   backBtn: { width: 44, height: 44, borderRadius: radius.tile, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
-  progressBadge: { backgroundColor: colors.goldSoft, paddingHorizontal: space[3], paddingVertical: 6, borderRadius: radius.pill },
-  progressBadgeText: { ...type.label, color: colors.goldText },
+  progressBadge: { backgroundColor: colors.goldSoft, paddingHorizontal: space[3], paddingVertical: 6, borderRadius: radius.pill, minWidth: 72, alignItems: 'center' },
+  progressBadgeText: { ...type.label, color: colors.goldText, flexShrink: 0 },
 
   scrollContent: { paddingBottom: space[10] },
   heartContainer: { height: width * 0.9 * 1.1, alignItems: 'center', justifyContent: 'center', marginTop: space[1] },

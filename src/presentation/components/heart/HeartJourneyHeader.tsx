@@ -10,7 +10,7 @@ export const HeartJourneyHeader = ({ completedCount, onBack }: any) => (
   <ScreenHeader
     title="نور القرآن في قلبك"
     onBack={onBack}
-    right={<View style={s.progressBadge}><Text style={s.progressBadgeText}>{toAr(completedCount)}/١١٤</Text></View>}
+    right={<View style={s.progressBadge}><Text style={s.progressBadgeText} numberOfLines={1}>{toAr(completedCount)}/١١٤</Text></View>}
   />
 );
 
