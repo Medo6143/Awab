@@ -66,6 +66,25 @@ export function useAzanPermissions() {
       return false; // Stop here, requires user context switch
     }
 
+    // 1b. Full-screen intent (Android 14+ revokes it by default for non-alarm apps,
+    // which is why the azan screen never pops over the lock screen on new phones).
+    try {
+      const canFsi = AzanModule?.canUseFullScreenIntent ? await AzanModule.canUseFullScreenIntent() : true;
+      if (!canFsi) {
+        Alert.alert(
+          'شاشة الأذان',
+          'لإظهار شاشة الأذان فوق قفل الشاشة يجب السماح بـ "الإشعارات بملء الشاشة" لتطبيق أوّاب.',
+          [
+            { text: 'لاحقاً', style: 'cancel' },
+            { text: 'الإعدادات', onPress: () => AzanModule.openFullScreenIntentSettings() }
+          ]
+        );
+        return false;
+      }
+    } catch (e) {
+      console.warn('Full-screen intent check failed', e);
+    }
+
     // 2. Battery Optimization
     const hasBatteryOpt = await checkBatteryOptimization();
     if (!hasBatteryOpt) {

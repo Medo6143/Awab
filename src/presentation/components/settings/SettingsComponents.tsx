@@ -194,32 +194,37 @@ export const NotificationSettings = ({ notificationPrefs, onToggleCategory, onTe
 export const AzanSelector = ({ azanSettings, onUpdate, accentColor }: any) => {
   const { AZAN_TYPES } = require('./AzanConstants');
   const { NativeModules, Platform } = require('react-native');
-  const [hasOverlayPermission, setHasOverlayPermission] = React.useState(true);
+  const { useAzanPermissions } = require('../../../shared/hooks/useAzanPermissions');
+  const permissions = useAzanPermissions();
 
-  React.useEffect(() => {
-    if (Platform.OS === 'android') {
-      const module = NativeModules.AzanModule;
-      if (module && module.checkOverlayPermission) {
-        module.checkOverlayPermission().then(setHasOverlayPermission);
-      } else {
-        console.warn('AzanModule or checkOverlayPermission is not available. A native rebuild may be required.');
-        setHasOverlayPermission(false);
-      }
-    }
+  const [hasOverlayPermission, setHasOverlayPermission] = React.useState(true);
+  const [hasExactAlarm, setHasExactAlarm] = React.useState(true);
+  const [hasBatteryOpt, setHasBatteryOpt] = React.useState(true);
+
+  const refreshPermissions = React.useCallback(() => {
+    if (Platform.OS !== 'android') return;
+    permissions.checkOverlayPermission().then(setHasOverlayPermission);
+    permissions.checkExactAlarmPermission().then(setHasExactAlarm);
+    permissions.checkBatteryOptimization().then(setHasBatteryOpt);
   }, []);
 
-  const requestPermission = () => {
+  React.useEffect(() => {
+    refreshPermissions();
+  }, [refreshPermissions]);
+
+  const requestOverlay = () => {
     const module = NativeModules.AzanModule;
     if (module && module.requestOverlayPermission) {
       module.requestOverlayPermission();
-      setTimeout(() => {
-        if (module.checkOverlayPermission) {
-          module.checkOverlayPermission().then(setHasOverlayPermission);
-        }
-      }, 5000);
+      setTimeout(refreshPermissions, 5000);
     } else {
       Alert.alert("خطأ", "موديول صلاحيات الأذان غير متوفر حالياً. يرجى إعادة بناء التطبيق (Rebuild).");
     }
+  };
+
+  const fixAlarmReliability = async () => {
+    await permissions.requestAllPermissions();
+    setTimeout(refreshPermissions, 5000);
   };
 
   const startTest = () => {
@@ -236,15 +241,17 @@ export const AzanSelector = ({ azanSettings, onUpdate, accentColor }: any) => {
     }
   };
 
+  const needsAlarmFix = Platform.OS === 'android' && (!hasExactAlarm || !hasBatteryOpt);
+
   return (
     <View style={s.subSection}>
       <View style={s.labelRow}><FontAwesome5 name="bell" size={16} color={accentColor} /><Text style={s.subLabel}>تنبيه الآذان</Text></View>
-      
+
       {/* Azan Type Selection */}
       <View style={s.styleRow}>
         {AZAN_TYPES.map((t: any) => (
-          <TouchableOpacity 
-            key={t.id} 
+          <TouchableOpacity
+            key={t.id}
             style={[s.styleBtn, azanSettings.type === t.id && { backgroundColor: '#1e293b', borderColor: accentColor }]}
             onPress={() => onUpdate({ type: t.id })}
           >
@@ -253,7 +260,36 @@ export const AzanSelector = ({ azanSettings, onUpdate, accentColor }: any) => {
         ))}
       </View>
 
+      {needsAlarmFix && (
+        <TouchableOpacity
+          style={{ marginTop: 10, padding: 12, borderRadius: 10, backgroundColor: '#7c2d12', borderWidth: 1, borderColor: '#f97316' }}
+          onPress={fixAlarmReliability}
+        >
+          <Text style={{ color: '#fed7aa', fontWeight: '700', textAlign: 'center' }}>
+            ⚠️ الأذان قد لا يرن في وقته — اضغط هنا لمنح الأذونات المطلوبة
+          </Text>
+        </TouchableOpacity>
+      )}
 
+      {!hasOverlayPermission && (
+        <TouchableOpacity
+          style={{ marginTop: 8, padding: 10, borderRadius: 10, backgroundColor: '#1e293b' }}
+          onPress={requestOverlay}
+        >
+          <Text style={{ color: accentColor, fontWeight: '600', textAlign: 'center' }}>
+            السماح بالظهور فوق التطبيقات الأخرى
+          </Text>
+        </TouchableOpacity>
+      )}
+
+      <TouchableOpacity
+        style={{ marginTop: 8, padding: 10, borderRadius: 10, backgroundColor: '#1e293b' }}
+        onPress={startTest}
+      >
+        <Text style={{ color: accentColor, fontWeight: '600', textAlign: 'center' }}>
+          تجربة الأذان الآن
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };

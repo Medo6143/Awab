@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { DeviceEventEmitter, NativeModules, Platform } from 'react-native';
+import { Alert, DeviceEventEmitter, NativeModules, Platform } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import { NotificationService } from '../../data/services/NotificationService';
@@ -33,9 +33,6 @@ export const useNotifications = () => {
     const checkInitialNotification = async () => {
       const lastResponse = await getNotifications().getLastNotificationResponseAsync();
       const now = new Date();
-      const currentHHmm = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-      const fiveMinsAgo = new Date(now.getTime() - 5 * 60 * 1000);
-      const prevHHmm = `${String(fiveMinsAgo.getHours()).padStart(2, '0')}:${String(fiveMinsAgo.getMinutes()).padStart(2, '0')}`;
 
       if (lastResponse && isMounted) {
         const { title, data } = lastResponse.notification.request.content;
@@ -195,6 +192,19 @@ export const useNotifications = () => {
           dispatch(showAzanModal(pendingPrayer));
         }
       });
+
+      // If the phone was rebooted and we couldn't re-arm the alarms (e.g. exact-alarm
+      // permission was revoked), BootReceiver sets this flag instead of failing silently.
+      NativeModules.AzanModule.didBootRescheduleFail?.().then((failed: boolean) => {
+        if (failed) {
+          console.warn('useNotifications: Boot reschedule failed — azan alarms may be missing.');
+          Alert.alert(
+            'تنبيه: الأذان متوقف',
+            'بعد إعادة تشغيل الجهاز لم يتمكن التطبيق من إعادة جدولة الأذان بسبب نقص إذن "المنبهات المجدولة". يرجى فتح إعدادات الأذان ومنح الإذن مجددًا.',
+            [{ text: 'حسنًا', onPress: () => NativeModules.AzanModule.clearBootRescheduleFailedFlag?.() }]
+          );
+        }
+      }).catch(() => {});
     }
 
     return () => { 

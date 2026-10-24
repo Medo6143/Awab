@@ -191,33 +191,51 @@ export class NotificationService {
         const useAzanSound = azanType !== 'none'; 
         const channelId = useAzanSound ? 'azan' : 'default';
 
-        if (useAzanSound && Platform.OS === 'android') {
-          // Robust Native Azan
-          const { AzanModule } = require('react-native').NativeModules;
-          if (AzanModule) {
-            console.log(`NotificationService: Scheduling ROBUST Azan for ${prayer.id} at ${hours}:${minutes}`);
-            AzanModule.scheduleAzan(prayer.id, prayer.name, hours, minutes, azanType);
-          }
-        } else {
-          // Standard expo-notification fallback
+        // Expo-notifications path. Used on iOS, for silent mode, and as the Android fallback
+        // whenever the native AzanModule is missing (build without the config plugin) or
+        // rejects (exact-alarm permission revoked). Without this fallback the prayer had
+        // NO notification at all on such builds.
+        const scheduleExpoPrayer = async (fallback: boolean) => {
           await getNotifications().scheduleNotificationAsync({
             identifier: `prayer-${prayer.id}`,
             content: {
-              title: `\u200fصلاة ${prayer.name}`,
+              title: `‏صلاة ${prayer.name}`,
               body: prayer.body,
-              sound: true, 
+              sound: useAzanSound ? 'azan.mp3' : true,
               priority: getNotifications().AndroidNotificationPriority.MAX,
               //@ts-ignore
               fullScreenIntent: true,
-              data: { prayerId: prayer.id, type: 'prayer' },
+              data: { prayerId: prayer.id, prayerName: prayer.name, type: 'prayer', fallback },
             },
             trigger: {
               type: getNotifications().SchedulableTriggerInputTypes.DAILY,
               hour: hours,
               minute: minutes,
-              channelId: channelId,
+              channelId,
             },
           });
+        };
+
+        if (useAzanSound && Platform.OS === 'android') {
+          // Robust Native Azan (exact alarm + foreground service, survives Doze/reboot)
+          const { AzanModule } = require('react-native').NativeModules;
+          if (AzanModule?.scheduleAzan) {
+            console.log(`NotificationService: Scheduling ROBUST Azan for ${prayer.id} at ${hours}:${minutes}`);
+            try {
+              await AzanModule.scheduleAzan(prayer.id, prayer.name, hours, minutes, azanType);
+            } catch (nativeError: any) {
+              console.error(
+                `NotificationService: Native azan scheduling FAILED for ${prayer.id} (code: ${nativeError?.code}):`,
+                nativeError
+              );
+              await scheduleExpoPrayer(true);
+            }
+          } else {
+            console.warn('NotificationService: AzanModule is not linked in this build. Falling back to expo-notifications.');
+            await scheduleExpoPrayer(true);
+          }
+        } else {
+          await scheduleExpoPrayer(false);
         }
 
         if (prefs?.prePrayerReminderEnabled) {
@@ -274,7 +292,7 @@ export class NotificationService {
           content: { title: '\u200fرسالة من أوّاب: قيام الليل', body: '\u200f🌌 قيام الليل شرف المؤمن.. لا تنسَ نصيبك من صلاة الليل', sound: 'sali_ala_nabii.mp3' },
           trigger: { type: getNotifications().SchedulableTriggerInputTypes.DAILY, hour: 2, minute: 0, channelId: 'spiritual' },
         });
-      } catch (e) {}
+      } catch (e) { console.error('NotificationService: Failed to schedule qiyam reminder:', e); }
     }
     if (prefs && prefs.duha) {
       try {
@@ -283,7 +301,7 @@ export class NotificationService {
           content: { title: '\u200fصلاة الضحى', body: '\u200f☀️ صلاة الأوابين.. ركعتي الضحى تجزئ عن صدقة كل سلامى من عظامك', sound: 'sali_ala_nabii.mp3' },
           trigger: { type: getNotifications().SchedulableTriggerInputTypes.DAILY, hour: 9, minute: 0, channelId: 'spiritual' },
         });
-      } catch (e) {}
+      } catch (e) { console.error('NotificationService: Failed to schedule duha reminder:', e); }
     }
   }
 
@@ -302,7 +320,7 @@ export class NotificationService {
         },
         trigger: { type: getNotifications().SchedulableTriggerInputTypes.DAILY, hour: parsed.hours, minute: parsed.minutes, channelId: 'spiritual' },
       });
-    } catch (e) {}
+    } catch (e) { console.error('NotificationService: Failed to schedule daily ward:', e); }
   }
 
   private static ENCOURAGEMENT_MESSAGES = [

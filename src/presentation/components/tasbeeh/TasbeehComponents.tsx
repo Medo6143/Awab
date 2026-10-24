@@ -1,37 +1,29 @@
 import React, { useRef, useCallback } from 'react';
-import { View, Text, TouchableOpacity, Animated, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, Animated, FlatList, Dimensions } from 'react-native';
 import { Target, Plus } from 'lucide-react-native';
 import { s } from './TasbeehStyles';
 import { toAr } from './TasbeehConstants';
+import { SebhaSvg } from './SebhaSvg';
+
+const { width } = Dimensions.get('window');
 
 // ── Tasbeeh Counter ────────────────────────────────────────────────────────
 export const TasbeehCounter = ({ count, target, selectedDhikr, scaleAnim, onPress, accentColor }: any) => {
   const isBlack = accentColor === '#000000';
-  
+  const textColor = isBlack ? '#FFFFFF' : (accentColor || '#fcd34d');
+  const size = Math.min(width * 0.86, 360);
+
   return (
     <View style={s.counterBody}>
       <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-        <TouchableOpacity 
-          activeOpacity={0.9} 
-          onPress={onPress} 
-          style={[
-            s.mainCircle, 
-            accentColor ? { backgroundColor: accentColor, borderColor: isBlack ? '#475569' : accentColor, shadowColor: isBlack ? '#475569' : accentColor } : {}
-          ]}
-        >
-           <View style={[
-             s.innerRing, 
-             { backgroundColor: isBlack ? '#475569' : '#0c0805' }, 
-             accentColor ? { borderColor: isBlack ? '#FFFFFF' : accentColor } : {}
-           ]}>
-              <Text style={s.dhikrHeader}>{selectedDhikr}</Text>
-              <Text style={[s.mainCount, { color: isBlack ? '#FFFFFF' : (accentColor || '#fcd34d') }]}>{toAr(count)}</Text>
-              <View style={s.progressTextRow}>
-                 <Target size={14} color={isBlack ? '#FFFFFF' : (accentColor || "#B8860B")} />
-                 <Text style={[s.progressText, { color: isBlack ? '#FFFFFF' : (accentColor || '#B8860B') }]}>الهدف: {toAr(target)}</Text>
-              </View>
-           </View>
-        </TouchableOpacity>
+        <SebhaSvg size={size} count={count} accentColor={accentColor || '#B8860B'} onPress={onPress}>
+          <Text style={s.dhikrHeader}>{selectedDhikr}</Text>
+          <Text style={[s.mainCount, { color: textColor }]}>{toAr(count)}</Text>
+          <View style={s.progressTextRow}>
+            <Target size={14} color={textColor} />
+            <Text style={[s.progressText, { color: textColor }]}>الهدف: {toAr(target)}</Text>
+          </View>
+        </SebhaSvg>
       </Animated.View>
     </View>
   );

@@ -14,6 +14,7 @@ import { HeartJourneyHeader, HeartNarrative } from '../components/heart/HeartJou
 import { JuzSelectionModal, BulkMarkModal } from '../components/heart/HeartModals';
 import { s } from '../components/heart/HeartJourneyStyles';
 import { JUZ_SURAH_RANGES, toAr } from '../components/heart/HeartJourneyConstants';
+import { HEART_MAP } from '../components/heart/heartMap';
 
 const HeartJourneyScreen = ({ navigation }: any) => {
   const dispatch = useDispatch();
@@ -34,31 +35,18 @@ const HeartJourneyScreen = ({ navigation }: any) => {
     ).start();
   }, []);
 
+  // Overall khatma progress drives how high the heart fills red (like a tank).
+  const heartProgress = completedSurahs.length / 114;
+
   const heartSegments = useMemo(() => {
-    const segments = [];
-    const rows = 12;
-    const cols = 10;
-    let count = 0;
-
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        if (count >= 114) break;
-        const x = 1 + c * 2.2;
-        const y = 4 + r * 2.1;
-        const isCompleted = completedSurahs.includes(count + 1);
-
-        segments.push({
-          id: count + 1,
-          name: SURAH_NAMES[count],
-          x: x + 1.1,
-          y: y + 1.05,
-          d: `M${x} ${y} h2.3 v2.3 h-2.3 z`,
-          completed: isCompleted
-        });
-        count++;
-      }
-    }
-    return segments;
+    return HEART_MAP.cells.map((cell) => ({
+      id: cell.id,
+      name: SURAH_NAMES[cell.id - 1],
+      d: cell.d,
+      cx: cell.cx,
+      cy: cell.cy,
+      completed: completedSurahs.includes(cell.id),
+    }));
   }, [completedSurahs]);
 
   const handleToggle = (id: number) => {
@@ -94,7 +82,7 @@ const HeartJourneyScreen = ({ navigation }: any) => {
       <HeartJourneyHeader onBack={() => navigation.goBack()} completedCount={completedSurahs.length} />
 
       <ScrollView contentContainerStyle={s.scrollContent} showsVerticalScrollIndicator={false}>
-        <HeartVisualizer pulseAnim={pulseAnim} heartSegments={heartSegments} />
+        <HeartVisualizer pulseAnim={pulseAnim} heartSegments={heartSegments} progress={heartProgress} />
 
         <HeartNarrative 
           khatmaCount={khatmaCount} 

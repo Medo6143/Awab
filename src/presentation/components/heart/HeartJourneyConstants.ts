@@ -11,3 +11,7 @@ export const JUZ_SURAH_RANGES = [
 export const HEART_ANATOMY_BODY = "M12 28 C6 24, 2 18, 2 12 C2 7, 6 4, 12 8 C18 4, 22 7, 22 12 C22 18, 18 24, 12 28 Z";
 
 export const toAr = (n: number) => n.toString().replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[+d]);
+
+// NOTE: the heart map itself (114 organic regions) now lives in ./heartMap.ts,
+// generated as a Voronoi tessellation. HEART_ANATOMY_BODY above is kept for any
+// legacy references but is no longer used by HeartVisualizer.

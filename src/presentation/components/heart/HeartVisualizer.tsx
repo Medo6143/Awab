@@ -1,58 +1,66 @@
 import React from 'react';
 import { View, Animated, Dimensions } from 'react-native';
-import Svg, { Path, G, Defs, RadialGradient, Stop, LinearGradient as SvgLinearGradient, ClipPath } from 'react-native-svg';
+import Svg, { Path, Rect, G, Text as SvgText, Defs, ClipPath, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import { s } from './HeartJourneyStyles';
-import { HEART_ANATOMY_BODY } from './HeartJourneyConstants';
+import { HEART_MAP } from './heartMap';
 
 const { width } = Dimensions.get('window');
 
-export const HeartVisualizer = ({ pulseAnim, heartSegments }: any) => (
-  <View style={s.heartContainer}>
-    <Animated.View style={{ transform: [{ scale: pulseAnim }], width: width * 1.1, height: width * 1.1 }}>
-      <Svg width="100%" height="100%" viewBox="0 0 24 30">
-        <Defs>
-          <RadialGradient id="chamberGrad" cx="50%" cy="50%" rx="50%" ry="50%">
-            <Stop offset="0%" stopColor="#2b1f15" />
-            <Stop offset="100%" stopColor="#1a140f" />
-          </RadialGradient>
-          <SvgLinearGradient id="aortaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-             <Stop offset="0%" stopColor="#451a03" />
-             <Stop offset="100%" stopColor="#2b1f15" />
-          </SvgLinearGradient>
-          <ClipPath id="heartClip">
-            <Path d={HEART_ANATOMY_BODY} />
-          </ClipPath>
-        </Defs>
+// heartSegments: [{ id, name, d, cx, cy, completed }]
+// progress: 0..1 overall khatma completion — the heart fills red from the bottom up.
+export const HeartVisualizer = ({ pulseAnim, heartSegments, progress = 0 }: any) => {
+  const { viewW, viewH, heartD, minY, maxY } = HEART_MAP;
+  const clamped = Math.max(0, Math.min(1, progress));
+  const fillY = maxY - (maxY - minY) * clamped;
 
-        <G>
-          <Path
-            d="M10 2 C10 1, 14 1, 14 2 L14 8 C14 9, 10 9, 10 8 Z"
-            fill="url(#aortaGrad)"
-          />
-          <Path
-            d={HEART_ANATOMY_BODY}
-            fill="url(#chamberGrad)"
-            stroke="#451a03"
-            strokeWidth="0.1"
-          />
+  return (
+    <View style={s.heartContainer}>
+      <Animated.View style={{ transform: [{ scale: pulseAnim }], width: width * 1.02, height: width * 1.02 }}>
+        <Svg width="100%" height="100%" viewBox={`0 0 ${viewW} ${viewH}`}>
+          <Defs>
+            <ClipPath id="heartClip">
+              <Path d={heartD} />
+            </ClipPath>
+            <SvgLinearGradient id="redFill" x1="0" y1="1" x2="0" y2="0">
+              <Stop offset="0%" stopColor="#a5281d" />
+              <Stop offset="100%" stopColor="#d94436" />
+            </SvgLinearGradient>
+          </Defs>
+
+          {/* Cream panel background (matches the reference look) */}
+          <Rect x={0} y={0} width={viewW} height={viewH} rx={24} fill="#fbf7f0" />
+
+          {/* Heart base + rising red fill (the "tank"), clipped to the heart outline */}
           <G clipPath="url(#heartClip)">
-            {heartSegments.map((seg: any) => (
-              <G key={seg.id}>
-                <Path
-                  d={seg.d}
-                  fill={seg.completed ? "#8B0000" : "transparent"}
-                />
-              </G>
-            ))}
+            <Rect x={0} y={0} width={viewW} height={viewH} fill="#ffffff" />
+            <Rect x={0} y={fillY} width={viewW} height={viewH - fillY} fill="url(#redFill)" />
           </G>
-          <Path
-            d={HEART_ANATOMY_BODY}
-            fill="none"
-            stroke="rgba(255,100,100,0.15)"
-            strokeWidth="0.2"
-          />
-        </G>
-      </Svg>
-    </Animated.View>
-  </View>
-);
+
+          {/* Region borders + surah names */}
+          {heartSegments.map((seg: any) => {
+            const underFill = seg.completed || seg.cy > fillY;
+            return (
+              <React.Fragment key={seg.id}>
+                <Path d={seg.d} fill="none" stroke="#cfc6b6" strokeWidth={1} />
+                <SvgText
+                  x={seg.cx}
+                  y={seg.cy + 3}
+                  fill={underFill ? '#ffffff' : '#8a9797'}
+                  fontSize={8.5}
+                  fontFamily="Tajawal_700Bold"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
+                  {seg.name}
+                </SvgText>
+              </React.Fragment>
+            );
+          })}
+
+          {/* Heart outline */}
+          <Path d={heartD} fill="none" stroke="#c9bfae" strokeWidth={1.5} />
+        </Svg>
+      </Animated.View>
+    </View>
+  );
+};

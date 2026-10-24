@@ -28,8 +28,14 @@
       "permissions": [
         "USE_FULL_SCREEN_INTENT",
         "SCHEDULE_EXACT_ALARM",
+        "USE_EXACT_ALARM",
+        "RECEIVE_BOOT_COMPLETED",
+        "WAKE_LOCK",
+        "VIBRATE",
         "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_MEDIA_PLAYBACK",
         "FOREGROUND_SERVICE_SPECIAL_USE",
+        "REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
         "SYSTEM_ALERT_WINDOW",
         "POST_NOTIFICATIONS"
       ],
@@ -56,8 +62,8 @@
         }
       ],
       "expo-video",
-      "./plugins/withAndroidWakeScreen.js",
-      "./plugins/withFloatingBubble.js"
+      "./plugins/withFloatingBubble.js",
+      "./plugins/withOwwabNative.js"
     ],
     "runtimeVersion": {
       "policy": "appVersion"
