@@ -19,17 +19,38 @@ export const s = StyleSheet.create({
 
   scrollContent: { paddingBottom: 50 },
   heartContainer: { 
-    height: width * 1.0, 
+    height: width * 0.9 * 1.1, 
     alignItems: 'center', 
     justifyContent: 'center',
-    marginTop: 10
+    marginTop: 4
   },
+
+  heartZoomBtn: { position: 'absolute', top: 8, left: 20, padding: 10, backgroundColor: '#1a140f', borderRadius: 14, zIndex: 2 },
+
+  // ── Zoom modal ──
+  zoomRoot: { flex: 1, backgroundColor: '#0c0805' },
+  zoomHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 12 },
+  zoomTitle: { fontFamily: 'Tajawal_700Bold', fontSize: 18, color: '#fcd34d' },
+  zoomHint: { fontFamily: 'Tajawal_400Regular', fontSize: 12.5, color: '#94a3b8', textAlign: 'center', paddingVertical: 10 },
+  zoomCaption: {
+    position: 'absolute', bottom: 56, alignSelf: 'center',
+    backgroundColor: '#1a120b', borderRadius: 999, paddingHorizontal: 18, paddingVertical: 10,
+    borderWidth: 1, borderColor: '#d4af37',
+  },
+  zoomCaptionText: { fontFamily: 'Tajawal_700Bold', fontSize: 16, color: '#fff' },
 
   narrative: { paddingHorizontal: 24, marginTop: -20, marginBottom: 20 },
   narrativeTitle: { fontFamily: 'Amiri_700Bold', fontSize: 28, color: '#fcd34d' },
   narrativeSub: { fontFamily: 'Tajawal_400Regular', fontSize: 14, color: '#94a3b8', marginTop: 5 },
 
   checklistContainer: { paddingHorizontal: 20 },
+  searchBox: {
+    flexDirection: 'row-reverse', alignItems: 'center', gap: 10,
+    backgroundColor: '#14100b', borderRadius: 16, paddingHorizontal: 14, height: 48,
+    marginBottom: 12, borderWidth: 1, borderColor: '#2b1f15',
+  },
+  searchInput: { flex: 1, color: '#fff', fontFamily: 'Tajawal_500Medium', fontSize: 15, textAlign: 'right', paddingVertical: 0 },
+  searchEmpty: { fontFamily: 'Tajawal_400Regular', fontSize: 14, color: '#94a3b8', textAlign: 'center', paddingVertical: 20 },
   checkItem: {
     flexDirection: 'row',
     alignItems: 'center',

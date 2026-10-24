@@ -1,20 +1,20 @@
-import React, { useEffect, useRef, useMemo, useState } from 'react';
-import { Animated, ScrollView } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Animated, ScrollView, View, TouchableOpacity } from 'react-native';
+import { Maximize2 } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import { toggleSurahCompleted, setCompletedSurahs, finishKhatma } from '../store/slices/quranSlice';
-import { SURAH_NAMES } from '../../shared/constants/surahs';
 import * as Haptics from 'expo-haptics';
 
 // Heart Components & Constants
-import { HeartVisualizer } from '../components/heart/HeartVisualizer';
+import { AnatomicalHeart } from '../components/heart/AnatomicalHeart';
+import { HeartZoomModal } from '../components/heart/HeartZoomModal';
 import { SurahChecklist } from '../components/heart/SurahChecklist';
 import { HeartJourneyHeader, HeartNarrative } from '../components/heart/HeartJourneyHeader';
 import { JuzSelectionModal, BulkMarkModal } from '../components/heart/HeartModals';
 import { s } from '../components/heart/HeartJourneyStyles';
 import { JUZ_SURAH_RANGES, toAr } from '../components/heart/HeartJourneyConstants';
-import { HEART_MAP } from '../components/heart/heartMap';
 
 const HeartJourneyScreen = ({ navigation }: any) => {
   const dispatch = useDispatch();
@@ -23,6 +23,7 @@ const HeartJourneyScreen = ({ navigation }: any) => {
 
   const [showJuzModal, setShowJuzModal] = useState(false);
   const [showBulkModal, setShowBulkModal] = useState(false);
+  const [showZoom, setShowZoom] = useState(false);
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
@@ -38,21 +39,15 @@ const HeartJourneyScreen = ({ navigation }: any) => {
   // Overall khatma progress drives how high the heart fills red (like a tank).
   const heartProgress = completedSurahs.length / 114;
 
-  const heartSegments = useMemo(() => {
-    return HEART_MAP.cells.map((cell) => ({
-      id: cell.id,
-      name: SURAH_NAMES[cell.id - 1],
-      d: cell.d,
-      cx: cell.cx,
-      cy: cell.cy,
-      completed: completedSurahs.includes(cell.id),
-    }));
-  }, [completedSurahs]);
-
-  const handleToggle = (id: number) => {
+  const handleToggle = useCallback((id: number) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     dispatch(toggleSurahCompleted(id));
-  };
+  }, [dispatch]);
+
+  const openZoom = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setShowZoom(true);
+  }, []);
 
   const markUntilSurah = (surahId: number) => {
     const list = Array.from({ length: surahId }, (_, i) => i + 1);
@@ -82,7 +77,18 @@ const HeartJourneyScreen = ({ navigation }: any) => {
       <HeartJourneyHeader onBack={() => navigation.goBack()} completedCount={completedSurahs.length} />
 
       <ScrollView contentContainerStyle={s.scrollContent} showsVerticalScrollIndicator={false}>
-        <HeartVisualizer pulseAnim={pulseAnim} heartSegments={heartSegments} progress={heartProgress} />
+        <View style={s.heartContainer}>
+          <TouchableOpacity onPress={openZoom} style={s.heartZoomBtn} accessibilityLabel="تكبير القلب">
+            <Maximize2 color="#fcd34d" size={18} />
+          </TouchableOpacity>
+          <AnatomicalHeart
+            pulseAnim={pulseAnim}
+            completedSurahs={completedSurahs}
+            progress={heartProgress}
+            onToggleSurah={handleToggle}
+            onZoomRequest={openZoom}
+          />
+        </View>
 
         <HeartNarrative 
           khatmaCount={khatmaCount} 
@@ -97,6 +103,13 @@ const HeartJourneyScreen = ({ navigation }: any) => {
 
       <JuzSelectionModal visible={showJuzModal} onClose={() => setShowJuzModal(false)} onSelectJuz={markJuz} />
       <BulkMarkModal visible={showBulkModal} onClose={() => setShowBulkModal(false)} onSelectSurah={markUntilSurah} />
+      <HeartZoomModal
+        visible={showZoom}
+        onClose={() => setShowZoom(false)}
+        completedSurahs={completedSurahs}
+        progress={heartProgress}
+        onToggleSurah={handleToggle}
+      />
     </SafeAreaView>
   );
 };
