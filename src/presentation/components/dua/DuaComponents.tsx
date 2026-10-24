@@ -3,77 +3,82 @@ import { View, Text, TouchableOpacity, TextInput, ScrollView } from 'react-nativ
 import { Plus, Search, X, Share2, Copy } from 'lucide-react-native';
 import { s } from './DuaStyles';
 import { DUA_CATEGORIES } from './DuaConstants';
+import { ScreenHeader, IconButton, Chip } from '../ui';
+import { colors, icon } from '../../../shared/theme/tokens';
+import { useAccent } from '../../../shared/theme/useAccent';
 
-export const DuaHeader = ({ onAdd, hideHeader }: any) => {
+export const DuaHeader = ({ onAdd, onBack, hideHeader }: any) => {
   if (hideHeader) return null;
   return (
-    <View style={s.header}>
-      <TouchableOpacity onPress={onAdd} style={s.addBtn}>
-        <Plus color="#fcd34d" size={24} />
-      </TouchableOpacity>
-      <Text style={s.headerTitle}>جوامع الدعاء</Text>
-      <View style={{ width: 40 }} />
-    </View>
+    <ScreenHeader
+      title="جوامع الدعاء"
+      onBack={onBack}
+      right={
+        <IconButton onPress={onAdd} label="إضافة دعاء">
+          <Plus color={colors.gold} size={icon.size.lg} strokeWidth={icon.stroke} />
+        </IconButton>
+      }
+    />
   );
 };
 
 export const DuaSearch = ({ query, onChange }: any) => (
   <View style={s.searchSection}>
     <View style={s.searchBar}>
-      <Search size={20} color="#94a3b8" />
-      <TextInput 
+      {query !== '' ? (
+        <TouchableOpacity onPress={() => onChange('')} hitSlop={8} accessibilityLabel="مسح البحث">
+          <X size={18} color={colors.textMuted} />
+        </TouchableOpacity>
+      ) : (
+        <Search size={18} color={colors.textMuted} />
+      )}
+      <TextInput
         style={s.searchInput}
         placeholder="ابحث في الأدعية..."
-        placeholderTextColor="#64748b"
+        placeholderTextColor={colors.textFaint}
         value={query}
         onChangeText={onChange}
         textAlign="right"
+        accessibilityLabel="بحث في الأدعية"
       />
-      {query !== '' && (
-        <TouchableOpacity onPress={() => onChange('')}>
-          <X size={18} color="#94a3b8" />
-        </TouchableOpacity>
-      )}
     </View>
   </View>
 );
 
-export const DuaCategories = ({ selected, onSelect }: any) => (
-  <View style={s.categoriesScroll}>
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.catContent}>
-      <TouchableOpacity 
-        onPress={() => onSelect('all')}
-        style={[s.catChip, selected === 'all' && s.catChipActive]}
-      >
-        <Text style={[s.catText, selected === 'all' && s.catTextActive]}>الكل</Text>
-      </TouchableOpacity>
-      {DUA_CATEGORIES.map(cat => (
-        <TouchableOpacity 
-          key={cat.id}
-          onPress={() => onSelect(cat.id)}
-          style={[s.catChip, selected === cat.id && s.catChipActive]}
-        >
-          <cat.icon size={16} color={selected === cat.id ? "#fff" : "#B8860B"} />
-          <Text style={[s.catText, selected === cat.id && s.catTextActive]}>{cat.name}</Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-  </View>
-);
+export const DuaCategories = ({ selected, onSelect }: any) => {
+  const accent = useAccent();
+  return (
+    <View style={s.categoriesScroll}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.catContent}>
+        <Chip label="الكل" selected={selected === 'all'} onPress={() => onSelect('all')} size="sm" />
+        {DUA_CATEGORIES.map((cat) => (
+          <Chip
+            key={cat.id}
+            label={cat.name}
+            selected={selected === cat.id}
+            onPress={() => onSelect(cat.id)}
+            size="sm"
+            icon={<cat.icon size={icon.size.sm} color={selected === cat.id ? accent.accentText : colors.textMuted} strokeWidth={icon.stroke} />}
+          />
+        ))}
+      </ScrollView>
+    </View>
+  );
+};
 
 export const DuaCard = ({ item, onShare, onCopy }: any) => (
   <View style={s.duaCard}>
     <Text style={s.duaText}>{item.text}</Text>
     <View style={s.duaFooter}>
-      <Text style={s.duaRef}>{item.ref}</Text>
-      <View style={{ flexDirection: 'row', gap: 15 }}>
-        <TouchableOpacity onPress={() => onShare(item.text, item.ref)} style={s.actionBtn}>
-          <Share2 size={18} color="#B8860B" />
+      <View style={s.actions}>
+        <TouchableOpacity onPress={() => onShare(item.text, item.ref)} style={s.actionBtn} accessibilityLabel="مشاركة">
+          <Share2 size={16} color={colors.gold} strokeWidth={icon.stroke} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => onCopy(item.text)} style={s.actionBtn}>
-          <Copy size={18} color="#B8860B" />
+        <TouchableOpacity onPress={() => onCopy(item.text)} style={s.actionBtn} accessibilityLabel="نسخ">
+          <Copy size={16} color={colors.gold} strokeWidth={icon.stroke} />
         </TouchableOpacity>
       </View>
+      <Text style={s.duaRef}>{item.ref}</Text>
     </View>
   </View>
 );

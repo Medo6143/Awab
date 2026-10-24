@@ -1,15 +1,10 @@
-import React from 'react';
-import { View } from 'react-native';
-import { BookOpen, Heart, User } from 'lucide-react-native';
+import { BookOpen, Heart, User, Sun, LifeBuoy, LucideIcon } from 'lucide-react-native';
 
-export const SunIcon = ({ size, color }: any) => <View style={{ width: size, height: size, borderRadius: size/2, backgroundColor: color }} />;
-export const ActivityIcon = ({ size, color }: any) => <View style={{ width: size, height: 2, backgroundColor: color }} />;
-
-export const DUA_CATEGORIES = [
-  { id: 'daily', name: 'أدعية يومية', icon: SunIcon },
+export const DUA_CATEGORIES: { id: string; name: string; icon: LucideIcon }[] = [
+  { id: 'daily', name: 'أدعية يومية', icon: Sun },
   { id: 'prophetic', name: 'أدعية نبوية', icon: Heart },
   { id: 'quranic', name: 'أدعية قرآنية', icon: BookOpen },
-  { id: 'relief', name: 'الكرب والهم', icon: ActivityIcon },
+  { id: 'relief', name: 'الكرب والهم', icon: LifeBuoy },
   { id: 'personal', name: 'أدعية شخصية', icon: User },
 ];
 

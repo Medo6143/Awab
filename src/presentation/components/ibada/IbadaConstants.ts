@@ -1,6 +1,9 @@
-export const IBADA_CATEGORIES = [
-  { id: 'obligatory', name: 'الفرائض', color: '#B8860B' },
-  { id: 'sunnah', name: 'السنن', color: '#10b981' },
-  { id: 'daily', name: 'الأذكار والورد', color: '#3b82f6' },
-  { id: 'voluntary', name: 'التطوع', color: '#8b5cf6' },
+import { Landmark, Sparkles, BookOpen, HandHeart, LucideIcon } from 'lucide-react-native';
+
+// Category identity comes from the icon; all tiles share the accent colour.
+export const IBADA_CATEGORIES: { id: string; name: string; icon: LucideIcon }[] = [
+  { id: 'obligatory', name: 'الفرائض', icon: Landmark },
+  { id: 'sunnah', name: 'السنن', icon: Sparkles },
+  { id: 'daily', name: 'الأذكار والورد', icon: BookOpen },
+  { id: 'voluntary', name: 'التطوع', icon: HandHeart },
 ];
