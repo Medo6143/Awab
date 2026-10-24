@@ -1,184 +1,91 @@
-import { NativeModules, Platform, Alert } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
+import { NotificationService } from '../../data/services/NotificationService';
 
 const { AzanModule, OemBatteryModule } = NativeModules;
 
+export type ReadinessStatus = 'ok' | 'missing' | 'unknown';
+export type ReadinessItem = {
+  id: 'notifications' | 'exactAlarm' | 'fullScreen' | 'battery' | 'oem' | 'module';
+  label: string;
+  hint: string;
+  status: ReadinessStatus;
+  fix?: () => void | Promise<unknown>;
+};
+
+const OEM_VENDORS = ['xiaomi', 'huawei', 'honor', 'oppo', 'vivo', 'samsung', 'realme', 'oneplus'];
+
+/**
+ * Everything the adhan needs to actually fire on this phone, as a checklist.
+ * Each item knows how to open the matching system page. No alert chains.
+ */
 export function useAzanPermissions() {
-  /**
-   * Check if EXACT ALARMS are allowed (Android 12+)
-   */
   const checkExactAlarmPermission = async (): Promise<boolean> => {
     if (Platform.OS !== 'android') return true;
-    try {
-      return await AzanModule.canScheduleExactAlarms();
-    } catch (e) {
-      console.error('Failed to check exact alarm permission', e);
-      return false;
-    }
+    try { return await AzanModule.canScheduleExactAlarms(); } catch { return false; }
   };
 
-  /**
-   * Check if battery optimizations are ignored
-   */
   const checkBatteryOptimization = async (): Promise<boolean> => {
     if (Platform.OS !== 'android') return true;
-    try {
-      return await OemBatteryModule.isIgnoringBatteryOptimizations();
-    } catch (e) {
-      console.error('Failed to check battery optimization', e);
-      return false;
-    }
+    try { return await OemBatteryModule.isIgnoringBatteryOptimizations(); } catch { return false; }
   };
 
-  /**
-   * Check if floating overlay is allowed (optional but recommended for lock screen)
-   */
   const checkOverlayPermission = async (): Promise<boolean> => {
     if (Platform.OS !== 'android') return true;
-    try {
-      return await AzanModule.checkOverlayPermission();
-    } catch (e) {
-      console.error('Failed to check overlay permission', e);
-      return false;
-    }
+    try { return await AzanModule.checkOverlayPermission(); } catch { return false; }
   };
 
-  /**
-   * Run the full setup process.
-   * Guides the user through:
-   * 1. Exact Alarm (Android 12+)
-   * 2. Battery Optimization
-   * 3. OEM Battery Killers (Xiaomi/Huawei)
-   */
-  const requestAllPermissions = async () => {
-    if (Platform.OS !== 'android') return true;
+  const checkFullScreenIntent = async (): Promise<boolean> => {
+    if (Platform.OS !== 'android' || !AzanModule?.canUseFullScreenIntent) return true;
+    try { return await AzanModule.canUseFullScreenIntent(); } catch { return true; }
+  };
 
-    // 1. Exact Alarms
-    const hasExactAlarm = await checkExactAlarmPermission();
-    if (!hasExactAlarm) {
-      Alert.alert(
-        'إذن مجدول الصلاة',
-        'نحتاج إذن "المنبهات المجدولة" لضمان عمل الأذان في وقته بالضبط.',
-        [
-          { text: 'إلغاء', style: 'cancel' },
-          { text: 'موافق', onPress: () => AzanModule.openAlarmSettings() }
-        ]
-      );
-      return false; // Stop here, requires user context switch
+  const getReadiness = async (): Promise<ReadinessItem[]> => {
+    if (Platform.OS !== 'android') return [];
+    if (!AzanModule?.scheduleAzan) {
+      return [{
+        id: 'module', label: 'وحدة الأذان غير موجودة', status: 'missing',
+        hint: 'هذه النسخة بُنيت بدون الكود الأصلي للأذان. أعد بناء التطبيق.',
+      }];
     }
 
-    // 1b. Full-screen intent (Android 14+ revokes it by default for non-alarm apps,
-    // which is why the azan screen never pops over the lock screen on new phones).
+    const [notif, exact, fsi, battery] = await Promise.all([
+      NotificationService.getPermissionStatus(),
+      checkExactAlarmPermission(),
+      checkFullScreenIntent(),
+      checkBatteryOptimization(),
+    ]);
+
+    const items: ReadinessItem[] = [
+      { id: 'notifications', label: 'الإشعارات', hint: 'يظهر إشعار الأذان مع زر الإيقاف', status: notif ? 'ok' : 'missing', fix: () => NotificationService.requestPermissions() },
+      { id: 'exactAlarm', label: 'المنبهات الدقيقة', hint: 'يرن الأذان في الدقيقة نفسها', status: exact ? 'ok' : 'missing', fix: () => AzanModule.openAlarmSettings() },
+      { id: 'fullScreen', label: 'شاشة الأذان فوق القفل', hint: 'أندرويد ١٤ وما بعده يطلب هذا الإذن', status: fsi ? 'ok' : 'missing', fix: () => AzanModule.openFullScreenIntentSettings?.() },
+      { id: 'battery', label: 'استثناء من توفير البطارية', hint: 'حتى لا يُقتل المنبه أثناء النوم', status: battery ? 'ok' : 'missing', fix: () => OemBatteryModule.requestIgnoreBatteryOptimizations() },
+    ];
+
     try {
-      const canFsi = AzanModule?.canUseFullScreenIntent ? await AzanModule.canUseFullScreenIntent() : true;
-      if (!canFsi) {
-        Alert.alert(
-          'شاشة الأذان',
-          'لإظهار شاشة الأذان فوق قفل الشاشة يجب السماح بـ "الإشعارات بملء الشاشة" لتطبيق أوّاب.',
-          [
-            { text: 'لاحقاً', style: 'cancel' },
-            { text: 'الإعدادات', onPress: () => AzanModule.openFullScreenIntentSettings() }
-          ]
-        );
-        return false;
+      const manufacturer: string = await OemBatteryModule.getManufacturer();
+      if (OEM_VENDORS.includes(manufacturer)) {
+        items.push({
+          id: 'oem', label: `إعدادات ${manufacturer} الإضافية`, status: 'unknown',
+          hint: 'فعّل "التشغيل التلقائي" و"بدون قيود" للتطبيق من إعدادات الجهاز',
+          fix: () => OemBatteryModule.openOemBatterySettings?.(),
+        });
       }
-    } catch (e) {
-      console.warn('Full-screen intent check failed', e);
-    }
+    } catch {}
 
-    // 2. Battery Optimization
-    const hasBatteryOpt = await checkBatteryOptimization();
-    if (!hasBatteryOpt) {
-      Alert.alert(
-        'تحسين البطارية',
-        'يجب استثناء التطبيق من "تحسين البطارية" حتى يعمل الأذان عندما تكون الشاشة مغلقة.',
-        [
-          { text: 'إلغاء', style: 'cancel' },
-          { text: 'موافق', onPress: () => OemBatteryModule.requestIgnoreBatteryOptimizations() }
-        ]
-      );
-      return false;
-    }
-
-    // 3. OEM AutoStart (Xiaomi, Huawei, etc)
-    const manufacturer = await OemBatteryModule.getManufacturer();
-    const needsOemSettings = ['xiaomi', 'huawei', 'honor', 'oppo', 'vivo', 'samsung'].includes(manufacturer);
-    
-    if (needsOemSettings) {
-      Alert.alert(
-        'إعدادات الجهاز الإضافية',
-        'في أجهزة ' + manufacturer + '، يجب تفعيل عمل التطبيق في الخلفية يدوياً لضمان موثوقية الأذان.',
-        [
-          { text: 'تخطي', style: 'cancel' },
-          { text: 'الذهاب للإعدادت', onPress: () => OemBatteryModule.openOemBatterySettings() }
-        ]
-      );
-    } else {
-      Alert.alert('ممتاز!', 'تم تجهيز هاتفك بنجاح لضمان دقة مواعيد الأذان.');
-    }
-
-    return true;
+    return items;
   };
 
-  // ──────────────────────────────────────────────────────────────
-  // Wrapper for scheduleAzan with Permission Guard
-  // ──────────────────────────────────────────────────────────────
-  const scheduleAzanSafely = async (
-    prayerId: string,
-    prayerName: string,
-    hour: number,
-    minute: number,
-    type: 'full' | 'short' = 'full'
-  ): Promise<boolean> => {
+  const scheduleAzanSafely = async (prayerId: string, prayerName: string, hour: number, minute: number, type: 'full' | 'short' = 'full'): Promise<boolean> => {
     if (Platform.OS !== 'android') return false;
-
-    try {
-      await AzanModule.scheduleAzan(prayerId, prayerName, hour, minute, type);
-      return true;
-    } catch (e: any) {
-      if (e?.code === 'PERMISSION_DENIED') {
-        Alert.alert(
-          'خطأ',
-          'لا يمكن جدولة الأذان بدون إذن "المنبهات المجدولة". يرجى السماح به من الإعدادات.',
-          [
-            { text: 'إلغاء', style: 'cancel' },
-            { text: 'الإعدادات', onPress: () => AzanModule.openAlarmSettings() }
-          ]
-        );
-      }
-      return false;
-    }
+    try { await AzanModule.scheduleAzan(prayerId, prayerName, hour, minute, type); return true; } catch { return false; }
   };
 
-  /**
-   * Schedule a test Azan n seconds from now.
-   */
-  const testAzanAfterDelay = async (delaySeconds: number = 5): Promise<boolean> => {
-    if (Platform.OS !== 'android') return false;
-
-    try {
-      await AzanModule.testAzan(delaySeconds);
-      return true;
-    } catch (e: any) {
-      if (e?.code === 'PERMISSION_DENIED') {
-        Alert.alert(
-          'خطأ',
-          'لا يمكن تجربة الأذان بدون إذن "المنبهات المجدولة".',
-          [
-            { text: 'إلغاء', style: 'cancel' },
-            { text: 'الإعدادات', onPress: () => AzanModule.openAlarmSettings() }
-          ]
-        );
-      }
-      return false;
-    }
+  /** Schedules a test adhan n seconds from now. Resolves false when the exact-alarm permission is missing. */
+  const testAzanAfterDelay = async (delaySeconds: number = 30): Promise<boolean> => {
+    if (Platform.OS !== 'android' || !AzanModule?.testAzan) return false;
+    try { await AzanModule.testAzan(delaySeconds); return true; } catch { return false; }
   };
 
-  return {
-    checkExactAlarmPermission,
-    checkBatteryOptimization,
-    checkOverlayPermission,
-    requestAllPermissions,
-    scheduleAzanSafely,
-    testAzanAfterDelay,
-  };
+  return { checkExactAlarmPermission, checkBatteryOptimization, checkOverlayPermission, checkFullScreenIntent, getReadiness, scheduleAzanSafely, testAzanAfterDelay };
 }

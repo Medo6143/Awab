@@ -55,6 +55,16 @@ export class NotificationService {
     }
   }
 
+  /** True when the OS currently allows this app to post notifications. */
+  static async getPermissionStatus(): Promise<boolean> {
+    try {
+      const { status } = await getNotifications().getPermissionsAsync();
+      return status === 'granted';
+    } catch {
+      return false;
+    }
+  }
+
   static async initializeChannels() {
     const isExpoGo = Constants.appOwnership === 'expo';
     if (isExpoGo || Platform.OS !== 'android') return;
