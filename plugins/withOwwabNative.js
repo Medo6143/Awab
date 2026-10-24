@@ -215,8 +215,15 @@ function withAzanIntent(config) {
     }
   }
 
+  // New Architecture (bridgeless) exposes the context through ReactHost; the legacy
+  // reactInstanceManager getter throws "Cannot get ReactInstanceManager without a ReactNativeHost".
   private val reactContext: com.facebook.react.bridge.ReactContext?
-    get() = reactInstanceManager?.currentReactContext
+    get() {
+      val app = application as? com.facebook.react.ReactApplication ?: return null
+      val fromHost = try { app.reactHost?.currentReactContext } catch (e: Exception) { null }
+      if (fromHost != null) return fromHost
+      return try { app.reactNativeHost.reactInstanceManager.currentReactContext } catch (e: Exception) { null }
+    }
 
   /**
    * Returns the name of the main component registered from JavaScript.`;
