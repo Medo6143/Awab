@@ -8,7 +8,7 @@ import { setPrayerData, setLoading as setPrayerLoading, setFailed as setPrayerFa
 
 export const usePrayerTimes = () => {
   const dispatch = useDispatch();
-  const { coords, countryCode } = useLocation();
+  const { coords, countryCode, error: locationError } = useLocation();
   const { calculationMethod: manualMethod } = useSelector((state: RootState) => state.settings);
   const { cachedData, lastFetchedDate, status } = useSelector((state: RootState) => state.prayer);
   const [nextPrayer, setNextPrayer] = useState<any>(null);
@@ -111,9 +111,10 @@ export const usePrayerTimes = () => {
     timings: cachedData?.timings, 
     date: cachedData?.date, 
     nextPrayer: nextPrayer ? { ...nextPrayer, arName: toArName(nextPrayer.name) } : null,
-    loading: status === 'loading' || (!cachedData && !!coords && status !== 'failed'),
+    // Location still resolving counts as loading; only a definite location error is "no location".
+    loading: status === 'loading' || (!coords && !locationError) || (!cachedData && !!coords && status !== 'failed'),
     error: status === 'failed',
-    hasLocation: !!coords,
+    hasLocation: !!coords || !locationError,
     retry,
   };
 };
