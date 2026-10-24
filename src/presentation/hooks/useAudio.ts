@@ -5,7 +5,7 @@ import { AudioState } from '../../domain/entities/types';
 import { RootState } from '../store';
 import { setReciterId } from '../store/slices/settingsSlice';
 import { setAudioState } from '../store/slices/audioSlice';
-import { usePlaybackState, useProgress, State } from 'react-native-track-player';
+import TrackPlayer, { usePlaybackState, useProgress, State } from 'react-native-track-player';
 
 export const useAudio = () => {
   const dispatch = useDispatch();
@@ -70,9 +70,20 @@ export const useAudio = () => {
   const togglePlayback = async () => {
     if (state.isPlaying) {
       await AudioService.pause();
-    } else {
-      await AudioService.resume();
+      return;
     }
+    // After an app restart the persisted "current surah" has no queue behind it,
+    // so resume() would silently do nothing. Re-load the surah in that case.
+    if (state.playMode === 'surah' && state.currentSurahId) {
+      try {
+        const queue = await TrackPlayer.getQueue();
+        if (queue.length === 0) {
+          await playSurah(state.currentSurahId);
+          return;
+        }
+      } catch {}
+    }
+    await AudioService.resume();
   };
 
   const resumePlayback = async () => {

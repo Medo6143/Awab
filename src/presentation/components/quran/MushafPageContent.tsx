@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Bookmark } from 'lucide-react-native';
 import { pageCache, toAr, TOTAL_PAGES, Ayah } from './QuranConstants';
@@ -22,6 +22,13 @@ export const MushafPageContent = React.memo(({
   const [ayahs, setAyahs] = useState<Ayah[]>(pageCache.get(pageNum) ?? []);
   const [loading, setLoading] = useState(!pageCache.has(pageNum));
   const [prevPageNum, setPrevPageNum] = useState(pageNum);
+  const scrollRef = useRef<ScrollView>(null);
+
+  // The pager reuses this component for the "current" slot, so without this the
+  // scroll offset of the previous page carries over to the next one.
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+  }, [pageNum]);
 
   if (prevPageNum !== pageNum) {
     setPrevPageNum(pageNum);
@@ -93,7 +100,7 @@ export const MushafPageContent = React.memo(({
         <View style={s.headerCornerRight} />
       </View>
 
-      <ScrollView contentContainerStyle={s.ayahList} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollRef} contentContainerStyle={s.ayahList} showsVerticalScrollIndicator={false}>
         {loading ? (
           <View style={s.centerLoader}>
             <ActivityIndicator size="large" color="#d4af37" />

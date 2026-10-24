@@ -651,3 +651,39 @@ index b2409a0..17f214a 100644
 +        }
      }
  }
+diff --git a/node_modules/react-native-track-player/android/src/main/java/com/doublesymmetry/trackplayer/service/MusicService.kt b/node_modules/react-native-track-player/android/src/main/java/com/doublesymmetry/trackplayer/service/MusicService.kt
+index afa6b0f..407be35 100644
+--- a/node_modules/react-native-track-player/android/src/main/java/com/doublesymmetry/trackplayer/service/MusicService.kt
++++ b/node_modules/react-native-track-player/android/src/main/java/com/doublesymmetry/trackplayer/service/MusicService.kt
+@@ -739,9 +739,21 @@ class MusicService : HeadlessJsTaskService() {
+         return bundle
+     }
+ 
++    /**
++     * Bridgeless (New Architecture) safe context lookup. `reactNativeHost.reactInstanceManager`
++     * creates a detached legacy instance whose context is always null under bridgeless mode, so
++     * every remote event (pause/play/stop...) was silently dropped before reaching JS.
++     */
++    private fun currentReactContext(): com.facebook.react.bridge.ReactContext? {
++        val app = application as? com.facebook.react.ReactApplication ?: return null
++        val fromHost = try { app.reactHost?.currentReactContext } catch (e: Exception) { null }
++        if (fromHost != null) return fromHost
++        return try { app.reactNativeHost.reactInstanceManager.currentReactContext } catch (e: Exception) { null }
++    }
++
+     @MainThread
+     private fun emit(event: String, data: Bundle? = null) {
+-        reactNativeHost.reactInstanceManager.currentReactContext
++        currentReactContext()
+             ?.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+             ?.emit(event, data?.let { Arguments.fromBundle(it) })
+     }
+@@ -751,7 +763,7 @@ class MusicService : HeadlessJsTaskService() {
+         val payload = Arguments.createArray()
+         data.forEach { payload.pushMap(Arguments.fromBundle(it)) }
+ 
+-        reactNativeHost.reactInstanceManager.currentReactContext
++        currentReactContext()
+             ?.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+             ?.emit(event, payload)
+     }

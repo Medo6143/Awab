@@ -245,9 +245,17 @@ export const FloatingTasbeehController = () => {
             dispatch(resetCount());
         });
 
+        // User stopped the sebha from the overlay itself (dragged it onto the stop target).
+        // Reconcile the count first so nothing counted while the app was away is lost.
+        const removeSub = DeviceEventEmitter.addListener('floating-bubble-remove', async () => {
+            await syncCountFromNative();
+            dispatch(setFloatingActive(false));
+        });
+
         return () => {
             pressSub.remove();
             resetSub.remove();
+            removeSub.remove();
         };
     }, [dispatch, hasFloatingBubbleModule]);
 
@@ -333,6 +341,15 @@ export const FloatingTasbeehToggle = ({ accentTheme }: any) => {
 
             if (isFloatingActive) {
                 console.log('🔵 Hiding bubble...');
+                // Pull the latest native count before the service goes away
+                try {
+                    const { RNFloatingBubble } = NativeModules;
+                    const nativeCount = RNFloatingBubble?.getSavedTasbeehCount ? await RNFloatingBubble.getSavedTasbeehCount() : count;
+                    if (typeof nativeCount === 'number' && nativeCount > count) {
+                        dispatch(incrementCount(nativeCount - count));
+                        dispatch(logDhikr({ name: store.getState().tasbeeh.selectedDhikr || 'سبحان الله', count: nativeCount - count }));
+                    }
+                } catch (_) {}
                 await safeHideFloatingBubble();
                 dispatch(setFloatingActive(false));
             } else {

@@ -42,7 +42,7 @@ index e889521..1675490 100644
 +connection.project.dir=../../../android
  eclipse.preferences.version=1
 diff --git a/node_modules/react-native-floating-bubble/android/build.gradle b/node_modules/react-native-floating-bubble/android/build.gradle
-index 2173e8d..511598e 100644
+index 2173e8d..6b4eed9 100644
 --- a/node_modules/react-native-floating-bubble/android/build.gradle
 +++ b/node_modules/react-native-floating-bubble/android/build.gradle
 @@ -13,12 +13,12 @@ buildscript {
@@ -69,1302 +69,8 @@ index 2173e8d..511598e 100644
 -    implementation 'com.github.txusballesteros:bubbles-for-android:develop-SNAPSHOT'
 +    implementation 'com.github.txusballesteros:bubbles-for-android:1.2.1'
  }
-\ No newline at end of file
 -  
 \ No newline at end of file
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/4b84ee9ad9f4c2673f18698b24d91481/results.bin b/node_modules/react-native-floating-bubble/android/build/.transforms/4b84ee9ad9f4c2673f18698b24d91481/results.bin
-new file mode 100644
-index 0000000..0d259dd
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/.transforms/4b84ee9ad9f4c2673f18698b24d91481/results.bin
-@@ -0,0 +1 @@
-+o/classes
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/4b84ee9ad9f4c2673f18698b24d91481/transformed/classes/classes_dex/classes.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/4b84ee9ad9f4c2673f18698b24d91481/transformed/classes/classes_dex/classes.dex
-new file mode 100644
-index 0000000..d7cfbca
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/4b84ee9ad9f4c2673f18698b24d91481/transformed/classes/classes_dex/classes.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/results.bin b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/results.bin
-new file mode 100644
-index 0000000..7ed749e
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/results.bin
-@@ -0,0 +1 @@
-+o/bundleLibRuntimeToDirDebug
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/BuildConfig.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/BuildConfig.dex
-new file mode 100644
-index 0000000..66535f9
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/BuildConfig.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$1.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$1.dex
-new file mode 100644
-index 0000000..e0d7f3b
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$1.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$10.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$10.dex
-new file mode 100644
-index 0000000..fecbde0
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$10.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$11.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$11.dex
-new file mode 100644
-index 0000000..feceb35
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$11.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$2.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$2.dex
-new file mode 100644
-index 0000000..9259b09
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$2.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$3.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$3.dex
-new file mode 100644
-index 0000000..662bca3
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$3.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$4.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$4.dex
-new file mode 100644
-index 0000000..9c41816
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$4.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$5.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$5.dex
-new file mode 100644
-index 0000000..4517424
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$5.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$6.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$6.dex
-new file mode 100644
-index 0000000..df31026
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$6.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$7.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$7.dex
-new file mode 100644
-index 0000000..d46b599
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$7.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$8.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$8.dex
-new file mode 100644
-index 0000000..6d3cf0e
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$8.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$9.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$9.dex
-new file mode 100644
-index 0000000..7ec1ed6
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService$9.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService.dex
-new file mode 100644
-index 0000000..df8da51
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/FloatingBubbleService.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/RNFloatingBubbleModule$1.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/RNFloatingBubbleModule$1.dex
-new file mode 100644
-index 0000000..bc09316
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/RNFloatingBubbleModule$1.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/RNFloatingBubbleModule$2.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/RNFloatingBubbleModule$2.dex
-new file mode 100644
-index 0000000..8f81aac
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/RNFloatingBubbleModule$2.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/RNFloatingBubbleModule$3.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/RNFloatingBubbleModule$3.dex
-new file mode 100644
-index 0000000..48d7d7a
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/RNFloatingBubbleModule$3.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/RNFloatingBubbleModule.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/RNFloatingBubbleModule.dex
-new file mode 100644
-index 0000000..3a37d5d
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/RNFloatingBubbleModule.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/RNFloatingBubblePackage.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/RNFloatingBubblePackage.dex
-new file mode 100644
-index 0000000..264a8e9
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/RNFloatingBubblePackage.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/SharedPrefsHelper.dex b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/SharedPrefsHelper.dex
-new file mode 100644
-index 0000000..7e4c0ca
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/bundleLibRuntimeToDirDebug_dex/com/reactlibrary/SharedPrefsHelper.dex differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/desugar_graph.bin b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/desugar_graph.bin
-new file mode 100644
-index 0000000..a9f30da
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/.transforms/ec7c3ec50c97b2559aa4b4192ed0e5b6/transformed/bundleLibRuntimeToDirDebug/desugar_graph.bin differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/generated/source/buildConfig/debug/com/reactlibrary/BuildConfig.java b/node_modules/react-native-floating-bubble/android/build/generated/source/buildConfig/debug/com/reactlibrary/BuildConfig.java
-new file mode 100644
-index 0000000..4381f65
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/generated/source/buildConfig/debug/com/reactlibrary/BuildConfig.java
-@@ -0,0 +1,10 @@
-+/**
-+ * Automatically generated file. DO NOT MODIFY
-+ */
-+package com.reactlibrary;
-+
-+public final class BuildConfig {
-+  public static final boolean DEBUG = Boolean.parseBoolean("true");
-+  public static final String LIBRARY_PACKAGE_NAME = "com.reactlibrary";
-+  public static final String BUILD_TYPE = "debug";
-+}
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml
-new file mode 100644
-index 0000000..61a53c1
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/AndroidManifest.xml
-@@ -0,0 +1,21 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-+    package="com.reactlibrary" >
-+
-+    <uses-sdk android:minSdkVersion="24" />
-+
-+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-+
-+    <application>
-+        <service
-+            android:name="com.reactlibrary.FloatingBubbleService"
-+            android:foregroundServiceType="specialUse"
-+            android:stopWithTask="false" >
-+            <property
-+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_REASON"
-+                android:value="Floating Tasbeeh counter and dhikr reminders that must remain active over other apps." />
-+        </service>
-+    </application>
-+
-+</manifest>
-\ No newline at end of file
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/output-metadata.json b/node_modules/react-native-floating-bubble/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/output-metadata.json
-new file mode 100644
-index 0000000..99bfe68
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/aapt_friendly_merged_manifests/debug/processDebugManifest/aapt/output-metadata.json
-@@ -0,0 +1,18 @@
-+{
-+  "version": 3,
-+  "artifactType": {
-+    "type": "AAPT_FRIENDLY_MERGED_MANIFESTS",
-+    "kind": "Directory"
-+  },
-+  "applicationId": "com.reactlibrary",
-+  "variantName": "debug",
-+  "elements": [
-+    {
-+      "type": "SINGLE",
-+      "filters": [],
-+      "attributes": [],
-+      "outputFile": "AndroidManifest.xml"
-+    }
-+  ],
-+  "elementType": "File"
-+}
-\ No newline at end of file
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties b/node_modules/react-native-floating-bubble/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties
-new file mode 100644
-index 0000000..1211b1e
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties
-@@ -0,0 +1,6 @@
-+aarFormatVersion=1.0
-+aarMetadataVersion=1.0
-+minCompileSdk=1
-+minCompileSdkExtension=0
-+minAndroidGradlePluginVersion=1.0.0
-+coreLibraryDesugaringEnabled=false
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/annotation_processor_list/debug/javaPreCompileDebug/annotationProcessors.json b/node_modules/react-native-floating-bubble/android/build/intermediates/annotation_processor_list/debug/javaPreCompileDebug/annotationProcessors.json
-new file mode 100644
-index 0000000..9e26dfe
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/annotation_processor_list/debug/javaPreCompileDebug/annotationProcessors.json
-@@ -0,0 +1 @@
-+{}
-\ No newline at end of file
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar b/node_modules/react-native-floating-bubble/android/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar
-new file mode 100644
-index 0000000..0dd55ab
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar b/node_modules/react-native-floating-bubble/android/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar
-new file mode 100644
-index 0000000..d3e4238
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/compile_symbol_list/debug/generateDebugRFile/R.txt b/node_modules/react-native-floating-bubble/android/build/intermediates/compile_symbol_list/debug/generateDebugRFile/R.txt
-new file mode 100644
-index 0000000..6e6a162
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/compile_symbol_list/debug/generateDebugRFile/R.txt
-@@ -0,0 +1,70 @@
-+int color black 0x0
-+int color black_opacity_25 0x0
-+int color black_opacity_66 0x0
-+int color brand_main 0x0
-+int color brand_main_1 0x0
-+int color brand_main_2 0x0
-+int color brand_main_3 0x0
-+int color brand_red 0x0
-+int color brand_secondary 0x0
-+int color brand_secondary_1 0x0
-+int color brand_secondary_1_opacity_50 0x0
-+int color brand_secondary_1_opacity_90 0x0
-+int color brand_secondary_dark 0x0
-+int color chat_away 0x0
-+int color gray_separator 0x0
-+int color grey 0x0
-+int color grey_1 0x0
-+int color grey_2 0x0
-+int color grey_dark 0x0
-+int color grey_dark_1 0x0
-+int color grey_dark_2 0x0
-+int color grey_dark_2_opacity_25 0x0
-+int color grey_light 0x0
-+int color grey_light_1 0x0
-+int color grey_light_2 0x0
-+int color highlight_on_blue 0x0
-+int color highlight_on_dark_grey 0x0
-+int color highlight_on_light_grey 0x0
-+int color highlight_on_white 0x0
-+int color important 0x0
-+int color loud 0x0
-+int color loud_dark 0x0
-+int color loud_light 0x0
-+int color navigation 0x0
-+int color neutral 0x0
-+int color positive_loud 0x0
-+int color positive_quiet 0x0
-+int color quiet 0x0
-+int color quiet_1 0x0
-+int color quiet_2 0x0
-+int color quiet_3 0x0
-+int color quiet_4 0x0
-+int color red_dark 0x0
-+int color red_darkest 0x0
-+int color white 0x0
-+int color white_opacity_30 0x0
-+int color white_opacity_50 0x0
-+int color white_opacity_70 0x0
-+int drawable bg_btn_count 0x0
-+int drawable bg_btn_reset 0x0
-+int drawable bg_reminder_card 0x0
-+int drawable bg_tasbeeh_body 0x0
-+int drawable bg_tasbeeh_inner_screen 0x0
-+int drawable bg_tasbeeh_screen 0x0
-+int drawable bg_tasbeeh_screen_border 0x0
-+int drawable bubble_counter_bkg 0x0
-+int drawable bubble_icon 0x0
-+int drawable profile_decorator 0x0
-+int id btn_count_tasbeeh 0x0
-+int id btn_reset_tasbeeh 0x0
-+int id reminder_container 0x0
-+int id reminder_header 0x0
-+int id reminder_text 0x0
-+int id screen_frame 0x0
-+int id tasbeeh_body_container 0x0
-+int id tasbeeh_count_text 0x0
-+int layout bubble_layout 0x0
-+int layout bubble_trash_layout 0x0
-+int layout reminder_layout 0x0
-+int mipmap bubble_trash_background 0x0
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_btn_count.xml.flat b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_btn_count.xml.flat
-new file mode 100644
-index 0000000..4da43e0
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_btn_count.xml.flat differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_btn_reset.xml.flat b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_btn_reset.xml.flat
-new file mode 100644
-index 0000000..dbd2982
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_btn_reset.xml.flat differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_reminder_card.xml.flat b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_reminder_card.xml.flat
-new file mode 100644
-index 0000000..104efc3
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_reminder_card.xml.flat differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_tasbeeh_body.xml.flat b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_tasbeeh_body.xml.flat
-new file mode 100644
-index 0000000..0657627
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_tasbeeh_body.xml.flat differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_tasbeeh_inner_screen.xml.flat b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_tasbeeh_inner_screen.xml.flat
-new file mode 100644
-index 0000000..deee3d1
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_tasbeeh_inner_screen.xml.flat differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_tasbeeh_screen.xml.flat b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_tasbeeh_screen.xml.flat
-new file mode 100644
-index 0000000..3f5d491
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_tasbeeh_screen.xml.flat differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_tasbeeh_screen_border.xml.flat b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_tasbeeh_screen_border.xml.flat
-new file mode 100644
-index 0000000..8470d8e
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bg_tasbeeh_screen_border.xml.flat differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bubble_counter_bkg.xml.flat b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bubble_counter_bkg.xml.flat
-new file mode 100644
-index 0000000..841b961
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bubble_counter_bkg.xml.flat differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bubble_icon.png.flat b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bubble_icon.png.flat
-new file mode 100644
-index 0000000..f5cf6e3
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_bubble_icon.png.flat differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_profile_decorator.png.flat b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_profile_decorator.png.flat
-new file mode 100644
-index 0000000..0bcb693
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/drawable_profile_decorator.png.flat differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_bubble_layout.xml.flat b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_bubble_layout.xml.flat
-new file mode 100644
-index 0000000..ee00c45
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_bubble_layout.xml.flat differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_bubble_trash_layout.xml.flat b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_bubble_trash_layout.xml.flat
-new file mode 100644
-index 0000000..d78d0e6
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_bubble_trash_layout.xml.flat differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_reminder_layout.xml.flat b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_reminder_layout.xml.flat
-new file mode 100644
-index 0000000..aa3d186
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/layout_reminder_layout.xml.flat differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/mipmap-mdpi-v4_bubble_trash_background.png.flat b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/mipmap-mdpi-v4_bubble_trash_background.png.flat
-new file mode 100644
-index 0000000..afbc140
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/compiled_local_resources/debug/compileDebugLibraryResources/out/mipmap-mdpi-v4_bubble_trash_background.png.flat differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties b/node_modules/react-native-floating-bubble/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
-new file mode 100644
-index 0000000..61d0899
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
-@@ -0,0 +1,15 @@
-+#Sun Mar 15 04:38:41 EET 2026
-+com.reactlibrary.react-native-floating-bubble-main-6\:/drawable/profile_decorator.png=/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/profile_decorator.png
-+com.reactlibrary.react-native-floating-bubble-main-6\:/drawable/bg_tasbeeh_screen.xml=/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_tasbeeh_screen.xml
-+com.reactlibrary.react-native-floating-bubble-main-6\:/layout/bubble_layout.xml=/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/layout/bubble_layout.xml
-+com.reactlibrary.react-native-floating-bubble-main-6\:/drawable/bg_btn_reset.xml=/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_btn_reset.xml
-+com.reactlibrary.react-native-floating-bubble-main-6\:/drawable/bubble_icon.png=/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bubble_icon.png
-+com.reactlibrary.react-native-floating-bubble-main-6\:/drawable/bg_btn_count.xml=/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_btn_count.xml
-+com.reactlibrary.react-native-floating-bubble-main-6\:/drawable/bg_tasbeeh_screen_border.xml=/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_tasbeeh_screen_border.xml
-+com.reactlibrary.react-native-floating-bubble-main-6\:/drawable/bg_tasbeeh_inner_screen.xml=/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_tasbeeh_inner_screen.xml
-+com.reactlibrary.react-native-floating-bubble-main-6\:/drawable/bubble_counter_bkg.xml=/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bubble_counter_bkg.xml
-+com.reactlibrary.react-native-floating-bubble-main-6\:/layout/reminder_layout.xml=/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/layout/reminder_layout.xml
-+com.reactlibrary.react-native-floating-bubble-main-6\:/drawable/bg_reminder_card.xml=/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_reminder_card.xml
-+com.reactlibrary.react-native-floating-bubble-main-6\:/drawable/bg_tasbeeh_body.xml=/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_tasbeeh_body.xml
-+com.reactlibrary.react-native-floating-bubble-main-6\:/layout/bubble_trash_layout.xml=/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/layout/bubble_trash_layout.xml
-+com.reactlibrary.react-native-floating-bubble-main-6\:/mipmap-mdpi/bubble_trash_background.png=/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/mipmap-mdpi-v4/bubble_trash_background.png
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/incremental/debug/packageDebugResources/merged.dir/values/values.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/incremental/debug/packageDebugResources/merged.dir/values/values.xml
-new file mode 100644
-index 0000000..250d7ed
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/incremental/debug/packageDebugResources/merged.dir/values/values.xml
-@@ -0,0 +1,51 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<resources>
-+    <color name="black">#000000</color>
-+    <color name="black_opacity_25">#40000000</color>
-+    <color name="black_opacity_66">#99000000</color>
-+    <color name="brand_main">#21a5b8</color>
-+    <color name="brand_main_1">#1f8b9b</color>
-+    <color name="brand_main_2">#15606c</color>
-+    <color name="brand_main_3">#0b363c</color>
-+    <color name="brand_red">#d51826</color>
-+    <color name="brand_secondary">#83a1a6</color>
-+    <color name="brand_secondary_1">#516366</color>
-+    <color name="brand_secondary_1_opacity_50">#80516366</color>
-+    <color name="brand_secondary_1_opacity_90">#E6516366</color>
-+    <color name="brand_secondary_dark">#7B989C</color>
-+    <color name="chat_away">#e8a95c</color>
-+    <color name="gray_separator">#dadada</color>
-+    <color name="grey">#cccccc</color>
-+    <color name="grey_1">#bbbbbb</color>
-+    <color name="grey_2">#999999</color>
-+    <color name="grey_dark">#666666</color>
-+    <color name="grey_dark_1">#444444</color>
-+    <color name="grey_dark_2">#333333</color>
-+    <color name="grey_dark_2_opacity_25">#40333333</color>
-+    <color name="grey_light">#f6f6f6</color>
-+    <color name="grey_light_1">#eeeeee</color>
-+    <color name="grey_light_2">#e6e6e6</color>
-+    <color name="highlight_on_blue">#2D8AB4</color>
-+    <color name="highlight_on_dark_grey">#333333</color>
-+    <color name="highlight_on_light_grey">#DDDDDD</color>
-+    <color name="highlight_on_white">#EAF3F6</color>
-+    <color name="important">#e8a95c</color>
-+    <color name="loud">#cb4a4a</color>
-+    <color name="loud_dark">#9f434e</color>
-+    <color name="loud_light">#e45555</color>
-+    <color name="navigation">#222222</color>
-+    <color name="neutral">#d4cbaa</color>
-+    <color name="positive_loud">#7ed321</color>
-+    <color name="positive_quiet">#8dce83</color>
-+    <color name="quiet">#e1f4f7</color>
-+    <color name="quiet_1">#c1e6eb</color>
-+    <color name="quiet_2">#fff3f5</color>
-+    <color name="quiet_3">#fee0e3</color>
-+    <color name="quiet_4">#fffcea</color>
-+    <color name="red_dark">#AB1F24</color>
-+    <color name="red_darkest">#921C20</color>
-+    <color name="white">#ffffff</color>
-+    <color name="white_opacity_30">#3Cffffff</color>
-+    <color name="white_opacity_50">#80ffffff</color>
-+    <color name="white_opacity_70">#B4ffffff</color>
-+</resources>
-\ No newline at end of file
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
-new file mode 100644
-index 0000000..1fd811c
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
-@@ -0,0 +1,2 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<merger version="3"><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main" generated-set="main$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/res"><file path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/res/values/colors.xml" qualifiers=""><color name="brand_red">#d51826</color><color name="brand_main">#21a5b8</color><color name="brand_main_1">#1f8b9b</color><color name="brand_main_2">#15606c</color><color name="brand_main_3">#0b363c</color><color name="brand_secondary">#83a1a6</color><color name="brand_secondary_dark">#7B989C</color><color name="brand_secondary_1">#516366</color><color name="brand_secondary_1_opacity_50">#80516366</color><color name="brand_secondary_1_opacity_90">#E6516366</color><color name="white">#ffffff</color><color name="white_opacity_30">#3Cffffff</color><color name="white_opacity_50">#80ffffff</color><color name="white_opacity_70">#B4ffffff</color><color name="grey_light">#f6f6f6</color><color name="grey_light_1">#eeeeee</color><color name="grey_light_2">#e6e6e6</color><color name="grey">#cccccc</color><color name="grey_1">#bbbbbb</color><color name="grey_2">#999999</color><color name="grey_dark">#666666</color><color name="grey_dark_1">#444444</color><color name="grey_dark_2">#333333</color><color name="navigation">#222222</color><color name="grey_dark_2_opacity_25">#40333333</color><color name="black">#000000</color><color name="black_opacity_25">#40000000</color><color name="black_opacity_66">#99000000</color><color name="quiet">#e1f4f7</color><color name="quiet_1">#c1e6eb</color><color name="quiet_2">#fff3f5</color><color name="quiet_3">#fee0e3</color><color name="quiet_4">#fffcea</color><color name="positive_loud">#7ed321</color><color name="positive_quiet">#8dce83</color><color name="important">#e8a95c</color><color name="loud_light">#e45555</color><color name="loud">#cb4a4a</color><color name="loud_dark">#9f434e</color><color name="neutral">#d4cbaa</color><color name="chat_away">#e8a95c</color><color name="red_dark">#AB1F24</color><color name="red_darkest">#921C20</color><color name="highlight_on_white">#EAF3F6</color><color name="highlight_on_blue">#2D8AB4</color><color name="highlight_on_dark_grey">#333333</color><color name="highlight_on_light_grey">#DDDDDD</color><color name="gray_separator">#dadada</color></file><file name="bubble_trash_background" path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/res/mipmap-mdpi/bubble_trash_background.png" qualifiers="mdpi-v4" type="mipmap"/><file name="bubble_layout" path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_layout.xml" qualifiers="" type="layout"/><file name="reminder_layout" path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/res/layout/reminder_layout.xml" qualifiers="" type="layout"/><file name="bubble_trash_layout" path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_trash_layout.xml" qualifiers="" type="layout"/><file name="bg_btn_count" path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_count.xml" qualifiers="" type="drawable"/><file name="profile_decorator" path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/res/drawable/profile_decorator.png" qualifiers="" type="drawable"/><file name="bubble_counter_bkg" path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bubble_counter_bkg.xml" qualifiers="" type="drawable"/><file name="bg_tasbeeh_screen" path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_screen.xml" qualifiers="" type="drawable"/><file name="bubble_icon" path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bubble_icon.png" qualifiers="" type="drawable"/><file name="bg_tasbeeh_screen_border" path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_screen_border.xml" qualifiers="" type="drawable"/><file name="bg_tasbeeh_inner_screen" path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_inner_screen.xml" qualifiers="" type="drawable"/><file name="bg_btn_reset" path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_reset.xml" qualifiers="" type="drawable"/><file name="bg_tasbeeh_body" path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_body.xml" qualifiers="" type="drawable"/><file name="bg_reminder_card" path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_reminder_card.xml" qualifiers="" type="drawable"/></source></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/debug/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug" generated-set="debug$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/debug/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/build/generated/res/resValues/debug"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated" generated-set="generated$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/build/generated/res/resValues/debug"/></dataSet><mergedItems/></merger>
-\ No newline at end of file
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/incremental/mergeDebugAssets/merger.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/incremental/mergeDebugAssets/merger.xml
-new file mode 100644
-index 0000000..83bb31e
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/incremental/mergeDebugAssets/merger.xml
-@@ -0,0 +1,2 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/assets"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/debug/assets"/></dataSet><dataSet config="generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/build/intermediates/shader_assets/debug/compileDebugShaders/out"/></dataSet></merger>
-\ No newline at end of file
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
-new file mode 100644
-index 0000000..7e9b914
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/incremental/mergeDebugJniLibFolders/merger.xml
-@@ -0,0 +1,2 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/jniLibs"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/debug/jniLibs"/></dataSet></merger>
-\ No newline at end of file
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/incremental/mergeDebugShaders/merger.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/incremental/mergeDebugShaders/merger.xml
-new file mode 100644
-index 0000000..c38f3b2
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/incremental/mergeDebugShaders/merger.xml
-@@ -0,0 +1,2 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<merger version="3"><dataSet config="main" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/shaders"/></dataSet><dataSet config="debug" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/debug/shaders"/></dataSet></merger>
-\ No newline at end of file
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/BuildConfig.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/BuildConfig.class
-new file mode 100644
-index 0000000..ef22f74
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/BuildConfig.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$1.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$1.class
-new file mode 100644
-index 0000000..300c8da
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$1.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$10.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$10.class
-new file mode 100644
-index 0000000..5ecfa76
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$10.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$11.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$11.class
-new file mode 100644
-index 0000000..89194c0
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$11.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$2.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$2.class
-new file mode 100644
-index 0000000..82a076b
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$2.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$3.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$3.class
-new file mode 100644
-index 0000000..987b8a6
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$3.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$4.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$4.class
-new file mode 100644
-index 0000000..be110aa
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$4.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$5.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$5.class
-new file mode 100644
-index 0000000..2ea8e81
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$5.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$6.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$6.class
-new file mode 100644
-index 0000000..3632faf
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$6.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$7.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$7.class
-new file mode 100644
-index 0000000..03ff5f6
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$7.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$8.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$8.class
-new file mode 100644
-index 0000000..3c704a1
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$8.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$9.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$9.class
-new file mode 100644
-index 0000000..d515a67
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService$9.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService.class
-new file mode 100644
-index 0000000..3f9b2e8
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/FloatingBubbleService.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/RNFloatingBubbleModule$1.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/RNFloatingBubbleModule$1.class
-new file mode 100644
-index 0000000..f447d4d
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/RNFloatingBubbleModule$1.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/RNFloatingBubbleModule$2.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/RNFloatingBubbleModule$2.class
-new file mode 100644
-index 0000000..16a6ffb
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/RNFloatingBubbleModule$2.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/RNFloatingBubbleModule$3.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/RNFloatingBubbleModule$3.class
-new file mode 100644
-index 0000000..d60fa55
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/RNFloatingBubbleModule$3.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/RNFloatingBubbleModule.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/RNFloatingBubbleModule.class
-new file mode 100644
-index 0000000..23bd418
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/RNFloatingBubbleModule.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/RNFloatingBubblePackage.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/RNFloatingBubblePackage.class
-new file mode 100644
-index 0000000..2cabdad
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/RNFloatingBubblePackage.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/SharedPrefsHelper.class b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/SharedPrefsHelper.class
-new file mode 100644
-index 0000000..721d6a8
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/reactlibrary/SharedPrefsHelper.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt b/node_modules/react-native-floating-bubble/android/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt
-new file mode 100644
-index 0000000..1ce1ed7
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources/R-def.txt
-@@ -0,0 +1,72 @@
-+R_DEF: Internal format may change without notice
-+local
-+color black
-+color black_opacity_25
-+color black_opacity_66
-+color brand_main
-+color brand_main_1
-+color brand_main_2
-+color brand_main_3
-+color brand_red
-+color brand_secondary
-+color brand_secondary_1
-+color brand_secondary_1_opacity_50
-+color brand_secondary_1_opacity_90
-+color brand_secondary_dark
-+color chat_away
-+color gray_separator
-+color grey
-+color grey_1
-+color grey_2
-+color grey_dark
-+color grey_dark_1
-+color grey_dark_2
-+color grey_dark_2_opacity_25
-+color grey_light
-+color grey_light_1
-+color grey_light_2
-+color highlight_on_blue
-+color highlight_on_dark_grey
-+color highlight_on_light_grey
-+color highlight_on_white
-+color important
-+color loud
-+color loud_dark
-+color loud_light
-+color navigation
-+color neutral
-+color positive_loud
-+color positive_quiet
-+color quiet
-+color quiet_1
-+color quiet_2
-+color quiet_3
-+color quiet_4
-+color red_dark
-+color red_darkest
-+color white
-+color white_opacity_30
-+color white_opacity_50
-+color white_opacity_70
-+drawable bg_btn_count
-+drawable bg_btn_reset
-+drawable bg_reminder_card
-+drawable bg_tasbeeh_body
-+drawable bg_tasbeeh_inner_screen
-+drawable bg_tasbeeh_screen
-+drawable bg_tasbeeh_screen_border
-+drawable bubble_counter_bkg
-+drawable bubble_icon
-+drawable profile_decorator
-+id btn_count_tasbeeh
-+id btn_reset_tasbeeh
-+id reminder_container
-+id reminder_header
-+id reminder_text
-+id screen_frame
-+id tasbeeh_body_container
-+id tasbeeh_count_text
-+layout bubble_layout
-+layout bubble_trash_layout
-+layout reminder_layout
-+mipmap bubble_trash_background
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/manifest_merge_blame_file/debug/processDebugManifest/manifest-merger-blame-debug-report.txt b/node_modules/react-native-floating-bubble/android/build/intermediates/manifest_merge_blame_file/debug/processDebugManifest/manifest-merger-blame-debug-report.txt
-new file mode 100644
-index 0000000..55d5a54
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/manifest_merge_blame_file/debug/processDebugManifest/manifest-merger-blame-debug-report.txt
-@@ -0,0 +1,33 @@
-+1<?xml version="1.0" encoding="utf-8"?>
-+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-+3    package="com.reactlibrary" >
-+4
-+5    <uses-sdk android:minSdkVersion="24" />
-+6
-+7    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-+7-->/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:4:5-76
-+7-->/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:4:22-74
-+8    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-+8-->/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:5:5-88
-+8-->/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:5:22-86
-+9
-+10    <application>
-+10-->/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:7:5-11:19
-+11        <service
-+11-->/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:8:9-10:19
-+12            android:name="com.reactlibrary.FloatingBubbleService"
-+12-->/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:8:18-55
-+13            android:foregroundServiceType="specialUse"
-+13-->/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:8:56-98
-+14            android:stopWithTask="false" >
-+14-->/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:8:99-127
-+15            <property
-+15-->/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:9:13-185
-+16                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_REASON"
-+16-->/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:9:23-81
-+17                android:value="Floating Tasbeeh counter and dhikr reminders that must remain active over other apps." />
-+17-->/home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:9:82-183
-+18        </service>
-+19    </application>
-+20
-+21</manifest>
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml
-new file mode 100644
-index 0000000..61a53c1
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml
-@@ -0,0 +1,21 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-+    package="com.reactlibrary" >
-+
-+    <uses-sdk android:minSdkVersion="24" />
-+
-+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-+
-+    <application>
-+        <service
-+            android:name="com.reactlibrary.FloatingBubbleService"
-+            android:foregroundServiceType="specialUse"
-+            android:stopWithTask="false" >
-+            <property
-+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_REASON"
-+                android:value="Floating Tasbeeh counter and dhikr reminders that must remain active over other apps." />
-+        </service>
-+    </application>
-+
-+</manifest>
-\ No newline at end of file
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/navigation_json/debug/extractDeepLinksDebug/navigation.json b/node_modules/react-native-floating-bubble/android/build/intermediates/navigation_json/debug/extractDeepLinksDebug/navigation.json
-new file mode 100644
-index 0000000..0637a08
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/navigation_json/debug/extractDeepLinksDebug/navigation.json
-@@ -0,0 +1 @@
-+[]
-\ No newline at end of file
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt b/node_modules/react-native-floating-bubble/android/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt
-new file mode 100644
-index 0000000..08f4ebe
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt
-@@ -0,0 +1 @@
-+0 Warning/Error
-\ No newline at end of file
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_btn_count.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_btn_count.xml
-new file mode 100644
-index 0000000..9ec0bcd
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_btn_count.xml
-@@ -0,0 +1,5 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
-+    <gradient android:startColor="#FFFFFF" android:centerColor="#F1F3F5" android:endColor="#DEE2E6" android:type="radial" android:gradientRadius="20dp" />
-+    <stroke android:width="1dp" android:color="#ADB5BD" />
-+</shape>
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_btn_reset.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_btn_reset.xml
-new file mode 100644
-index 0000000..830c869
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_btn_reset.xml
-@@ -0,0 +1,5 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
-+    <gradient android:startColor="#FCD34D" android:centerColor="#EAB308" android:endColor="#D97706" android:type="radial" android:gradientRadius="10dp" />
-+    <stroke android:width="1dp" android:color="#92400E" />
-+</shape>
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_reminder_card.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_reminder_card.xml
-new file mode 100644
-index 0000000..157f96b
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_reminder_card.xml
-@@ -0,0 +1,12 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<shape xmlns:android="http://schemas.android.com/apk/res/android"
-+    android:shape="rectangle">
-+    <gradient
-+        android:startColor="#CC000000"
-+        android:endColor="#EE1a140f"
-+        android:angle="270" />
-+    <corners android:radius="20dp" />
-+    <stroke
-+        android:width="1.5dp"
-+        android:color="#B8860B" />
-+</shape>
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_tasbeeh_body.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_tasbeeh_body.xml
-new file mode 100644
-index 0000000..2e97b4c
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_tasbeeh_body.xml
-@@ -0,0 +1,13 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-+    <corners android:radius="37.5dp" />
-+    <gradient
-+        android:startColor="#F8F9FA"
-+        android:centerColor="#E9ECEF"
-+        android:endColor="#CED4DA"
-+        android:angle="270"
-+        android:type="linear" />
-+    <stroke
-+        android:width="1dp"
-+        android:color="#ADB5BD" />
-+</shape>
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_tasbeeh_inner_screen.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_tasbeeh_inner_screen.xml
-new file mode 100644
-index 0000000..7d1f40e
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_tasbeeh_inner_screen.xml
-@@ -0,0 +1,5 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-+    <solid android:color="#000000" />
-+    <corners android:radius="8dp" />
-+</shape>
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_tasbeeh_screen.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_tasbeeh_screen.xml
-new file mode 100644
-index 0000000..9b75133
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_tasbeeh_screen.xml
-@@ -0,0 +1,6 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-+    <solid android:color="#8DA186" />
-+    <corners android:radius="5dp" />
-+    <stroke android:width="2dp" android:color="#2A2A2A" />
-+</shape>
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_tasbeeh_screen_border.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_tasbeeh_screen_border.xml
-new file mode 100644
-index 0000000..5f758fc
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bg_tasbeeh_screen_border.xml
-@@ -0,0 +1,6 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-+    <solid android:color="#000000" />
-+    <corners android:radius="10dp" />
-+    <stroke android:width="2dp" android:color="#A08040" />
-+</shape>
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bubble_counter_bkg.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bubble_counter_bkg.xml
-new file mode 100644
-index 0000000..5e59b1b
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bubble_counter_bkg.xml
-@@ -0,0 +1,29 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<!--
-+ * Copyright Txus Ballesteros 2015 (@txusballesteros)
-+ *
-+ * This file is part of some open source application.
-+ *
-+ * Licensed to the Apache Software Foundation (ASF) under one
-+ * or more contributor license agreements.  See the NOTICE file
-+ * distributed with this work for additional information
-+ * regarding copyright ownership.  The ASF licenses this file
-+ * to you under the Apache License, Version 2.0 (the
-+ * "License"); you may not use this file except in compliance
-+ * with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing,
-+ * software distributed under the License is distributed on an
-+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ * KIND, either express or implied.  See the License for the
-+ * specific language governing permissions and limitations
-+ * under the License.
-+ *
-+ * Contact: Txus Ballesteros <txus.ballesteros@gmail.com>
-+-->
-+<shape android:shape="rectangle" xmlns:android="http://schemas.android.com/apk/res/android">
-+    <corners android:radius="3dp" />
-+    <solid android:color="@color/brand_red" />
-+</shape>
-\ No newline at end of file
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bubble_icon.png b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bubble_icon.png
-new file mode 100644
-index 0000000..5aa6364
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/bubble_icon.png differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/profile_decorator.png b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/profile_decorator.png
-new file mode 100644
-index 0000000..b51c1dd
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/drawable/profile_decorator.png differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/layout/bubble_layout.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/layout/bubble_layout.xml
-new file mode 100644
-index 0000000..af8943b
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/layout/bubble_layout.xml
-@@ -0,0 +1,65 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<FrameLayout
-+    xmlns:android="http://schemas.android.com/apk/res/android"
-+    android:layout_width="match_parent"
-+    android:layout_height="match_parent"
-+    android:clipChildren="false"
-+    android:clipToPadding="false"
-+    android:clickable="false"
-+    android:focusable="false">
-+
-+    <LinearLayout
-+        android:id="@+id/tasbeeh_body_container"
-+        android:layout_width="match_parent"
-+        android:layout_height="match_parent"
-+        android:background="@drawable/bg_tasbeeh_body"
-+        android:orientation="vertical"
-+        android:gravity="center_horizontal"
-+        android:padding="8dp">
-+
-+        <View
-+            android:id="@+id/btn_reset_tasbeeh"
-+            android:layout_width="14dp"
-+            android:layout_height="14dp"
-+            android:layout_marginTop="2dp"
-+            android:background="@drawable/bg_btn_reset"
-+            android:clickable="true"
-+            android:focusable="true"/>
-+
-+        <FrameLayout
-+            android:id="@+id/screen_frame"
-+            android:layout_width="match_parent"
-+            android:layout_height="0dp"
-+            android:layout_weight="1.3"
-+            android:layout_marginTop="2dp"
-+            android:layout_marginStart="8dp"
-+            android:layout_marginEnd="8dp"
-+            android:background="@drawable/bg_tasbeeh_screen_border">
-+
-+            <TextView
-+                android:id="@+id/tasbeeh_count_text"
-+                android:layout_width="match_parent"
-+                android:layout_height="match_parent"
-+                android:gravity="center"
-+                android:text="33"
-+                android:textColor="#FF9800"
-+                android:textSize="18sp"
-+                android:textStyle="bold"
-+                android:includeFontPadding="false"
-+                android:fontFamily="monospace"
-+                android:background="@drawable/bg_tasbeeh_inner_screen" />
-+        </FrameLayout>
-+
-+        <View
-+            android:id="@+id/btn_count_tasbeeh"
-+            android:layout_width="0dp"
-+            android:layout_height="0dp"
-+            android:layout_weight="1.8"
-+            android:layout_marginTop="6dp"
-+            android:layout_marginBottom="4dp"
-+            android:background="@drawable/bg_btn_count"
-+            android:clickable="true"
-+            android:focusable="true" />
-+
-+    </LinearLayout>
-+</FrameLayout>
-\ No newline at end of file
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/layout/bubble_trash_layout.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/layout/bubble_trash_layout.xml
-new file mode 100644
-index 0000000..0d9c344
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/layout/bubble_trash_layout.xml
-@@ -0,0 +1,8 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<ImageView
-+    xmlns:android="http://schemas.android.com/apk/res/android"
-+    android:layout_width="wrap_content"
-+    android:layout_height="wrap_content"
-+    android:layout_marginBottom="20dp"
-+    android:src="@mipmap/bubble_trash_background"
-+    android:layout_gravity="bottom|center_horizontal" />
-\ No newline at end of file
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/layout/reminder_layout.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/layout/reminder_layout.xml
-new file mode 100644
-index 0000000..c069c7b
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/layout/reminder_layout.xml
-@@ -0,0 +1,49 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-+    android:id="@+id/reminder_container"
-+    android:layout_width="wrap_content"
-+    android:layout_height="wrap_content"
-+    android:orientation="vertical"
-+    android:padding="16dp"
-+    android:gravity="center"
-+    android:background="@android:color/transparent">
-+
-+    <LinearLayout
-+        android:layout_width="wrap_content"
-+        android:layout_height="wrap_content"
-+        android:background="@drawable/bg_reminder_card"
-+        android:orientation="vertical"
-+        android:padding="24dp"
-+        android:elevation="10dp"
-+        android:gravity="center">
-+
-+        <TextView
-+            android:id="@+id/reminder_header"
-+            android:layout_width="wrap_content"
-+            android:layout_height="wrap_content"
-+            android:text="✨ تذكير بالذكر ✨"
-+            android:textColor="#B8860B"
-+            android:textSize="13sp"
-+            android:fontFamily="serif"
-+            android:layout_marginBottom="12dp" />
-+
-+        <TextView
-+            android:id="@+id/reminder_text"
-+            android:layout_width="wrap_content"
-+            android:layout_height="wrap_content"
-+            android:text="سبحان الله وبحمده"
-+            android:textColor="#FFFFFF"
-+            android:textSize="22sp"
-+            android:textStyle="bold"
-+            android:gravity="center" />
-+
-+        <TextView
-+            android:layout_width="wrap_content"
-+            android:layout_height="wrap_content"
-+            android:text="انقر على السبحة للإخفاء"
-+            android:textColor="#88FFFFFF"
-+            android:textSize="10sp"
-+            android:layout_marginTop="12dp" />
-+            
-+    </LinearLayout>
-+</LinearLayout>
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/mipmap-mdpi-v4/bubble_trash_background.png b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/mipmap-mdpi-v4/bubble_trash_background.png
-new file mode 100644
-index 0000000..0e5c522
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/mipmap-mdpi-v4/bubble_trash_background.png differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/values/values.xml b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/values/values.xml
-new file mode 100644
-index 0000000..250d7ed
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/packaged_res/debug/packageDebugResources/values/values.xml
-@@ -0,0 +1,51 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<resources>
-+    <color name="black">#000000</color>
-+    <color name="black_opacity_25">#40000000</color>
-+    <color name="black_opacity_66">#99000000</color>
-+    <color name="brand_main">#21a5b8</color>
-+    <color name="brand_main_1">#1f8b9b</color>
-+    <color name="brand_main_2">#15606c</color>
-+    <color name="brand_main_3">#0b363c</color>
-+    <color name="brand_red">#d51826</color>
-+    <color name="brand_secondary">#83a1a6</color>
-+    <color name="brand_secondary_1">#516366</color>
-+    <color name="brand_secondary_1_opacity_50">#80516366</color>
-+    <color name="brand_secondary_1_opacity_90">#E6516366</color>
-+    <color name="brand_secondary_dark">#7B989C</color>
-+    <color name="chat_away">#e8a95c</color>
-+    <color name="gray_separator">#dadada</color>
-+    <color name="grey">#cccccc</color>
-+    <color name="grey_1">#bbbbbb</color>
-+    <color name="grey_2">#999999</color>
-+    <color name="grey_dark">#666666</color>
-+    <color name="grey_dark_1">#444444</color>
-+    <color name="grey_dark_2">#333333</color>
-+    <color name="grey_dark_2_opacity_25">#40333333</color>
-+    <color name="grey_light">#f6f6f6</color>
-+    <color name="grey_light_1">#eeeeee</color>
-+    <color name="grey_light_2">#e6e6e6</color>
-+    <color name="highlight_on_blue">#2D8AB4</color>
-+    <color name="highlight_on_dark_grey">#333333</color>
-+    <color name="highlight_on_light_grey">#DDDDDD</color>
-+    <color name="highlight_on_white">#EAF3F6</color>
-+    <color name="important">#e8a95c</color>
-+    <color name="loud">#cb4a4a</color>
-+    <color name="loud_dark">#9f434e</color>
-+    <color name="loud_light">#e45555</color>
-+    <color name="navigation">#222222</color>
-+    <color name="neutral">#d4cbaa</color>
-+    <color name="positive_loud">#7ed321</color>
-+    <color name="positive_quiet">#8dce83</color>
-+    <color name="quiet">#e1f4f7</color>
-+    <color name="quiet_1">#c1e6eb</color>
-+    <color name="quiet_2">#fff3f5</color>
-+    <color name="quiet_3">#fee0e3</color>
-+    <color name="quiet_4">#fffcea</color>
-+    <color name="red_dark">#AB1F24</color>
-+    <color name="red_darkest">#921C20</color>
-+    <color name="white">#ffffff</color>
-+    <color name="white_opacity_30">#3Cffffff</color>
-+    <color name="white_opacity_50">#80ffffff</color>
-+    <color name="white_opacity_70">#B4ffffff</color>
-+</resources>
-\ No newline at end of file
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/BuildConfig.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/BuildConfig.class
-new file mode 100644
-index 0000000..ef22f74
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/BuildConfig.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$1.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$1.class
-new file mode 100644
-index 0000000..300c8da
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$1.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$10.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$10.class
-new file mode 100644
-index 0000000..5ecfa76
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$10.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$11.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$11.class
-new file mode 100644
-index 0000000..89194c0
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$11.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$2.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$2.class
-new file mode 100644
-index 0000000..82a076b
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$2.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$3.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$3.class
-new file mode 100644
-index 0000000..987b8a6
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$3.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$4.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$4.class
-new file mode 100644
-index 0000000..be110aa
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$4.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$5.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$5.class
-new file mode 100644
-index 0000000..2ea8e81
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$5.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$6.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$6.class
-new file mode 100644
-index 0000000..3632faf
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$6.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$7.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$7.class
-new file mode 100644
-index 0000000..03ff5f6
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$7.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$8.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$8.class
-new file mode 100644
-index 0000000..3c704a1
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$8.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$9.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$9.class
-new file mode 100644
-index 0000000..d515a67
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService$9.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService.class
-new file mode 100644
-index 0000000..3f9b2e8
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/FloatingBubbleService.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/RNFloatingBubbleModule$1.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/RNFloatingBubbleModule$1.class
-new file mode 100644
-index 0000000..f447d4d
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/RNFloatingBubbleModule$1.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/RNFloatingBubbleModule$2.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/RNFloatingBubbleModule$2.class
-new file mode 100644
-index 0000000..16a6ffb
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/RNFloatingBubbleModule$2.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/RNFloatingBubbleModule$3.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/RNFloatingBubbleModule$3.class
-new file mode 100644
-index 0000000..d60fa55
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/RNFloatingBubbleModule$3.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/RNFloatingBubbleModule.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/RNFloatingBubbleModule.class
-new file mode 100644
-index 0000000..23bd418
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/RNFloatingBubbleModule.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/RNFloatingBubblePackage.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/RNFloatingBubblePackage.class
-new file mode 100644
-index 0000000..2cabdad
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/RNFloatingBubblePackage.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/SharedPrefsHelper.class b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/SharedPrefsHelper.class
-new file mode 100644
-index 0000000..721d6a8
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_dir/debug/bundleLibRuntimeToDirDebug/com/reactlibrary/SharedPrefsHelper.class differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar
-new file mode 100644
-index 0000000..fa2d7e0
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt b/node_modules/react-native-floating-bubble/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt
-new file mode 100644
-index 0000000..f54eb0d
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt
-@@ -0,0 +1,71 @@
-+com.reactlibrary
-+color black
-+color black_opacity_25
-+color black_opacity_66
-+color brand_main
-+color brand_main_1
-+color brand_main_2
-+color brand_main_3
-+color brand_red
-+color brand_secondary
-+color brand_secondary_1
-+color brand_secondary_1_opacity_50
-+color brand_secondary_1_opacity_90
-+color brand_secondary_dark
-+color chat_away
-+color gray_separator
-+color grey
-+color grey_1
-+color grey_2
-+color grey_dark
-+color grey_dark_1
-+color grey_dark_2
-+color grey_dark_2_opacity_25
-+color grey_light
-+color grey_light_1
-+color grey_light_2
-+color highlight_on_blue
-+color highlight_on_dark_grey
-+color highlight_on_light_grey
-+color highlight_on_white
-+color important
-+color loud
-+color loud_dark
-+color loud_light
-+color navigation
-+color neutral
-+color positive_loud
-+color positive_quiet
-+color quiet
-+color quiet_1
-+color quiet_2
-+color quiet_3
-+color quiet_4
-+color red_dark
-+color red_darkest
-+color white
-+color white_opacity_30
-+color white_opacity_50
-+color white_opacity_70
-+drawable bg_btn_count
-+drawable bg_btn_reset
-+drawable bg_reminder_card
-+drawable bg_tasbeeh_body
-+drawable bg_tasbeeh_inner_screen
-+drawable bg_tasbeeh_screen
-+drawable bg_tasbeeh_screen_border
-+drawable bubble_counter_bkg
-+drawable bubble_icon
-+drawable profile_decorator
-+id btn_count_tasbeeh
-+id btn_reset_tasbeeh
-+id reminder_container
-+id reminder_header
-+id reminder_text
-+id screen_frame
-+id tasbeeh_body_container
-+id tasbeeh_count_text
-+layout bubble_layout
-+layout bubble_trash_layout
-+layout reminder_layout
-+mipmap bubble_trash_background
-diff --git a/node_modules/react-native-floating-bubble/android/build/outputs/logs/manifest-merger-debug-report.txt b/node_modules/react-native-floating-bubble/android/build/outputs/logs/manifest-merger-debug-report.txt
-new file mode 100644
-index 0000000..55fde3d
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/build/outputs/logs/manifest-merger-debug-report.txt
-@@ -0,0 +1,41 @@
-+-- Merging decision tree log ---
-+manifest
-+ADDED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:1:1-13:12
-+INJECTED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:1:1-13:12
-+	package
-+		ADDED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:2:11-37
-+		INJECTED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml
-+	xmlns:android
-+		ADDED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:1:11-69
-+uses-permission#android.permission.FOREGROUND_SERVICE
-+ADDED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:4:5-76
-+	android:name
-+		ADDED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:4:22-74
-+uses-permission#android.permission.FOREGROUND_SERVICE_SPECIAL_USE
-+ADDED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:5:5-88
-+	android:name
-+		ADDED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:5:22-86
-+application
-+ADDED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:7:5-11:19
-+service#com.reactlibrary.FloatingBubbleService
-+ADDED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:8:9-10:19
-+	android:stopWithTask
-+		ADDED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:8:99-127
-+	android:foregroundServiceType
-+		ADDED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:8:56-98
-+	android:name
-+		ADDED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:8:18-55
-+property#android.app.PROPERTY_SPECIAL_USE_FGS_REASON
-+ADDED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:9:13-185
-+	android:value
-+		ADDED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:9:82-183
-+	android:name
-+		ADDED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml:9:23-81
-+uses-sdk
-+INJECTED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml reason: use-sdk injection requested
-+INJECTED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml
-+INJECTED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml
-+	android:targetSdkVersion
-+		INJECTED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml
-+	android:minSdkVersion
-+		INJECTED from /home/mohamed-wael/Desktop/ramadan-app/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml
-diff --git a/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$1.class.uniqueId12 b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$1.class.uniqueId12
-new file mode 100644
-index 0000000..300c8da
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$1.class.uniqueId12 differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$10.class.uniqueId4 b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$10.class.uniqueId4
-new file mode 100644
-index 0000000..79e68c1
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$10.class.uniqueId4 differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$11.class.uniqueId6 b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$11.class.uniqueId6
-new file mode 100644
-index 0000000..99f38cf
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$11.class.uniqueId6 differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$2.class.uniqueId8 b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$2.class.uniqueId8
-new file mode 100644
-index 0000000..82a076b
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$2.class.uniqueId8 differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$3.class.uniqueId13 b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$3.class.uniqueId13
-new file mode 100644
-index 0000000..987b8a6
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$3.class.uniqueId13 differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$4.class.uniqueId2 b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$4.class.uniqueId2
-new file mode 100644
-index 0000000..be110aa
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$4.class.uniqueId2 differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$5.class.uniqueId0 b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$5.class.uniqueId0
-new file mode 100644
-index 0000000..2ea8e81
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$5.class.uniqueId0 differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$6.class.uniqueId1 b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$6.class.uniqueId1
-new file mode 100644
-index 0000000..3632faf
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$6.class.uniqueId1 differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$7.class.uniqueId14 b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$7.class.uniqueId14
-new file mode 100644
-index 0000000..03ff5f6
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$7.class.uniqueId14 differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$8.class.uniqueId10 b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$8.class.uniqueId10
-new file mode 100644
-index 0000000..3fb1dfa
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$8.class.uniqueId10 differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$9.class.uniqueId5 b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$9.class.uniqueId5
-new file mode 100644
-index 0000000..788c845
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService$9.class.uniqueId5 differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService.class.uniqueId11 b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService.class.uniqueId11
-new file mode 100644
-index 0000000..ef1a56d
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/FloatingBubbleService.class.uniqueId11 differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/RNFloatingBubbleModule$1.class.uniqueId15 b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/RNFloatingBubbleModule$1.class.uniqueId15
-new file mode 100644
-index 0000000..f447d4d
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/RNFloatingBubbleModule$1.class.uniqueId15 differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/RNFloatingBubbleModule$2.class.uniqueId3 b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/RNFloatingBubbleModule$2.class.uniqueId3
-new file mode 100644
-index 0000000..16a6ffb
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/RNFloatingBubbleModule$2.class.uniqueId3 differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/RNFloatingBubbleModule$3.class.uniqueId7 b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/RNFloatingBubbleModule$3.class.uniqueId7
-new file mode 100644
-index 0000000..d60fa55
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/RNFloatingBubbleModule$3.class.uniqueId7 differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/RNFloatingBubbleModule.class.uniqueId9 b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/RNFloatingBubbleModule.class.uniqueId9
-new file mode 100644
-index 0000000..23bd418
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/RNFloatingBubbleModule.class.uniqueId9 differ
-diff --git a/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin
-new file mode 100644
-index 0000000..bdde798
-Binary files /dev/null and b/node_modules/react-native-floating-bubble/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin differ
 diff --git a/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml b/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml
 index 41a92ab..8a476d0 100644
 --- a/node_modules/react-native-floating-bubble/android/src/main/AndroidManifest.xml
@@ -1388,10 +94,10 @@ index 41a92ab..8a476d0 100644
 \ No newline at end of file
 diff --git a/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/FloatingBubbleService.java b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/FloatingBubbleService.java
 new file mode 100644
-index 0000000..68e05eb
+index 0000000..ad5c36d
 --- /dev/null
 +++ b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/FloatingBubbleService.java
-@@ -0,0 +1,669 @@
+@@ -0,0 +1,750 @@
 +package com.reactlibrary;
 +
 +import android.app.AlarmManager;
@@ -1434,6 +140,8 @@ index 0000000..68e05eb
 +    private Handler handler = new Handler();
 +    private String currentDhikr = "سبحان الله";
 +    private View reminderView;
++    private View stopTargetView;
++    private boolean overStopTarget = false;
 +    private View bubbleView;
 +    private WindowManager windowManager;
 +    private WindowManager.LayoutParams params;
@@ -1542,9 +250,7 @@ index 0000000..68e05eb
 +                        isBeingKilledBySystem = true;
 +                        showFloatingBubble(x, y);
 +                    } else if ("hide".equals(action)) {
-+                        prefs.setShouldShow(false);
-+                        isBeingKilledBySystem = false;
-+                        hideFloatingBubble();
++                        stopBubbleCompletely();
 +                    } else if ("config".equals(action)) {
 +                        loadConfigFromPrefs();
 +                        if (bubbleView != null) {
@@ -1565,7 +271,9 @@ index 0000000..68e05eb
 +            }
 +
 +            handler.removeCallbacks(timerRunnable);
-+            handler.postDelayed(timerRunnable, reminderInterval * 60 * 1000);
++            if (bubbleView != null) {
++                handler.postDelayed(timerRunnable, reminderInterval * 60 * 1000);
++            }
 +
 +            lastEvent = "onStartCommand_finished";
 +        } catch (Exception e) {
@@ -1747,8 +455,23 @@ index 0000000..68e05eb
 +                        params.x = initialX + deltaX;
 +                        params.y = initialY + deltaY;
 +                        windowManager.updateViewLayout(bubbleView, params);
++                        if (Math.abs(deltaX) > TOUCH_MAX_OFFSET || Math.abs(deltaY) > TOUCH_MAX_OFFSET) {
++                            showStopTarget();
++                            updateStopTargetHighlight(event.getRawX(), event.getRawY());
++                        }
++                        return true;
++                    case MotionEvent.ACTION_CANCEL:
++                        hideStopTarget();
 +                        return true;
 +                    case MotionEvent.ACTION_UP:
++                        boolean droppedOnStop = stopTargetView != null
++                                && isViewTouched(stopTargetView, event.getRawX(), event.getRawY());
++                        hideStopTarget();
++                        if (droppedOnStop) {
++                            Log.d(TAG, "Bubble dropped on stop target - stopping");
++                            stopBubbleCompletely();
++                            return true;
++                        }
 +                        prefs.savePosition(params.x, params.y);
 +                        int upDeltaX = (int) (event.getRawX() - initialTouchX);
 +                        int upDeltaY = (int) (event.getRawY() - initialTouchY);
@@ -1903,6 +626,68 @@ index 0000000..68e05eb
 +        return x >= left && x <= right && y >= top && y <= bottom;
 +    }
 +
++    // ──────────────────────────────────────────────────────────────
++    // Stop target (shown while dragging; drop the bubble on it to stop)
++    // ──────────────────────────────────────────────────────────────
++
++    private void showStopTarget() {
++        if (stopTargetView != null || !hasPermission())
++            return;
++        try {
++            LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
++            stopTargetView = inflater.inflate(R.layout.bubble_stop_layout, null);
++            int layoutType = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
++                    ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
++                    : WindowManager.LayoutParams.TYPE_PHONE;
++            WindowManager.LayoutParams p = new WindowManager.LayoutParams(
++                    WindowManager.LayoutParams.WRAP_CONTENT,
++                    WindowManager.LayoutParams.WRAP_CONTENT,
++                    layoutType,
++                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
++                    PixelFormat.TRANSLUCENT);
++            p.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
++            p.y = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, getResources().getDisplayMetrics());
++            windowManager.addView(stopTargetView, p);
++        } catch (Exception e) {
++            Log.e(TAG, "showStopTarget failed", e);
++            stopTargetView = null;
++        }
++    }
++
++    private void updateStopTargetHighlight(float rawX, float rawY) {
++        if (stopTargetView == null) return;
++        boolean over = isViewTouched(stopTargetView, rawX, rawY);
++        if (over != overStopTarget) {
++            overStopTarget = over;
++            stopTargetView.setScaleX(over ? 1.25f : 1f);
++            stopTargetView.setScaleY(over ? 1.25f : 1f);
++            stopTargetView.setAlpha(over ? 1f : 0.85f);
++        }
++    }
++
++    private void hideStopTarget() {
++        overStopTarget = false;
++        if (stopTargetView == null) return;
++        try {
++            windowManager.removeViewImmediate(stopTargetView);
++        } catch (Exception ignored) {}
++        stopTargetView = null;
++    }
++
++    /** User-initiated stop: hide bubble + reminder card, stop the reminder timer and the service. */
++    public void stopBubbleCompletely() {
++        prefs.setShouldShow(false);
++        isBeingKilledBySystem = false;
++        handler.removeCallbacks(timerRunnable);
++        hideReminder();
++        hideStopTarget();
++        hideFloatingBubble();
++        try {
++            stopForeground(true);
++        } catch (Exception ignored) {}
++        stopSelf();
++    }
++
 +    public void hideFloatingBubble() {
 +        if (bubbleView != null) {
 +            try {
@@ -1933,6 +718,8 @@ index 0000000..68e05eb
 +    public void showReminder() {
 +        if (reminderView != null)
 +            return;
++        if (bubbleView == null)
++            return; // sebha is stopped: no reminder cards
 +        if (!hasPermission())
 +            return;
 +
@@ -2062,7 +849,7 @@ index 0000000..68e05eb
 +    }
 +}
 diff --git a/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/RNFloatingBubbleModule.java b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/RNFloatingBubbleModule.java
-index cde29db..5d33e33 100644
+index cde29db..34b8772 100644
 --- a/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/RNFloatingBubbleModule.java
 +++ b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/RNFloatingBubbleModule.java
 @@ -1,49 +1,73 @@
@@ -2213,7 +1000,7 @@ index cde29db..5d33e33 100644
 +      promise.reject("Error", e.getMessage());
      }
    }  
- 
+   
 -  @ReactMethod // Notates a method that should be exposed to React
 +  @ReactMethod
    public void requestPermission(final Promise promise) {
@@ -2229,7 +1016,7 @@ index cde29db..5d33e33 100644
 +       promise.reject("Error", e.getMessage());
      }
    }  
- 
+   
 -  @ReactMethod // Notates a method that should be exposed to React
 +  @ReactMethod
    public void checkPermission(final Promise promise) {
@@ -2240,7 +1027,7 @@ index cde29db..5d33e33 100644
 +      promise.reject("Error", e.getMessage());
      }
    }  
- 
+   
 -  @ReactMethod // Notates a method that should be exposed to React
 +  @ReactMethod
    public void initialize(final Promise promise) {
@@ -2356,7 +1143,7 @@ index cde29db..5d33e33 100644
 +    FloatingBubbleService service = FloatingBubbleService.getInstance();
 +    if (service != null) {
 +        service.hideReminder();
-     }
+     } 
 -    if (hasPermission()) {
 -      promise.resolve("");
 +    if (promise != null) promise.resolve("");
@@ -2540,6 +1327,17 @@ index 0000000..157f96b
 +        android:width="1.5dp"
 +        android:color="#B8860B" />
 +</shape>
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_stop_target.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_stop_target.xml
+new file mode 100644
+index 0000000..929c200
+--- /dev/null
++++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_stop_target.xml
+@@ -0,0 +1,5 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
++    <solid android:color="#CC7F1D1D" />
++    <stroke android:width="2dp" android:color="#FCA5A5" />
++</shape>
 diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_body.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_body.xml
 new file mode 100644
 index 0000000..2e97b4c
@@ -2679,6 +1477,44 @@ index d2a8762..af8943b 100644
 +    </LinearLayout>
 +</FrameLayout>
 \ No newline at end of file
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_stop_layout.xml b/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_stop_layout.xml
+new file mode 100644
+index 0000000..e04a683
+--- /dev/null
++++ b/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_stop_layout.xml
+@@ -0,0 +1,32 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    android:id="@+id/stop_target"
++    android:layout_width="wrap_content"
++    android:layout_height="wrap_content"
++    android:orientation="vertical"
++    android:gravity="center"
++    android:padding="12dp">
++
++    <TextView
++        android:id="@+id/stop_target_icon"
++        android:layout_width="72dp"
++        android:layout_height="72dp"
++        android:gravity="center"
++        android:text="✕"
++        android:textColor="#FFFFFF"
++        android:textSize="30sp"
++        android:textStyle="bold"
++        android:background="@drawable/bg_stop_target" />
++
++    <TextView
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:layout_marginTop="6dp"
++        android:text="اسحب هنا لإيقاف المسبحة"
++        android:textColor="#FFFFFF"
++        android:textSize="13sp"
++        android:shadowColor="#000000"
++        android:shadowDx="0"
++        android:shadowDy="1"
++        android:shadowRadius="3" />
++</LinearLayout>
 diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/layout/reminder_layout.xml b/node_modules/react-native-floating-bubble/android/src/main/res/layout/reminder_layout.xml
 new file mode 100644
 index 0000000..c069c7b
