@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { NativeModules, Platform } from 'react-native';
 import { useLocation } from './useLocation';
 import { useSelector, useDispatch } from 'react-redux';
@@ -12,6 +12,7 @@ export const usePrayerTimes = () => {
   const { calculationMethod: manualMethod } = useSelector((state: RootState) => state.settings);
   const { cachedData, lastFetchedDate, status } = useSelector((state: RootState) => state.prayer);
   const [nextPrayer, setNextPrayer] = useState<any>(null);
+  const [retryTick, setRetryTick] = useState(0);
 
   const toArName = (name: string) => {
     const map: Record<string, string> = {
@@ -81,7 +82,7 @@ export const usePrayerTimes = () => {
         }
       })();
     }
-  }, [coords, countryCode, manualMethod, dispatch]);
+  }, [coords, countryCode, manualMethod, dispatch, retryTick]);
 
   // Update remaining time for the App UI every minute
   useEffect(() => {
@@ -101,10 +102,18 @@ export const usePrayerTimes = () => {
     return () => clearInterval(interval);
   }, [cachedData]);
 
+  const retry = useCallback(() => {
+    dispatch(setPrayerLoading());
+    setRetryTick((t) => t + 1);
+  }, [dispatch]);
+
   return { 
     timings: cachedData?.timings, 
     date: cachedData?.date, 
     nextPrayer: nextPrayer ? { ...nextPrayer, arName: toArName(nextPrayer.name) } : null,
-    loading: status === 'loading'
+    loading: status === 'loading' || (!cachedData && !!coords && status !== 'failed'),
+    error: status === 'failed',
+    hasLocation: !!coords,
+    retry,
   };
 };

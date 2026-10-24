@@ -1,67 +1,47 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ImageBackground } from 'react-native';
-import { Settings, Activity, Star, Moon } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { THEME } from '../../../shared/theme/constants';
+import { View, Text } from 'react-native';
+import { Settings, Activity, Moon } from 'lucide-react-native';
 import { styles } from './HomeStyles';
+import { IconButton } from '../ui';
+import { colors, icon } from '../../../shared/theme/tokens';
+import { useAccent } from '../../../shared/theme/useAccent';
 
 interface Props {
-  dynamicContent: any;
+  dynamicContent: { title: string; sub: string; isHoliday?: boolean; holidayName?: string };
   hijriDateStr: string;
-  accentTheme: string;
   onSettingsPress: () => void;
   onStatsPress: () => void;
 }
 
-export const HomeHeader = ({ dynamicContent, hijriDateStr, accentTheme, onSettingsPress, onStatsPress }: Props) => {
-  const accentColor = (THEME.colors as any)[accentTheme] || THEME.colors.primary;
-
+/** Slim, image-free header: greeting, hijri date, two icon actions. */
+export const HomeHeader = ({ dynamicContent, hijriDateStr, onSettingsPress, onStatsPress }: Props) => {
+  const accent = useAccent();
   return (
     <View style={styles.header}>
-      <ImageBackground 
-        source={require('../../../../assets/images/mosque_bg.png')} 
-        style={styles.headerBackground}
-        imageStyle={{ opacity: 0.35 }}
-      >
-        <LinearGradient 
-          colors={['rgba(12, 8, 5, 0.2)', 'rgba(12, 8, 5, 0.7)', '#0c0805']} 
-          locations={[0, 0.6, 1]}
-          style={styles.headerGradient}
-        >
-          {/* Top Bar: App Name + Actions */}
-          <View style={styles.headerTopBar}>
-            <Text style={styles.headerAppName}>أوّاب</Text>
-            <View style={styles.headerActionRow}>
-              <TouchableOpacity onPress={onStatsPress} style={styles.headerActionBtn}>
-                <Activity color={accentColor} size={20} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={onSettingsPress} style={styles.headerActionBtn}>
-                <Settings color={accentColor} size={20} />
-              </TouchableOpacity>
-            </View>
-          </View>
+      <View style={styles.headerActions}>
+        <IconButton onPress={onSettingsPress} label="الإعدادات">
+          <Settings color={accent.accent} size={icon.size.md} strokeWidth={icon.stroke} />
+        </IconButton>
+        <IconButton onPress={onStatsPress} label="الإحصائيات">
+          <Activity color={accent.accent} size={icon.size.md} strokeWidth={icon.stroke} />
+        </IconButton>
+      </View>
 
-          {/* Greeting Area */}
-          <View style={styles.headerGreetingArea}>
-            <Text style={styles.headerTitle}>{dynamicContent.title}</Text>
-            <Text style={styles.headerSub}>{dynamicContent.sub}</Text>
-
-            {dynamicContent.isHoliday && (
-              <View style={styles.holidayBadge}>
-                <Star size={12} color="#451a03" fill="#451a03" />
-                <Text style={styles.holidayBadgeText}>{dynamicContent.holidayName}</Text>
-              </View>
-            )}
-
-            {hijriDateStr ? (
-              <View style={styles.hijriBadge}>
-                <Moon size={14} color="#d4af37" />
-                <Text style={styles.hijriText}>{hijriDateStr}</Text>
-              </View>
-            ) : null}
-          </View>
-        </LinearGradient>
-      </ImageBackground>
+      <View style={styles.headerText}>
+        <Text style={styles.headerTitle} numberOfLines={1}>{dynamicContent.title}</Text>
+        <Text style={styles.headerSub} numberOfLines={1}>{dynamicContent.sub}</Text>
+        <View style={styles.hijriRow}>
+          {dynamicContent.isHoliday && dynamicContent.holidayName ? (
+            <View style={styles.holidayPill}><Text style={styles.holidayText}>{dynamicContent.holidayName}</Text></View>
+          ) : null}
+          {hijriDateStr ? (
+            <>
+              <Text style={styles.hijriText}>{hijriDateStr}</Text>
+              <Moon size={14} color={colors.gold} strokeWidth={icon.stroke} />
+            </>
+          ) : null}
+        </View>
+      </View>
     </View>
   );
 };
