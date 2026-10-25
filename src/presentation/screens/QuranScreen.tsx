@@ -17,9 +17,10 @@ import { TafsirBottomSheet } from '../components/quran/TafsirBottomSheet';
 import { SurahPickerModal } from '../components/quran/SurahPickerModal';
 import { ReciterPickerModal } from '../components/quran/ReciterPickerModal';
 import { BookmarksModal } from '../components/quran/BookmarksModal';
+import { TAFSIR_LIST } from '../components/settings/SettingsConstants';
 import { s } from '../components/quran/QuranStyles';
 import { 
-    TOTAL_PAGES, JUZ_PAGES, toAr, stripHtml, 
+    TOTAL_PAGES, JUZ_PAGES, toAr, 
     pageCache, Ayah, SurahMeta, H 
 } from '../components/quran/QuranConstants';
 
@@ -96,7 +97,7 @@ const QuranScreen = ({ navigation }: any) => {
         `https://api.quran.com/api/v4/tafsirs/${selectedTafsirId}/by_ayah/${ayah.surah.number}:${ayah.numberInSurah}`
       );
       const data = await res.json();
-      setTafsir(stripHtml(data.tafsir.text));
+      setTafsir(data.tafsir.text);
     } catch (error) {
       setTafsir('عذراً، حدث خطأ أثناء جلب التفسير.');
     } finally {
@@ -105,8 +106,9 @@ const QuranScreen = ({ navigation }: any) => {
   };
 
   const openBottomSheet = () => {
+    // the sheet is already bottom-aligned at 85% height; any extra offset pushes its toolbar off-screen
     Animated.spring(bottomSheetAnim, {
-      toValue: H * 0.15,
+      toValue: 0,
       useNativeDriver: true,
       friction: 9,
     }).start();
@@ -246,6 +248,7 @@ const QuranScreen = ({ navigation }: any) => {
         visible={!!selectedAyah}
         selectedAyah={selectedAyah}
         tafsir={tafsir}
+        tafsirName={TAFSIR_LIST.find((t) => t.id === selectedTafsirId)?.name}
         tafsirLoading={tafsirLoading}
         tafsirStyle={tafsirStyle}
         tafsirFontSize={tafsirFontSize}

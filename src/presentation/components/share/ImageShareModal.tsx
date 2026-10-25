@@ -1,0 +1,101 @@
+import React, { useRef, useState } from 'react';
+import { Alert, Modal, PixelRatio, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { captureRef } from 'react-native-view-shot';
+import * as Sharing from 'expo-sharing';
+import * as MediaLibrary from 'expo-media-library';
+import { Download, Share2, X } from 'lucide-react-native';
+import { IconButton, PillButton } from '../ui';
+import { colors, icon, space, type } from '../../../shared/theme/tokens';
+import { useAccent } from '../../../shared/theme/useAccent';
+
+/** Story size (9:16). Cards lay themselves out in dp at exactly this many pixels. */
+export const SHARE_PX_W = 1080;
+export const SHARE_PX_H = 1920;
+export const shareCardSize = () => {
+  const r = PixelRatio.get();
+  return { w: SHARE_PX_W / r, h: SHARE_PX_H / r };
+};
+
+type Props = {
+  visible: boolean;
+  title: string;
+  onClose: () => void;
+  /** Rendered at full story size; the modal scales the preview down to fit. */
+  children: React.ReactNode;
+};
+
+/**
+ * Preview + share/save for an image card. Sharing hands a PNG to the system sheet, so the
+ * user can pick WhatsApp → "My status" (or any app); saving writes it to the gallery.
+ */
+export const ImageShareModal = ({ visible, title, onClose, children }: Props) => {
+  const accent = useAccent();
+  const ref = useRef<View>(null);
+  const [busy, setBusy] = useState<'share' | 'save' | null>(null);
+  const { width, height } = useWindowDimensions();
+  const { w, h } = shareCardSize();
+  const scale = Math.min((width - space[8] * 2) / w, (height * 0.66) / h);
+
+  const capture = () => captureRef(ref, { format: 'png', quality: 1, result: 'tmpfile' });
+
+  const onShare = async () => {
+    setBusy('share');
+    try {
+      const uri = await capture();
+      if (!(await Sharing.isAvailableAsync())) { Alert.alert('المشاركة غير متاحة على هذا الجهاز'); return; }
+      await Sharing.shareAsync(uri, { mimeType: 'image/png', dialogTitle: title, UTI: 'public.png' });
+    } catch {
+      Alert.alert('تعذّر إنشاء الصورة', 'حاول مرة أخرى.');
+    } finally { setBusy(null); }
+  };
+
+  const onSave = async () => {
+    setBusy('save');
+    try {
+      const perm = await MediaLibrary.requestPermissionsAsync(true, ['photo']);
+      if (!perm.granted) { Alert.alert('لا يوجد إذن', 'اسمح لأوّاب بحفظ الصور من إعدادات الهاتف.'); return; }
+      const uri = await capture();
+      await MediaLibrary.saveToLibraryAsync(uri);
+      Alert.alert('تم الحفظ', 'الصورة محفوظة في معرض الصور.');
+    } catch {
+      Alert.alert('تعذّر حفظ الصورة', 'حاول مرة أخرى.');
+    } finally { setBusy(null); }
+  };
+
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
+      <View style={st.backdrop}>
+        <View style={st.top}>
+          <Text style={st.title}>{title}</Text>
+          <IconButton onPress={onClose} label="إغلاق">
+            <X size={icon.size.md} color={colors.text} strokeWidth={icon.stroke} />
+          </IconButton>
+        </View>
+
+        {/* direction:'ltr' + explicit offsets: under forced RTL `left` and a "top left" origin flip sides */}
+        <View style={{ width: w * scale, height: h * scale, borderRadius: 18, overflow: 'hidden', direction: 'ltr' }}>
+          {/* full-size card, scaled for preview; captureRef draws the card itself at full size */}
+          <View style={{ width: w, height: h, position: 'absolute', top: 0, left: 0, transform: [{ translateX: -(w - w * scale) / 2 }, { translateY: -(h - h * scale) / 2 }, { scale }] }}>
+            <View ref={ref} collapsable={false} style={{ width: w, height: h }}>
+              {children}
+            </View>
+          </View>
+        </View>
+
+        <View style={st.actions}>
+          <PillButton label="حفظ في المعرض" variant="ghost" icon={<Download size={icon.size.sm} color={accent.accentText} strokeWidth={icon.stroke} />} loading={busy === 'save'} disabled={!!busy} onPress={onSave} />
+          <PillButton label="مشاركة" icon={<Share2 size={icon.size.sm} color={accent.onAccent} strokeWidth={icon.stroke} />} loading={busy === 'share'} disabled={!!busy} onPress={onShare} />
+        </View>
+        <Text style={st.hint}>اختر واتساب ثم «حالتي» لنشرها كحالة</Text>
+      </View>
+    </Modal>
+  );
+};
+
+const st = StyleSheet.create({
+  backdrop: { flex: 1, backgroundColor: 'rgba(8,6,4,0.94)', alignItems: 'center', justifyContent: 'center', paddingHorizontal: space[5] },
+  top: { position: 'absolute', top: space[10], left: space[5], right: space[5], flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  title: { ...type.h2, color: colors.text },
+  actions: { flexDirection: 'row', gap: space[3], marginTop: space[6] },
+  hint: { ...type.caption, color: colors.textMuted, marginTop: space[3] },
+});

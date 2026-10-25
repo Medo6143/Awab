@@ -62,6 +62,15 @@
         }
       ],
       "expo-video",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "يحتاج أوّاب للوصول إلى الصور لحفظ صورة القلب وصور الآيات.",
+          "savePhotosPermission": "يحتاج أوّاب لحفظ صورة القلب وصور الآيات في معرض الصور.",
+          "isAccessMediaLocationEnabled": false,
+          "granularPermissions": ["photo"]
+        }
+      ],
       "./plugins/withFloatingBubble.js",
       "./plugins/withOwwabNative.js"
     ],

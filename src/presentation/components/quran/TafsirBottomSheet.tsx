@@ -1,15 +1,20 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, Modal, Pressable, Animated, ScrollView, TouchableOpacity, Share, ActivityIndicator, StyleSheet } from 'react-native';
 import { Share2, Copy, Star, Play, X } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import { s } from './QuranStyles';
 import { colors } from '../../../shared/theme/tokens';
 import { toAr, Ayah } from './QuranConstants';
+import { TafsirBlocks } from './TafsirBlocks';
+import { parseTafsir, tafsirExcerpt } from './tafsirParser';
+import { ImageShareModal } from '../share/ImageShareModal';
+import { AyahShareCard } from '../share/AyahShareCard';
 
 interface Props {
   visible: boolean;
   selectedAyah: Ayah | null;
-  tafsir: string | null;
+  tafsir: string | null;          // raw HTML from the API
+  tafsirName?: string;
   tafsirLoading: boolean;
   tafsirStyle: string;
   tafsirFontSize: number;
@@ -21,11 +26,14 @@ interface Props {
 }
 
 export const TafsirBottomSheet = ({
-  visible, selectedAyah, tafsir, tafsirLoading, tafsirStyle, tafsirFontSize,
+  visible, selectedAyah, tafsir, tafsirName, tafsirLoading, tafsirStyle, tafsirFontSize,
   bottomSheetAnim, bookmarks, onClose, onToggleBookmark, onPlayAyah
 }: Props) => {
 
-  const handleShare = async () => {
+  const [shareOpen, setShareOpen] = useState(false);
+  const excerpt = useMemo(() => (tafsir ? tafsirExcerpt(parseTafsir(tafsir)) : ''), [tafsir]);
+
+  const handleShareText = async () => {
     if (!selectedAyah) return;
     try {
       await Share.share({
@@ -52,33 +60,8 @@ export const TafsirBottomSheet = ({
 
     if (!tafsir) return null;
 
-    switch (tafsirStyle) {
-      case 'simple':
-        return (
-          <View style={s.simpleTafsir}>
-            <Text style={[s.tafsirTextMain, { fontSize: tafsirFontSize }]}>{tafsir}</Text>
-          </View>
-        );
-      case 'book':
-        return (
-          <View style={s.bookTafsir}>
-            <View style={s.bookOrnamentTop} />
-            <Text style={[s.tafsirTextMain, s.bookText, { fontSize: tafsirFontSize }]}>{tafsir}</Text>
-            <View style={s.bookOrnamentBottom} />
-          </View>
-        );
-      case 'modern':
-      default:
-        return (
-          <View style={s.modernTafsir}>
-            <View style={s.modernHeader}>
-              <View style={s.modernIndicator} />
-              <Text style={s.modernTitle}>التفسير</Text>
-            </View>
-            <Text style={[s.tafsirTextMain, s.modernText, { fontSize: tafsirFontSize }]}>{tafsir}</Text>
-          </View>
-        );
-    }
+    const variant = tafsirStyle === 'book' || tafsirStyle === 'simple' ? tafsirStyle : 'modern';
+    return <TafsirBlocks html={tafsir} fontSize={tafsirFontSize} variant={variant} sourceName={tafsirName} />;
   };
 
   return (
@@ -122,9 +105,9 @@ export const TafsirBottomSheet = ({
               <Play size={24} color={colors.paperInk} />
               <Text style={s.sheetToolLab}>الصوت</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={s.sheetToolBtn} onPress={handleShare}>
+            <TouchableOpacity style={s.sheetToolBtn} onPress={() => setShareOpen(true)} onLongPress={handleShareText}>
               <Share2 size={24} color={colors.paperInk} />
-              <Text style={s.sheetToolLab}>مشاركة</Text>
+              <Text style={s.sheetToolLab}>صورة</Text>
             </TouchableOpacity>
             <TouchableOpacity style={s.sheetToolBtn} onPress={handleCopy}>
               <Copy size={24} color={colors.paperInk} />
@@ -133,6 +116,17 @@ export const TafsirBottomSheet = ({
           </View>
         </Animated.View>
       </View>
+      {selectedAyah ? (
+        <ImageShareModal visible={shareOpen} title="مشاركة الآية كصورة" onClose={() => setShareOpen(false)}>
+          <AyahShareCard
+            ayahText={selectedAyah.text}
+            surahName={selectedAyah.surah.name}
+            ayahNumber={selectedAyah.numberInSurah}
+            tafsirName={tafsirName}
+            tafsirExcerpt={excerpt}
+          />
+        </ImageShareModal>
+      ) : null}
     </Modal>
   );
 };
