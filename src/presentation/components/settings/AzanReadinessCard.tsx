@@ -47,14 +47,14 @@ export const AzanReadinessCard = () => {
           <View key={item.id}>
             {idx > 0 ? <View style={s.itemDivider} /> : null}
             <View style={s.readinessRow}>
-              {item.status !== 'ok' && item.fix ? (
-                <PillButton label={item.status === 'missing' ? 'إصلاح' : 'فتح'} size="sm" variant={item.status === 'missing' ? 'primary' : 'ghost'} onPress={() => { item.fix?.(); }} />
-              ) : null}
+              <IconTile icon={Icon} tone={tone as any} />
               <View style={s.readinessText}>
                 <Text style={s.readinessTitle}>{item.label}</Text>
                 <Text style={s.readinessHint}>{item.hint}</Text>
               </View>
-              <IconTile icon={Icon} tone={tone as any} />
+              {item.status !== 'ok' && item.fix ? (
+                <PillButton label={item.status === 'missing' ? 'إصلاح' : 'فتح'} size="sm" variant={item.status === 'missing' ? 'primary' : 'ghost'} onPress={() => { item.fix?.(); }} />
+              ) : null}
             </View>
           </View>
         );

@@ -27,18 +27,18 @@ export const ItemRow = ({ icon: Icon, label, sub, value, onValueChange, isToggle
     <View>
       {!first ? <View style={s.itemDivider} /> : null}
       <View style={s.itemRow}>
+        <View style={s.itemLeft}>
+          <IconTile icon={Icon} />
+          <View style={{ flex: 1 }}>
+            <Text style={s.itemLabel}>{label}</Text>
+            {sub ? <Text style={s.itemSub}>{sub}</Text> : null}
+          </View>
+        </View>
         {isToggle ? (
           <Switch value={!!value} onValueChange={onValueChange} trackColor={{ false: colors.surfaceRaised, true: accent.accent }} thumbColor={colors.text} />
         ) : (
           <View>{value}</View>
         )}
-        <View style={s.itemLeft}>
-          <View style={{ flex: 1 }}>
-            <Text style={s.itemLabel}>{label}</Text>
-            {sub ? <Text style={s.itemSub}>{sub}</Text> : null}
-          </View>
-          <IconTile icon={Icon} />
-        </View>
       </View>
     </View>
   );

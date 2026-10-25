@@ -419,6 +419,19 @@ export const FloatingTasbeehToggle = ({ accentTheme }: any) => {
 
     return (
         <View style={styles.card}>
+            <View style={[styles.iconWrap, { backgroundColor: accentColor + '20' }]}>
+                <Layers color={accentColor} size={20} strokeWidth={1.75} />
+            </View>
+
+            <View style={styles.textCol}>
+                <Text style={styles.title}>المسبحة العائمة</Text>
+                <Text style={styles.subtitle}>تعمل فوق التطبيقات للتسبيح السريع</Text>
+                <View style={styles.statusRow}>
+                    <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+                    <Text style={[styles.statusText, { color: statusColor }]}>{statusLabel}</Text>
+                </View>
+            </View>
+
             <TouchableOpacity
                 style={[styles.actionBtn, { backgroundColor: isFloatingActive ? colors.dangerSoft : accentColor, opacity: isToggling ? 0.6 : 1 }]}
                 onPress={handleToggle}
@@ -426,19 +439,6 @@ export const FloatingTasbeehToggle = ({ accentTheme }: any) => {
             >
                 <Text style={[styles.actionText, isFloatingActive && { color: '#ff8a80' }]}>{isFloatingActive ? 'إيقاف' : 'تفعيل'}</Text>
             </TouchableOpacity>
-
-            <View style={styles.textCol}>
-                <Text style={styles.title}>المسبحة العائمة</Text>
-                <Text style={styles.subtitle}>تعمل فوق التطبيقات للتسبيح السريع</Text>
-                <View style={styles.statusRow}>
-                    <Text style={[styles.statusText, { color: statusColor }]}>{statusLabel}</Text>
-                    <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
-                </View>
-            </View>
-
-            <View style={[styles.iconWrap, { backgroundColor: accentColor + '20' }]}>
-                <Layers color={accentColor} size={20} strokeWidth={1.75} />
-            </View>
         </View>
     );
 };
@@ -447,9 +447,9 @@ const styles = StyleSheet.create({
     card: { flexDirection: 'row', alignItems: 'center', gap: space[3], padding: space[4], borderRadius: radius.card, backgroundColor: colors.surface },
     iconWrap: { width: 44, height: 44, borderRadius: radius.tile, alignItems: 'center', justifyContent: 'center' },
     textCol: { flex: 1 },
-    title: { ...type.bodyMedium, fontFamily: 'Tajawal_700Bold', color: colors.text, textAlign: 'right' },
-    subtitle: { ...type.caption, color: colors.textMuted, marginTop: 2, textAlign: 'right' },
-    statusRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: 6, marginTop: 6, justifyContent: 'flex-start' },
+    title: { ...type.bodyMedium, fontFamily: 'Tajawal_700Bold', color: colors.text },
+    subtitle: { ...type.caption, color: colors.textMuted, marginTop: 2 },
+    statusRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6, justifyContent: 'flex-start' },
     statusDot: { width: 8, height: 8, borderRadius: 4 },
     statusText: { ...type.caption },
     actionBtn: { paddingHorizontal: space[4], height: 40, borderRadius: radius.pill, minWidth: 80, alignItems: 'center', justifyContent: 'center' },

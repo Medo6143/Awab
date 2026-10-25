@@ -4,10 +4,10 @@ import { colors, radius, space, type } from '../../../shared/theme/tokens';
 export const styles = StyleSheet.create({
   // ── Header ──
   header: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', paddingTop: space[3], paddingBottom: space[4] },
-  headerText: { flex: 1, alignItems: 'flex-end' },
-  headerTitle: { ...type.h1, color: colors.text, textAlign: 'right' },
-  headerSub: { ...type.body, color: colors.textMuted, textAlign: 'right', marginTop: 2 },
-  hijriRow: { flexDirection: 'row', alignItems: 'center', gap: space[2], marginTop: space[2], alignSelf: 'flex-end' },
+  headerText: { flex: 1, alignItems: 'flex-start' },
+  headerTitle: { ...type.h1, color: colors.text },
+  headerSub: { ...type.body, color: colors.textMuted, marginTop: 2 },
+  hijriRow: { flexDirection: 'row', alignItems: 'center', gap: space[2], marginTop: space[2], alignSelf: 'flex-start' },
   hijriText: { ...type.label, color: colors.gold },
   holidayPill: { backgroundColor: colors.goldSoft, paddingHorizontal: space[3], paddingVertical: 4, borderRadius: radius.pill },
   holidayText: { ...type.caption, color: colors.goldText },
@@ -22,7 +22,7 @@ export const styles = StyleSheet.create({
   heroEyebrow: { ...type.label, color: colors.textMuted },
   heroTimePill: { backgroundColor: 'rgba(255,255,255,0.08)', paddingHorizontal: space[3], paddingVertical: 6, borderRadius: radius.pill },
   heroTimeText: { ...type.label, color: colors.text },
-  heroBottom: { alignItems: 'flex-end' },
+  heroBottom: { alignItems: 'flex-start' },
   heroCaption: { ...type.body, color: colors.textMuted, marginTop: -4 },
   heroPrayerName: { ...type.h2, color: colors.text },
   heroStateWrap: { flex: 1, alignItems: 'center', justifyContent: 'center' },
@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
   gridLabel: { ...type.caption, color: colors.textMuted, textAlign: 'center' },
 
   // ── Verse ──
-  verseTag: { alignSelf: 'flex-end', backgroundColor: colors.goldSoft, paddingHorizontal: space[3], paddingVertical: 4, borderRadius: radius.pill },
+  verseTag: { alignSelf: 'flex-start', backgroundColor: colors.goldSoft, paddingHorizontal: space[3], paddingVertical: 4, borderRadius: radius.pill },
   verseTagText: { ...type.caption, color: colors.goldText },
   verseText: { ...type.quran, color: colors.text, textAlign: 'center', marginTop: space[3] },
   verseRef: { ...type.caption, color: colors.textMuted, textAlign: 'center', marginTop: space[2] },

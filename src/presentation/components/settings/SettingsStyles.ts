@@ -11,8 +11,8 @@ export const s = StyleSheet.create({
   itemRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: space[4], paddingVertical: space[3], gap: space[3] },
   itemDivider: { height: 1, backgroundColor: colors.hairline, marginHorizontal: space[4] },
   itemLeft: { flexDirection: 'row', alignItems: 'center', flex: 1, gap: space[3] },
-  itemLabel: { ...type.bodyMedium, color: colors.text, flex: 1, textAlign: 'right' },
-  itemSub: { ...type.caption, color: colors.textMuted, textAlign: 'right', marginTop: 2 },
+  itemLabel: { ...type.bodyMedium, color: colors.text, flex: 1 },
+  itemSub: { ...type.caption, color: colors.textMuted, marginTop: 2 },
 
   subSection: { padding: space[4], borderTopWidth: 1, borderTopColor: colors.hairline },
   labelRow: { flexDirection: 'row', alignItems: 'center', marginBottom: space[3], gap: space[2] },
@@ -44,14 +44,14 @@ export const s = StyleSheet.create({
   // Colour swatches
   swatchRow: { flexDirection: 'row', flexWrap: 'wrap', gap: space[2], marginTop: space[2] },
   swatch: { width: 34, height: 34, borderRadius: 17, borderWidth: 2, borderColor: 'transparent' },
-  hint: { ...type.caption, color: colors.textFaint, marginTop: space[3], textAlign: 'right' },
+  hint: { ...type.caption, color: colors.textFaint, marginTop: space[3] },
 
   // Azan readiness
   readinessRow: { flexDirection: 'row', alignItems: 'center', gap: space[3], paddingVertical: space[3] },
   readinessText: { flex: 1 },
-  readinessTitle: { ...type.bodyMedium, color: colors.text, textAlign: 'right' },
-  readinessHint: { ...type.caption, color: colors.textMuted, textAlign: 'right', marginTop: 2 },
-  readinessSummary: { ...type.body, color: colors.textMuted, textAlign: 'right', marginBottom: space[2] },
+  readinessTitle: { ...type.bodyMedium, color: colors.text },
+  readinessHint: { ...type.caption, color: colors.textMuted, marginTop: 2 },
+  readinessSummary: { ...type.body, color: colors.textMuted, marginBottom: space[2] },
 
   // About / credit
   aboutBtn: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: colors.surface, borderRadius: radius.card, padding: space[4], marginTop: space[6] },

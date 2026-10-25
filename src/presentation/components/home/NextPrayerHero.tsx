@@ -54,12 +54,12 @@ export const NextPrayerHero = ({ nextPrayer, loading, error, hasLocation, onRetr
     body = (
       <View style={styles.heroBody}>
         <View style={styles.heroTopRow}>
-          <View style={styles.heroTimePill}><Text style={styles.heroTimeText}>{toAr(nextPrayer.time)}</Text></View>
           <Text style={styles.heroEyebrow}>الصلاة القادمة</Text>
+          <View style={styles.heroTimePill}><Text style={styles.heroTimeText}>{toAr(nextPrayer.time)}</Text></View>
         </View>
         <View style={styles.heroBottom}>
           <Text style={styles.heroPrayerName}>{nextPrayer.arName}</Text>
-          <StatNumber value={isTomorrow ? 'غداً' : formatCountdown(nextPrayer.remaining)} size="display" align="right" color={colors.goldText} />
+          <StatNumber value={isTomorrow ? 'غداً' : formatCountdown(nextPrayer.remaining)} size="display" align="start" color={colors.goldText} />
           <Text style={styles.heroCaption}>{isTomorrow ? 'انتهت صلوات اليوم' : 'الوقت المتبقي'}</Text>
         </View>
       </View>

@@ -26,7 +26,7 @@ export const s = StyleSheet.create({
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: space[5] },
   modalTitle: { ...type.h2, color: colors.text },
   modalBody: { flex: 1 },
-  inputLabel: { ...type.label, color: colors.textMuted, marginBottom: space[2], textAlign: 'right' },
+  inputLabel: { ...type.label, color: colors.textMuted, marginBottom: space[2] },
   textInput: { backgroundColor: colors.surfaceRaised, borderRadius: radius.field, padding: space[4], color: colors.text, ...type.body, textAlign: 'right', marginBottom: space[4] },
   largeInput: { height: 140, textAlignVertical: 'top' },
 });

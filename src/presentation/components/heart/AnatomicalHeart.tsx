@@ -218,7 +218,8 @@ export const AnatomicalHeart = ({ pulseAnim, completedSurahs, progress, size, on
 
           {coronaries}
         </Svg>
-        <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+        {/* direction:'ltr' — under forced RTL Android swaps left/right, which would mirror every label. */}
+        <View pointerEvents="none" style={[StyleSheet.absoluteFill, { direction: 'ltr' }]}>
           {CELL_LAYOUT.map((cell) => (
             <HeartLabel key={`l${cell.id}`} cx={cell.cx} cy={cell.cy} lines={cell.lines} fontSize={cell.fontSize} done={doneSet.has(cell.id)} scale={scale} />
           ))}

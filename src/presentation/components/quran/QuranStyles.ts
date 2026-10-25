@@ -114,7 +114,7 @@ export const s = StyleSheet.create({
   meccanBg: {},
   medinanBg: {},
   revText: { ...type.caption, fontSize: 10, color: colors.textMuted },
-  surahMetaRow: { flexDirection: 'row-reverse', alignItems: 'center', marginTop: 4, gap: space[2] },
+  surahMetaRow: { flexDirection: 'row', alignItems: 'center', marginTop: 4, gap: space[2] },
   surahEntrySub: { ...type.caption, color: colors.textMuted },
   vDivider: { width: 1, height: 10, backgroundColor: colors.hairline },
 
@@ -134,12 +134,12 @@ export const s = StyleSheet.create({
   reciterModalContent: { width: '92%', maxHeight: '70%', backgroundColor: colors.surface, borderRadius: radius.sheet, padding: space[5] },
   reciterModalHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: space[4] },
   reciterModalTitle: { ...type.h2, color: colors.text },
-  reciterItem: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', padding: space[4], backgroundColor: colors.surfaceRaised, borderRadius: radius.field, marginBottom: space[2] },
+  reciterItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: space[4], backgroundColor: colors.surfaceRaised, borderRadius: radius.field, marginBottom: space[2] },
   reciterItemActive: { backgroundColor: colors.goldSoft },
   reciterItemName: { ...type.bodyMedium, color: colors.textMuted },
   reciterItemNameActive: { color: colors.goldText, fontFamily: 'Tajawal_700Bold' },
 
-  bookmarkRow: { flexDirection: 'row-reverse', alignItems: 'center', padding: space[4], marginHorizontal: space[5], marginBottom: space[2], backgroundColor: colors.surface, borderRadius: radius.card, gap: space[3] },
+  bookmarkRow: { flexDirection: 'row', alignItems: 'center', padding: space[4], marginHorizontal: space[5], marginBottom: space[2], backgroundColor: colors.surface, borderRadius: radius.card, gap: space[3] },
   bookmarkRowLabel: { ...type.bodyMedium, color: colors.text },
   emptyBoxText: { ...type.body, color: colors.textMuted, textAlign: 'center', marginTop: 50 },
 });

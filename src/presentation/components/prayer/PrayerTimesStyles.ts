@@ -3,7 +3,7 @@ import { colors, radius, space, type } from '../../../shared/theme/tokens';
 
 export const s = StyleSheet.create({
   // ── Hero ──
-  hero: { padding: space[5], alignItems: 'flex-end' },
+  hero: { padding: space[5], alignItems: 'flex-start' },
   heroEyebrow: { ...type.label, color: colors.textMuted },
   heroName: { ...type.h1, color: colors.text, marginTop: 2 },
   heroDateRow: { flexDirection: 'row', alignItems: 'center', gap: space[2], marginTop: space[3] },

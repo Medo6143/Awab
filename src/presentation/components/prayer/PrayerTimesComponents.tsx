@@ -22,13 +22,13 @@ export const PrayerCountdown = ({ nextPrayer, date }: { nextPrayer: NextPrayer; 
           value={nextPrayer ? (isTomorrow ? 'غداً' : formatCountdown(nextPrayer.remaining)) : '—'}
           caption={nextPrayer ? `تبدأ ${toAr(nextPrayer.time)}` : undefined}
           size="display"
-          align="right"
+          align="start"
           color={colors.goldText}
         />
         {hijri ? (
           <View style={s.heroDateRow}>
-            <Text style={s.heroDate}>{hijri.day} {hijri.month?.ar} {hijri.year} هـ</Text>
             <Calendar size={icon.size.sm} color={colors.textMuted} strokeWidth={icon.stroke} />
+            <Text style={s.heroDate}>{hijri.day} {hijri.month?.ar} {hijri.year} هـ</Text>
           </View>
         ) : null}
       </View>
@@ -41,14 +41,14 @@ export const PrayerTimeRow = ({ name, time, isActive, notify }: { name: string; 
   const BellIcon = notify ? Bell : BellOff;
   return (
     <View style={[s.row, isActive && s.rowActive]} accessibilityLabel={`${PRAYER_NAME_MAP[name] || name} ${time}`}>
-      <View style={s.rowLeft}>
-        <BellIcon size={icon.size.md} color={notify ? (isActive ? accent.accent : colors.textFaint) : colors.textFaint} strokeWidth={icon.stroke} />
-        <Text style={[s.rowTime, isActive && s.rowTimeActive]}>{toAr(time)}</Text>
-      </View>
       <View style={s.rowRight}>
-        {isActive ? <View style={s.nowPill}><Text style={s.nowPillText}>القادمة</Text></View> : null}
-        <Text style={[s.rowName, isActive && s.rowNameActive]}>{PRAYER_NAME_MAP[name] || name}</Text>
         <View style={[s.dot, isActive && { backgroundColor: accent.accent }]} />
+        <Text style={[s.rowName, isActive && s.rowNameActive]}>{PRAYER_NAME_MAP[name] || name}</Text>
+        {isActive ? <View style={s.nowPill}><Text style={s.nowPillText}>القادمة</Text></View> : null}
+      </View>
+      <View style={s.rowLeft}>
+        <Text style={[s.rowTime, isActive && s.rowTimeActive]}>{toAr(time)}</Text>
+        <BellIcon size={icon.size.md} color={notify ? (isActive ? accent.accent : colors.textFaint) : colors.textFaint} strokeWidth={icon.stroke} />
       </View>
     </View>
   );

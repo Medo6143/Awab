@@ -18,29 +18,29 @@ export const HomeHeader = ({ dynamicContent, hijriDateStr, onSettingsPress, onSt
   const accent = useAccent();
   return (
     <View style={styles.header}>
-      <View style={styles.headerActions}>
-        <IconButton onPress={onSettingsPress} label="الإعدادات">
-          <Settings color={accent.accent} size={icon.size.md} strokeWidth={icon.stroke} />
-        </IconButton>
-        <IconButton onPress={onStatsPress} label="الإحصائيات">
-          <Activity color={accent.accent} size={icon.size.md} strokeWidth={icon.stroke} />
-        </IconButton>
-      </View>
-
       <View style={styles.headerText}>
         <Text style={styles.headerTitle} numberOfLines={1}>{dynamicContent.title}</Text>
         <Text style={styles.headerSub} numberOfLines={1}>{dynamicContent.sub}</Text>
         <View style={styles.hijriRow}>
+          {hijriDateStr ? (
+            <>
+              <Moon size={14} color={colors.gold} strokeWidth={icon.stroke} />
+              <Text style={styles.hijriText}>{hijriDateStr}</Text>
+            </>
+          ) : null}
           {dynamicContent.isHoliday && dynamicContent.holidayName ? (
             <View style={styles.holidayPill}><Text style={styles.holidayText}>{dynamicContent.holidayName}</Text></View>
           ) : null}
-          {hijriDateStr ? (
-            <>
-              <Text style={styles.hijriText}>{hijriDateStr}</Text>
-              <Moon size={14} color={colors.gold} strokeWidth={icon.stroke} />
-            </>
-          ) : null}
         </View>
+      </View>
+
+      <View style={styles.headerActions}>
+        <IconButton onPress={onStatsPress} label="الإحصائيات">
+          <Activity color={accent.accent} size={icon.size.md} strokeWidth={icon.stroke} />
+        </IconButton>
+        <IconButton onPress={onSettingsPress} label="الإعدادات">
+          <Settings color={accent.accent} size={icon.size.md} strokeWidth={icon.stroke} />
+        </IconButton>
       </View>
     </View>
   );

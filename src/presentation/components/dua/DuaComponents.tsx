@@ -70,15 +70,15 @@ export const DuaCard = ({ item, onShare, onCopy }: any) => (
   <View style={s.duaCard}>
     <Text style={s.duaText}>{item.text}</Text>
     <View style={s.duaFooter}>
+      <Text style={s.duaRef}>{item.ref}</Text>
       <View style={s.actions}>
-        <TouchableOpacity onPress={() => onShare(item.text, item.ref)} style={s.actionBtn} accessibilityLabel="مشاركة">
-          <Share2 size={16} color={colors.gold} strokeWidth={icon.stroke} />
-        </TouchableOpacity>
         <TouchableOpacity onPress={() => onCopy(item.text)} style={s.actionBtn} accessibilityLabel="نسخ">
           <Copy size={16} color={colors.gold} strokeWidth={icon.stroke} />
         </TouchableOpacity>
+        <TouchableOpacity onPress={() => onShare(item.text, item.ref)} style={s.actionBtn} accessibilityLabel="مشاركة">
+          <Share2 size={16} color={colors.gold} strokeWidth={icon.stroke} />
+        </TouchableOpacity>
       </View>
-      <Text style={s.duaRef}>{item.ref}</Text>
     </View>
   </View>
 );

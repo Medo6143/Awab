@@ -91,11 +91,11 @@ const SettingsScreen = ({ navigation }: any) => {
       </SettingSection>
 
       <TouchableOpacity style={s.aboutBtn} accessibilityRole="button" onPress={() => Alert.alert('أوّاب', 'تطبيق رفيق المسلم اليومي: مواقيت الصلاة والأذان، المصحف، الأذكار، المسبحة، ورحلة ختم القرآن.')}>
-        <ChevronLeft size={icon.size.sm} color={colors.textFaint} strokeWidth={icon.stroke} />
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <Text style={s.aboutText}>عن التطبيق</Text>
           <Info size={icon.size.md} color={colors.gold} strokeWidth={icon.stroke} />
+          <Text style={s.aboutText}>عن التطبيق</Text>
         </View>
+        <ChevronLeft size={icon.size.sm} color={colors.textFaint} strokeWidth={icon.stroke} />
       </TouchableOpacity>
 
       <View style={s.credit}>

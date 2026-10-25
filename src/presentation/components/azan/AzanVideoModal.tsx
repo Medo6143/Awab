@@ -106,7 +106,7 @@ const s = StyleSheet.create({
   video: { width, height, position: 'absolute' },
   videoPlaceholder: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
   overlay: { flex: 1, justifyContent: 'space-between', padding: 30, paddingVertical: 60 },
-  header: { alignItems: 'flex-end' },
+  header: { alignItems: 'flex-start' },
   closeBtn: { width: 50, height: 50, borderRadius: 25, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
   content: { alignItems: 'center' },
   timeText: { fontFamily: 'Tajawal_700Bold', fontSize: 64, color: '#fff', marginBottom: 10 },

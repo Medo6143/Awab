@@ -60,7 +60,7 @@ export const DailyReportModal: React.FC<DailyReportModalProps> = ({ visible, onC
             <TouchableOpacity onPress={onClose} style={st.closeBtn} accessibilityLabel="إغلاق">
               <X color={colors.textMuted} size={icon.size.lg} strokeWidth={icon.stroke} />
             </TouchableOpacity>
-            <View style={{ alignItems: 'flex-end' }}>
+            <View style={{ alignItems: 'flex-start' }}>
               <Text style={st.title}>{TITLES[periodType]}</Text>
               <Text style={st.date}>{dateLabel}</Text>
             </View>
@@ -134,16 +134,16 @@ const st = StyleSheet.create({
   date: { ...type.caption, color: colors.textMuted, marginTop: 2 },
   closeBtn: { width: 40, height: 40, borderRadius: radius.tile, backgroundColor: colors.surfaceRaised, alignItems: 'center', justifyContent: 'center' },
   scroll: { paddingBottom: space[6] },
-  scoreBox: { flexDirection: 'row-reverse', alignItems: 'center', gap: space[4], backgroundColor: colors.surfaceRaised, padding: space[5], borderRadius: radius.card, marginBottom: space[4] },
+  scoreBox: { flexDirection: 'row', alignItems: 'center', gap: space[4], backgroundColor: colors.surfaceRaised, padding: space[5], borderRadius: radius.card, marginBottom: space[4] },
   scoreText: { flex: 1 },
-  feedbackTitle: { ...type.h2, textAlign: 'right' },
-  feedbackMsg: { ...type.body, color: colors.textMuted, textAlign: 'right', marginTop: 4 },
+  feedbackTitle: { ...type.h2 },
+  feedbackMsg: { ...type.body, color: colors.textMuted, marginTop: 4 },
   miniGrid: { flexDirection: 'row', gap: space[3], marginBottom: space[5] },
   miniCard: { flex: 1, backgroundColor: colors.surfaceRaised, padding: space[4], borderRadius: radius.card, alignItems: 'center', gap: space[2] },
-  sectionTitle: { ...type.h2, color: colors.text, marginBottom: space[3], textAlign: 'right' },
+  sectionTitle: { ...type.h2, color: colors.text, marginBottom: space[3] },
   list: { gap: space[2], marginBottom: space[5] },
-  row: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', gap: space[3], backgroundColor: colors.surfaceRaised, padding: space[4], borderRadius: radius.field },
-  rowName: { ...type.bodyMedium, color: colors.text, flex: 1, textAlign: 'right' },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: space[3], backgroundColor: colors.surfaceRaised, padding: space[4], borderRadius: radius.field },
+  rowName: { ...type.bodyMedium, color: colors.text, flex: 1 },
   rowValue: { ...type.label, fontSize: 15 },
   footer: { paddingTop: space[3] },
 });

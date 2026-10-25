@@ -32,15 +32,15 @@ export const TaskItem = ({ task, onToggle }: any) => {
       accessibilityLabel={task.name}
       activeOpacity={0.8}
     >
+      <View style={s.taskLeft}>
+        {category ? <IconTile icon={category.icon} tone={task.isCompleted ? 'muted' : 'accent'} /> : null}
+        <Text style={[s.taskName, task.isCompleted && s.taskNameCompleted]}>{task.name}</Text>
+      </View>
       {task.isCompleted ? (
         <CheckCircle2 color={accent.accent} size={icon.size.lg} strokeWidth={icon.stroke} />
       ) : (
         <Circle color={colors.textFaint} size={icon.size.lg} strokeWidth={icon.stroke} />
       )}
-      <View style={s.taskLeft}>
-        <Text style={[s.taskName, task.isCompleted && s.taskNameCompleted]}>{task.name}</Text>
-        {category ? <IconTile icon={category.icon} tone={task.isCompleted ? 'muted' : 'accent'} /> : null}
-      </View>
     </TouchableOpacity>
   );
 };

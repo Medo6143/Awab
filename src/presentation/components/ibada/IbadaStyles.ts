@@ -12,6 +12,6 @@ export const s = StyleSheet.create({
   taskCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: space[3], paddingRight: space[4], backgroundColor: colors.surface, borderRadius: radius.card, marginBottom: space[2] },
   taskCardDone: { backgroundColor: colors.surfaceRaised },
   taskLeft: { flexDirection: 'row', alignItems: 'center', gap: space[3], flex: 1 },
-  taskName: { ...type.bodyMedium, fontSize: 16, color: colors.text, flex: 1, textAlign: 'right' },
+  taskName: { ...type.bodyMedium, fontSize: 16, color: colors.text, flex: 1 },
   taskNameCompleted: { color: colors.textMuted, textDecorationLine: 'line-through' },
 });

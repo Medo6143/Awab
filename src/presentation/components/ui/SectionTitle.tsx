@@ -21,6 +21,6 @@ export const SectionTitle = ({ title, action, style }: Props) => {
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginTop: space[6], marginBottom: space[3] },
-  title: { ...type.h2, color: colors.text, textAlign: 'right' },
+  title: { ...type.h2, color: colors.text },
   action: { ...type.label },
 });
