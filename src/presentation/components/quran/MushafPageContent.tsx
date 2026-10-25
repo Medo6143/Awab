@@ -169,11 +169,11 @@ export const MushafPageContent = React.memo(({
                       style={[s.singleAyah, highlightedAyah === a.number && s.highlightedText]}
                     >
                       {text}
-                      {" "}
-                      <View style={s.ayaMarkContainer}>
-                         <Text style={s.ayaOrnament}>۝</Text>
-                         <Text style={s.ayaMarkNumber}>{toAr(a.numberInSurah)}</Text>
-                      </View>
+                      {/* Plain text, not an inline View: Android mispositions inline Views in RTL
+                          text, so the marker landed on the last word. Amiri renders U+06DD followed
+                          by Arabic-Indic digits as one enclosed ayah number. */}
+                      {" "}
+                      <Text style={s.ayaEnd}>{"۝" + toAr(a.numberInSurah)}</Text>
                       {" "}
                     </Text>
                    );

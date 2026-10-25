@@ -52,6 +52,7 @@ export const s = StyleSheet.create({
   highlightedText: { backgroundColor: 'rgba(212,175,55,0.4)', borderRadius: 6 },
 
   ayaMarkContainer: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', marginHorizontal: 4 },
+  ayaEnd: { fontFamily: 'Amiri_400Regular', color: colors.goldDeep },
   ayaOrnament: { fontFamily: 'Amiri_700Bold', fontSize: 26, color: colors.goldDeep, position: 'absolute' },
   ayaMarkNumber: { fontFamily: 'Tajawal_700Bold', fontSize: 14, color: colors.paperInk, zIndex: 1, top: 7, left: 0, bottom: 0, right: 0 },
 
