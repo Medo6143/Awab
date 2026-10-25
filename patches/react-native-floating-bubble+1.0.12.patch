@@ -94,10 +94,10 @@ index 41a92ab..8a476d0 100644
 \ No newline at end of file
 diff --git a/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/FloatingBubbleService.java b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/FloatingBubbleService.java
 new file mode 100644
-index 0000000..ad5c36d
+index 0000000..6da8470
 --- /dev/null
 +++ b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/FloatingBubbleService.java
-@@ -0,0 +1,750 @@
+@@ -0,0 +1,723 @@
 +package com.reactlibrary;
 +
 +import android.app.AlarmManager;
@@ -336,34 +336,6 @@ index 0000000..ad5c36d
 +            applyConfigToBubble();
 +            setupBubbleTouchListener();
 +
-+            View btnCount = bubbleView.findViewById(R.id.btn_count_tasbeeh);
-+            if (btnCount != null) {
-+                btnCount.setOnClickListener(new View.OnClickListener() {
-+                    @Override
-+                    public void onClick(View v) {
-+                        hideReminder();
-+                        tasbeehCount++;
-+                        prefs.saveCount(tasbeehCount);
-+                        updateCounterDisplay();
-+                        sendBroadcast(new Intent(ACTION_BUBBLE_PRESS));
-+                    }
-+                });
-+            }
-+
-+            View btnReset = bubbleView.findViewById(R.id.btn_reset_tasbeeh);
-+            if (btnReset != null) {
-+                btnReset.setOnClickListener(new View.OnClickListener() {
-+                    @Override
-+                    public void onClick(View v) {
-+                        hideReminder();
-+                        tasbeehCount = 0;
-+                        prefs.saveCount(tasbeehCount);
-+                        updateCounterDisplay();
-+                        sendBroadcast(new Intent(ACTION_BUBBLE_RESET));
-+                    }
-+                });
-+            }
-+
 +            windowManager.addView(bubbleView, params);
 +            Log.d(TAG, "showFloatingBubble: ✅ addView SUCCESS - bubble should be visible now!");
 +        } catch (IllegalStateException e) {
@@ -433,35 +405,64 @@ index 0000000..ad5c36d
 +        });
 +    }
 +
++    private WoodCounterView counter() {
++        return bubbleView == null ? null : (WoodCounterView) bubbleView.findViewById(R.id.wood_counter);
++    }
++
++    private void doCount() {
++        hideReminder();
++        tasbeehCount++;
++        prefs.saveCount(tasbeehCount);
++        updateCounterDisplay();
++        sendBroadcast(new Intent(ACTION_BUBBLE_PRESS));
++    }
++
++    private void doReset() {
++        hideReminder();
++        tasbeehCount = 0;
++        prefs.saveCount(tasbeehCount);
++        updateCounterDisplay();
++        sendBroadcast(new Intent(ACTION_BUBBLE_RESET));
++    }
++
 +    private void setupBubbleTouchListener() {
 +        if (bubbleView == null)
 +            return;
 +        bubbleView.setOnTouchListener(new View.OnTouchListener() {
 +            private static final int TOUCH_MAX_OFFSET = 30;
++            private boolean dragging = false;
 +
 +            @Override
 +            public boolean onTouch(View v, MotionEvent event) {
-+                hideReminder();
++                final WoodCounterView c = counter();
 +                switch (event.getAction()) {
 +                    case MotionEvent.ACTION_DOWN:
++                        hideReminder();
++                        dragging = false;
 +                        initialX = params.x;
 +                        initialY = params.y;
 +                        initialTouchX = event.getRawX();
 +                        initialTouchY = event.getRawY();
++                        if (c != null) c.setPressedPart(c.partAt(event.getX(), event.getY()));
 +                        return true;
 +                    case MotionEvent.ACTION_MOVE:
 +                        int deltaX = (int) (event.getRawX() - initialTouchX);
 +                        int deltaY = (int) (event.getRawY() - initialTouchY);
-+                        params.x = initialX + deltaX;
-+                        params.y = initialY + deltaY;
-+                        windowManager.updateViewLayout(bubbleView, params);
-+                        if (Math.abs(deltaX) > TOUCH_MAX_OFFSET || Math.abs(deltaY) > TOUCH_MAX_OFFSET) {
++                        if (!dragging && (Math.abs(deltaX) > TOUCH_MAX_OFFSET || Math.abs(deltaY) > TOUCH_MAX_OFFSET)) {
++                            dragging = true;
++                            if (c != null) c.setPressedPart(WoodCounterView.PART_NONE);
++                        }
++                        if (dragging) {
++                            params.x = initialX + deltaX;
++                            params.y = initialY + deltaY;
++                            windowManager.updateViewLayout(bubbleView, params);
 +                            showStopTarget();
 +                            updateStopTargetHighlight(event.getRawX(), event.getRawY());
 +                        }
 +                        return true;
 +                    case MotionEvent.ACTION_CANCEL:
 +                        hideStopTarget();
++                        if (c != null) c.setPressedPart(WoodCounterView.PART_NONE);
 +                        return true;
 +                    case MotionEvent.ACTION_UP:
 +                        boolean droppedOnStop = stopTargetView != null
@@ -473,19 +474,26 @@ index 0000000..ad5c36d
 +                            return true;
 +                        }
 +                        prefs.savePosition(params.x, params.y);
-+                        int upDeltaX = (int) (event.getRawX() - initialTouchX);
-+                        int upDeltaY = (int) (event.getRawY() - initialTouchY);
-+
-+                        if (Math.abs(upDeltaX) < TOUCH_MAX_OFFSET && Math.abs(upDeltaY) < TOUCH_MAX_OFFSET) {
-+                            View btnCount = bubbleView.findViewById(R.id.btn_count_tasbeeh);
-+                            View btnReset = bubbleView.findViewById(R.id.btn_reset_tasbeeh);
-+
-+                            if (isViewTouched(btnCount, event.getRawX(), event.getRawY())) {
-+                                btnCount.performClick();
-+                            } else if (isViewTouched(btnReset, event.getRawX(), event.getRawY())) {
-+                                btnReset.performClick();
++                        if (!dragging && c != null) {
++                            int part = c.partAt(event.getX(), event.getY());
++                            if (part == WoodCounterView.PART_RESET) {
++                                doReset();
++                            } else {
++                                c.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);
++                                doCount();
 +                            }
++                            // keep the button visibly pressed for a beat, like a real clicker
++                            handler.postDelayed(new Runnable() {
++                                @Override
++                                public void run() {
++                                    WoodCounterView cc = counter();
++                                    if (cc != null) cc.setPressedPart(WoodCounterView.PART_NONE);
++                                }
++                            }, 90);
++                        } else if (c != null) {
++                            c.setPressedPart(WoodCounterView.PART_NONE);
 +                        }
++                        dragging = false;
 +                        return true;
 +                }
 +                return false;
@@ -506,9 +514,7 @@ index 0000000..ad5c36d
 +                    if (colorStr == null || colorStr.isEmpty() || !colorStr.startsWith("#")) {
 +                        colorStr = "#B8860B"; // Default Gold
 +                    }
-+                    boolean isBlack = colorStr.equalsIgnoreCase("#000000");
-+                    
-+                    Log.d(TAG, "applyConfigToBubble: scale=" + bubbleScale + " accent=" + colorStr + " isBlack=" + isBlack);
++                    Log.d(TAG, "applyConfigToBubble: scale=" + bubbleScale + " accent=" + colorStr);
 +
 +                    // 1. Root Container Size
 +                    int widthPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float) (85 * bubbleScale),
@@ -518,75 +524,10 @@ index 0000000..ad5c36d
 +                    params.width = widthPx;
 +                    params.height = heightPx;
 +
-+                    // 2. Body Background & Stroke
-+                    View body = bubbleView.findViewById(R.id.tasbeeh_body_container);
-+                    if (body != null) {
-+                        body.setLayoutParams(new android.widget.FrameLayout.LayoutParams(widthPx, heightPx));
-+                        try {
-+                            android.graphics.drawable.Drawable bg = body.getBackground();
-+                            if (bg instanceof GradientDrawable) {
-+                                GradientDrawable gd = (GradientDrawable) bg.mutate();
-+                                int bodyColor = Color.parseColor(colorStr);
-+                                gd.setColors(new int[]{bodyColor, bodyColor});
-+                                // Use a visible Grey stroke for Black theme, otherwise a dark thin stroke.
-+                                gd.setStroke(4, Color.parseColor(isBlack ? "#475569" : "#1a140f"));
-+                            }
-+                        } catch (Exception e) { Log.e(TAG, "Error updating body bg", e); }
-+                    }
++                    WoodCounterView c = counter();
++                    if (c != null) c.setConfig(colorStr, showBorder, showReset);
 +
-+                    // 3. Reset Button
-+                    View resetBtn = bubbleView.findViewById(R.id.btn_reset_tasbeeh);
-+                    if (resetBtn != null) {
-+                        int rSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float) (14 * bubbleScale), getResources().getDisplayMetrics());
-+                        resetBtn.getLayoutParams().width = rSize;
-+                        resetBtn.getLayoutParams().height = rSize;
-+                        resetBtn.setVisibility(showReset ? View.VISIBLE : View.GONE);
-+                    }
-+
-+                    // 4. Count Button Area
-+                    View countBtn = bubbleView.findViewById(R.id.btn_count_tasbeeh);
-+                    if (countBtn != null) {
-+                        int cSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float) (45 * bubbleScale), getResources().getDisplayMetrics());
-+                        countBtn.getLayoutParams().width = cSize;
-+                        countBtn.getLayoutParams().height = cSize;
-+                    }
-+
-+                    // 5. Screen Frame (Border Display)
-+                    View screenFrame = bubbleView.findViewById(R.id.screen_frame);
-+                    if (screenFrame != null) {
-+                        int sW = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float) (66 * bubbleScale), getResources().getDisplayMetrics());
-+                        int sH = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float) (40 * bubbleScale), getResources().getDisplayMetrics());
-+                        screenFrame.getLayoutParams().width = sW;
-+                        screenFrame.getLayoutParams().height = sH;
-+                        try {
-+                            android.graphics.drawable.Drawable fbg = screenFrame.getBackground();
-+                            if (fbg instanceof GradientDrawable) {
-+                                GradientDrawable fgd = (GradientDrawable) fbg.mutate();
-+                                // For Black theme, make the outer screen frame border White for visibility
-+                                fgd.setStroke(showBorder ? 4 : 0, Color.parseColor(isBlack ? "#FFFFFF" : colorStr));
-+                                fgd.setAlpha(showBorder ? 255 : 0);
-+                            }
-+                        } catch (Exception e) { Log.e(TAG, "Error updating screen frame", e); }
-+                    }
-+
-+                    // 6. Count Text & Inner Screen
-+                    TextView tv = bubbleView.findViewById(R.id.tasbeeh_count_text);
-+                    if (tv != null) {
-+                        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, (float) (19 * bubbleScale));
-+                        // Special case for Black: White numbers. Otherwise use accent color.
-+                        tv.setTextColor(Color.parseColor(isBlack ? "#FFFFFF" : colorStr));
-+                        try {
-+                            android.graphics.drawable.Drawable sbg = tv.getBackground();
-+                            if (sbg instanceof GradientDrawable) {
-+                                GradientDrawable sgd = (GradientDrawable) sbg.mutate();
-+                                // Inner screen should be Grey for Black theme, Black for others.
-+                                int sColor = Color.parseColor(isBlack ? "#475569" : "#000000");
-+                                sgd.setColors(new int[]{sColor, sColor});
-+                            }
-+                        } catch (Exception e) { Log.e(TAG, "Error updating inner screen", e); }
-+                    }
-+
-+                    // 7. Finalize Layout Update
++                    // Finalize Layout Update
 +                    updateCounterDisplay();
 +                    try {
 +                        if (bubbleView.getParent() != null) {
@@ -606,9 +547,9 @@ index 0000000..ad5c36d
 +            handler.post(new Runnable() {
 +                @Override
 +                public void run() {
-+                    TextView tv = bubbleView.findViewById(R.id.tasbeeh_count_text);
-+                    if (tv != null)
-+                        tv.setText(String.valueOf(tasbeehCount));
++                    WoodCounterView c = counter();
++                    if (c != null)
++                        c.setCount(tasbeehCount);
 +                }
 +            });
 +        }
@@ -731,8 +672,16 @@ index 0000000..ad5c36d
 +                    reminderView = inflater.inflate(R.layout.reminder_layout, null);
 +
 +                    TextView tv = (TextView) reminderView.findViewById(R.id.reminder_text);
-+                    if (tv != null)
++                    if (tv != null) {
 +                        tv.setText(currentDhikr);
++                        // long athkar get a smaller face so the card stays compact
++                        int len = currentDhikr == null ? 0 : currentDhikr.length();
++                        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, len > 120 ? 14 : len > 60 ? 16 : len > 30 ? 18 : 21);
++                    }
++                    reminderView.setOnClickListener(new View.OnClickListener() {
++                        @Override
++                        public void onClick(View v) { hideReminder(); }
++                    });
 +
 +                    int layoutType;
 +                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -741,15 +690,35 @@ index 0000000..ad5c36d
 +                        layoutType = WindowManager.LayoutParams.TYPE_PHONE;
 +                    }
 +
-+                    WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-+                            WindowManager.LayoutParams.WRAP_CONTENT,
-+                            WindowManager.LayoutParams.WRAP_CONTENT,
-+                            layoutType,
++                    android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
++                    int margin = dp(16), gap = dp(10);
++                    int cardW = Math.min(dm.widthPixels - margin * 2, dp(300));
++                    reminderView.measure(
++                            View.MeasureSpec.makeMeasureSpec(cardW, View.MeasureSpec.AT_MOST),
++                            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
++                    int w = reminderView.getMeasuredWidth(), h = reminderView.getMeasuredHeight();
++
++                    WindowManager.LayoutParams rp = new WindowManager.LayoutParams(
++                            w, h, layoutType,
 +                            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
 +                            PixelFormat.TRANSLUCENT);
++                    rp.gravity = Gravity.TOP | Gravity.LEFT;
 +
-+                    params.gravity = Gravity.CENTER;
-+                    windowManager.addView(reminderView, params);
++                    // Sit next to the sebha, never on top of it: above if it fits, else below,
++                    // else in the half of the screen the sebha is not in.
++                    int bx = FloatingBubbleService.this.params.x, by = FloatingBubbleService.this.params.y;
++                    int bw = FloatingBubbleService.this.params.width, bh = FloatingBubbleService.this.params.height;
++                    int screenH = dm.heightPixels;
++                    int top = dp(24), bottom = screenH - dp(24);
++                    int y;
++                    if (by - gap - h >= top) y = by - gap - h;
++                    else if (by + bh + gap + h <= bottom) y = by + bh + gap;
++                    else y = (by + bh / 2 > screenH / 2) ? top : bottom - h;
++                    int x = bx + bw / 2 - w / 2;
++                    x = Math.max(margin, Math.min(x, dm.widthPixels - margin - w));
++                    rp.x = x;
++                    rp.y = y;
++                    windowManager.addView(reminderView, rp);
 +                } catch (Exception e) {
 +                }
 +            }
@@ -770,6 +739,10 @@ index 0000000..ad5c36d
 +                }
 +            }
 +        });
++    }
++
++    private int dp(int v) {
++        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, getResources().getDisplayMetrics());
 +    }
 +
 +    public boolean isReminderVisible() {
@@ -1287,45 +1260,341 @@ index 0000000..0d991ae
 +    public void setShouldShow(boolean show) { prefs.edit().putBoolean("shouldShow", show).apply(); }
 +    public boolean getShouldShow() { return prefs.getBoolean("shouldShow", false); }
 +}
-diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_count.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_count.xml
+diff --git a/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/WoodCounterView.java b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/WoodCounterView.java
 new file mode 100644
-index 0000000..9ec0bcd
+index 0000000..6d82c51
 --- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_count.xml
-@@ -0,0 +1,5 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
-+    <gradient android:startColor="#FFFFFF" android:centerColor="#F1F3F5" android:endColor="#DEE2E6" android:type="radial" android:gradientRadius="20dp" />
-+    <stroke android:width="1dp" android:color="#ADB5BD" />
-+</shape>
-diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_reset.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_reset.xml
-new file mode 100644
-index 0000000..830c869
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_btn_reset.xml
-@@ -0,0 +1,5 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
-+    <gradient android:startColor="#FCD34D" android:centerColor="#EAB308" android:endColor="#D97706" android:type="radial" android:gradientRadius="10dp" />
-+    <stroke android:width="1dp" android:color="#92400E" />
-+</shape>
++++ b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/WoodCounterView.java
+@@ -0,0 +1,315 @@
++package com.reactlibrary;
++
++import android.content.Context;
++import android.graphics.BlurMaskFilter;
++import android.graphics.Canvas;
++import android.graphics.Color;
++import android.graphics.LinearGradient;
++import android.graphics.Paint;
++import android.graphics.Path;
++import android.graphics.RadialGradient;
++import android.graphics.RectF;
++import android.graphics.Shader;
++import android.util.AttributeSet;
++import android.view.View;
++
++/**
++ * A realistic wooden finger tally counter, drawn entirely in code so it stays sharp at any
++ * bubble scale: grained wood body, recessed LCD with 7-segment digits, a domed chrome count
++ * button that sinks when pressed, and a small chrome reset button.
++ *
++ * The configured colour stains the wood; the default gold keeps it natural.
++ */
++public class WoodCounterView extends View {
++    public static final int PART_NONE = 0;
++    public static final int PART_COUNT = 1;
++    public static final int PART_RESET = 2;
++
++    private static final int NATURAL_WOOD = 0xFFC27C3A;
++    // segments a,b,c,d,e,f,g for 0-9
++    private static final int[] DIGITS = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
++
++    private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
++    private final Path body = new Path();
++    private final RectF tmp = new RectF();
++    private final RectF lcdBezel = new RectF();
++    private final RectF lcd = new RectF();
++    private float countCx, countCy, countR, resetCx, resetCy, resetR;
++
++    private int count = 0;
++    private int wood = NATURAL_WOOD;
++    private boolean showBorder = true;
++    private boolean showReset = true;
++    private int pressed = PART_NONE;
++
++    public WoodCounterView(Context c) { this(c, null); }
++
++    public WoodCounterView(Context c, AttributeSet a) {
++        super(c, a);
++        setLayerType(LAYER_TYPE_SOFTWARE, null); // BlurMaskFilter needs a software layer
++    }
++
++    // ── public API ───────────────────────────────────────────────
++    public void setCount(int value) { if (value != count) { count = value; invalidate(); } }
++
++    public void setConfig(String colorHex, boolean border, boolean reset) {
++        wood = woodFor(colorHex);
++        showBorder = border;
++        showReset = reset;
++        invalidate();
++    }
++
++    public void setPressedPart(int part) { if (part != pressed) { pressed = part; invalidate(); } }
++
++    /** Which control is under (x, y) in view coordinates. Anywhere on the body counts. */
++    public int partAt(float x, float y) {
++        if (showReset && dist(x, y, resetCx, resetCy) <= resetR * 1.8f) return PART_RESET;
++        return PART_COUNT;
++    }
++
++    // ── colour ───────────────────────────────────────────────────
++    private static int woodFor(String hex) {
++        int c;
++        try { c = Color.parseColor(hex); } catch (Exception e) { return NATURAL_WOOD; }
++        if (c == 0xFFB8860B || c == 0xFFD4AF37) return NATURAL_WOOD;
++        float t = c == Color.BLACK ? 0.7f : 0.5f;
++        return mix(NATURAL_WOOD, c, t);
++    }
++
++    private static int mix(int a, int b, float t) {
++        return Color.rgb(
++                (int) (Color.red(a) + (Color.red(b) - Color.red(a)) * t),
++                (int) (Color.green(a) + (Color.green(b) - Color.green(a)) * t),
++                (int) (Color.blue(a) + (Color.blue(b) - Color.blue(a)) * t));
++    }
++
++    private static int shade(int c, float f) { // f<1 darker, f>1 lighter
++        if (f < 1) return mix(Color.BLACK, c, f);
++        return mix(c, Color.WHITE, f - 1);
++    }
++
++    private static int alpha(int c, int a) { return (c & 0x00FFFFFF) | (a << 24); }
++
++    /** A shader is multiplied by the paint's alpha, so reset it to opaque first. */
++    private void shader(Shader sh) {
++        paint.setColor(Color.BLACK);
++        paint.setShader(sh);
++    }
++
++    private static float dist(float x1, float y1, float x2, float y2) { return (float) Math.hypot(x1 - x2, y1 - y2); }
++
++    // ── layout ───────────────────────────────────────────────────
++    @Override
++    protected void onSizeChanged(int w, int h, int ow, int oh) {
++        super.onSizeChanged(w, h, ow, oh);
++        float pad = w * 0.06f;
++        RectF r = new RectF(pad, pad * 0.6f, w - pad, h - pad * 1.2f);
++        float top = r.width() * 0.34f, bottom = r.width() * 0.46f;
++        body.reset();
++        body.addRoundRect(r, new float[] { top, top, top, top, bottom, bottom, bottom, bottom }, Path.Direction.CW);
++
++        float bw = r.width();
++        lcdBezel.set(r.left + bw * 0.1f, r.top + r.height() * 0.1f, r.right - bw * 0.1f, r.top + r.height() * 0.38f);
++        float inset = bw * 0.045f;
++        lcd.set(lcdBezel.left + inset, lcdBezel.top + inset * 1.1f, lcdBezel.right - inset, lcdBezel.bottom - inset * 1.1f);
++
++        countR = bw * 0.27f;
++        countCx = r.centerX();
++        countCy = r.bottom - countR - r.height() * 0.08f;
++        resetR = bw * 0.065f;
++        resetCx = r.right - bw * 0.2f;
++        resetCy = (lcdBezel.bottom + (countCy - countR)) / 2f;
++    }
++
++    // ── drawing ──────────────────────────────────────────────────
++    @Override
++    protected void onDraw(Canvas canvas) {
++        int w = getWidth(), h = getHeight();
++        if (w == 0 || h == 0) return;
++        paint.reset();
++        paint.setAntiAlias(true);
++
++        // drop shadow
++        paint.setColor(0x66000000);
++        paint.setMaskFilter(new BlurMaskFilter(w * 0.05f, BlurMaskFilter.Blur.NORMAL));
++        canvas.save();
++        canvas.translate(0, w * 0.025f);
++        canvas.drawPath(body, paint);
++        canvas.restore();
++        paint.setMaskFilter(null);
++
++        drawWood(canvas, w, h);
++        drawLcd(canvas);
++        if (showReset) drawChrome(canvas, resetCx, resetCy, resetR, pressed == PART_RESET, false);
++        drawChrome(canvas, countCx, countCy, countR, pressed == PART_COUNT, true);
++    }
++
++    private void drawWood(Canvas canvas, int w, int h) {
++        RectF b = new RectF();
++        body.computeBounds(b, true);
++
++        // base tone, lit from the top-left
++        shader(new LinearGradient(b.left, b.top, b.right, b.bottom,
++                new int[] { shade(wood, 1.12f), wood, shade(wood, 0.72f) }, new float[] { 0f, 0.55f, 1f }, Shader.TileMode.CLAMP));
++        canvas.drawPath(body, paint);
++        paint.setShader(null);
++
++        // grain: gently waving vertical fibres, deterministic so the bubble never "shimmers"
++        canvas.save();
++        canvas.clipPath(body);
++        paint.setStyle(Paint.Style.STROKE);
++        Path grain = new Path();
++        int lines = 22;
++        for (int i = 0; i < lines; i++) {
++            float x0 = b.left + b.width() * (i + 0.5f) / lines;
++            float amp = b.width() * (0.012f + 0.01f * ((i * 7) % 5) / 4f);
++            float phase = i * 1.7f;
++            grain.reset();
++            for (int s = 0; s <= 24; s++) {
++                float y = b.top + b.height() * s / 24f;
++                float x = x0 + (float) Math.sin(phase + s * 0.55f) * amp + (float) Math.sin(s * 0.18f + i) * amp * 0.6f;
++                if (s == 0) grain.moveTo(x, y); else grain.lineTo(x, y);
++            }
++            paint.setStrokeWidth(b.width() * (i % 3 == 0 ? 0.012f : 0.006f));
++            paint.setColor(alpha(shade(wood, 0.55f), i % 3 == 0 ? 70 : 40));
++            canvas.drawPath(grain, paint);
++        }
++        // a couple of soft knots of darker grain
++        paint.setStyle(Paint.Style.STROKE);
++        for (int k = 0; k < 3; k++) {
++            paint.setStrokeWidth(b.width() * 0.006f);
++            paint.setColor(alpha(shade(wood, 0.5f), 45));
++            float kx = b.left + b.width() * 0.22f, ky = b.top + b.height() * 0.62f;
++            tmp.set(kx - b.width() * (0.05f + k * 0.03f), ky - b.width() * (0.02f + k * 0.015f),
++                    kx + b.width() * (0.05f + k * 0.03f), ky + b.width() * (0.02f + k * 0.015f));
++            canvas.drawOval(tmp, paint);
++        }
++        paint.setStyle(Paint.Style.FILL);
++
++        // varnish sheen
++        shader(new RadialGradient(b.left + b.width() * 0.3f, b.top + b.height() * 0.18f, b.width() * 0.8f,
++                new int[] { 0x40FFFFFF, 0x00FFFFFF }, null, Shader.TileMode.CLAMP));
++        canvas.drawRect(b, paint);
++        // edge darkening
++        shader(new RadialGradient(b.centerX(), b.centerY(), Math.max(b.width(), b.height()) * 0.62f,
++                new int[] { 0x00000000, 0x00000000, 0x55000000 }, new float[] { 0f, 0.7f, 1f }, Shader.TileMode.CLAMP));
++        canvas.drawRect(b, paint);
++        paint.setShader(null);
++        canvas.restore();
++
++        if (showBorder) {
++            paint.setStyle(Paint.Style.STROKE);
++            paint.setStrokeWidth(w * 0.018f);
++            paint.setColor(shade(wood, 0.45f));
++            canvas.drawPath(body, paint);
++            paint.setStrokeWidth(w * 0.008f);
++            paint.setColor(alpha(shade(wood, 1.3f), 120));
++            canvas.save();
++            canvas.translate(0, w * 0.006f);
++            canvas.restore();
++            paint.setStyle(Paint.Style.FILL);
++        }
++    }
++
++    private void drawLcd(Canvas canvas) {
++        float r = lcdBezel.height() * 0.28f;
++        // glossy black bezel
++        shader(new LinearGradient(0, lcdBezel.top, 0, lcdBezel.bottom,
++                new int[] { 0xFF3A3A3A, 0xFF0D0D0D, 0xFF000000 }, new float[] { 0f, 0.5f, 1f }, Shader.TileMode.CLAMP));
++        canvas.drawRoundRect(lcdBezel, r, r, paint);
++        // LCD glass
++        float lr = r * 0.6f;
++        shader(new LinearGradient(0, lcd.top, 0, lcd.bottom,
++                new int[] { 0xFFC9D3BD, 0xFFB2BDA4, 0xFFA3AE95 }, new float[] { 0f, 0.6f, 1f }, Shader.TileMode.CLAMP));
++        canvas.drawRoundRect(lcd, lr, lr, paint);
++        paint.setShader(null);
++        // inner shadow along the top edge of the glass
++        shader(new LinearGradient(0, lcd.top, 0, lcd.top + lcd.height() * 0.25f,
++                new int[] { 0x55000000, 0x00000000 }, null, Shader.TileMode.CLAMP));
++        canvas.drawRoundRect(lcd, lr, lr, paint);
++        paint.setShader(null);
++
++        drawDigits(canvas);
++
++        // glass reflection on the top half
++        canvas.save();
++        tmp.set(lcd.left, lcd.top, lcd.right, lcd.top + lcd.height() * 0.45f);
++        shader(new LinearGradient(0, tmp.top, 0, tmp.bottom, new int[] { 0x40FFFFFF, 0x08FFFFFF }, null, Shader.TileMode.CLAMP));
++        canvas.drawRoundRect(tmp, lr, lr, paint);
++        paint.setShader(null);
++        canvas.restore();
++    }
++
++    private void drawDigits(Canvas canvas) {
++        String s = String.valueOf(Math.max(0, count));
++        int cells = Math.max(4, s.length());
++        float padX = lcd.width() * 0.07f, padY = lcd.height() * 0.17f;
++        float areaW = lcd.width() - padX * 2, areaH = lcd.height() - padY * 2;
++        float gap = areaW * 0.05f;
++        float cw = Math.min((areaW - gap * (cells - 1)) / cells, areaH * 0.58f);
++        float startX = lcd.right - padX - (cw * cells + gap * (cells - 1));
++        float t = cw * 0.2f;
++
++        canvas.save();
++        canvas.skew(-0.08f, 0);
++        canvas.translate(lcd.centerY() * 0.08f, 0);
++        for (int i = 0; i < cells; i++) {
++            int fromRight = cells - 1 - i;
++            int idx = s.length() - 1 - fromRight;
++            int mask = idx >= 0 ? DIGITS[s.charAt(idx) - '0'] : 0;
++            float x = startX + i * (cw + gap);
++            drawDigit(canvas, x, lcd.top + padY, cw, areaH, t, 0x7F, 0x14000000); // ghost "8"
++            if (mask != 0) drawDigit(canvas, x, lcd.top + padY, cw, areaH, t, mask, 0xF0182014);
++        }
++        canvas.restore();
++    }
++
++    private void drawDigit(Canvas canvas, float x, float y, float w, float h, float t, int mask, int color) {
++        paint.setColor(color);
++        float g = t * 0.22f, rr = t * 0.45f, mid = y + h / 2f;
++        RectF[] seg = {
++                new RectF(x + t * 0.5f + g, y, x + w - t * 0.5f - g, y + t),                 // a
++                new RectF(x + w - t, y + t * 0.5f + g, x + w, mid - g),                       // b
++                new RectF(x + w - t, mid + g, x + w, y + h - t * 0.5f - g),                   // c
++                new RectF(x + t * 0.5f + g, y + h - t, x + w - t * 0.5f - g, y + h),          // d
++                new RectF(x, mid + g, x + t, y + h - t * 0.5f - g),                           // e
++                new RectF(x, y + t * 0.5f + g, x + t, mid - g),                               // f
++                new RectF(x + t * 0.5f + g, mid - t / 2f, x + w - t * 0.5f - g, mid + t / 2f), // g
++        };
++        for (int i = 0; i < 7; i++) if ((mask & (1 << i)) != 0) canvas.drawRoundRect(seg[i], rr, rr, paint);
++    }
++
++    private void drawChrome(Canvas canvas, float cx, float cy, float r, boolean down, boolean big) {
++        // recess in the wood
++        paint.setColor(0x80000000);
++        paint.setMaskFilter(new BlurMaskFilter(r * 0.15f, BlurMaskFilter.Blur.NORMAL));
++        canvas.drawCircle(cx, cy + r * 0.06f, r * 1.04f, paint);
++        paint.setMaskFilter(null);
++
++        // chrome bezel ring
++        shader(new LinearGradient(cx - r, cy - r, cx + r, cy + r,
++                new int[] { 0xFFFFFFFF, 0xFF9AA0A6, 0xFFE8EBEE, 0xFF5E6369 }, new float[] { 0f, 0.4f, 0.65f, 1f }, Shader.TileMode.CLAMP));
++        canvas.drawCircle(cx, cy, r, paint);
++        paint.setShader(null);
++
++        // dark gap between ring and cap
++        float capR = r * (big ? 0.8f : 0.72f);
++        paint.setColor(0xFF2B2E31);
++        canvas.drawCircle(cx, cy, capR * 1.04f, paint);
++
++        // domed cap; sinks and darkens when pressed
++        float dy = down ? r * 0.04f : 0f;
++        float cr = down ? capR * 0.96f : capR;
++        shader(new RadialGradient(cx - cr * 0.3f, cy - cr * 0.35f + dy, cr * 1.3f,
++                down ? new int[] { 0xFFDADDE0, 0xFFA9AEB3, 0xFF7C8186 } : new int[] { 0xFFFFFFFF, 0xFFD7DADD, 0xFF9DA2A7 },
++                new float[] { 0f, 0.55f, 1f }, Shader.TileMode.CLAMP));
++        canvas.drawCircle(cx, cy + dy, cr, paint);
++        paint.setShader(null);
++
++        if (!down) { // specular highlight
++            tmp.set(cx - cr * 0.55f, cy - cr * 0.7f, cx + cr * 0.15f, cy - cr * 0.25f);
++            paint.setColor(0x99FFFFFF);
++            canvas.drawOval(tmp, paint);
++        }
++    }
++}
 diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_reminder_card.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_reminder_card.xml
 new file mode 100644
-index 0000000..157f96b
+index 0000000..4559957
 --- /dev/null
 +++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_reminder_card.xml
-@@ -0,0 +1,12 @@
+@@ -0,0 +1,9 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<shape xmlns:android="http://schemas.android.com/apk/res/android"
 +    android:shape="rectangle">
-+    <gradient
-+        android:startColor="#CC000000"
-+        android:endColor="#EE1a140f"
-+        android:angle="270" />
-+    <corners android:radius="20dp" />
++    <solid android:color="#F21A140F" />
++    <corners android:radius="18dp" />
 +    <stroke
-+        android:width="1.5dp"
-+        android:color="#B8860B" />
++        android:width="1dp"
++        android:color="#66D4AF37" />
 +</shape>
 diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_stop_target.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_stop_target.xml
 new file mode 100644
@@ -1338,65 +1607,11 @@ index 0000000..929c200
 +    <solid android:color="#CC7F1D1D" />
 +    <stroke android:width="2dp" android:color="#FCA5A5" />
 +</shape>
-diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_body.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_body.xml
-new file mode 100644
-index 0000000..2e97b4c
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_body.xml
-@@ -0,0 +1,13 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-+    <corners android:radius="37.5dp" />
-+    <gradient
-+        android:startColor="#F8F9FA"
-+        android:centerColor="#E9ECEF"
-+        android:endColor="#CED4DA"
-+        android:angle="270"
-+        android:type="linear" />
-+    <stroke
-+        android:width="1dp"
-+        android:color="#ADB5BD" />
-+</shape>
-diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_inner_screen.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_inner_screen.xml
-new file mode 100644
-index 0000000..7d1f40e
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_inner_screen.xml
-@@ -0,0 +1,5 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-+    <solid android:color="#000000" />
-+    <corners android:radius="8dp" />
-+</shape>
-diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_screen.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_screen.xml
-new file mode 100644
-index 0000000..9b75133
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_screen.xml
-@@ -0,0 +1,6 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-+    <solid android:color="#8DA186" />
-+    <corners android:radius="5dp" />
-+    <stroke android:width="2dp" android:color="#2A2A2A" />
-+</shape>
-diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_screen_border.xml b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_screen_border.xml
-new file mode 100644
-index 0000000..5f758fc
---- /dev/null
-+++ b/node_modules/react-native-floating-bubble/android/src/main/res/drawable/bg_tasbeeh_screen_border.xml
-@@ -0,0 +1,6 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-+    <solid android:color="#000000" />
-+    <corners android:radius="10dp" />
-+    <stroke android:width="2dp" android:color="#A08040" />
-+</shape>
 diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_layout.xml b/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_layout.xml
-index d2a8762..af8943b 100644
+index d2a8762..7f11d5e 100644
 --- a/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_layout.xml
 +++ b/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_layout.xml
-@@ -1,17 +1,65 @@
+@@ -1,17 +1,15 @@
  <?xml version="1.0" encoding="utf-8"?>
 -<com.txusballesteros.bubbles.BubbleLayout
 +<FrameLayout
@@ -1421,62 +1636,11 @@ index d2a8762..af8943b 100644
 -        android:scaleType="centerCrop"/>
 -</com.txusballesteros.bubbles.BubbleLayout>
 \ No newline at end of file
-+    <LinearLayout
-+        android:id="@+id/tasbeeh_body_container"
++    <com.reactlibrary.WoodCounterView
++        android:id="@+id/wood_counter"
 +        android:layout_width="match_parent"
-+        android:layout_height="match_parent"
-+        android:background="@drawable/bg_tasbeeh_body"
-+        android:orientation="vertical"
-+        android:gravity="center_horizontal"
-+        android:padding="8dp">
-+
-+        <View
-+            android:id="@+id/btn_reset_tasbeeh"
-+            android:layout_width="14dp"
-+            android:layout_height="14dp"
-+            android:layout_marginTop="2dp"
-+            android:background="@drawable/bg_btn_reset"
-+            android:clickable="true"
-+            android:focusable="true"/>
-+
-+        <FrameLayout
-+            android:id="@+id/screen_frame"
-+            android:layout_width="match_parent"
-+            android:layout_height="0dp"
-+            android:layout_weight="1.3"
-+            android:layout_marginTop="2dp"
-+            android:layout_marginStart="8dp"
-+            android:layout_marginEnd="8dp"
-+            android:background="@drawable/bg_tasbeeh_screen_border">
-+
-+            <TextView
-+                android:id="@+id/tasbeeh_count_text"
-+                android:layout_width="match_parent"
-+                android:layout_height="match_parent"
-+                android:gravity="center"
-+                android:text="33"
-+                android:textColor="#FF9800"
-+                android:textSize="18sp"
-+                android:textStyle="bold"
-+                android:includeFontPadding="false"
-+                android:fontFamily="monospace"
-+                android:background="@drawable/bg_tasbeeh_inner_screen" />
-+        </FrameLayout>
-+
-+        <View
-+            android:id="@+id/btn_count_tasbeeh"
-+            android:layout_width="0dp"
-+            android:layout_height="0dp"
-+            android:layout_weight="1.8"
-+            android:layout_marginTop="6dp"
-+            android:layout_marginBottom="4dp"
-+            android:background="@drawable/bg_btn_count"
-+            android:clickable="true"
-+            android:focusable="true" />
-+
-+    </LinearLayout>
++        android:layout_height="match_parent" />
 +</FrameLayout>
-\ No newline at end of file
 diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_stop_layout.xml b/node_modules/react-native-floating-bubble/android/src/main/res/layout/bubble_stop_layout.xml
 new file mode 100644
 index 0000000..e04a683
@@ -1517,56 +1681,54 @@ index 0000000..e04a683
 +</LinearLayout>
 diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/layout/reminder_layout.xml b/node_modules/react-native-floating-bubble/android/src/main/res/layout/reminder_layout.xml
 new file mode 100644
-index 0000000..c069c7b
+index 0000000..37e6cb4
 --- /dev/null
 +++ b/node_modules/react-native-floating-bubble/android/src/main/res/layout/reminder_layout.xml
-@@ -0,0 +1,49 @@
+@@ -0,0 +1,47 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 +    android:id="@+id/reminder_container"
 +    android:layout_width="wrap_content"
 +    android:layout_height="wrap_content"
++    android:background="@drawable/bg_reminder_card"
 +    android:orientation="vertical"
-+    android:padding="16dp"
++    android:paddingStart="18dp"
++    android:paddingEnd="18dp"
++    android:paddingTop="14dp"
++    android:paddingBottom="12dp"
++    android:elevation="8dp"
 +    android:gravity="center"
-+    android:background="@android:color/transparent">
++    android:clickable="true"
++    android:focusable="false">
 +
-+    <LinearLayout
++    <TextView
++        android:id="@+id/reminder_header"
 +        android:layout_width="wrap_content"
 +        android:layout_height="wrap_content"
-+        android:background="@drawable/bg_reminder_card"
-+        android:orientation="vertical"
-+        android:padding="24dp"
-+        android:elevation="10dp"
-+        android:gravity="center">
++        android:text="تذكير بالذكر"
++        android:textColor="#D4AF37"
++        android:textSize="12sp"
++        android:textStyle="bold"
++        android:layout_marginBottom="8dp" />
 +
-+        <TextView
-+            android:id="@+id/reminder_header"
-+            android:layout_width="wrap_content"
-+            android:layout_height="wrap_content"
-+            android:text="✨ تذكير بالذكر ✨"
-+            android:textColor="#B8860B"
-+            android:textSize="13sp"
-+            android:fontFamily="serif"
-+            android:layout_marginBottom="12dp" />
++    <TextView
++        android:id="@+id/reminder_text"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:text="سبحان الله وبحمده"
++        android:textColor="#F5EFE6"
++        android:textSize="20sp"
++        android:textStyle="bold"
++        android:lineSpacingMultiplier="1.25"
++        android:maxLines="7"
++        android:ellipsize="end"
++        android:gravity="center" />
 +
-+        <TextView
-+            android:id="@+id/reminder_text"
-+            android:layout_width="wrap_content"
-+            android:layout_height="wrap_content"
-+            android:text="سبحان الله وبحمده"
-+            android:textColor="#FFFFFF"
-+            android:textSize="22sp"
-+            android:textStyle="bold"
-+            android:gravity="center" />
-+
-+        <TextView
-+            android:layout_width="wrap_content"
-+            android:layout_height="wrap_content"
-+            android:text="انقر على السبحة للإخفاء"
-+            android:textColor="#88FFFFFF"
-+            android:textSize="10sp"
-+            android:layout_marginTop="12dp" />
-+            
-+    </LinearLayout>
++    <TextView
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:text="اضغط هنا أو على السبحة للإخفاء"
++        android:textColor="#A89F93"
++        android:textSize="10sp"
++        android:layout_marginTop="10dp" />
 +</LinearLayout>
