@@ -37,16 +37,51 @@ const CELL_LAYOUT: CellLayout[] = HEART_CELLS.map((c) => {
 });
 
 // ── Memoised cell + label ───────────────────────────────────────────────────
+const LONG_PRESS_MS = 400;
+const MOVE_SLOP = 10; // px a finger may wander before the touch counts as a drag
+
+/**
+ * Touches are handled with raw responder props instead of onPress/onLongPress.
+ * react-native-svg routes those through the legacy Touchable mixin, which measures the
+ * element to build its press rect; under the new architecture that measurement fails,
+ * so the first finger move "leaves" the cell and the long press is cancelled.
+ * Here: hold → zoom, short tap → toggle, drag → let the ScrollView take over.
+ */
 const HeartCell = React.memo(
-  ({ id, d, done, onToggle, onZoom }: { id: number; d: string; done: boolean; onToggle?: (id: number) => void; onZoom?: () => void }) => (
-    <Path
-      d={d}
-      fill={done ? 'url(#blood)' : 'url(#muscle)'}
-      onPress={onToggle ? () => onToggle(id) : undefined}
-      onLongPress={onZoom}
-      delayLongPress={400}
-    />
-  ),
+  ({ id, d, done, onToggle, onZoom }: { id: number; d: string; done: boolean; onToggle?: (id: number) => void; onZoom?: () => void }) => {
+    const touch = React.useRef<{ x: number; y: number; timer: ReturnType<typeof setTimeout> | null; long: boolean; moved: boolean } | null>(null);
+    const clear = () => { if (touch.current?.timer) clearTimeout(touch.current.timer); touch.current = null; };
+    React.useEffect(() => clear, []);
+    const interactive = !!(onToggle || onZoom);
+    return (
+      <Path
+        d={d}
+        fill={done ? 'url(#blood)' : 'url(#muscle)'}
+        onStartShouldSetResponder={() => interactive}
+        onResponderTerminationRequest={() => true}
+        onResponderGrant={(e) => {
+          clear();
+          const t = { x: e.nativeEvent.pageX, y: e.nativeEvent.pageY, timer: null as ReturnType<typeof setTimeout> | null, long: false, moved: false };
+          if (onZoom) t.timer = setTimeout(() => { t.long = true; onZoom(); }, LONG_PRESS_MS);
+          touch.current = t;
+        }}
+        onResponderMove={(e) => {
+          const t = touch.current;
+          if (!t || t.moved) return;
+          if (Math.abs(e.nativeEvent.pageX - t.x) > MOVE_SLOP || Math.abs(e.nativeEvent.pageY - t.y) > MOVE_SLOP) {
+            t.moved = true;
+            if (t.timer) clearTimeout(t.timer);
+          }
+        }}
+        onResponderRelease={() => {
+          const t = touch.current;
+          if (t && !t.long && !t.moved) onToggle?.(id);
+          clear();
+        }}
+        onResponderTerminate={clear}
+      />
+    );
+  },
 );
 
 /**
