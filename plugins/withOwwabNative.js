@@ -194,7 +194,7 @@ function withAzanIntent(config) {
     src = src.replace('    super.onCreate(null)', wakeScreenCode);
 
     const helpers = `
-  override fun onNewIntent(intent: android.content.Intent?) {
+  override fun onNewIntent(intent: android.content.Intent) {
     super.onNewIntent(intent)
     setIntent(intent)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {

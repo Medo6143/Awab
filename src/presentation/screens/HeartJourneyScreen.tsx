@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, View, TouchableOpacity } from 'react-native';
-import { Maximize2 } from 'lucide-react-native';
+import { Alert, Animated } from 'react-native';
 import { Screen } from '../components/ui';
-import { colors } from '../../shared/theme/tokens';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import { toggleSurahCompleted, setCompletedSurahs, finishKhatma } from '../store/slices/quranSlice';
 import * as Haptics from 'expo-haptics';
 
 // Heart Components & Constants
-import { AnatomicalHeart } from '../components/heart/AnatomicalHeart';
+import { HeartViewer } from '../components/heart/HeartViewer';
+import { ImageShareModal } from '../components/share/ImageShareModal';
+import { HeartShareCard } from '../components/share/HeartShareCard';
 import { HeartZoomModal } from '../components/heart/HeartZoomModal';
 import { SurahChecklist } from '../components/heart/SurahChecklist';
 import { HeartJourneyHeader, HeartNarrative } from '../components/heart/HeartJourneyHeader';
@@ -25,6 +25,7 @@ const HeartJourneyScreen = ({ navigation }: any) => {
   const [showJuzModal, setShowJuzModal] = useState(false);
   const [showBulkModal, setShowBulkModal] = useState(false);
   const [showZoom, setShowZoom] = useState(false);
+  const [showShare, setShowShare] = useState(false);
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
@@ -67,6 +68,18 @@ const HeartJourneyScreen = ({ navigation }: any) => {
     setShowJuzModal(false);
   };
 
+  const confirmReset = () => {
+    if (!completedSurahs.length) return;
+    Alert.alert(
+      'تصفير القلب',
+      `سيتم مسح علامات ${toAr(completedSurahs.length)} سورة ويعود القلب فارغاً. لا يمكن التراجع عن ذلك.`,
+      [
+        { text: 'إلغاء', style: 'cancel' },
+        { text: 'تصفير', style: 'destructive', onPress: () => { dispatch(setCompletedSurahs([])); Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning); } },
+      ],
+    );
+  };
+
   const handleFinishKhatma = () => {
     if (completedSurahs.length < 114) return;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -75,18 +88,15 @@ const HeartJourneyScreen = ({ navigation }: any) => {
 
   return (
     <Screen scroll padded={false} header={<HeartJourneyHeader onBack={() => navigation.goBack()} completedCount={completedSurahs.length} />}>
-        <View style={s.heartContainer}>
-          <TouchableOpacity onPress={openZoom} style={s.heartZoomBtn} accessibilityLabel="تكبير القلب">
-            <Maximize2 color={colors.gold} size={18} />
-          </TouchableOpacity>
-          <AnatomicalHeart
-            pulseAnim={pulseAnim}
-            completedSurahs={completedSurahs}
-            progress={heartProgress}
-            onToggleSurah={handleToggle}
-            onZoomRequest={openZoom}
-          />
-        </View>
+        <HeartViewer
+          pulseAnim={pulseAnim}
+          completedSurahs={completedSurahs}
+          progress={heartProgress}
+          onToggleSurah={handleToggle}
+          onOpenFullscreen={openZoom}
+          onDownload={() => setShowShare(true)}
+          onReset={confirmReset}
+        />
 
         <HeartNarrative 
           khatmaCount={khatmaCount} 
@@ -107,6 +117,9 @@ const HeartJourneyScreen = ({ navigation }: any) => {
         progress={heartProgress}
         onToggleSurah={handleToggle}
       />
+      <ImageShareModal visible={showShare} title="صورة القلب" onClose={() => setShowShare(false)}>
+        <HeartShareCard completedSurahs={completedSurahs} khatmaCount={khatmaCount} />
+      </ImageShareModal>
     </Screen>
   );
 };
