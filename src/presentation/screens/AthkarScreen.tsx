@@ -9,13 +9,14 @@ import { RootState } from '../store';
 import { incrementAthkarCount, syncDailyReset, resetAthkarCounts } from '../store/slices/athkarSlice';
 import { logDhikr } from '../store/slices/statsSlice';
 import { MORNING_ATHKAR, EVENING_ATHKAR, AthkarItem } from '../../shared/constants/athkar';
-import { EmptyState } from '../components/ui';
+import { EmptyState, useBottomInset } from '../components/ui';
 import { AthkarHeader, AthkarTabs, AthkarProgressBar, AthkarCard } from '../components/athkar/AthkarComponents';
 import { s } from '../components/athkar/AthkarStyles';
 import { colors } from '../../shared/theme/tokens';
 
 /** Rendered both as a tab (route TabAthkar, no back button) and as a stack screen (الأذكار). */
 const AthkarScreen = ({ route, navigation, hideHeader }: EmbeddableScreenProps<'الأذكار' | 'TabAthkar'>) => {
+  const listBottom = useBottomInset(true);
   const dispatch = useDispatch();
   const isTab = route?.name === 'TabAthkar';
   const initialTab = route?.params?.type === 'evening' ? 'evening' : 'morning';
@@ -52,7 +53,7 @@ const AthkarScreen = ({ route, navigation, hideHeader }: EmbeddableScreenProps<'
         data={athkarList}
         renderItem={({ item }) => <AthkarCard item={item} currentCount={completionCounts[item.id] || 0} onToggle={handlePress} />}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={s.listPadding}
+        contentContainerStyle={[s.listPadding, { paddingBottom: listBottom }]}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={allDone ? (
           <EmptyState icon={CrescentStarIcon} title={activeTab === 'morning' ? 'أتممت أذكار الصباح' : 'أتممت أذكار المساء'} message="تقبّل الله منك. يمكنك إعادة الضبط لتكرارها." />

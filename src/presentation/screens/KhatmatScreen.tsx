@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { Animated, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import { ChevronLeft } from 'lucide-react-native';
 import { HeartLightIcon } from '../components/icons/IslamicIcons';
@@ -21,6 +21,7 @@ const EMPTY: Khatma[] = [];
 /** Log of finished khatmat, one list per heart (reading / memorization). Tap a row to share its heart. */
 const KhatmatScreen = ({ navigation, route }: ScreenProps<'الختمات'>) => {
   const [mode, setMode] = useState<HeartMode>(route.params?.mode ?? 'reading');
+  const navBar = useSafeAreaInsets().bottom;
   const quran = useSelector((s: RootState) => s.quran);
   const all = quran.khatmat ?? EMPTY;
   const still = useRef(new Animated.Value(1)).current;
@@ -39,7 +40,7 @@ const KhatmatScreen = ({ navigation, route }: ScreenProps<'الختمات'>) => 
       <FlatList
         data={list}
         keyExtractor={(k) => k.id}
-        contentContainerStyle={st.list}
+        contentContainerStyle={[st.list, { paddingBottom: space[10] + navBar }]}
         renderItem={({ item }) => (
           <TouchableOpacity style={st.row} onPress={() => setShared(item)} accessibilityRole="button" accessibilityLabel={`${khatmaTitle(item.number)}، مشاركة صورة القلب`}>
             <AnatomicalHeart pulseAnim={still} completedSurahs={ALL_SURAHS} progress={1} size={56} labels={false} />

@@ -2,6 +2,7 @@ import React from 'react';
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BlurView } from 'expo-blur';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   CrescentStarIcon, IconComponent, MihrabClockIcon, MosqueIcon, QuranStandIcon, TasbihIcon,
 } from '../components/icons/IslamicIcons';
@@ -23,6 +24,8 @@ const ICONS: Record<string, IconComponent> = {
  */
 export const GlassTabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
   const accent = useAccent();
+  // sit above the system navigation bar (3-button nav is ~48dp tall; gesture nav is thin)
+  const navBar = useSafeAreaInsets().bottom;
   const focusedOptions = descriptors[state.routes[state.index].key]?.options;
   // the Quran tab hides the bar with tabBarStyle: { display: 'none' }
   if ((focusedOptions?.tabBarStyle as { display?: string } | undefined)?.display === 'none') return null;
@@ -30,7 +33,7 @@ export const GlassTabBar = ({ state, descriptors, navigation }: BottomTabBarProp
   const useBlur = Platform.OS === 'ios' || Platform.OS === 'android';
 
   return (
-    <View pointerEvents="box-none" style={styles.wrap}>
+    <View pointerEvents="box-none" style={[styles.wrap, { bottom: layout.tabBarBottom + navBar }]}>
       <View style={[styles.bar, elevation.floating]}>
         {useBlur ? (
           <BlurView intensity={40} tint="dark" experimentalBlurMethod="dimezisBlurView" style={StyleSheet.absoluteFill} />

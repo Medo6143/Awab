@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View, ViewStyle, StyleProp } from 'react-native';
-import { SafeAreaView, Edge } from 'react-native-safe-area-context';
+import { SafeAreaView, Edge, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, layout, space } from '../../../shared/theme/tokens';
 
 type Props = {
@@ -17,11 +17,15 @@ type Props = {
   edges?: Edge[];
 };
 
-/** Bottom padding to pass to a FlatList/ScrollView the screen owns itself. */
-export const bottomInset = (tab?: boolean) => (tab ? layout.tabBarInset : space[8]);
+/**
+ * Bottom padding for scrolling content: clears the floating tab bar (if any) and the system
+ * navigation bar, which the app draws under (edge-to-edge; 3-button nav makes it tall).
+ */
+export const useBottomInset = (tab?: boolean) => (tab ? layout.tabBarInset : space[8]) + useSafeAreaInsets().bottom;
 
 export const Screen = ({ children, scroll, tab, padded = true, header, style, contentStyle, edges = ['top'] }: Props) => {
   const padding = padded ? { paddingHorizontal: layout.screenPadding } : null;
+  const bottom = useBottomInset(tab);
   return (
     <SafeAreaView edges={edges} style={[styles.root, style]}>
       {header}
@@ -29,7 +33,7 @@ export const Screen = ({ children, scroll, tab, padded = true, header, style, co
         <ScrollView
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={[padding, { paddingBottom: bottomInset(tab) }, contentStyle]}
+          contentContainerStyle={[padding, contentStyle, { paddingBottom: bottom }]}
         >
           {children}
         </ScrollView>

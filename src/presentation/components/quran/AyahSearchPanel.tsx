@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Search, X } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState } from '../ui';
 import { AyahHit, searchAyahs, warmAyahIndex } from '../../../data/quran/ayahSearch';
 import { colors, radius, space, type } from '../../../shared/theme/tokens';
@@ -11,6 +12,7 @@ import { SurahMeta } from './QuranConstants';
 /** Search box + results for the ayah tab of the Quran index. Searches 200 ms after typing stops. */
 export const AyahSearchPanel = ({ surahs, onSelect }: { surahs: SurahMeta[]; onSelect: (hit: AyahHit) => void }) => {
   const [query, setQuery] = useState('');
+  const navBar = useSafeAreaInsets().bottom;
   const [result, setResult] = useState<{ hits: AyahHit[]; total: number } | null>(null);
 
   // build the index while the keyboard opens, so the first query is as fast as the rest
@@ -53,7 +55,7 @@ export const AyahSearchPanel = ({ surahs, onSelect }: { surahs: SurahMeta[]; onS
           data={result.hits}
           keyExtractor={(h) => String(h.number)}
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={st.list}
+          contentContainerStyle={[st.list, { paddingBottom: space[10] + navBar }]}
           ListHeaderComponent={result.total ? (
             <Text style={st.count}>
               {result.total > result.hits.length

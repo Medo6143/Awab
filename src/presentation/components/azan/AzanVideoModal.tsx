@@ -6,6 +6,7 @@ import { AudioService } from '../../../data/services/AudioService';
 import { verseForPrayer } from '../../../domain/entities/prayerVerses';
 import { ADHAN_LINES, adhanLineAt } from '../../../domain/entities/adhan';
 import { useDependencies } from '../../providers/DependencyProvider';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { toAr } from '../../../shared/utils/format';
 
 interface AzanVideoModalProps {
@@ -47,6 +48,7 @@ const formatTime = (d: Date) => {
 const AzanContent = ({ onClose, prayerName }: { onClose: () => void; prayerName: string }) => {
   const { width, height } = useWindowDimensions();
   const { azanAlarms } = useDependencies();
+  const navBar = useSafeAreaInsets().bottom;
   const verse = verseForPrayer(prayerName);
   const line = useAdhanLine();
   const [now, setNow] = useState(new Date());
@@ -103,7 +105,7 @@ const AzanContent = ({ onClose, prayerName }: { onClose: () => void; prayerName:
         style={StyleSheet.absoluteFill}
       />
 
-      <View style={s.overlay}>
+      <View style={[s.overlay, { paddingBottom: 34 + navBar }]}>
         <TouchableOpacity onPress={handleClose} style={s.closeBtn} accessibilityLabel="إغلاق">
           <X color="#fff" size={22} />
         </TouchableOpacity>

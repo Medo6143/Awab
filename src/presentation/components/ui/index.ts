@@ -1,4 +1,4 @@
-export { Screen, bottomInset } from './Screen';
+export { Screen, useBottomInset } from './Screen';
 export { ScreenHeader, IconButton } from './ScreenHeader';
 export { Card } from './Card';
 export { SectionTitle } from './SectionTitle';
