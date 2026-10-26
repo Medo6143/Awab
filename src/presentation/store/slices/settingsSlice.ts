@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AzanSettings, DEFAULT_NOTIFICATION_PREFS, NotificationPrefs } from '../../../domain/entities/notifications';
 
 export type TafsirStyle = 'simple' | 'book' | 'modern';
 
@@ -11,25 +12,9 @@ interface SettingsState {
   tafsirStyle: TafsirStyle;
   tafsirFontSize: number;
   selectedReciterId: string;
-  notificationPrefs: {
-    prayers: boolean;
-    athkar: boolean;
-    qiyam: boolean;
-    duha: boolean;
-    ramadan: boolean;
-    dailyReminder: boolean;
-    prePrayerReminderEnabled: boolean;
-    prePrayerReminderOffset: number; // in minutes
-    dailyWardEnabled: boolean;
-    dailyWardTime: string; // HH:mm
-    encouragementEnabled: boolean;
-    encouragementInterval: number; // in hours
-  };
+  notificationPrefs: NotificationPrefs;
   calculationMethod: number;
-  azanSettings: {
-    type: 'none' | 'takbir' | 'full';
-    visualAzanEnabled: boolean;
-  };
+  azanSettings: AzanSettings;
 }
 
 const initialState: SettingsState = {
@@ -41,20 +26,7 @@ const initialState: SettingsState = {
   tafsirStyle: 'modern',
   tafsirFontSize: 18,
   selectedReciterId: 'alafasy',
-  notificationPrefs: {
-    prayers: true,
-    athkar: true,
-    qiyam: true,
-    duha: true,
-    ramadan: true,
-    dailyReminder: true,
-    prePrayerReminderEnabled: true,
-    prePrayerReminderOffset: 10,
-    dailyWardEnabled: true,
-    dailyWardTime: '05:00',
-    encouragementEnabled: true,
-    encouragementInterval: 3,
-  },
+  notificationPrefs: DEFAULT_NOTIFICATION_PREFS,
   calculationMethod: 5, // Egyptian General Authority of Survey
   azanSettings: {
     type: 'full',
@@ -97,7 +69,7 @@ export const settingsSlice = createSlice({
       const key = action.payload;
       const current = state.notificationPrefs[key];
       if (typeof current === 'boolean') {
-        (state.notificationPrefs as any)[key] = !current;
+        (state.notificationPrefs as Record<string, unknown>)[key] = !current;
       }
     },
     setCalculationMethod: (state, action: PayloadAction<number>) => {

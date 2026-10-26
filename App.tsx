@@ -28,7 +28,7 @@ import { AzanVideoModal } from './src/presentation/components/azan/AzanVideoModa
 import { hideAzanModal } from './src/presentation/store/slices/uiSlice';
 import { RootState } from './src/presentation/store';
 import { useSelector } from 'react-redux';
-import { NotificationService } from './src/data/services/NotificationService';
+import { appDependencies } from './src/data/container';
 import { FloatingTasbeehController } from './src/presentation/components/tasbeeh/FloatingTasbeeh';
 import { initializeTrackPlayer } from './src/data/services/TrackPlayerService';
 
@@ -126,9 +126,9 @@ export default function App() {
   useEffect(() => {
     // Initialize Notification Handler safely
     try {
-      NotificationService.init();
+      appDependencies.notifications.init();
     } catch (e) {
-      console.warn('NotificationService.init() failed:', e);
+      console.warn('notifications.init() failed:', e);
     }
 
     // RTL is forced at the native level (MainApplication.kt)

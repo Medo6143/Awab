@@ -1,5 +1,7 @@
 import { NativeModules, Platform } from 'react-native';
-import { NotificationService } from '../../data/services/NotificationService';
+import { appDependencies } from '../../data/container';
+
+const { notifications } = appDependencies;
 
 const { AzanModule, OemBatteryModule } = NativeModules;
 
@@ -49,14 +51,14 @@ export function useAzanPermissions() {
     }
 
     const [notif, exact, fsi, battery] = await Promise.all([
-      NotificationService.getPermissionStatus(),
+      notifications.status(),
       checkExactAlarmPermission(),
       checkFullScreenIntent(),
       checkBatteryOptimization(),
     ]);
 
     const items: ReadinessItem[] = [
-      { id: 'notifications', label: 'الإشعارات', hint: 'يظهر إشعار الأذان مع زر الإيقاف', status: notif ? 'ok' : 'missing', fix: () => NotificationService.requestPermissions() },
+      { id: 'notifications', label: 'الإشعارات', hint: 'يظهر إشعار الأذان مع زر الإيقاف', status: notif ? 'ok' : 'missing', fix: () => notifications.request() },
       { id: 'exactAlarm', label: 'المنبهات الدقيقة', hint: 'يرن الأذان في الدقيقة نفسها', status: exact ? 'ok' : 'missing', fix: () => AzanModule.openAlarmSettings() },
       { id: 'fullScreen', label: 'شاشة الأذان فوق القفل', hint: 'أندرويد ١٤ وما بعده يطلب هذا الإذن', status: fsi ? 'ok' : 'missing', fix: () => AzanModule.openFullScreenIntentSettings?.() },
       { id: 'battery', label: 'استثناء من توفير البطارية', hint: 'حتى لا يُقتل المنبه أثناء النوم', status: battery ? 'ok' : 'missing', fix: () => OemBatteryModule.requestIgnoreBatteryOptimizations() },

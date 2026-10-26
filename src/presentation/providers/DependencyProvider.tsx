@@ -1,7 +1,5 @@
 import React, { createContext, useContext, useMemo } from 'react';
-import { AppDependencies, createDependencies } from '../../data/container';
-
-const defaults = createDependencies();
+import { AppDependencies, appDependencies as defaults } from '../../data/container';
 const DependencyContext = createContext<AppDependencies>(defaults);
 
 /** Optional override, e.g. fakes in tests; the app works without wrapping anything. */

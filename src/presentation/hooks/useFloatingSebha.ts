@@ -6,7 +6,6 @@ import { incrementCount, resetCount, setFloatingActive } from '../store/slices/t
 import { logDhikr } from '../store/slices/statsSlice';
 import { useDependencies } from '../providers/DependencyProvider';
 import { FloatingSebhaConfig, reconcileCount } from '../../domain/services/FloatingSebha';
-import { NotificationService } from '../../data/services/NotificationService';
 
 const DEFAULT_LABEL = 'سبحان الله';
 type TasbeehState = RootState['tasbeeh'];
@@ -48,7 +47,7 @@ const useCountSync = () => {
  * turns overlay events into store actions. Rendered once at the app root.
  */
 export const useFloatingSebhaSync = () => {
-  const { floatingSebha } = useDependencies();
+  const { floatingSebha, notifications } = useDependencies();
   const dispatch = useDispatch();
   const store = useStore<RootState>();
   const syncCount = useCountSync();
@@ -62,7 +61,7 @@ export const useFloatingSebhaSync = () => {
     (async () => {
       if (!t.isFloatingActive || !available) return;
       if (!(await floatingSebha.hasPermission())) { dispatch(setFloatingActive(false)); return; }
-      await NotificationService.requestPermissions();
+      await notifications.request();
       await floatingSebha.initialize();
       if (!(await floatingSebha.isVisible())) {
         floatingSebha.configure(toSebhaConfig(store.getState().tasbeeh));
@@ -131,7 +130,7 @@ const waitForReturn = () => new Promise<void>((resolve) => {
 
 /** State and the on/off action behind the settings toggle. */
 export const useFloatingSebhaToggle = () => {
-  const { floatingSebha } = useDependencies();
+  const { floatingSebha, notifications } = useDependencies();
   const dispatch = useDispatch();
   const store = useStore<RootState>();
   const syncCount = useCountSync();
@@ -197,7 +196,7 @@ export const useFloatingSebhaToggle = () => {
         Alert.alert('صلاحية مطلوبة', 'يجب تفعيل "السماح بالعرض فوق التطبيقات الأخرى" من الإعدادات.');
         return;
       }
-      if (Platform.OS === 'android' && Number(Platform.Version) >= 33 && !(await NotificationService.requestPermissions())) {
+      if (Platform.OS === 'android' && Number(Platform.Version) >= 33 && !(await notifications.request())) {
         Alert.alert('تنبيه الإشعارات', 'يُفضل تفعيل الإشعارات لضمان استقرار المسبحة العائمة في الخلفية.');
       }
       if (isActive) await disable();

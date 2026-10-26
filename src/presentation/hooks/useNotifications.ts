@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef } from 'react';
 import { Alert, DeviceEventEmitter, NativeModules, Platform } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
-import { NotificationService } from '../../data/services/NotificationService';
+import { useDependencies } from '../providers/DependencyProvider';
+import { AzanSettings, DEFAULT_AZAN_SETTINGS, DEFAULT_NOTIFICATION_PREFS, parseClock } from '../../domain/entities/notifications';
 import { usePrayerTimes } from './usePrayerTimes';
 import { showAzanModal } from '../store/slices/uiSlice';
 
@@ -11,17 +12,13 @@ const getNotifications = () => require('expo-notifications');
 
 export const useNotifications = () => {
   const dispatch = useDispatch();
+  const { notifications } = useDependencies();
   const { timings } = usePrayerTimes();
   const { notificationPrefs, notificationsEnabled, azanSettings: rawAzanSettings } = useSelector((state: RootState) => state.settings);
   
-  const azanSettings = useMemo(() => {
-    const fallback = { type: 'full', visualAzanEnabled: true };
-    return rawAzanSettings ? { ...fallback, ...rawAzanSettings } : fallback;
-  }, [rawAzanSettings]);
-  
-  const safePrefs = useMemo(() => notificationPrefs || {
-    prayers: true, athkar: true, qiyam: true, duha: true, ramadan: true, dailyReminder: true
-  }, [notificationPrefs]);
+  const azanSettings = useMemo<AzanSettings>(() => ({ ...DEFAULT_AZAN_SETTINGS, ...rawAzanSettings }), [rawAzanSettings]);
+  // persisted state from older versions may lack newer keys
+  const safePrefs = useMemo(() => ({ ...DEFAULT_NOTIFICATION_PREFS, ...notificationPrefs }), [notificationPrefs]);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const lastScheduledRef = useRef<string>('');
@@ -51,7 +48,7 @@ export const useNotifications = () => {
         const nowMinutes = now.getHours() * 60 + now.getMinutes();
         
         Object.entries(timings).forEach(([prayerId, time]: [string, any]) => {
-          const parsed = NotificationService['parseTime'](time);
+          const parsed = parseClock(time);
           if (!parsed) return;
           
           const prayerMinutes = parsed.hours * 60 + parsed.minutes;
@@ -85,7 +82,7 @@ export const useNotifications = () => {
       try {
         console.log('useNotifications: Attempting init. Enabled:', notificationsEnabled);
         
-        const scheduledCount = await NotificationService.getScheduledCount();
+        const scheduledCount = await notifications.scheduledCount();
         console.log(`useNotifications: Currently scheduled: ${scheduledCount}`);
 
         const now = new Date();
@@ -100,7 +97,7 @@ export const useNotifications = () => {
           return;
         }
 
-        const hasPermission = await NotificationService.requestPermissions();
+        const hasPermission = await notifications.request();
         
         if (!isMounted) {
           isSchedulingRef.current = false;
@@ -109,26 +106,18 @@ export const useNotifications = () => {
 
         if (!hasPermission || !notificationsEnabled) {
           console.log('useNotifications: Cancelling all (Permission or Enabled false)');
-          await NotificationService.cancelAll();
+          await notifications.cancelAll();
           lastScheduledRef.current = scheduleState;
           isSchedulingRef.current = false;
           return;
         }
 
         console.log('useNotifications: Re-scheduling all...');
-        await NotificationService.cancelAll();
-        
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        await NotificationService.schedulePrayerNotifications(timings as any, { ...safePrefs, azanSettings });
-        await NotificationService.scheduleAthkarReminders(safePrefs);
-        await NotificationService.scheduleSpiritualReminders(safePrefs);
-        await NotificationService.scheduleDailyWard(safePrefs);
-        await NotificationService.scheduleEncouragementReminders(safePrefs);
+        await notifications.rescheduleAll({ prefs: safePrefs, azan: azanSettings, timings });
         
         lastScheduledRef.current = scheduleState;
         
-        const finalCount = await NotificationService.getScheduledCount();
+        const finalCount = await notifications.scheduledCount();
         console.log(`useNotifications: Scheduling complete. Total scheduled: ${finalCount}`);
         
       } catch (err) {

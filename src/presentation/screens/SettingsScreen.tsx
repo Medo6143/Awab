@@ -20,11 +20,12 @@ import {
 import { AzanReadinessCard } from '../components/settings/AzanReadinessCard';
 import { s } from '../components/settings/SettingsStyles';
 import { FloatingTasbeehToggle } from '../components/tasbeeh/FloatingTasbeeh';
-import { NotificationService } from '../../data/services/NotificationService';
+import { useDependencies } from '../providers/DependencyProvider';
 
 const SettingsScreen = ({ navigation }: any) => {
   const dispatch = useDispatch();
   const { testAzanAfterDelay } = useAzanPermissions();
+  const { notifications } = useDependencies();
   const {
     notificationsEnabled, locationEnabled, selectedTafsirId, tafsirStyle, tafsirFontSize,
     accentTheme, selectedReciterId, notificationPrefs, azanSettings: rawAzanSettings,
@@ -40,7 +41,7 @@ const SettingsScreen = ({ navigation }: any) => {
   };
 
   const testAzan = async () => {
-    const hasPerm = await NotificationService.requestPermissions();
+    const hasPerm = await notifications.request();
     if (!hasPerm) { showPermissionAlert(); return; }
     const ok = await testAzanAfterDelay(30);
     Alert.alert(
