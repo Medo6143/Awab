@@ -95,7 +95,7 @@ export const s = StyleSheet.create({
   surahNumHex: { width: 42, height: 42, borderRadius: radius.tile, backgroundColor: colors.goldSoft, alignItems: 'center', justifyContent: 'center' },
   surahNumHexText: { ...type.label, fontSize: 15, color: colors.goldText },
   surahTextSection: { flex: 1, marginHorizontal: space[4] },
-  surahRowTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: space[2] },
+  surahRowTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space[2] },
   surahEntryName: { ...type.h2, fontSize: 19, color: colors.text },
   revBadge: { paddingHorizontal: space[2], paddingVertical: 2, borderRadius: radius.pill, backgroundColor: colors.surfaceRaised },
   meccanBg: {},

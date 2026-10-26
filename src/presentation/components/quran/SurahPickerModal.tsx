@@ -8,12 +8,17 @@ import { colors } from '../../../shared/theme/tokens';
 import { s } from './QuranStyles';
 import { toAr, SurahMeta, JUZ_PAGES } from './QuranConstants';
 import { RECITER_MAP } from '../../../data/services/AudioService';
+import { SURAH_START_JUZ, SURAH_START_PAGE } from '../../../domain/entities/surahPages';
+import type { AyahHit } from '../../../data/quran/ayahSearch';
+import { AyahSearchPanel } from './AyahSearchPanel';
+
+export type PickerTab = 'surah' | 'ayah' | 'juz' | 'audio';
 
 interface Props {
   visible: boolean;
   onClose: () => void;
-  pickerTab: 'surah' | 'juz' | 'audio';
-  setPickerTab: (t: 'surah' | 'juz' | 'audio') => void;
+  pickerTab: PickerTab;
+  setPickerTab: (t: PickerTab) => void;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
   filteredSurahs: SurahMeta[];
@@ -22,6 +27,7 @@ interface Props {
   onRetrySurahs?: () => void;
   onSurahSelect: (n: number) => void;
   onJuzSelect: (n: number) => void;
+  onAyahSelect: (hit: AyahHit) => void;
   activeReciter?: Reciter;
   currentSurahId: number | null;
   isPlaying: boolean;
@@ -34,7 +40,7 @@ interface Props {
 
 export const SurahPickerModal = ({
   visible, onClose, pickerTab, setPickerTab, searchQuery, setSearchQuery,
-  filteredSurahs, surahsLoading, surahsError, onRetrySurahs, onSurahSelect, onJuzSelect,
+  filteredSurahs, surahsLoading, surahsError, onRetrySurahs, onSurahSelect, onJuzSelect, onAyahSelect,
   activeReciter, currentSurahId, isPlaying, isBuffering, onPlaySurah, togglePlayback,
   onShowReciterPicker, surahsList
 }: Props) => {
@@ -49,6 +55,7 @@ export const SurahPickerModal = ({
 
         <View style={s.pickerTabs}>
           <Chip label="السور" selected={pickerTab === 'surah'} onPress={() => setPickerTab('surah')} />
+          <Chip label="الآيات" selected={pickerTab === 'ayah'} onPress={() => setPickerTab('ayah')} />
           <Chip label="الأجزاء" selected={pickerTab === 'juz'} onPress={() => setPickerTab('juz')} />
           <Chip label="تلاوة كاملة" selected={pickerTab === 'audio'} onPress={() => setPickerTab('audio')} />
         </View>
@@ -89,9 +96,9 @@ export const SurahPickerModal = ({
                       <View style={s.surahMetaRow}>
                         <Text style={s.surahEntrySub}>{toAr(item.numberOfAyahs)} آية</Text>
                         <View style={s.vDivider} />
-                        <Text style={s.surahEntrySub}>الجزء {toAr(Math.ceil(item.number / 3.8))} </Text>
+                        <Text style={s.surahEntrySub}>الجزء {toAr(SURAH_START_JUZ[item.number - 1])}</Text>
                         <View style={s.vDivider} />
-                        <Text style={s.surahEntrySub}>صفحة {toAr(item.number * 5)}</Text>
+                        <Text style={s.surahEntrySub}>صفحة {toAr(SURAH_START_PAGE[item.number - 1])}</Text>
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -99,6 +106,8 @@ export const SurahPickerModal = ({
               />
             )}
           </>
+        ) : pickerTab === 'ayah' ? (
+          <AyahSearchPanel surahs={surahsList} onSelect={onAyahSelect} />
         ) : pickerTab === 'juz' ? (
           <FlatList
             key="juz-list"

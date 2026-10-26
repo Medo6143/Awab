@@ -17,10 +17,12 @@ import { useDependencies } from '../providers/DependencyProvider';
 import { MushafPageContent } from '../components/quran/MushafPageContent';
 import { GeometricFrame, StarBadge } from '../components/quran/MushafOrnaments';
 import { TafsirBottomSheet } from '../components/quran/TafsirBottomSheet';
-import { SurahPickerModal } from '../components/quran/SurahPickerModal';
+import { PickerTab, SurahPickerModal } from '../components/quran/SurahPickerModal';
+import { SURAH_START_PAGE } from '../../domain/entities/surahPages';
+import type { AyahHit } from '../../data/quran/ayahSearch';
 import { ReciterPickerModal } from '../components/quran/ReciterPickerModal';
 import { BookmarksModal } from '../components/quran/BookmarksModal';
-import { TAFSIR_LIST } from '../components/settings/SettingsConstants';
+import { MUYASSAR_TAFSIR_ID, TAFSIR_LIST } from '../components/settings/SettingsConstants';
 import { s } from '../components/quran/QuranStyles';
 import { 
     TOTAL_PAGES, JUZ_PAGES, toAr, 
@@ -37,13 +39,15 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const { selectedTafsirId, tafsirStyle, tafsirFontSize } = useSelector((state: RootState) => state.settings);
 
   const [selectedAyah, setSelectedAyah] = useState<Ayah | null>(null);
-  const tafsir = useTafsir(selectedTafsirId);
+  // "بسيط" means short: it always reads the concise Muyassar tafsir, whatever source is chosen
+  const tafsirId = tafsirStyle === 'simple' ? MUYASSAR_TAFSIR_ID : selectedTafsirId;
+  const tafsir = useTafsir(tafsirId);
   const { quran } = useDependencies();
   const [showSurahPicker, setShowSurahPicker] = useState(false);
   const [showBookmarks, setShowBookmarks] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [highlightedAyah, setHighlightedAyah] = useState<number | null>(null);
-  const [pickerTab, setPickerTab] = useState<'surah' | 'juz' | 'audio'>('surah');
+  const [pickerTab, setPickerTab] = useState<PickerTab>('surah');
   const [showReciterPicker, setShowReciterPicker] = useState(false);
 
   const pagerRef = useRef<PagerView>(null);
@@ -116,12 +120,20 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
     });
   };
 
-  const handleSurahSelect = async (surahNumber: number) => {
+  const handleSurahSelect = (surahNumber: number) => {
     setShowSurahPicker(false);
     setSearchQuery('');
-    try {
-      dispatch(setCurrentPage(await quran.getSurahStartPage(surahNumber)));
-    } catch {}
+    dispatch(setCurrentPage(SURAH_START_PAGE[surahNumber - 1] ?? 1));
+  };
+
+  // open the page of a searched ayah and mark the ayah on it for a few seconds
+  const searchHighlight = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const handleAyahSelect = (hit: AyahHit) => {
+    setShowSurahPicker(false);
+    dispatch(setCurrentPage(hit.page));
+    setHighlightedAyah(hit.number);
+    clearTimeout(searchHighlight.current);
+    searchHighlight.current = setTimeout(() => setHighlightedAyah((h) => (h === hit.number ? null : h)), 4000);
   };
 
   const handleReciterChange = (id: string) => {
@@ -239,7 +251,7 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
         visible={!!selectedAyah}
         selectedAyah={selectedAyah}
         tafsir={tafsir.html}
-        tafsirName={TAFSIR_LIST.find((t) => t.id === selectedTafsirId)?.name}
+        tafsirName={TAFSIR_LIST.find((t) => t.id === tafsirId)?.name}
         tafsirLoading={tafsir.loading}
         tafsirError={tafsir.error}
         onRetryTafsir={tafsir.retry}
@@ -264,6 +276,7 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
         surahsError={!!surahsError}
         onRetrySurahs={() => refetchSurahs?.()}
         onSurahSelect={handleSurahSelect}
+        onAyahSelect={handleAyahSelect}
         onJuzSelect={(n) => {
             dispatch(setCurrentPage(JUZ_PAGES[n-1]));
             setShowSurahPicker(false);
