@@ -41,20 +41,16 @@ export const MushafPageContent = React.memo(({
     });
     return groups;
   }, [ayahs]);
+  const juz = ayahs[0]?.juz;
 
   return (
     <View style={{ flex: 1 }}>
-      <View style={s.ornateHeader}>
-        <View style={s.headerCornerLeft} />
-        <View style={s.headerCenterInfo}>
-          <View style={s.ornateLine} />
-          <Text style={s.headerPageText}>{toAr(pageNum)}</Text>
-          <View style={s.ornateLine} />
-        </View>
-        <TouchableOpacity onPress={onToggleBookmark} style={s.headerBookmark}>
-          <Bookmark size={22} color={colors.paperInk} fill={isBookmarked ? colors.paperInk : 'none'} />
+      <View style={s.pageHeader}>
+        <Text style={s.pageHeaderText}>{surahGroups[0]?.surahName ?? ''}</Text>
+        <TouchableOpacity onPress={onToggleBookmark} hitSlop={10} accessibilityRole="button" accessibilityLabel={isBookmarked ? 'إزالة العلامة' : 'وضع علامة على الصفحة'}>
+          <Bookmark size={18} color={colors.goldDeep} fill={isBookmarked ? colors.goldDeep : 'none'} />
         </TouchableOpacity>
-        <View style={s.headerCornerRight} />
+        <Text style={s.pageHeaderText}>{juz ? `الجزء ${toAr(juz)}` : ''}</Text>
       </View>
 
       <ScrollView ref={scrollRef} contentContainerStyle={s.ayahList} showsVerticalScrollIndicator={false}>
@@ -74,11 +70,15 @@ export const MushafPageContent = React.memo(({
         ) : (
           surahGroups.map(group => (
             <View key={group.surahNum} style={s.surahGroup}>
-              <View style={s.goldBanner}>
-                <View style={s.bannerPatternLeft} />
-                <Text style={s.goldBannerTitle}>{group.surahName}</Text>
-                <View style={s.bannerPatternRight} />
-              </View>
+              {group.ayahs[0]?.numberInSurah === 1 && (
+                <View style={s.surahBand}>
+                  <View style={s.surahBandRule} />
+                  <View style={s.surahBandPill}>
+                    <Text style={s.surahBandTitle}>{group.surahName}</Text>
+                  </View>
+                  <View style={s.surahBandRule} />
+                </View>
+              )}
 
               {group.surahNum !== 9 && group.ayahs[0]?.numberInSurah === 1 && (
                 <View style={s.basmalaContainer}>

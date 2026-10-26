@@ -15,6 +15,7 @@ import { useDependencies } from '../providers/DependencyProvider';
 
 // Quran Components & Constants
 import { MushafPageContent } from '../components/quran/MushafPageContent';
+import { GeometricFrame, StarBadge } from '../components/quran/MushafOrnaments';
 import { TafsirBottomSheet } from '../components/quran/TafsirBottomSheet';
 import { SurahPickerModal } from '../components/quran/SurahPickerModal';
 import { ReciterPickerModal } from '../components/quran/ReciterPickerModal';
@@ -187,8 +188,8 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
       >
         {[Math.max(1, currentPage - 1), currentPage, Math.min(TOTAL_PAGES, currentPage + 1)].map((pageNum, idx) => (
           <View key={`pager-index-${idx}`} style={{ flex: 1, padding: 8 }}>
-            <View style={s.frameGoldLayer}>
-              <View style={s.frameCreamLayer}>
+            <View style={s.paperCard}>
+              <GeometricFrame paper={colors.paper}>
                 <MushafPageContent
                   pageNum={pageNum}
                   isCurrentPage={pageNum === currentPage}
@@ -199,7 +200,7 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
                   onAyahPress={getTafsir}
                   onAyahLongPress={(a: Ayah) => playAyah(a.surah.number, a.numberInSurah)}
                 />
-              </View>
+              </GeometricFrame>
             </View>
           </View>
         ))}
@@ -209,24 +210,24 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
       <View style={s.ornateFooter}>
         <TouchableOpacity
           onPress={() => currentPage > 1 && dispatch(setCurrentPage(currentPage - 1))}
-          style={[s.navBtn, currentPage <= 1 && s.btnDisabled]}
+          style={[s.navArrow, currentPage <= 1 && s.btnDisabled]}
           disabled={currentPage <= 1}
+          accessibilityRole="button"
+          accessibilityLabel="الصفحة السابقة"
         >
-          <ChevronRight size={22} color={colors.text} />
-          <Text style={s.navBtnText}>السابقة</Text>
+          <ChevronRight size={22} color={colors.gold} />
         </TouchableOpacity>
 
-        <View style={s.pageIndicator}>
-          <Text style={s.pageIndicatorText}>{toAr(currentPage)}</Text>
-        </View>
+        <StarBadge label={toAr(currentPage)} size={46} color={colors.goldDeep} textColor={colors.goldText} />
 
         <TouchableOpacity
           onPress={() => currentPage < TOTAL_PAGES && dispatch(setCurrentPage(currentPage + 1))}
-          style={[s.navBtn, currentPage >= TOTAL_PAGES && s.btnDisabled]}
+          style={[s.navArrow, currentPage >= TOTAL_PAGES && s.btnDisabled]}
           disabled={currentPage >= TOTAL_PAGES}
+          accessibilityRole="button"
+          accessibilityLabel="الصفحة التالية"
         >
-          <Text style={s.navBtnText}>التالية</Text>
-          <ChevronLeft size={22} color={colors.text} />
+          <ChevronLeft size={22} color={colors.gold} />
         </TouchableOpacity>
       </View>
 

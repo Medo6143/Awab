@@ -16,19 +16,11 @@ export const s = StyleSheet.create({
   iconBtn: { width: 38, height: 38, borderRadius: radius.tile, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
 
   mushafOuter: { flex: 1 },
-  frameGoldLayer: { flex: 1, borderWidth: 4, borderColor: colors.gold, backgroundColor: colors.surface, borderRadius: radius.field, padding: 4 },
-  frameCreamLayer: { flex: 1, backgroundColor: colors.paper, borderRadius: 8, overflow: 'hidden' },
+  // paper card holding the geometric frame (MushafOrnaments.GeometricFrame)
+  paperCard: { flex: 1, backgroundColor: colors.paper, borderRadius: 16, padding: 12 },
+  pageHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space[4], paddingTop: space[3], paddingBottom: space[1] },
+  pageHeaderText: { fontFamily: 'Tajawal_500Medium', fontSize: 12, color: colors.paperMuted, minWidth: 70 },
 
-  ornateHeader: {
-    flexDirection: 'row', alignItems: 'center', paddingHorizontal: space[4], paddingVertical: space[2],
-    backgroundColor: colors.paperDeep, borderBottomWidth: 2, borderBottomColor: colors.paperRule,
-  },
-  headerCornerLeft: { width: 24, height: 24, borderTopWidth: 2, borderLeftWidth: 2, borderColor: colors.paperRule },
-  headerCornerRight: { width: 24, height: 24, borderTopWidth: 2, borderRightWidth: 2, borderColor: colors.paperRule },
-  headerCenterInfo: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-  ornateLine: { flex: 1, height: 2, backgroundColor: colors.paperRule, marginHorizontal: space[2] },
-  headerPageText: { ...type.label, fontSize: 16, color: colors.paperInk },
-  headerBookmark: { marginHorizontal: space[3] },
 
   ayahList: { padding: space[4], paddingBottom: 60, flexGrow: 1 },
   centerLoader: { flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 120 },
@@ -39,10 +31,10 @@ export const s = StyleSheet.create({
   pageRetryText: { ...type.label, color: colors.paperInk },
 
   surahGroup: { marginBottom: space[6] },
-  goldBanner: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: colors.gold, paddingVertical: space[2], borderRadius: radius.field, marginBottom: space[5] },
-  goldBannerTitle: { fontFamily: 'Amiri_700Bold', fontSize: 34, color: colors.paperInk, textAlign: 'center', writingDirection: 'rtl' },
-  bannerPatternLeft: { width: 20, height: 2, backgroundColor: colors.paperInk, marginRight: space[4] },
-  bannerPatternRight: { width: 20, height: 2, backgroundColor: colors.paperInk, marginLeft: space[4] },
+  surahBand: { flexDirection: 'row', alignItems: 'center', gap: space[2], marginTop: space[2], marginBottom: space[3] },
+  surahBandRule: { flex: 1, height: 1, backgroundColor: colors.paperRule },
+  surahBandPill: { borderWidth: 1, borderColor: colors.paperRule, borderRadius: radius.pill, paddingHorizontal: space[5], paddingVertical: 2 },
+  surahBandTitle: { fontFamily: 'Amiri_700Bold', fontSize: 26, color: colors.paperInk, textAlign: 'center', writingDirection: 'rtl' },
 
   basmalaContainer: { alignItems: 'center', justifyContent: 'center', paddingVertical: space[4], width: '100%' },
   mushafBasmala: { fontFamily: 'Amiri_700Bold', fontSize: 32, color: colors.paperInk, textAlign: 'center' },
@@ -51,14 +43,11 @@ export const s = StyleSheet.create({
   singleAyah: { paddingHorizontal: 1 },
   highlightedText: { backgroundColor: 'rgba(212,175,55,0.4)', borderRadius: 6 },
 
-  ayaEnd: { fontFamily: 'Amiri_400Regular', color: colors.goldDeep },
+  ayaEnd: { fontFamily: 'Amiri_400Regular', color: '#b8902f' },
 
   ornateFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: space[5], paddingVertical: space[3], backgroundColor: colors.bg },
-  navBtn: { paddingVertical: space[2], paddingHorizontal: space[4], backgroundColor: colors.surface, borderRadius: radius.pill, flexDirection: 'row', alignItems: 'center', gap: space[2] },
+  navArrow: { width: 44, height: 44, borderRadius: radius.pill, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
   btnDisabled: { opacity: 0.4 },
-  navBtnText: { ...type.label, color: colors.text },
-  pageIndicator: { paddingHorizontal: space[3], paddingVertical: 6, backgroundColor: colors.goldSoft, borderRadius: radius.pill },
-  pageIndicatorText: { ...type.label, fontSize: 15, color: colors.goldText },
 
   // ── Tafsir sheet (paper) ──
   sheetOverlay: { flex: 1, backgroundColor: colors.overlay, justifyContent: 'flex-end' },

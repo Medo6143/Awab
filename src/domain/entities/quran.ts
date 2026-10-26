@@ -4,6 +4,9 @@ export interface MushafAyah {
   text: string;
   numberInSurah: number;
   page: number;
+  juz?: number;
+  /** 1..240; every 4 quarters make a hizb. */
+  hizbQuarter?: number;
   surah: { number: number; name: string; englishName: string };
 }
 
