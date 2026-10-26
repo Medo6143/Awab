@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Animated, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { Download, Eraser, Maximize2, ZoomIn, ZoomOut } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
-import { ZoomableHeart } from './ZoomableHeart';
+import { stepZoom, ZoomableHeart } from './ZoomableHeart';
 import { HEART_VB_H, HEART_VB_W } from './heartCells';
 import { colors, icon, radius, space } from '../../../shared/theme/tokens';
 import { toAr } from '../../../shared/utils/format';
@@ -28,12 +28,16 @@ export const HeartViewer = ({ pulseAnim, completedSurahs, progress, onToggleSura
   const { width: screenW } = useWindowDimensions();
   const base = screenW * 0.9;
   const frameH = (base * HEART_VB_H) / HEART_VB_W;
-  const [zi, setZi] = useState(0);
-  const zoom = ZOOMS[zi];
+  // free value: the buttons step through ZOOMS, a pinch can land anywhere in between
+  const [zoom, setZoom] = useState(1);
+  const minZoom = ZOOMS[0];
+  const maxZoom = ZOOMS[ZOOMS.length - 1];
+  const atMin = zoom <= minZoom + 0.01;
+  const atMax = zoom >= maxZoom - 0.01;
 
-  const step = (d: number) => {
-    const next = Math.max(0, Math.min(ZOOMS.length - 1, zi + d));
-    if (next !== zi) { Haptics.selectionAsync(); setZi(next); }
+  const step = (d: 1 | -1) => {
+    const next = stepZoom(ZOOMS, zoom, d);
+    if (next !== zoom) { Haptics.selectionAsync(); setZoom(next); }
   };
 
   return (
@@ -42,6 +46,9 @@ export const HeartViewer = ({ pulseAnim, completedSurahs, progress, onToggleSura
         frameW={screenW}
         frameH={frameH}
         size={base * zoom}
+        minSize={base * minZoom}
+        maxSize={base * maxZoom}
+        onSizeChange={(s) => setZoom(Math.min(maxZoom, Math.max(minZoom, s / base)))}
         margin={space[8]}
         pulseAnim={pulseAnim}
         completedSurahs={completedSurahs}
@@ -51,12 +58,12 @@ export const HeartViewer = ({ pulseAnim, completedSurahs, progress, onToggleSura
       />
 
       <View style={st.bar}>
-        <Tool label="أصغر" onPress={() => step(-1)} disabled={zi === 0}>
-          <ZoomOut size={icon.size.md} color={zi === 0 ? colors.textFaint : colors.goldText} strokeWidth={icon.stroke} />
+        <Tool label="أصغر" onPress={() => step(-1)} disabled={atMin}>
+          <ZoomOut size={icon.size.md} color={atMin ? colors.textFaint : colors.goldText} strokeWidth={icon.stroke} />
         </Tool>
         <Text style={st.zoomText}>{toAr(Math.round(zoom * 100))}٪</Text>
-        <Tool label="أكبر" onPress={() => step(1)} disabled={zi === ZOOMS.length - 1}>
-          <ZoomIn size={icon.size.md} color={zi === ZOOMS.length - 1 ? colors.textFaint : colors.goldText} strokeWidth={icon.stroke} />
+        <Tool label="أكبر" onPress={() => step(1)} disabled={atMax}>
+          <ZoomIn size={icon.size.md} color={atMax ? colors.textFaint : colors.goldText} strokeWidth={icon.stroke} />
         </Tool>
         <View style={st.sep} />
         <Tool label="ملء الشاشة" onPress={onOpenFullscreen}>

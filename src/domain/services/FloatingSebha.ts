@@ -5,6 +5,7 @@ export interface FloatingSebhaConfig {
   showBorder: boolean;
   showReset: boolean;
   reminderInterval: number; // minutes
+  haptics: boolean;         // vibrate on each count
 }
 
 export interface FloatingSebhaDiagnostics {

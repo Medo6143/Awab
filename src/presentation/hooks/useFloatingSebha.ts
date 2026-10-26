@@ -11,12 +11,13 @@ const DEFAULT_LABEL = 'سبحان الله';
 const errorMessage = (e: unknown) => (e instanceof Error ? e.message : String(e));
 type TasbeehState = RootState['tasbeeh'];
 
-export const toSebhaConfig = (t: TasbeehState): FloatingSebhaConfig => ({
+export const toSebhaConfig = (t: TasbeehState, haptics = true): FloatingSebhaConfig => ({
   scale: typeof t.floatingScale === 'number' ? t.floatingScale : 1,
   accentColor: t.floatingBubbleColor || '#B8860B',
   showBorder: !!t.floatingShowBorder,
   showReset: !!t.floatingShowReset,
   reminderInterval: t.floatingReminderInterval || 10,
+  haptics,
 });
 
 /** Pull the overlay's saved count into the store (or push the store's count to it). */
@@ -65,7 +66,7 @@ export const useFloatingSebhaSync = () => {
       await notifications.request();
       await floatingSebha.initialize();
       if (!(await floatingSebha.isVisible())) {
-        floatingSebha.configure(toSebhaConfig(store.getState().tasbeeh));
+        floatingSebha.configure(toSebhaConfig(store.getState().tasbeeh, store.getState().settings.tasbeehHaptics ?? true));
         await floatingSebha.show().catch(() => {});
       }
       await syncCount();
@@ -84,9 +85,10 @@ export const useFloatingSebhaSync = () => {
   }, [ready, available, floatingSebha, store, syncCount]);
 
   // mirror config (only while active: configuring starts the foreground service)
+  const haptics = useSelector((s: RootState) => s.settings.tasbeehHaptics) ?? true;
   useEffect(() => {
-    if (available && t.isFloatingActive) floatingSebha.configure(toSebhaConfig(t));
-  }, [available, t.isFloatingActive, t.floatingScale, t.floatingBubbleColor, t.floatingShowBorder, t.floatingShowReset, t.floatingReminderInterval, floatingSebha]);
+    if (available && t.isFloatingActive) floatingSebha.configure(toSebhaConfig(t, haptics));
+  }, [available, t.isFloatingActive, t.floatingScale, t.floatingBubbleColor, t.floatingShowBorder, t.floatingShowReset, t.floatingReminderInterval, haptics, floatingSebha]);
 
   useEffect(() => {
     if (ready && available && t.isFloatingActive) floatingSebha.setCount(t.count);
@@ -158,7 +160,7 @@ export const useFloatingSebhaToggle = () => {
 
   const enable = async () => {
     await floatingSebha.initialize();
-    floatingSebha.configure(toSebhaConfig(store.getState().tasbeeh));
+    floatingSebha.configure(toSebhaConfig(store.getState().tasbeeh, store.getState().settings.tasbeehHaptics ?? true));
     await floatingSebha.show();
     floatingSebha.setCount(store.getState().tasbeeh.count);
     dispatch(setFloatingActive(true));

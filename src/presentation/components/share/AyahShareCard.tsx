@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { toAr } from '../../../shared/utils/format';
 import { colors } from '../../../shared/theme/tokens';
-import { shareCardSize } from './ImageShareModal';
+import { useShareCardSize } from './ImageShareModal';
 import { layoutAyahCard } from './ayahCardLayout';
 
 const LOGO = require('../../../../assets/icon.png');
@@ -15,7 +15,7 @@ type Props = { ayahText: string; surahName: string; ayahNumber: number; tafsirNa
  * on every screen density.
  */
 export const AyahShareCard = ({ ayahText, surahName, ayahNumber, tafsirName, tafsirExcerpt }: Props) => {
-  const { w, h } = shareCardSize();
+  const { w, h } = useShareCardSize();
   const u = w / 100;
   const text = ayahText.trim();
   const { ayahSize, showTafsir, exSize } = layoutAyahCard(text.length, tafsirExcerpt?.length ?? 0, w, h);

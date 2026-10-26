@@ -1,14 +1,14 @@
 import React from 'react';
 import { Text, TouchableOpacity, View, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { Bell, MapPin, Info, ChevronLeft } from 'lucide-react-native';
+import { Bell, MapPin, Info, ChevronLeft, Vibrate, Target } from 'lucide-react-native';
 import { ScreenProps } from '../navigation/types';
 import { DEFAULT_AZAN_SETTINGS, DEFAULT_NOTIFICATION_PREFS } from '../../domain/entities/notifications';
 import { RootState } from '../store';
 import {
   toggleNotifications, toggleLocation, setTafsirId, setTafsirStyle, setTafsirFontSize,
   setAccentTheme, setReciterId, toggleNotificationCategory, setAzanSettings,
-  setDailyWardTime, setEncouragementInterval,
+  setDailyWardTime, setEncouragementInterval, setShareImageSize, toggleTasbeehHaptics, toggleTasbeehTargetAlert,
 } from '../store/slices/settingsSlice';
 import { setFloatingScale, setFloatingBubbleColor, toggleFloatingBorder, toggleFloatingReset, setFloatingReminderInterval } from '../store/slices/tasbeehSlice';
 import { colors, icon } from '../../shared/theme/tokens';
@@ -16,7 +16,7 @@ import { colors, icon } from '../../shared/theme/tokens';
 import { Screen, ScreenHeader } from '../components/ui';
 import {
   SettingSection, ItemRow, ThemeSelector, ReciterSelector, TafsirSettings,
-  NotificationSettings, AzanSelector, FloatingTasbeehSettings,
+  NotificationSettings, AzanSelector, FloatingTasbeehSettings, ShareImageSizeSelector,
 } from '../components/settings/SettingsComponents';
 import { AzanReadinessCard } from '../components/settings/AzanReadinessCard';
 import { s } from '../components/settings/SettingsStyles';
@@ -27,6 +27,7 @@ const SettingsScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const {
     notificationsEnabled, locationEnabled, selectedTafsirId, tafsirStyle, tafsirFontSize,
     accentTheme, selectedReciterId, notificationPrefs, azanSettings: rawAzanSettings,
+    shareImageSize = 'medium', tasbeehHaptics = true, tasbeehTargetAlert = true,
   } = useSelector((state: RootState) => state.settings);
   const { floatingScale, floatingBubbleColor, floatingShowBorder, floatingShowReset, floatingReminderInterval } = useSelector((state: RootState) => state.tasbeeh);
   // persisted state from older versions may lack newer keys
@@ -53,6 +54,11 @@ const SettingsScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
       </SettingSection>
       <View style={{ marginTop: 12 }}><AzanReadinessCard /></View>
 
+      <SettingSection title="المسبحة">
+        <ItemRow first icon={Vibrate} label="اهتزاز مع كل تسبيحة" sub="في المسبحة والمسبحة العائمة" value={tasbeehHaptics} onValueChange={() => dispatch(toggleTasbeehHaptics())} />
+        <ItemRow icon={Target} label="تنبيه عند إتمام العدد" sub="اهتزاز مميز عند الوصول للهدف" value={tasbeehTargetAlert} onValueChange={() => dispatch(toggleTasbeehTargetAlert())} />
+      </SettingSection>
+
       <SettingSection title="المسبحة العائمة">
         <View style={{ padding: 4 }}><FloatingTasbeehToggle /></View>
         <FloatingTasbeehSettings
@@ -66,6 +72,10 @@ const SettingsScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
 
       <SettingSection title="المظهر">
         <ThemeSelector accentTheme={accentTheme} onSelect={(id) => dispatch(setAccentTheme(id))} />
+      </SettingSection>
+
+      <SettingSection title="مشاركة الصور">
+        <ShareImageSizeSelector value={shareImageSize} onSelect={(v) => dispatch(setShareImageSize(v))} />
       </SettingSection>
 
       <SettingSection title="التلاوة">

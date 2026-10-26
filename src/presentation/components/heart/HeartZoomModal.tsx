@@ -2,11 +2,14 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Modal, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { X, Maximize2, Minimize2, ZoomIn, ZoomOut } from 'lucide-react-native';
-import { ZoomableHeart } from './ZoomableHeart';
+import { stepZoom, ZoomableHeart } from './ZoomableHeart';
 import { SURAH_NAMES } from '../../../shared/constants/surahs';
 import { toAr } from './HeartJourneyConstants';
 import { s } from './HeartJourneyStyles';
 import { colors } from '../../../shared/theme/tokens';
+
+// fit = 0.92× screen; then 1.5×, 2×, 2.6×, 3.4×
+const LEVELS = [0.92, 1.5, 2, 2.6, 3.4];
 
 type Props = {
   visible: boolean;
@@ -23,16 +26,17 @@ type Props = {
 export const HeartZoomModal = ({ visible, onClose, completedSurahs, progress, onToggleSurah }: Props) => {
   const { width: W } = useWindowDimensions();
   const [frameH, setFrameH] = useState(0);
-  // fit = 0.92× screen; then 1.5×, 2×, 2.6×, 3.4×
-  const LEVELS = [0.92, 1.5, 2, 2.6, 3.4];
-  const [level, setLevel] = useState(3);
-  const zoomed = level > 0;
-  const setZoomed = (fn: (z: boolean) => boolean) => setLevel(fn(zoomed) ? 3 : 0);
+  // free zoom (× screen width): buttons step through LEVELS, a pinch lands anywhere between
+  const [zoom, setZoom] = useState(LEVELS[3]);
+  const zoomed = zoom > LEVELS[0] + 0.01;
+  const setZoomed = (fn: (z: boolean) => boolean) => setZoom(fn(zoomed) ? LEVELS[3] : LEVELS[0]);
+  const atMin = !zoomed;
+  const atMax = zoom >= LEVELS[LEVELS.length - 1] - 0.01;
   const [last, setLast] = useState<{ id: number; done: boolean } | null>(null);
   const staticPulse = useRef(new Animated.Value(1)).current;
   const captionOpacity = useRef(new Animated.Value(0)).current;
 
-  const size = W * LEVELS[level];
+  const size = W * zoom;
 
   const toggle = useCallback((id: number) => {
     const nowDone = !completedSurahs.includes(id);
@@ -69,6 +73,9 @@ export const HeartZoomModal = ({ visible, onClose, completedSurahs, progress, on
               frameW={W}
               frameH={frameH}
               size={size}
+              minSize={W * LEVELS[0]}
+              maxSize={W * LEVELS[LEVELS.length - 1]}
+              onSizeChange={(px) => setZoom(Math.min(LEVELS[LEVELS.length - 1], Math.max(LEVELS[0], px / W)))}
               pulseAnim={staticPulse}
               completedSurahs={completedSurahs}
               progress={progress}
@@ -78,15 +85,15 @@ export const HeartZoomModal = ({ visible, onClose, completedSurahs, progress, on
         </View>
 
         <View style={s.zoomBar}>
-          <TouchableOpacity onPress={() => setLevel((l) => Math.max(0, l - 1))} disabled={level === 0} style={[s.zoomBtn, level === 0 && { opacity: 0.4 }]} accessibilityLabel="تصغير">
+          <TouchableOpacity onPress={() => setZoom((z) => stepZoom(LEVELS, z, -1))} disabled={atMin} style={[s.zoomBtn, atMin && { opacity: 0.4 }]} accessibilityLabel="تصغير">
             <ZoomOut color={colors.goldText} size={22} />
           </TouchableOpacity>
-          <Text style={s.zoomLevel}>{toAr(Math.round((LEVELS[level] / LEVELS[0]) * 100))}٪</Text>
-          <TouchableOpacity onPress={() => setLevel((l) => Math.min(LEVELS.length - 1, l + 1))} disabled={level === LEVELS.length - 1} style={[s.zoomBtn, level === LEVELS.length - 1 && { opacity: 0.4 }]} accessibilityLabel="تكبير">
+          <Text style={s.zoomLevel}>{toAr(Math.round((zoom / LEVELS[0]) * 100))}٪</Text>
+          <TouchableOpacity onPress={() => setZoom((z) => stepZoom(LEVELS, z, 1))} disabled={atMax} style={[s.zoomBtn, atMax && { opacity: 0.4 }]} accessibilityLabel="تكبير">
             <ZoomIn color={colors.goldText} size={22} />
           </TouchableOpacity>
         </View>
-        <Text style={s.zoomHint}>اسحب للتنقّل • اضغط على السورة لتحديدها</Text>
+        <Text style={s.zoomHint}>اسحب للتنقّل • قرّب بإصبعين للتكبير • اضغط على السورة لتحديدها</Text>
 
         {last && (
           <Animated.View pointerEvents="none" style={[s.zoomCaption, { opacity: captionOpacity }]}>

@@ -2,7 +2,7 @@ import { EmbeddableScreenProps } from '../navigation/types';
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Animated, Vibration, ScrollView } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { RotateCcw, Volume2, VolumeX, Settings2 } from 'lucide-react-native';
+import { RotateCcw, Vibrate, VibrateOff, Settings2 } from 'lucide-react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import {
@@ -10,6 +10,7 @@ import {
   addTarget, setSelectedDhikr, addDhikr, syncTasbeehReset,
 } from '../store/slices/tasbeehSlice';
 import { logDhikr } from '../store/slices/statsSlice';
+import { toggleTasbeehHaptics } from '../store/slices/settingsSlice';
 
 import { Screen, ScreenHeader, IconButton, Chip, PillButton } from '../components/ui';
 import { TasbeehCounter, TargetCarousel } from '../components/tasbeeh/TasbeehComponents';
@@ -22,7 +23,9 @@ const TasbeehScreen = ({ hideHeader, navigation }: EmbeddableScreenProps) => {
   const dispatch = useDispatch();
   const { count, target, targets, totalCount, selectedDhikr, dhikrList, floatingBubbleColor } = useSelector((state: RootState) => state.tasbeeh);
 
-  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+  // older persisted settings lack these keys: both default to on
+  const haptics = useSelector((state: RootState) => state.settings.tasbeehHaptics) ?? true;
+  const targetAlert = useSelector((state: RootState) => state.settings.tasbeehTargetAlert) ?? true;
   const [showAddDhikr, setShowAddDhikr] = useState(false);
   const [newDhikr, setNewDhikr] = useState('');
   const [showCustomTarget, setShowCustomTarget] = useState(false);
@@ -35,10 +38,10 @@ const TasbeehScreen = ({ hideHeader, navigation }: EmbeddableScreenProps) => {
   useEffect(() => { dispatch(syncTasbeehReset()); }, [dispatch]);
 
   const handlePress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    if (haptics) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     dispatch(incrementCount(1));
     dispatch(logDhikr({ name: selectedDhikr, count: 1 }));
-    if (count + 1 === target) {
+    if (targetAlert && count + 1 === target) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Vibration.vibrate([0, 100, 50, 100]);
     }
@@ -46,10 +49,10 @@ const TasbeehScreen = ({ hideHeader, navigation }: EmbeddableScreenProps) => {
       Animated.timing(scaleAnim, { toValue: 0.94, duration: 50, useNativeDriver: true }),
       Animated.spring(scaleAnim, { toValue: 1, friction: 5, useNativeDriver: true }),
     ]).start();
-  }, [count, target, scaleAnim, dispatch, selectedDhikr]);
+  }, [count, target, scaleAnim, dispatch, selectedDhikr, haptics, targetAlert]);
 
   const resetToday = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    if (haptics) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     dispatch(resetCount());
   };
 
@@ -62,10 +65,10 @@ const TasbeehScreen = ({ hideHeader, navigation }: EmbeddableScreenProps) => {
           title="المسبحة"
           subtitle={`الإجمالي ${toAr(totalCount)}`}
           right={
-            <IconButton onPress={() => setIsSoundEnabled((v) => !v)} label={isSoundEnabled ? 'كتم الصوت' : 'تشغيل الصوت'}>
-              {isSoundEnabled
-                ? <Volume2 size={icon.size.md} color={colors.gold} strokeWidth={icon.stroke} />
-                : <VolumeX size={icon.size.md} color={colors.textMuted} strokeWidth={icon.stroke} />}
+            <IconButton onPress={() => dispatch(toggleTasbeehHaptics())} label={haptics ? 'إيقاف الاهتزاز' : 'تشغيل الاهتزاز'}>
+              {haptics
+                ? <Vibrate size={icon.size.md} color={colors.gold} strokeWidth={icon.stroke} />
+                : <VibrateOff size={icon.size.md} color={colors.textMuted} strokeWidth={icon.stroke} />}
             </IconButton>
           }
         />

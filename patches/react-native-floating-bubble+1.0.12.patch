@@ -94,7 +94,7 @@ index 41a92ab..8a476d0 100644
 \ No newline at end of file
 diff --git a/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/FloatingBubbleService.java b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/FloatingBubbleService.java
 new file mode 100644
-index 0000000..0e34cd6
+index 0000000..95dd5f6
 --- /dev/null
 +++ b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/FloatingBubbleService.java
 @@ -0,0 +1,713 @@
@@ -477,7 +477,7 @@ index 0000000..0e34cd6
 +                            if (part == WoodCounterView.PART_RESET) {
 +                                doReset();
 +                            } else {
-+                                c.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);
++                                if (prefs.getHaptics()) c.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);
 +                                doCount();
 +                            }
 +                            // keep the button visibly pressed for a beat, like a real clicker
@@ -812,7 +812,7 @@ index 0000000..0e34cd6
 +    }
 +}
 diff --git a/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/RNFloatingBubbleModule.java b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/RNFloatingBubbleModule.java
-index cde29db..34b8772 100644
+index cde29db..ec2c650 100644
 --- a/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/RNFloatingBubbleModule.java
 +++ b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/RNFloatingBubbleModule.java
 @@ -1,49 +1,73 @@
@@ -907,7 +907,7 @@ index cde29db..34b8772 100644
      }
    }
  
-@@ -52,120 +76,222 @@ public class RNFloatingBubbleModule extends ReactContextBaseJavaModule {
+@@ -52,120 +76,223 @@ public class RNFloatingBubbleModule extends ReactContextBaseJavaModule {
      return "RNFloatingBubble";
    }
  
@@ -1042,6 +1042,7 @@ index cde29db..34b8772 100644
 +    if (config.hasKey("showBorder")) showBorder = config.getBoolean("showBorder");
 +    if (config.hasKey("showReset")) showReset = config.getBoolean("showReset");
 +    if (config.hasKey("reminderInterval")) reminderInterval = config.getInt("reminderInterval");
++    if (config.hasKey("haptics")) prefs.saveHaptics(config.getBoolean("haptics"));
  
 -  private boolean hasPermission(){
 -    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -1202,10 +1203,10 @@ index cde29db..34b8772 100644
 \ No newline at end of file
 diff --git a/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/SharedPrefsHelper.java b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/SharedPrefsHelper.java
 new file mode 100644
-index 0000000..0d991ae
+index 0000000..2a2800d
 --- /dev/null
 +++ b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/SharedPrefsHelper.java
-@@ -0,0 +1,44 @@
+@@ -0,0 +1,47 @@
 +package com.reactlibrary;
 +
 +import android.content.Context;
@@ -1244,6 +1245,9 @@ index 0000000..0d991ae
 +    public String getAccentColor() { return prefs.getString("accentColor", "#B8860B"); }
 +    public boolean getShowBorder() { return prefs.getBoolean("showBorder", true); }
 +    public boolean getShowReset() { return prefs.getBoolean("showReset", true); }
++    /** Vibrate on each count (the app's tasbih vibration setting). */
++    public boolean getHaptics() { return prefs.getBoolean("haptics", true); }
++    public void saveHaptics(boolean on) { prefs.edit().putBoolean("haptics", on).apply(); }
 +    public int getReminderInterval() { return prefs.getInt("reminderInterval", 10); }
 +    public String getDhikr() { return prefs.getString("dhikr", "سبحان الله"); }
 +    

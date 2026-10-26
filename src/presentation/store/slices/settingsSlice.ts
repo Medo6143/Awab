@@ -2,6 +2,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AzanSettings, DEFAULT_NOTIFICATION_PREFS, NotificationPrefs } from '../../../domain/entities/notifications';
 
 export type TafsirStyle = 'simple' | 'book' | 'modern';
+/** Pixel size of shared images: small 720×1280, medium 1080×1920, high 1440×2560. */
+export type ShareImageSize = 'small' | 'medium' | 'high';
 
 interface SettingsState {
   notificationsEnabled: boolean;
@@ -15,6 +17,9 @@ interface SettingsState {
   notificationPrefs: NotificationPrefs;
   calculationMethod: number;
   azanSettings: AzanSettings;
+  shareImageSize: ShareImageSize;
+  tasbeehHaptics: boolean;     // a light buzz on every count
+  tasbeehTargetAlert: boolean; // a stronger buzz when the target is reached
 }
 
 const initialState: SettingsState = {
@@ -32,6 +37,9 @@ const initialState: SettingsState = {
     type: 'full',
     visualAzanEnabled: true,
   },
+  shareImageSize: 'medium',
+  tasbeehHaptics: true,
+  tasbeehTargetAlert: true,
 };
 
 export const settingsSlice = createSlice({
@@ -55,6 +63,16 @@ export const settingsSlice = createSlice({
     },
     setTafsirStyle: (state, action: PayloadAction<TafsirStyle>) => {
       state.tafsirStyle = action.payload;
+    },
+    setShareImageSize: (state, action: PayloadAction<ShareImageSize>) => {
+      state.shareImageSize = action.payload;
+    },
+    // `?? true`: state persisted before these settings existed lacks the keys
+    toggleTasbeehHaptics: (state) => {
+      state.tasbeehHaptics = !(state.tasbeehHaptics ?? true);
+    },
+    toggleTasbeehTargetAlert: (state) => {
+      state.tasbeehTargetAlert = !(state.tasbeehTargetAlert ?? true);
     },
     setTafsirFontSize: (state, action: PayloadAction<number>) => {
       state.tafsirFontSize = action.payload;
@@ -102,7 +120,10 @@ export const {
   setTheme, 
   setAccentTheme,
   setTafsirId, 
-  setTafsirStyle, 
+  setTafsirStyle,
+  setShareImageSize,
+  toggleTasbeehHaptics,
+  toggleTasbeehTargetAlert, 
   setTafsirFontSize,
   setReciterId,
   toggleNotificationCategory,

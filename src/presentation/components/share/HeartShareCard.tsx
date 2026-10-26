@@ -5,7 +5,7 @@ import { formatDate, khatmaTitle, MODE_NOUN } from '../heart/khatmaFormat';
 import type { HeartMode } from '../../store/slices/quranSlice';
 import { toAr } from '../../../shared/utils/format';
 import { colors } from '../../../shared/theme/tokens';
-import { shareCardSize } from './ImageShareModal';
+import { useShareCardSize } from './ImageShareModal';
 
 const LOGO = require('../../../../assets/icon.png');
 
@@ -19,7 +19,7 @@ type Props = {
 
 /** 9:16 card of a heart (current or finished khatma) with its number and dates. */
 export const HeartShareCard = ({ completedSurahs, mode, number, startedAt, finishedAt }: Props) => {
-  const { w, h } = shareCardSize();
+  const { w, h } = useShareCardSize();
   const u = w / 100;
   const still = useRef(new Animated.Value(1)).current; // no pulse in a picture
   const done = completedSurahs.length;

@@ -3,6 +3,7 @@ import { View, Text, Switch, TouchableOpacity } from 'react-native';
 import {
   LucideIcon, Minus, Plus, Check, Palette, UserRound, BookOpen, Layers, Type as TypeIcon,
   BellRing, Clock3, Timer, Volume2, Maximize2, Square, RotateCcw, Hourglass, Moon, Sun, Star, Sparkles, HeartHandshake, Landmark,
+  ImageIcon,
 } from 'lucide-react-native';
 import { s } from './SettingsStyles';
 import { TAFSIR_LIST, STYLES_LIST, THEME_LIST } from './SettingsConstants';
@@ -13,7 +14,7 @@ import { useAccent } from '../../../shared/theme/useAccent';
 import { toAr } from '../../../shared/utils/format';
 import { AccentKey } from '../../../shared/theme/tokens';
 import { AzanSettings, NotificationPrefs } from '../../../domain/entities/notifications';
-import { TafsirStyle } from '../../store/slices/settingsSlice';
+import { ShareImageSize, TafsirStyle } from '../../store/slices/settingsSlice';
 import { AZAN_TYPES } from './AzanConstants';
 
 export const SettingSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -99,6 +100,27 @@ export const ReciterSelector = ({ selectedReciterId, onSelect }: { selectedRecit
     </View>
   );
 };
+
+const SHARE_SIZES: { id: ShareImageSize; name: string; sub: string }[] = [
+  { id: 'small', name: 'صغير', sub: '٧٢٠×١٢٨٠' },
+  { id: 'medium', name: 'متوسط', sub: '١٠٨٠×١٩٢٠' },
+  { id: 'high', name: 'عالي', sub: '١٤٤٠×٢٥٦٠' },
+];
+
+/** Size of the images made by "share as image" (ayah, dua, heart). */
+export const ShareImageSizeSelector = ({ value, onSelect }: { value: ShareImageSize; onSelect: (v: ShareImageSize) => void }) => (
+  <View style={[s.subSection, { borderTopWidth: 0 }]}>
+    <SubLabel icon={ImageIcon} text="حجم صورة المشاركة" />
+    <View style={s.row}>
+      {SHARE_SIZES.map((o) => (
+        <Chip key={o.id} label={o.name} size="sm" selected={value === o.id} onPress={() => onSelect(o.id)} style={{ flex: 1, justifyContent: 'center' }} />
+      ))}
+    </View>
+    <Text style={[s.itemSub, { marginTop: 8 }]}>
+      المقاس {SHARE_SIZES.find((o) => o.id === value)?.sub ?? ''} بكسل · الأكبر أوضح لكن ملفه أثقل، والمتوسط مناسب لحالات واتساب
+    </Text>
+  </View>
+);
 
 type TafsirSettingsProps = {
   selectedTafsirId: number; onSelectTafsir: (id: number) => void;

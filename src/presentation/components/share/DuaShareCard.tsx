@@ -1,14 +1,14 @@
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../../shared/theme/tokens';
-import { shareCardSize } from './ImageShareModal';
+import { useShareCardSize } from './ImageShareModal';
 import { layoutAyahCard } from './ayahCardLayout';
 
 const LOGO = require('../../../../assets/icon.png');
 
 /** 9:16 story card for a dua: brand, the dua in Amiri, its source. */
 export const DuaShareCard = ({ text, source }: { text: string; source: string }) => {
-  const { w, h } = shareCardSize();
+  const { w, h } = useShareCardSize();
   const u = w / 100;
   const body = text.trim();
   const { ayahSize } = layoutAyahCard(body.length, 0, w, h);

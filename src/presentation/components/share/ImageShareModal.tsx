@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Modal, PixelRatio, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { useSelector } from 'react-redux';
 import { captureRef, releaseCapture } from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
@@ -7,13 +8,23 @@ import { Download, Share2, X } from 'lucide-react-native';
 import { IconButton, PillButton } from '../ui';
 import { colors, icon, space, type } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
+import { toAr } from '../../../shared/utils/format';
+import type { RootState } from '../../store';
+import type { ShareImageSize } from '../../store/slices/settingsSlice';
 
-/** Story size (9:16). Cards lay themselves out in dp at exactly this many pixels. */
-export const SHARE_PX_W = 1080;
-export const SHARE_PX_H = 1920;
-export const shareCardSize = () => {
+/** Story format (9:16) at the width chosen in Settings. */
+export const SHARE_WIDTH_PX: Record<ShareImageSize, number> = { small: 720, medium: 1080, high: 1440 };
+
+/**
+ * Cards lay themselves out in dp at exactly the chosen number of pixels, so the capture is
+ * drawn natively at that size (sharp at every setting) rather than scaled afterwards.
+ */
+export const useShareCardSize = () => {
+  const size = useSelector((s: RootState) => s.settings.shareImageSize) ?? 'medium';
+  const pxW = SHARE_WIDTH_PX[size] ?? SHARE_WIDTH_PX.medium;
+  const pxH = Math.round((pxW * 16) / 9);
   const r = PixelRatio.get();
-  return { w: SHARE_PX_W / r, h: SHARE_PX_H / r };
+  return { w: pxW / r, h: pxH / r, pxW, pxH };
 };
 
 type Props = {
@@ -33,7 +44,7 @@ export const ImageShareModal = ({ visible, title, onClose, children }: Props) =>
   const ref = useRef<View>(null);
   const [busy, setBusy] = useState<'share' | 'save' | null>(null);
   const { width, height } = useWindowDimensions();
-  const { w, h } = shareCardSize();
+  const { w, h, pxW, pxH } = useShareCardSize();
   const scale = Math.min((width - space[8] * 2) / w, (height * 0.66) / h);
 
   // Every capture is a ~0.5 MB temp PNG. Keep them until the preview closes (a receiving app
@@ -101,7 +112,7 @@ export const ImageShareModal = ({ visible, title, onClose, children }: Props) =>
           <PillButton label="حفظ في المعرض" variant="ghost" icon={<Download size={icon.size.sm} color={accent.accentText} strokeWidth={icon.stroke} />} loading={busy === 'save'} disabled={!!busy} onPress={onSave} />
           <PillButton label="مشاركة" icon={<Share2 size={icon.size.sm} color={accent.onAccent} strokeWidth={icon.stroke} />} loading={busy === 'share'} disabled={!!busy} onPress={onShare} />
         </View>
-        <Text style={st.hint}>اختر واتساب ثم «حالتي» لنشرها كحالة</Text>
+        <Text style={st.hint}>اختر واتساب ثم «حالتي» لنشرها كحالة · {toAr(pxW)}×{toAr(pxH)}</Text>
       </View>
     </Modal>
   );
