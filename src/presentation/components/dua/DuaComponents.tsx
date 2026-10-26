@@ -67,7 +67,7 @@ export const DuaCategories = ({ selected, onSelect }: { selected: string; onSele
   );
 };
 
-export const DuaCard = ({ item, onShare, onCopy }: { item: Dua; onShare: (text: string, ref: string) => void; onCopy: (text: string) => void }) => (
+export const DuaCard = ({ item, onShare, onShareText, onCopy }: { item: Dua; onShare: (text: string, ref: string) => void; onShareText?: (text: string, ref: string) => void; onCopy: (text: string) => void }) => (
   <View style={s.duaCard}>
     <Text style={s.duaText}>{item.text}</Text>
     <View style={s.duaFooter}>
@@ -76,7 +76,7 @@ export const DuaCard = ({ item, onShare, onCopy }: { item: Dua; onShare: (text: 
         <TouchableOpacity onPress={() => onCopy(item.text)} style={s.actionBtn} accessibilityLabel="نسخ">
           <Copy size={16} color={colors.gold} strokeWidth={icon.stroke} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => onShare(item.text, item.ref)} style={s.actionBtn} accessibilityLabel="مشاركة">
+        <TouchableOpacity onPress={() => onShare(item.text, item.ref)} onLongPress={() => onShareText?.(item.text, item.ref)} style={s.actionBtn} accessibilityLabel="مشاركة كصورة">
           <Share2 size={16} color={colors.gold} strokeWidth={icon.stroke} />
         </TouchableOpacity>
       </View>

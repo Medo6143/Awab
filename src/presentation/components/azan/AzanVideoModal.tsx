@@ -1,3 +1,4 @@
+import { verseForPrayer } from '../../../domain/entities/prayerVerses';
 import type { VideoPlayer } from 'expo-video';
 import React, { useEffect, useState } from 'react';
 import { View, Text, Modal, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
@@ -16,6 +17,7 @@ interface AzanVideoModalProps {
 const videoSource = require('../../../../assets/video/azan_video.mp4');
 
 const AzanVideoContent: React.FC<{ onClose: () => void, prayerName: string }> = ({ onClose, prayerName }) => {
+  const verse = verseForPrayer(prayerName);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   // Move expo-video logic inside the component using require to avoid top-level JSI init
@@ -72,7 +74,8 @@ const AzanVideoContent: React.FC<{ onClose: () => void, prayerName: string }> = 
         </View>
 
         <View style={s.footer}>
-          <Text style={s.quote}>"يا أيها الذين آمنوا إذا نودِي للصلاة من يوم الجمعة فاسعوا إلى ذكر الله"</Text>
+          <Text style={s.quote}>﴿ {verse.text} ﴾</Text>
+          <Text style={s.quoteRef}>{verse.ref}</Text>
         </View>
       </LinearGradient>
     </View>
@@ -117,5 +120,6 @@ const s = StyleSheet.create({
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 40 },
   statusText: { fontFamily: 'Tajawal_500Medium', fontSize: 16, color: '#d4af37' },
   footer: { alignItems: 'center' },
-  quote: { fontFamily: 'Amiri_400Regular', fontSize: 18, color: '#a89f93', textAlign: 'center', fontStyle: 'italic' },
+  quote: { fontFamily: 'Amiri_700Bold', fontSize: 20, lineHeight: 36, color: '#e9e1d3', textAlign: 'center' },
+  quoteRef: { fontFamily: 'Tajawal_500Medium', fontSize: 13, color: '#a89f93', textAlign: 'center', marginTop: 4 },
 });

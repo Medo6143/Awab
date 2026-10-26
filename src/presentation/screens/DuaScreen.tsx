@@ -13,6 +13,8 @@ import { DuaHeader, DuaSearch, DuaCategories, DuaCard } from '../components/dua/
 import { AddDuaModal } from '../components/dua/DuaModals';
 import { s } from '../components/dua/DuaStyles';
 import { DUAS_DATA } from '../components/dua/DuaConstants';
+import { ImageShareModal } from '../components/share/ImageShareModal';
+import { DuaShareCard } from '../components/share/DuaShareCard';
 
 const DuaScreen = ({ hideHeader, navigation }: EmbeddableScreenProps) => {
   const dispatch = useDispatch();
@@ -29,7 +31,10 @@ const DuaScreen = ({ hideHeader, navigation }: EmbeddableScreenProps) => {
     (d.text.includes(searchQuery) || d.ref.includes(searchQuery)),
   );
 
-  const handleShare = async (text: string, ref: string) => {
+  // share opens the image card; long-press on share still shares plain text
+  const [shareDua, setShareDua] = useState<{ text: string; ref: string } | null>(null);
+  const handleShare = (text: string, ref: string) => setShareDua({ text, ref });
+  const handleShareText = async (text: string, ref: string) => {
     try { await Share.share({ message: `${text}\n[${ref}]` }); } catch {}
   };
   const handleCopy = async (text: string) => { await Clipboard.setStringAsync(text); };
@@ -52,7 +57,7 @@ const DuaScreen = ({ hideHeader, navigation }: EmbeddableScreenProps) => {
       <FlatList
         data={filteredDuas}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <DuaCard item={item} onShare={handleShare} onCopy={handleCopy} />}
+        renderItem={({ item }) => <DuaCard item={item} onShare={handleShare} onShareText={handleShareText} onCopy={handleCopy} />}
         contentContainerStyle={s.listContent}
         keyboardShouldPersistTaps="handled"
         ListEmptyComponent={
@@ -72,6 +77,10 @@ const DuaScreen = ({ hideHeader, navigation }: EmbeddableScreenProps) => {
         refText={newDuaRef} setRefText={setNewDuaRef}
         onSave={handleAddDua}
       />
+
+      <ImageShareModal visible={!!shareDua} title="مشاركة الدعاء كصورة" onClose={() => setShareDua(null)}>
+        {shareDua ? <DuaShareCard text={shareDua.text} source={shareDua.ref} /> : null}
+      </ImageShareModal>
     </SafeAreaView>
   );
 };

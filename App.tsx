@@ -14,6 +14,7 @@ import {
 } from '@expo-google-fonts/tajawal';
 import { Amiri_400Regular, Amiri_700Bold } from '@expo-google-fonts/amiri';
 import * as SplashScreen from 'expo-splash-screen';
+import { AnimatedSplash } from './src/presentation/components/splash/AnimatedSplash';
 
 import './global.css'; // NativeWind
 
@@ -167,6 +168,8 @@ export default function App() {
   }, [fontError]);
 
   const isReady = (fontsLoaded || fontTimedOut || !!fontError) && playerReady;
+  // animated launch screen, once per cold start, drawn over the app while it settles
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
     if (isReady) {
@@ -187,6 +190,7 @@ export default function App() {
               <QueryClientProvider client={queryClient}>
                 <AppNavigation />
               </QueryClientProvider>
+              {showSplash ? <AnimatedSplash onDone={() => setShowSplash(false)} /> : null}
             </Bootstrapper>
           </PersistGate>
         </Provider>

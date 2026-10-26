@@ -38,7 +38,8 @@ export const HeartShareCard = ({ completedSurahs, khatmaCount }: { completedSura
 };
 
 const st = StyleSheet.create({
-  card: { backgroundColor: colors.bg, justifyContent: 'space-between' },
+  // explicit: the share preview wraps cards in an LTR container for positioning
+  card: { backgroundColor: colors.bg, justifyContent: 'space-between', direction: 'rtl' },
   frame: { position: 'absolute', borderWidth: 1.2, borderColor: colors.goldLine },
   title: { fontFamily: 'Tajawal_800ExtraBold', color: colors.text },
   sub: { fontFamily: 'Tajawal_700Bold', color: colors.gold },

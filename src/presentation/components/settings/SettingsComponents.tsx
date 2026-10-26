@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Switch, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, Switch, TouchableOpacity } from 'react-native';
 import {
   LucideIcon, Minus, Plus, Check, Palette, UserRound, BookOpen, Layers, Type as TypeIcon,
   BellRing, Clock3, Timer, Volume2, Maximize2, Square, RotateCcw, Hourglass, Moon, Sun, Star, Sparkles, HeartHandshake, Landmark,
@@ -7,7 +7,7 @@ import {
 import { s } from './SettingsStyles';
 import { TAFSIR_LIST, STYLES_LIST, THEME_LIST } from './SettingsConstants';
 import { RECITER_MAP } from '../../../data/services/AudioService';
-import { Chip, IconTile, PillButton, SectionTitle } from '../ui';
+import { Chip, IconTile, SectionTitle } from '../ui';
 import { colors, icon } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 import { toAr } from '../../../shared/utils/format';
@@ -189,15 +189,12 @@ export const NotificationSettings = ({ notificationPrefs, onToggle, onWardTime, 
   );
 };
 
-export const AzanSelector = ({ azanSettings, onUpdate, onTest }: { azanSettings: AzanSettings; onUpdate: (u: Partial<AzanSettings>) => void; onTest: () => void }) => {
+export const AzanSelector = ({ azanSettings, onUpdate }: { azanSettings: AzanSettings; onUpdate: (u: Partial<AzanSettings>) => void }) => {
   return (
     <View style={s.subSection}>
       <SubLabel icon={Volume2} text="صوت الأذان" />
       <View style={s.chipsWrap}>
         {AZAN_TYPES.map((t) => <Chip key={t.id} label={t.name} size="sm" selected={azanSettings.type === t.id} onPress={() => onUpdate({ type: t.id })} />)}
-      </View>
-      <View style={{ marginTop: 16 }}>
-        <PillButton label="تجربة الأذان بعد ٣٠ ثانية" variant="ghost" onPress={onTest} />
       </View>
     </View>
   );
@@ -256,4 +253,3 @@ export const FloatingTasbeehSettings = ({
   );
 };
 
-export const showPermissionAlert = () => Alert.alert('صلاحية مطلوبة', 'فعّل الإشعارات من إعدادات الهاتف لتتمكن من تلقي التنبيهات.');

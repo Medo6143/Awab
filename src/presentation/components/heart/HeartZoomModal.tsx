@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Modal, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { X, Maximize2, Minimize2 } from 'lucide-react-native';
+import { X, Maximize2, Minimize2, ZoomIn, ZoomOut } from 'lucide-react-native';
 import { ZoomableHeart } from './ZoomableHeart';
 import { SURAH_NAMES } from '../../../shared/constants/surahs';
 import { toAr } from './HeartJourneyConstants';
@@ -23,12 +23,16 @@ type Props = {
 export const HeartZoomModal = ({ visible, onClose, completedSurahs, progress, onToggleSurah }: Props) => {
   const { width: W } = useWindowDimensions();
   const [frameH, setFrameH] = useState(0);
-  const [zoomed, setZoomed] = useState(true);
+  // fit = 0.92× screen; then 1.5×, 2×, 2.6×, 3.4×
+  const LEVELS = [0.92, 1.5, 2, 2.6, 3.4];
+  const [level, setLevel] = useState(3);
+  const zoomed = level > 0;
+  const setZoomed = (fn: (z: boolean) => boolean) => setLevel(fn(zoomed) ? 3 : 0);
   const [last, setLast] = useState<{ id: number; done: boolean } | null>(null);
   const staticPulse = useRef(new Animated.Value(1)).current;
   const captionOpacity = useRef(new Animated.Value(0)).current;
 
-  const size = zoomed ? W * 2.6 : W * 0.92;
+  const size = W * LEVELS[level];
 
   const toggle = useCallback((id: number) => {
     const nowDone = !completedSurahs.includes(id);
@@ -73,6 +77,15 @@ export const HeartZoomModal = ({ visible, onClose, completedSurahs, progress, on
           ) : null}
         </View>
 
+        <View style={s.zoomBar}>
+          <TouchableOpacity onPress={() => setLevel((l) => Math.max(0, l - 1))} disabled={level === 0} style={[s.zoomBtn, level === 0 && { opacity: 0.4 }]} accessibilityLabel="تصغير">
+            <ZoomOut color={colors.goldText} size={22} />
+          </TouchableOpacity>
+          <Text style={s.zoomLevel}>{toAr(Math.round((LEVELS[level] / LEVELS[0]) * 100))}٪</Text>
+          <TouchableOpacity onPress={() => setLevel((l) => Math.min(LEVELS.length - 1, l + 1))} disabled={level === LEVELS.length - 1} style={[s.zoomBtn, level === LEVELS.length - 1 && { opacity: 0.4 }]} accessibilityLabel="تكبير">
+            <ZoomIn color={colors.goldText} size={22} />
+          </TouchableOpacity>
+        </View>
         <Text style={s.zoomHint}>اسحب للتنقّل • اضغط على السورة لتحديدها</Text>
 
         {last && (

@@ -52,7 +52,8 @@ export const AyahShareCard = ({ ayahText, surahName, ayahNumber, tafsirName, taf
 };
 
 const st = StyleSheet.create({
-  card: { backgroundColor: colors.bg, justifyContent: 'space-between' },
+  // explicit: the share preview wraps cards in an LTR container for positioning
+  card: { backgroundColor: colors.bg, justifyContent: 'space-between', direction: 'rtl' },
   frame: { position: 'absolute', borderWidth: 1.2, borderColor: colors.goldLine },
   brand: { flexDirection: 'row', alignItems: 'center' },
   brandName: { fontFamily: 'Tajawal_800ExtraBold', color: colors.gold },

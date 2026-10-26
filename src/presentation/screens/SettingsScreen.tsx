@@ -11,23 +11,19 @@ import {
   setDailyWardTime, setEncouragementInterval,
 } from '../store/slices/settingsSlice';
 import { setFloatingScale, setFloatingBubbleColor, toggleFloatingBorder, toggleFloatingReset, setFloatingReminderInterval } from '../store/slices/tasbeehSlice';
-import { useAzanPermissions } from '../../shared/hooks/useAzanPermissions';
 import { colors, icon } from '../../shared/theme/tokens';
 
 import { Screen, ScreenHeader } from '../components/ui';
 import {
   SettingSection, ItemRow, ThemeSelector, ReciterSelector, TafsirSettings,
-  NotificationSettings, AzanSelector, FloatingTasbeehSettings, showPermissionAlert,
+  NotificationSettings, AzanSelector, FloatingTasbeehSettings,
 } from '../components/settings/SettingsComponents';
 import { AzanReadinessCard } from '../components/settings/AzanReadinessCard';
 import { s } from '../components/settings/SettingsStyles';
 import { FloatingTasbeehToggle } from '../components/tasbeeh/FloatingTasbeeh';
-import { useDependencies } from '../providers/DependencyProvider';
 
 const SettingsScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const dispatch = useDispatch();
-  const { testAzanAfterDelay } = useAzanPermissions();
-  const { notifications } = useDependencies();
   const {
     notificationsEnabled, locationEnabled, selectedTafsirId, tafsirStyle, tafsirFontSize,
     accentTheme, selectedReciterId, notificationPrefs, azanSettings: rawAzanSettings,
@@ -36,16 +32,6 @@ const SettingsScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   // persisted state from older versions may lack newer keys
   const azanSettings = { ...DEFAULT_AZAN_SETTINGS, ...rawAzanSettings };
   const prefs = { ...DEFAULT_NOTIFICATION_PREFS, ...notificationPrefs };
-
-  const testAzan = async () => {
-    const hasPerm = await notifications.request();
-    if (!hasPerm) { showPermissionAlert(); return; }
-    const ok = await testAzanAfterDelay(30);
-    Alert.alert(
-      ok ? 'بدأت التجربة' : 'تعذّر بدء التجربة',
-      ok ? 'سيرفع الأذان بعد ٣٠ ثانية. اقفل الشاشة أو اخرج من التطبيق لتجربة التنبيه الحقيقي.' : 'راجع قائمة "جاهزية الأذان" وأصلح الأذونات الناقصة ثم أعد المحاولة.',
-    );
-  };
 
   return (
     <Screen scroll contentStyle={s.content} header={<ScreenHeader title="الإعدادات" subtitle="تخصيص تجربة أوّاب" large onBack={navigation?.canGoBack?.() ? () => navigation.goBack() : undefined} />}>
@@ -62,7 +48,7 @@ const SettingsScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
       </SettingSection>
 
       <SettingSection title="الأذان">
-        <AzanSelector azanSettings={azanSettings} onUpdate={(update) => dispatch(setAzanSettings(update))} onTest={testAzan} />
+        <AzanSelector azanSettings={azanSettings} onUpdate={(update) => dispatch(setAzanSettings(update))} />
         <ItemRow icon={MapPin} label="مواقيت الصلاة حسب الموقع" value={locationEnabled} onValueChange={() => dispatch(toggleLocation())} />
       </SettingSection>
       <View style={{ marginTop: 12 }}><AzanReadinessCard /></View>

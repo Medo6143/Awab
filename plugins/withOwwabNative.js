@@ -18,6 +18,7 @@ const {
   withMainApplication,
   withMainActivity,
   AndroidConfig,
+  withAndroidStyles,
 } = require('@expo/config-plugins');
 const fs = require('fs');
 const path = require('path');
@@ -242,10 +243,26 @@ function withAzanIntent(config) {
   });
 }
 
+/**
+ * The app theme has no window background, so Android paints its default grey for a
+ * moment between the system splash and the first React frame. Make it the app's dark.
+ */
+function withDarkWindowBackground(config) {
+  return withAndroidStyles(config, (cfg) => {
+    const theme = cfg.modResults.resources.style?.find((st) => st.$.name === 'AppTheme');
+    if (theme) {
+      theme.item = (theme.item || []).filter((i) => i.$.name !== 'android:windowBackground');
+      theme.item.push({ $: { name: 'android:windowBackground' }, _: '#0c0805' });
+    }
+    return cfg;
+  });
+}
+
 module.exports = function withOwwabNative(config) {
   config = withNativeSources(config);
   config = withNativeManifest(config);
   config = withNativePackages(config);
   config = withAzanIntent(config);
+  config = withDarkWindowBackground(config);
   return config;
 };

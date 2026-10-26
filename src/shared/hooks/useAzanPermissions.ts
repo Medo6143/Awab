@@ -83,11 +83,5 @@ export function useAzanPermissions() {
     try { await AzanModule.scheduleAzan(prayerId, prayerName, hour, minute, type); return true; } catch { return false; }
   };
 
-  /** Schedules a test adhan n seconds from now. Resolves false when the exact-alarm permission is missing. */
-  const testAzanAfterDelay = async (delaySeconds: number = 30): Promise<boolean> => {
-    if (Platform.OS !== 'android' || !AzanModule?.testAzan) return false;
-    try { await AzanModule.testAzan(delaySeconds); return true; } catch { return false; }
-  };
-
-  return { checkExactAlarmPermission, checkBatteryOptimization, checkOverlayPermission, checkFullScreenIntent, getReadiness, scheduleAzanSafely, testAzanAfterDelay };
+  return { checkExactAlarmPermission, checkBatteryOptimization, checkOverlayPermission, checkFullScreenIntent, getReadiness, scheduleAzanSafely };
 }
