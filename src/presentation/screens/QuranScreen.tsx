@@ -184,6 +184,9 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
         initialPage={1}
         onPageSelected={onPageSelected}
         orientation="horizontal"
+        // pinned: by default it follows I18nManager.isRTL, which is still false on the first
+        // launch after install (forceRTL needs a restart), and the swipe ran backwards
+        layoutDirection="rtl"
         overdrag={false}
       >
         {[Math.max(1, currentPage - 1), currentPage, Math.min(TOTAL_PAGES, currentPage + 1)].map((pageNum, idx) => (
