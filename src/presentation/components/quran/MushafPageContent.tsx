@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { AlertTriangle } from 'lucide-react-native';
 import { colors } from '../../../shared/theme/tokens';
 import { Bookmark } from 'lucide-react-native';
-import { pageCache, toAr, TOTAL_PAGES, Ayah } from './QuranConstants';
+import { toAr, Ayah } from './QuranConstants';
+import { useMushafPage } from '../../hooks/useQuran';
 import { s } from './QuranStyles';
 
 interface Props {
@@ -21,11 +22,7 @@ export const MushafPageContent = React.memo(({
   pageNum, isCurrentPage, bookmarks, highlightedAyah, isBookmarked,
   onToggleBookmark, onAyahPress, onAyahLongPress
 }: Props) => {
-  const [ayahs, setAyahs] = useState<Ayah[]>(pageCache.get(pageNum) ?? []);
-  const [loading, setLoading] = useState(!pageCache.has(pageNum));
-  const [error, setError] = useState(false);
-  const [attempt, setAttempt] = useState(0);
-  const [prevPageNum, setPrevPageNum] = useState(pageNum);
+  const { ayahs, loading, error, retry } = useMushafPage(pageNum);
   const scrollRef = useRef<ScrollView>(null);
 
   // The pager reuses this component for the "current" slot, so without this the
@@ -33,52 +30,6 @@ export const MushafPageContent = React.memo(({
   useEffect(() => {
     scrollRef.current?.scrollTo({ y: 0, animated: false });
   }, [pageNum]);
-
-  if (prevPageNum !== pageNum) {
-    setPrevPageNum(pageNum);
-    const cached = pageCache.get(pageNum);
-    if (cached) {
-      setAyahs(cached);
-      setLoading(false);
-    } else {
-      setAyahs([]);
-      setLoading(true);
-    }
-  }
-
-  const prefetch = useCallback((pn: number) => {
-    if (pn < 1 || pn > TOTAL_PAGES || pageCache.has(pn)) return;
-    fetch(`https://api.alquran.cloud/v1/page/${pn}/quran-uthmani`)
-      .then(r => r.json())
-      .then(json => {
-        const data = json?.data?.ayahs ?? [];
-        if (data.length) pageCache.set(pn, data);
-      }).catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    if (pageCache.has(pageNum)) {
-      setAyahs(pageCache.get(pageNum)!);
-      setLoading(false);
-      prefetch(pageNum + 1);
-      prefetch(pageNum - 1);
-      return;
-    }
-    setLoading(true);
-    setError(false);
-    fetch(`https://api.alquran.cloud/v1/page/${pageNum}/quran-uthmani`)
-      .then(r => r.json())
-      .then(json => {
-        const data = json?.data?.ayahs ?? [];
-        if (!data.length) throw new Error('empty page');
-        pageCache.set(pageNum, data);
-        setAyahs(data);
-        setLoading(false);
-        prefetch(pageNum + 1);
-        prefetch(pageNum - 1);
-      })
-      .catch(() => { setLoading(false); setError(true); });
-  }, [pageNum, prefetch, attempt]);
 
   const surahGroups = useMemo(() => {
     const groups: { surahNum: number; surahName: string; ayahs: Ayah[] }[] = [];
@@ -116,7 +67,7 @@ export const MushafPageContent = React.memo(({
           <View style={s.pageError}>
             <AlertTriangle size={32} color={colors.goldDeep} style={{ alignSelf: 'center' }} />
             <Text style={s.pageErrorText}>تعذّر تحميل الصفحة. تأكد من الاتصال بالإنترنت.</Text>
-            <TouchableOpacity style={s.pageRetryBtn} onPress={() => setAttempt((a) => a + 1)} accessibilityRole="button">
+            <TouchableOpacity style={s.pageRetryBtn} onPress={retry} accessibilityRole="button">
               <Text style={s.pageRetryText}>إعادة المحاولة</Text>
             </TouchableOpacity>
           </View>

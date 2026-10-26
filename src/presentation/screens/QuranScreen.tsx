@@ -9,7 +9,8 @@ import { useAudio } from '../hooks/useAudio';
 import { RootState } from '../store';
 import { setCurrentPage, togglePageBookmark, toggleBookmark } from '../store/slices/quranSlice';
 import { logQuranPage } from '../store/slices/statsSlice';
-import { useSurahs } from '../hooks/useQuran';
+import { useSurahs, useTafsir } from '../hooks/useQuran';
+import { useRepositories } from '../providers/RepositoryProvider';
 
 // Quran Components & Constants
 import { MushafPageContent } from '../components/quran/MushafPageContent';
@@ -21,7 +22,7 @@ import { TAFSIR_LIST } from '../components/settings/SettingsConstants';
 import { s } from '../components/quran/QuranStyles';
 import { 
     TOTAL_PAGES, JUZ_PAGES, toAr, 
-    pageCache, Ayah, SurahMeta, H 
+    Ayah, SurahMeta, H 
 } from '../components/quran/QuranConstants';
 
 const QuranScreen = ({ navigation }: any) => {
@@ -34,10 +35,8 @@ const QuranScreen = ({ navigation }: any) => {
   const { selectedTafsirId, tafsirStyle, tafsirFontSize } = useSelector((state: RootState) => state.settings);
 
   const [selectedAyah, setSelectedAyah] = useState<Ayah | null>(null);
-  const [tafsir, setTafsir] = useState<string | null>(null);
-  const [tafsirLoading, setTafsirLoading] = useState(false);
-  const [tafsirError, setTafsirError] = useState(false);
-  const tafsirRequest = useRef(0); // ignore answers for an ayah the user already left
+  const tafsir = useTafsir(selectedTafsirId);
+  const { quran } = useRepositories();
   const [showSurahPicker, setShowSurahPicker] = useState(false);
   const [showBookmarks, setShowBookmarks] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -54,7 +53,7 @@ const QuranScreen = ({ navigation }: any) => {
   } = useAudio();
 
   const bottomSheetAnim = useRef(new Animated.Value(H)).current;
-  const { data: surahsData, isLoading: surahsLoading, isError: surahsError, refetch: refetchSurahs } = useSurahs() as any;
+  const { data: surahsData, isLoading: surahsLoading, isError: surahsError, refetch: refetchSurahs } = useSurahs();
   
   const surahsList = (surahsData as SurahMeta[] | undefined) ?? [];
   const filteredSurahs = surahsList.filter(s =>
@@ -87,34 +86,11 @@ const QuranScreen = ({ navigation }: any) => {
     pagerRef.current?.setPageWithoutAnimation(1);
   }, [currentPage]);
 
-  const getTafsir = async (ayah: Ayah) => {
+  const getTafsir = (ayah: Ayah) => {
     setSelectedAyah(ayah);
     setHighlightedAyah(ayah.number);
     openBottomSheet();
-    loadTafsir(ayah);
-  };
-
-  // The error is its own state: it must never end up as tafsir text (the share image
-  // uses the tafsir as its excerpt).
-  const loadTafsir = async (ayah: Ayah) => {
-    const req = ++tafsirRequest.current;
-    setTafsirLoading(true);
-    setTafsirError(false);
-    setTafsir(null);
-    try {
-      const res = await fetch(
-        `https://api.quran.com/api/v4/tafsirs/${selectedTafsirId}/by_ayah/${ayah.surah.number}:${ayah.numberInSurah}`
-      );
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      const html: unknown = data?.tafsir?.text;
-      if (typeof html !== 'string' || !html.trim()) throw new Error('empty tafsir');
-      if (req === tafsirRequest.current) setTafsir(html);
-    } catch {
-      if (req === tafsirRequest.current) setTafsirError(true);
-    } finally {
-      if (req === tafsirRequest.current) setTafsirLoading(false);
-    }
+    tafsir.load({ surah: ayah.surah.number, ayah: ayah.numberInSurah });
   };
 
   const openBottomSheet = () => {
@@ -127,8 +103,7 @@ const QuranScreen = ({ navigation }: any) => {
   };
 
   const closeBottomSheet = () => {
-    tafsirRequest.current++; // drop any tafsir still loading for the sheet being closed
-    setTafsirLoading(false);
+    tafsir.cancel(); // drop any tafsir still loading for the sheet being closed
     Animated.timing(bottomSheetAnim, {
       toValue: H,
       duration: 250,
@@ -143,10 +118,7 @@ const QuranScreen = ({ navigation }: any) => {
     setShowSurahPicker(false);
     setSearchQuery('');
     try {
-      const res = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}`);
-      const json = await res.json();
-      const firstPage: number = json?.data?.ayahs?.[0]?.page;
-      if (firstPage) dispatch(setCurrentPage(firstPage));
+      dispatch(setCurrentPage(await quran.getSurahStartPage(surahNumber)));
     } catch {}
   };
 
@@ -177,7 +149,7 @@ const QuranScreen = ({ navigation }: any) => {
               if (isPlaying) {
                 await togglePlayback();
               } else {
-                const itemsToPlay = pageCache.get(currentPage)?.map(a => ({
+                const itemsToPlay = quran.peekPage(currentPage)?.map(a => ({
                   surahId: a.surah.number,
                   ayahNumber: a.numberInSurah
                 })) ?? [];
@@ -261,11 +233,11 @@ const QuranScreen = ({ navigation }: any) => {
       <TafsirBottomSheet
         visible={!!selectedAyah}
         selectedAyah={selectedAyah}
-        tafsir={tafsir}
+        tafsir={tafsir.html}
         tafsirName={TAFSIR_LIST.find((t) => t.id === selectedTafsirId)?.name}
-        tafsirLoading={tafsirLoading}
-        tafsirError={tafsirError}
-        onRetryTafsir={() => selectedAyah && loadTafsir(selectedAyah)}
+        tafsirLoading={tafsir.loading}
+        tafsirError={tafsir.error}
+        onRetryTafsir={tafsir.retry}
         tafsirStyle={tafsirStyle}
         tafsirFontSize={tafsirFontSize}
         bottomSheetAnim={bottomSheetAnim}

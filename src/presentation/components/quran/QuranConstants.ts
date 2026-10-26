@@ -14,20 +14,7 @@ export function stripHtml(html: string) {
   return html.replace(/<[^>]*>?/gm, '').trim();
 }
 
-export interface Ayah {
-  number: number;
-  text: string;
-  numberInSurah: number;
-  page: number;
-  surah: { number: number; name: string; englishName: string };
-}
-
-export interface SurahMeta {
-  number: number;
-  name: string;
-  englishName: string;
-  numberOfAyahs: number;
-  revelationType: string;
-}
-
-export const pageCache = new Map<number, Ayah[]>();
+// Quran types live in the domain; re-exported so existing UI imports keep working.
+import type { MushafAyah, SurahMeta } from '../../../domain/entities/quran';
+export type Ayah = MushafAyah;
+export type { SurahMeta };
