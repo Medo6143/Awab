@@ -9,6 +9,9 @@ export interface AzanNativeModule {
   scheduleAzan?(id: string, name: string, hours: number, minutes: number, type: string): Promise<void>;
   cancelAzan?(id: string): void;
   getPendingAzan?(): Promise<string | null>;
+  /** ms into the adhan the native service is playing, or -1. */
+  getAzanPositionMs?(): Promise<number>;
+  stopAzan?(): void;
   didBootRescheduleFail?(): Promise<boolean>;
   clearBootRescheduleFailedFlag?(): void;
 }

@@ -28,6 +28,21 @@ public class AzanService extends Service {
     public  static final String ACTION_STOP      = "STOP_AZAN";
 
     private MediaPlayer       mediaPlayer;
+
+    /** The running service, so AzanModule can report the playback position to JS. */
+    private static AzanService current;
+
+    /** Milliseconds into the adhan, or -1 when nothing is playing. */
+    public static boolean isRunning() {
+        return current != null;
+    }
+
+    public static int currentPositionMs() {
+        AzanService svc = current;
+        if (svc == null || svc.mediaPlayer == null) return -1;
+        try { return svc.mediaPlayer.isPlaying() ? svc.mediaPlayer.getCurrentPosition() : -1; }
+        catch (IllegalStateException e) { return -1; }
+    }
     private AudioManager      audioManager;
     private AudioFocusRequest audioFocusRequest; // API 26+
 
@@ -70,6 +85,7 @@ public class AzanService extends Service {
 
     @Override
     public void onDestroy() {
+        if (current == this) current = null;
         releaseMediaPlayer();
         abandonAudioFocus();
         super.onDestroy();
@@ -125,6 +141,7 @@ public class AzanService extends Service {
             mediaPlayer.setLooping(false);
             mediaPlayer.prepareAsync();
 
+            current = this;
             mediaPlayer.setOnPreparedListener(MediaPlayer::start);
 
             mediaPlayer.setOnCompletionListener(mp -> {

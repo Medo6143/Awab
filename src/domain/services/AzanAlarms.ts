@@ -7,4 +7,8 @@ export interface AzanAlarms {
   clearBootRescheduleFailed(): void;
   /** An alarm fired while the app is running. */
   onTriggered(listener: (prayerName: string) => void): () => void;
+  /** Seconds into the adhan the alarm is playing, or null when it is not. */
+  playbackPosition(): Promise<number | null>;
+  /** Stops the adhan the alarm is playing, if any. */
+  stop(): void;
 }

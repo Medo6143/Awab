@@ -20,6 +20,17 @@ export class NativeAzanAlarms implements AzanAlarms {
     try { this.mod?.clearBootRescheduleFailedFlag?.(); } catch {}
   }
 
+  async playbackPosition() {
+    try {
+      const ms = await this.mod?.getAzanPositionMs?.();
+      return typeof ms === 'number' && ms >= 0 ? ms / 1000 : null;
+    } catch { return null; }
+  }
+
+  stop() {
+    try { this.mod?.stopAzan?.(); } catch {}
+  }
+
   onTriggered(listener: (prayerName: string) => void) {
     const sub = DeviceEventEmitter.addListener('onAzanTriggered', (e: { prayerName?: string }) => listener(e?.prayerName || 'الصلاة'));
     return () => sub.remove();

@@ -182,6 +182,14 @@ export class AudioService {
   }
 
 
+  /** Seconds into the azan this service is playing (expo-av), or null. */
+  static async azanPosition(): Promise<number | null> {
+    try {
+      const st = await this.sound?.getStatusAsync();
+      return st && st.isLoaded && st.isPlaying ? st.positionMillis / 1000 : null;
+    } catch { return null; }
+  }
+
   static async playAzan(type: 'takbir' | 'full') {
     console.log('AudioService: playAzan called with type:', type);
     try {

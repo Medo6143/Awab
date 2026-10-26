@@ -231,6 +231,21 @@ public class AzanModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void getAzanPositionMs(Promise promise) {
+        promise.resolve(AzanService.currentPositionMs());
+    }
+
+    /** Stops the adhan the alarm service is playing, from the in-app azan screen. */
+    @ReactMethod
+    public void stopAzan() {
+        if (!AzanService.isRunning()) return;
+        Context context = getReactApplicationContext();
+        Intent intent = new Intent(context, AzanService.class);
+        intent.setAction(AzanService.ACTION_STOP);
+        context.startService(intent);
+    }
+
+    @ReactMethod
     public void getPendingAzan(Promise promise) {
         promise.resolve(pendingPrayerName);
         pendingPrayerName = null;
