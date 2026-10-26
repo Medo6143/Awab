@@ -15,6 +15,7 @@ import TasbeehScreen from '../screens/TasbeehScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import AthkarScreen from '../screens/AthkarScreen';
 import HeartJourneyScreen from '../screens/HeartJourneyScreen';
+import KhatmatScreen from '../screens/KhatmatScreen';
 import QiblaScreen from '../screens/QiblaScreen';
 import PrayerTimesScreen from '../screens/PrayerTimesScreen';
 import ZakatScreen from '../screens/ZakatScreen';
@@ -64,6 +65,7 @@ const AppNavigation = () => {
           <Stack.Screen name="الأذكار" component={AthkarScreen} />
           <Stack.Screen name="الأدعية" component={DuaScreen} />
           <Stack.Screen name="نور_القلب" component={HeartJourneyScreen} />
+          <Stack.Screen name="الختمات" component={KhatmatScreen} />
           <Stack.Screen name="القبلة" component={QiblaScreen} />
           <Stack.Screen name="الصلاة" component={PrayerTimesScreen} />
           <Stack.Screen name="الزكاة" component={ZakatScreen} />

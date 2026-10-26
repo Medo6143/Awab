@@ -14,6 +14,7 @@ export type RootStackParamList = {
   'الأذكار': { type?: 'morning' | 'evening' } | undefined;
   'الأدعية': undefined;
   'نور_القلب': undefined;
+  'الختمات': { mode?: 'reading' | 'hifz' } | undefined;
   'القبلة': undefined;
   'الصلاة': undefined;
   'الزكاة': undefined;

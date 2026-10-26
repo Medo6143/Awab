@@ -119,9 +119,10 @@ type Props = {
   size?: number;                        // rendered width
   onToggleSurah?: (id: number) => void; // tap a cell to mark/unmark that surah
   onZoomRequest?: () => void;           // long-press on a cell
+  labels?: boolean;                     // surah names; off for thumbnails
 };
 
-export const AnatomicalHeart = ({ pulseAnim, completedSurahs, progress, size, onToggleSurah, onZoomRequest }: Props) => {
+export const AnatomicalHeart = ({ pulseAnim, completedSurahs, progress, size, onToggleSurah, onZoomRequest, labels = true }: Props) => {
   const width = size ?? Dimensions.get('window').width * 0.9;
   const height = (width * HEART_VB_H) / HEART_VB_W;
   const scale = width / HEART_VB_W; // viewBox units → px, for the RN label overlay
@@ -183,11 +184,13 @@ export const AnatomicalHeart = ({ pulseAnim, completedSurahs, progress, size, on
           </G>
         </Svg>
         {/* direction:'ltr' — under forced RTL Android swaps left/right, which would mirror every label. */}
-        <View pointerEvents="none" style={[StyleSheet.absoluteFill, { direction: 'ltr' }]}>
-          {CELL_LAYOUT.map((cell) => (
-            <HeartLabel key={`l${cell.id}`} cx={cell.cx} cy={cell.cy} lines={cell.lines} fontSize={cell.fontSize} done={doneSet.has(cell.id)} scale={scale} />
-          ))}
-        </View>
+        {labels ? (
+          <View pointerEvents="none" style={[StyleSheet.absoluteFill, { direction: 'ltr' }]}>
+            {CELL_LAYOUT.map((cell) => (
+              <HeartLabel key={`l${cell.id}`} cx={cell.cx} cy={cell.cy} lines={cell.lines} fontSize={cell.fontSize} done={doneSet.has(cell.id)} scale={scale} />
+            ))}
+          </View>
+        ) : null}
       </Animated.View>
     </View>
   );
