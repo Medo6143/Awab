@@ -23,6 +23,9 @@ const persistConfig = {
   key: 'root_v6',     // Incremented version for stats and tasbeeh
   version: STORE_VERSION,
   storage: AsyncStorage,
+  // Session-only state: an open azan screen or a "playing" flag must not come back
+  // after the app was killed (the azan screen reappeared on every launch).
+  blacklist: ['ui', 'audio'],
 };
 
 const rootReducer = combineReducers({
