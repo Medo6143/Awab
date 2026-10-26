@@ -1,8 +1,8 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { colors, radius, space } from '../../../shared/theme/tokens';
 import { toAr } from '../../../shared/utils/format';
-import { parseTafsir, TafsirBlock, TafsirRun } from './tafsirParser';
+import { TafsirBlock, TafsirRun } from './tafsirParser';
 
 type Variant = 'modern' | 'book' | 'simple';
 
@@ -11,8 +11,7 @@ type Variant = 'modern' | 'book' | 'simple';
  * quoted ayah phrase shows that phrase as its heading, so each phrase sits with its own
  * explanation; lead-ins ("عن ابن عباس:") are bold and cross-references are small tags.
  */
-export const TafsirBlocks = ({ html, fontSize, variant, sourceName }: { html: string; fontSize: number; variant: Variant; sourceName?: string }) => {
-  const blocks = useMemo(() => parseTafsir(html), [html]);
+export const TafsirBlocks = ({ blocks, fontSize, variant, sourceName }: { blocks: TafsirBlock[]; fontSize: number; variant: Variant; sourceName?: string }) => {
   if (!blocks.length) return null;
 
   return (
@@ -72,25 +71,24 @@ const Section = ({ block, index, count, fontSize, variant }: { block: TafsirBloc
   );
 };
 
-const INK = '#271900';
 const st = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: space[3], marginBottom: space[4] },
   headerBar: { width: 5, height: 24, borderRadius: 3, backgroundColor: colors.gold },
   headerTitle: { fontFamily: 'Tajawal_700Bold', fontSize: 18, color: colors.paperInk, flex: 1 },
-  headerCount: { fontFamily: 'Tajawal_500Medium', fontSize: 12, color: '#8b6b3e' },
+  headerCount: { fontFamily: 'Tajawal_500Medium', fontSize: 12, color: colors.paperMuted },
 
-  section: { flexDirection: 'row', gap: space[3], backgroundColor: '#fffdf6', borderRadius: radius.card, padding: space[4], marginBottom: space[3], borderWidth: 1, borderColor: '#efe2bf' },
-  sectionBook: { backgroundColor: '#fcf8eb', borderRadius: radius.field },
-  sectionSimple: { backgroundColor: 'transparent', borderWidth: 0, borderRadius: 0, paddingHorizontal: 0, borderBottomWidth: 1, borderBottomColor: '#e8dcbc' },
+  section: { flexDirection: 'row', gap: space[3], backgroundColor: colors.paperCard, borderRadius: radius.card, padding: space[4], marginBottom: space[3], borderWidth: 1, borderColor: colors.paperBorder },
+  sectionBook: { backgroundColor: colors.paperCardBook, borderRadius: radius.field },
+  sectionSimple: { backgroundColor: 'transparent', borderWidth: 0, borderRadius: 0, paddingHorizontal: 0, borderBottomWidth: 1, borderBottomColor: colors.paperDivider },
   badge: { width: 26, height: 26, borderRadius: 13, backgroundColor: colors.paperDeep, alignItems: 'center', justifyContent: 'center', marginTop: 3 },
   badgeText: { fontFamily: 'Tajawal_700Bold', fontSize: 13, color: colors.paperInk },
   sectionBody: { flex: 1 },
 
   headingWrap: { marginBottom: space[2] },
-  quran: { fontFamily: 'Amiri_700Bold', color: '#8a5a12' },
-  quranInline: { fontFamily: 'Amiri_700Bold', color: '#8a5a12' },
-  lead: { fontFamily: 'Tajawal_700Bold', color: INK },
-  ref: { fontFamily: 'Tajawal_500Medium', color: '#8b6b3e' },
-  text: { fontFamily: 'Tajawal_400Regular', color: INK, textAlign: 'justify' },
+  quran: { fontFamily: 'Amiri_700Bold', color: colors.paperQuote },
+  quranInline: { fontFamily: 'Amiri_700Bold', color: colors.paperQuote },
+  lead: { fontFamily: 'Tajawal_700Bold', color: colors.paperInk },
+  ref: { fontFamily: 'Tajawal_500Medium', color: colors.paperMuted },
+  text: { fontFamily: 'Tajawal_400Regular', color: colors.paperInk, textAlign: 'justify' },
   textBook: { fontFamily: 'Amiri_400Regular' },
 });

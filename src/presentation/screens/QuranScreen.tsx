@@ -127,6 +127,8 @@ const QuranScreen = ({ navigation }: any) => {
   };
 
   const closeBottomSheet = () => {
+    tafsirRequest.current++; // drop any tafsir still loading for the sheet being closed
+    setTafsirLoading(false);
     Animated.timing(bottomSheetAnim, {
       toValue: H,
       duration: 250,

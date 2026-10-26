@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { Animated, Image, StyleSheet, Text, View } from 'react-native';
 import { AnatomicalHeart } from '../heart/AnatomicalHeart';
 import { toAr } from '../../../shared/utils/format';
+import { colors } from '../../../shared/theme/tokens';
 import { shareCardSize } from './ImageShareModal';
 
 const LOGO = require('../../../../assets/icon.png');
@@ -18,8 +19,8 @@ export const HeartShareCard = ({ completedSurahs, khatmaCount }: { completedSura
       <View style={[st.frame, { top: 3.5 * u, left: 3.5 * u, right: 3.5 * u, bottom: 3.5 * u, borderRadius: 4 * u }]} />
 
       <View style={{ alignItems: 'center' }}>
-        <Text style={[st.title, { fontSize: 7 * u }]}>نور القرآن في قلبي</Text>
-        <Text style={[st.sub, { fontSize: 3.6 * u, marginTop: 1.4 * u }]}>
+        <Text allowFontScaling={false} style={[st.title, { fontSize: 7 * u }]}>نور القرآن في قلبي</Text>
+        <Text allowFontScaling={false} style={[st.sub, { fontSize: 3.6 * u, marginTop: 1.4 * u }]}>
           {toAr(done)} سورة من ١١٤{khatmaCount > 0 ? ` · ${toAr(khatmaCount)} ختمة` : ''}
         </Text>
       </View>
@@ -30,17 +31,17 @@ export const HeartShareCard = ({ completedSurahs, khatmaCount }: { completedSura
 
       <View style={[st.brand, { gap: 2.2 * u }]}>
         <Image source={LOGO} style={{ width: 9 * u, height: 9 * u, borderRadius: 2.2 * u }} />
-        <Text style={[st.brandName, { fontSize: 4.4 * u }]}>أوّاب</Text>
+        <Text allowFontScaling={false} style={[st.brandName, { fontSize: 4.4 * u }]}>أوّاب</Text>
       </View>
     </View>
   );
 };
 
 const st = StyleSheet.create({
-  card: { backgroundColor: '#0e0a07', justifyContent: 'space-between' },
-  frame: { position: 'absolute', borderWidth: 1.2, borderColor: 'rgba(212,175,55,0.45)' },
-  title: { fontFamily: 'Tajawal_800ExtraBold', color: '#f5efe6' },
-  sub: { fontFamily: 'Tajawal_700Bold', color: '#d4af37' },
+  card: { backgroundColor: colors.bg, justifyContent: 'space-between' },
+  frame: { position: 'absolute', borderWidth: 1.2, borderColor: colors.goldLine },
+  title: { fontFamily: 'Tajawal_800ExtraBold', color: colors.text },
+  sub: { fontFamily: 'Tajawal_700Bold', color: colors.gold },
   brand: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-  brandName: { fontFamily: 'Tajawal_800ExtraBold', color: '#d4af37' },
+  brandName: { fontFamily: 'Tajawal_800ExtraBold', color: colors.gold },
 });

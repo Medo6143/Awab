@@ -19,9 +19,12 @@ export const colors = {
   goldSoft: 'rgba(212,175,55,0.14)',
   goldDeep: '#9a7a1f',
   goldText: '#fcd34d',
+  goldLine: 'rgba(212,175,55,0.45)',
+  goldLineSoft: 'rgba(212,175,55,0.22)',
   onGold: '#1a140f',
 
   text: '#f5efe6',
+  textSoft: '#d9d0c3',
   textMuted: '#a89f93',
   textFaint: '#6b6259',
 
@@ -35,6 +38,12 @@ export const colors = {
   paperDeep: '#ebd9a3',
   paperInk: '#2b1f15',
   paperRule: '#d4af37',
+  paperCard: '#fffdf6',
+  paperCardBook: '#fcf8eb',
+  paperBorder: '#efe2bf',
+  paperDivider: '#e8dcbc',
+  paperQuote: '#8a5a12',
+  paperMuted: '#8b6b3e',
 
   overlay: 'rgba(0,0,0,0.6)',
   glass: 'rgba(26,20,15,0.72)',

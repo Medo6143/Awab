@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { Animated, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { Download, Eraser, Maximize2, ZoomIn, ZoomOut } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
-import { AnatomicalHeart } from './AnatomicalHeart';
+import { ZoomableHeart } from './ZoomableHeart';
 import { HEART_VB_H, HEART_VB_W } from './heartCells';
 import { colors, icon, radius, space } from '../../../shared/theme/tokens';
 import { toAr } from '../../../shared/utils/format';
@@ -25,26 +25,11 @@ type Props = {
  * the page around. Controls: zoom out/in, fullscreen, save as image, reset.
  */
 export const HeartViewer = ({ pulseAnim, completedSurahs, progress, onToggleSurah, onOpenFullscreen, onDownload, onReset }: Props) => {
-  const screenW = Dimensions.get('window').width;
+  const { width: screenW } = useWindowDimensions();
   const base = screenW * 0.9;
   const frameH = (base * HEART_VB_H) / HEART_VB_W;
   const [zi, setZi] = useState(0);
   const zoom = ZOOMS[zi];
-  const size = base * zoom;
-  const heartH = (size * HEART_VB_H) / HEART_VB_W;
-  const contentW = Math.max(screenW, size + space[8]);
-  const contentH = Math.max(frameH, heartH + space[6]);
-
-  const hRef = useRef<ScrollView>(null);
-  const vRef = useRef<ScrollView>(null);
-  // keep the middle of the heart in view when the zoom changes
-  useEffect(() => {
-    const t = setTimeout(() => {
-      hRef.current?.scrollTo({ x: (contentW - screenW) / 2, animated: false });
-      vRef.current?.scrollTo({ y: (contentH - frameH) / 2, animated: false });
-    }, 0);
-    return () => clearTimeout(t);
-  }, [zi]);
 
   const step = (d: number) => {
     const next = Math.max(0, Math.min(ZOOMS.length - 1, zi + d));
@@ -53,29 +38,17 @@ export const HeartViewer = ({ pulseAnim, completedSurahs, progress, onToggleSura
 
   return (
     <View style={{ marginBottom: space[5] }}>
-      <View style={{ height: frameH }}>
-        <ScrollView ref={vRef} nestedScrollEnabled scrollEnabled={zoom > 1} showsVerticalScrollIndicator={false}>
-          {/* direction:'ltr' so scroll offsets are measured from the left, not flipped by RTL */}
-          <ScrollView
-            ref={hRef}
-            horizontal
-            nestedScrollEnabled
-            scrollEnabled={zoom > 1}
-            showsHorizontalScrollIndicator={false}
-            style={{ direction: 'ltr' }}
-            contentContainerStyle={{ width: contentW, height: contentH, alignItems: 'center', justifyContent: 'center' }}
-          >
-            <AnatomicalHeart
-              pulseAnim={pulseAnim}
-              completedSurahs={completedSurahs}
-              progress={progress}
-              size={size}
-              onToggleSurah={onToggleSurah}
-              onZoomRequest={onOpenFullscreen}
-            />
-          </ScrollView>
-        </ScrollView>
-      </View>
+      <ZoomableHeart
+        frameW={screenW}
+        frameH={frameH}
+        size={base * zoom}
+        margin={space[8]}
+        pulseAnim={pulseAnim}
+        completedSurahs={completedSurahs}
+        progress={progress}
+        onToggleSurah={onToggleSurah}
+        onZoomRequest={onOpenFullscreen}
+      />
 
       <View style={st.bar}>
         <Tool label="أصغر" onPress={() => step(-1)} disabled={zi === 0}>

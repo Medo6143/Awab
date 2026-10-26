@@ -12,9 +12,15 @@
 export type TafsirRun = { kind: 'text' | 'quran' | 'lead' | 'ref'; text: string };
 export type TafsirBlock = { runs: TafsirRun[] };
 
-const ENTITIES: Record<string, string> = { '&nbsp;': ' ', '&amp;': '&', '&quot;': '"', '&#39;': "'", '&lt;': '<', '&gt;': '>' };
-const decode = (s: string) => s.replace(/&(nbsp|amp|quot|#39|lt|gt);/g, (m) => ENTITIES[m] ?? m);
-const clean = (s: string) => decode(s.replace(/<[^>]+>/g, '')).replace(/\\/g, '').replace(/\s+/g, ' ');
+const NAMED: Record<string, string> = { nbsp: ' ', amp: '&', quot: '"', apos: "'", lt: '<', gt: '>', hellip: '…', laquo: '«', raquo: '»' };
+const fromCode = (n: number) => (Number.isFinite(n) && n > 0 && n <= 0x10ffff ? String.fromCodePoint(n === 0xa0 ? 0x20 : n) : '');
+/** Named entities the API uses plus every decimal (&#8230;) and hex (&#x2026;) entity. */
+export const decodeEntities = (s: string) =>
+  s.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, body: string) => {
+    if (body[0] === '#') return fromCode(body[1] === 'x' || body[1] === 'X' ? parseInt(body.slice(2), 16) : parseInt(body.slice(1), 10)) || m;
+    return NAMED[body.toLowerCase()] ?? m;
+  });
+const clean = (s: string) => decodeEntities(s.replace(/<[^>]+>/g, '')).replace(/\\/g, '').replace(/\s+/g, ' ');
 
 const kindOf = (cls: string): TafsirRun['kind'] => {
   if (/\breference\b/.test(cls)) return 'ref';

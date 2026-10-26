@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Modal, ScrollView, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Animated, Modal, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { X, Maximize2, Minimize2 } from 'lucide-react-native';
-import { AnatomicalHeart, HEART_VB_H, HEART_VB_W } from './AnatomicalHeart';
+import { ZoomableHeart } from './ZoomableHeart';
 import { SURAH_NAMES } from '../../../shared/constants/surahs';
 import { toAr } from './HeartJourneyConstants';
 import { s } from './HeartJourneyStyles';
@@ -21,14 +21,14 @@ type Props = {
  * Taps still toggle the surah; a caption confirms what was tapped.
  */
 export const HeartZoomModal = ({ visible, onClose, completedSurahs, progress, onToggleSurah }: Props) => {
-  const { width: W, height: H } = useWindowDimensions();
+  const { width: W } = useWindowDimensions();
+  const [frameH, setFrameH] = useState(0);
   const [zoomed, setZoomed] = useState(true);
   const [last, setLast] = useState<{ id: number; done: boolean } | null>(null);
   const staticPulse = useRef(new Animated.Value(1)).current;
   const captionOpacity = useRef(new Animated.Value(0)).current;
 
   const size = zoomed ? W * 2.6 : W * 0.92;
-  const heartH = (size * HEART_VB_H) / HEART_VB_W;
 
   const toggle = useCallback((id: number) => {
     const nowDone = !completedSurahs.includes(id);
@@ -59,28 +59,19 @@ export const HeartZoomModal = ({ visible, onClose, completedSurahs, progress, on
           </TouchableOpacity>
         </View>
 
-        <ScrollView
-          key={`h${zoomed}`}
-          horizontal
-          nestedScrollEnabled
-          showsHorizontalScrollIndicator={false}
-          contentOffset={{ x: Math.max(0, (size - W) / 2), y: 0 }}
-        >
-          <ScrollView
-            key={`v${zoomed}`}
-            nestedScrollEnabled
-            showsVerticalScrollIndicator={false}
-            contentOffset={{ x: 0, y: Math.max(0, (heartH - H * 0.8) / 2) }}
-          >
-            <AnatomicalHeart
+        <View style={{ flex: 1 }} onLayout={(e) => setFrameH(e.nativeEvent.layout.height)}>
+          {frameH > 0 ? (
+            <ZoomableHeart
+              frameW={W}
+              frameH={frameH}
               size={size}
               pulseAnim={staticPulse}
               completedSurahs={completedSurahs}
               progress={progress}
               onToggleSurah={toggle}
             />
-          </ScrollView>
-        </ScrollView>
+          ) : null}
+        </View>
 
         <Text style={s.zoomHint}>اسحب للتنقّل • اضغط على السورة لتحديدها</Text>
 

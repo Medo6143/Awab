@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Modal, PixelRatio, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
-import { captureRef } from 'react-native-view-shot';
+import { captureRef, releaseCapture } from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
 import { Download, Share2, X } from 'lucide-react-native';
@@ -36,13 +36,27 @@ export const ImageShareModal = ({ visible, title, onClose, children }: Props) =>
   const { w, h } = shareCardSize();
   const scale = Math.min((width - space[8] * 2) / w, (height * 0.66) / h);
 
-  const capture = () => captureRef(ref, { format: 'png', quality: 1, result: 'tmpfile' });
+  // Every capture is a ~0.5 MB temp PNG. Keep them until the preview closes (a receiving app
+  // such as WhatsApp may still be reading a shared file after the share sheet returns),
+  // then delete them all.
+  const captures = useRef<string[]>([]);
+  const capture = async () => {
+    const uri = await captureRef(ref, { format: 'png', quality: 1, result: 'tmpfile' });
+    captures.current.push(uri);
+    return uri;
+  };
+  const releaseAll = () => {
+    captures.current.forEach((u) => { try { releaseCapture(u); } catch {} });
+    captures.current = [];
+  };
+  useEffect(() => { if (!visible) releaseAll(); }, [visible]);
+  useEffect(() => releaseAll, []);
 
   const onShare = async () => {
     setBusy('share');
     try {
-      const uri = await capture();
       if (!(await Sharing.isAvailableAsync())) { Alert.alert('المشاركة غير متاحة على هذا الجهاز'); return; }
+      const uri = await capture();
       await Sharing.shareAsync(uri, { mimeType: 'image/png', dialogTitle: title, UTI: 'public.png' });
     } catch {
       Alert.alert('تعذّر إنشاء الصورة', 'حاول مرة أخرى.');
@@ -56,7 +70,7 @@ export const ImageShareModal = ({ visible, title, onClose, children }: Props) =>
       const perm = await MediaLibrary.requestPermissionsAsync(true);
       if (!perm.granted) { Alert.alert('لا يوجد إذن', 'اسمح لأوّاب بحفظ الصور من إعدادات الهاتف.'); return; }
       const uri = await capture();
-      await MediaLibrary.saveToLibraryAsync(uri);
+      await MediaLibrary.saveToLibraryAsync(uri); // copies the file into the gallery
       Alert.alert('تم الحفظ', 'الصورة محفوظة في معرض الصور.');
     } catch {
       Alert.alert('تعذّر حفظ الصورة', 'حاول مرة أخرى.');
@@ -94,7 +108,7 @@ export const ImageShareModal = ({ visible, title, onClose, children }: Props) =>
 };
 
 const st = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: 'rgba(8,6,4,0.94)', alignItems: 'center', justifyContent: 'center', paddingHorizontal: space[5] },
+  backdrop: { flex: 1, backgroundColor: colors.glassOpaque, alignItems: 'center', justifyContent: 'center', paddingHorizontal: space[5] },
   top: { position: 'absolute', top: space[10], left: space[5], right: space[5], flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   title: { ...type.h2, color: colors.text },
   actions: { flexDirection: 'row', gap: space[3], marginTop: space[6] },

@@ -33,7 +33,9 @@ export const TafsirBottomSheet = ({
 }: Props) => {
 
   const [shareOpen, setShareOpen] = useState(false);
-  const excerpt = useMemo(() => (tafsir ? tafsirExcerpt(parseTafsir(tafsir)) : ''), [tafsir]);
+  // parse once: the sections and the share-card excerpt come from the same blocks
+  const blocks = useMemo(() => (tafsir ? parseTafsir(tafsir) : []), [tafsir]);
+  const excerpt = useMemo(() => tafsirExcerpt(blocks), [blocks]);
 
   const handleShareText = async () => {
     if (!selectedAyah) return;
@@ -74,7 +76,7 @@ export const TafsirBottomSheet = ({
     if (!tafsir) return null;
 
     const variant = tafsirStyle === 'book' || tafsirStyle === 'simple' ? tafsirStyle : 'modern';
-    return <TafsirBlocks html={tafsir} fontSize={tafsirFontSize} variant={variant} sourceName={tafsirName} />;
+    return <TafsirBlocks blocks={blocks} fontSize={tafsirFontSize} variant={variant} sourceName={tafsirName} />;
   };
 
   return (
