@@ -10,7 +10,7 @@ import { RootState } from '../store';
 import { setCurrentPage, togglePageBookmark, toggleBookmark } from '../store/slices/quranSlice';
 import { logQuranPage } from '../store/slices/statsSlice';
 import { useSurahs, useTafsir } from '../hooks/useQuran';
-import { useRepositories } from '../providers/RepositoryProvider';
+import { useDependencies } from '../providers/DependencyProvider';
 
 // Quran Components & Constants
 import { MushafPageContent } from '../components/quran/MushafPageContent';
@@ -36,7 +36,7 @@ const QuranScreen = ({ navigation }: any) => {
 
   const [selectedAyah, setSelectedAyah] = useState<Ayah | null>(null);
   const tafsir = useTafsir(selectedTafsirId);
-  const { quran } = useRepositories();
+  const { quran } = useDependencies();
   const [showSurahPicker, setShowSurahPicker] = useState(false);
   const [showBookmarks, setShowBookmarks] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');

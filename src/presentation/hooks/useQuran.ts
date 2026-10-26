@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useRepositories } from '../providers/RepositoryProvider';
+import { useDependencies } from '../providers/DependencyProvider';
 import { AyahRef, MushafAyah } from '../../domain/entities/quran';
 
 export const useSurahs = () => {
-  const { quran } = useRepositories();
+  const { quran } = useDependencies();
   return useQuery({ queryKey: ['surahs'], queryFn: () => quran.getSurahs(), staleTime: Infinity });
 };
 
 /** One Mushaf page: cached instantly when available, otherwise loaded with retry. Neighbours are prefetched. */
 export const useMushafPage = (page: number) => {
-  const { quran } = useRepositories();
+  const { quran } = useDependencies();
   const [state, setState] = useState<{ page: number; ayahs: MushafAyah[]; loading: boolean; error: boolean }>(() => {
     const cached = quran.peekPage(page);
     return { page, ayahs: cached ?? [], loading: !cached, error: false };
@@ -47,7 +47,7 @@ export const useMushafPage = (page: number) => {
  * for an ayah the user already left never overwrites the current one.
  */
 export const useTafsir = (tafsirId: number) => {
-  const { tafsir } = useRepositories();
+  const { tafsir } = useDependencies();
   const [html, setHtml] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
