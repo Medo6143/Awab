@@ -1,3 +1,4 @@
+import { EmbeddableScreenProps } from '../navigation/types';
 import React, { useState, useEffect } from 'react';
 import { FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -14,7 +15,7 @@ import { s } from '../components/athkar/AthkarStyles';
 import { colors } from '../../shared/theme/tokens';
 
 /** Rendered both as a tab (route TabAthkar, no back button) and as a stack screen (الأذكار). */
-const AthkarScreen = ({ route, navigation, hideHeader }: any) => {
+const AthkarScreen = ({ route, navigation, hideHeader }: EmbeddableScreenProps<'الأذكار' | 'TabAthkar'>) => {
   const dispatch = useDispatch();
   const isTab = route?.name === 'TabAthkar';
   const initialTab = route?.params?.type === 'evening' ? 'evening' : 'morning';
@@ -43,7 +44,7 @@ const AthkarScreen = ({ route, navigation, hideHeader }: any) => {
 
   return (
     <SafeAreaView edges={['top']} style={s.root}>
-      <AthkarHeader hideHeader={hideHeader} isTab={isTab} onBack={() => navigation.goBack()} onReset={() => dispatch(resetAthkarCounts())} />
+      <AthkarHeader hideHeader={hideHeader} isTab={isTab} onBack={() => navigation?.goBack()} onReset={() => dispatch(resetAthkarCounts())} />
       <AthkarTabs activeTab={activeTab} onTabChange={setActiveTab} />
       <AthkarProgressBar progressPercent={progressPercent} totalCompleted={totalCompleted} totalPossible={totalPossible} />
 

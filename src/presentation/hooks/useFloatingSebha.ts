@@ -8,6 +8,7 @@ import { useDependencies } from '../providers/DependencyProvider';
 import { FloatingSebhaConfig, reconcileCount } from '../../domain/services/FloatingSebha';
 
 const DEFAULT_LABEL = 'سبحان الله';
+const errorMessage = (e: unknown) => (e instanceof Error ? e.message : String(e));
 type TasbeehState = RootState['tasbeeh'];
 
 export const toSebhaConfig = (t: TasbeehState): FloatingSebhaConfig => ({
@@ -203,12 +204,12 @@ export const useFloatingSebhaToggle = () => {
       else {
         try {
           await enable();
-        } catch (e: any) {
-          Alert.alert('خطأ في التفعيل', 'فشل إظهار المسبحة العائمة: ' + (e?.message || String(e)) + '\n\nتأكد من:\n1. تفعيل "العرض فوق التطبيقات"\n2. عدم تفعيل توفير البطارية للتطبيق');
+        } catch (e) {
+          Alert.alert('خطأ في التفعيل', 'فشل إظهار المسبحة العائمة: ' + errorMessage(e) + '\n\nتأكد من:\n1. تفعيل "العرض فوق التطبيقات"\n2. عدم تفعيل توفير البطارية للتطبيق');
         }
       }
-    } catch (e: any) {
-      Alert.alert('خطأ', 'حدث خطأ: ' + (e?.message || String(e)));
+    } catch (e) {
+      Alert.alert('خطأ', 'حدث خطأ: ' + errorMessage(e));
     } finally {
       setIsToggling(false);
     }

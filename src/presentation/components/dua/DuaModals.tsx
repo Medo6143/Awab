@@ -5,7 +5,12 @@ import { s } from './DuaStyles';
 import { PillButton } from '../ui';
 import { colors } from '../../../shared/theme/tokens';
 
-export const AddDuaModal = ({ visible, onClose, text, setText, refText, setRefText, onSave }: any) => (
+export const AddDuaModal = ({ visible, onClose, text, setText, refText, setRefText, onSave }: {
+  visible: boolean; onClose: () => void;
+  text: string; setText: (t: string) => void;
+  refText: string; setRefText: (t: string) => void;
+  onSave: () => void;
+}) => (
   <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
     <View style={s.modalOverlay}>
       <View style={s.modalContent}>

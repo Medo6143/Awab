@@ -1,3 +1,4 @@
+import { EmbeddableScreenProps } from '../navigation/types';
 import React, { useEffect, useRef } from 'react';
 import { View, Text, Animated } from 'react-native';
 import { MapPinOff } from 'lucide-react-native';
@@ -11,7 +12,7 @@ import { toAr } from '../../shared/utils/format';
 
 const ACCURACY_LABEL: Record<string, string> = { high: 'دقة عالية', medium: 'دقة متوسطة', low: 'دقة منخفضة', unknown: 'معايرة' };
 
-const QiblaScreen = ({ navigation, hideHeader, tab }: any) => {
+const QiblaScreen = ({ navigation, hideHeader, tab }: EmbeddableScreenProps) => {
   const { heading, qiblaDir, accuracy, error } = useLocation();
   const headingAnim = useRef(new Animated.Value(0)).current;
   const qiblaAnim = useRef(new Animated.Value(0)).current;
@@ -54,7 +55,7 @@ const QiblaScreen = ({ navigation, hideHeader, tab }: any) => {
       scroll
       tab={tab}
       edges={hideHeader ? [] : ['top']}
-      header={!hideHeader ? <ScreenHeader title="اتجاه القبلة" onBack={() => navigation.goBack()} /> : undefined}
+      header={!hideHeader ? <ScreenHeader title="اتجاه القبلة" onBack={() => navigation?.goBack()} /> : undefined}
     >
       {error ? (
         <EmptyState icon={MapPinOff} title="الموقع غير متاح" message="فعّل خدمة الموقع ثم افتح الشاشة مرة أخرى لتحديد اتجاه القبلة." />

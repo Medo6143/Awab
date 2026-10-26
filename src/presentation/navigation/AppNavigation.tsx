@@ -1,6 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+import { RootStackParamList, TabParamList } from './types';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { View } from 'react-native';
 import { useAudio } from '../hooks/useAudio';
@@ -27,16 +28,10 @@ import StatsScreen from '../screens/StatsScreen';
  *  - Stack routes keep their Arabic names (used all over the app for navigate()).
  *  - Tasbeeh is a tab now; `navigate('TabTasbeeh')` works from any nested screen.
  */
-export type TabParamList = {
-  TabHome: undefined;
-  TabPrayer: undefined;
-  TabQuran: undefined;
-  TabTasbeeh: undefined;
-  TabAthkar: { type?: 'morning' | 'evening' } | undefined;
-};
+export type { TabParamList } from './types';
 
 const Tab = createBottomTabNavigator<TabParamList>();
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<RootStackParamList>();
 
 const TabNavigator = () => (
   <Tab.Navigator

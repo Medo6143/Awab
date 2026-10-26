@@ -18,7 +18,7 @@ export class LocationService {
       } catch (e) {
         // Network provider unavailable (indoors, airplane mode, emulators): fall back to
         // the last known fix, then to a GPS-only request, instead of giving up.
-        console.warn('LocationService: current position failed, trying fallbacks:', (e as any)?.message);
+        console.warn('LocationService: current position failed, trying fallbacks:', e instanceof Error ? e.message : e);
         location = await Location.getLastKnownPositionAsync({ maxAge: 24 * 60 * 60 * 1000 });
         if (!location) {
           location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });

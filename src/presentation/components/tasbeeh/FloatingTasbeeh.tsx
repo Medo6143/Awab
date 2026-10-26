@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Layers } from 'lucide-react-native';
 import { colors, radius, space, type } from '../../../shared/theme/tokens';
 import { useFloatingSebhaSync, useFloatingSebhaToggle } from '../../hooks/useFloatingSebha';
-import { THEME } from '../../../shared/theme/constants';
+import { useAccent } from '../../../shared/theme/useAccent';
 
 /**
  * ── GLOBAL CONTROLLER ──
@@ -19,9 +19,9 @@ export const FloatingTasbeehController = () => {
  * ── TOGGLE UI COMPONENT ──
  * The on/off card shown in Settings. Rendering only; behaviour is in useFloatingSebhaToggle.
  */
-export const FloatingTasbeehToggle = ({ accentTheme }: any) => {
+export const FloatingTasbeehToggle = () => {
     const { isActive: isFloatingActive, isPermitted, isToggling, toggle: handleToggle } = useFloatingSebhaToggle();
-    const accentColor = (THEME.colors as any)[accentTheme] || THEME.colors.primary;
+    const accentColor = useAccent().accent;
 
     const statusLabel = !isPermitted ? 'تحتاج صلاحية' : isFloatingActive ? 'مفعلة الآن' : 'جاهزة للتفعيل';
     const statusColor = !isPermitted ? '#ff8a80' : isFloatingActive ? colors.success : colors.goldText;

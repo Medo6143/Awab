@@ -1,3 +1,4 @@
+import { EmbeddableScreenProps } from '../navigation/types';
 import React, { useState } from 'react';
 import { FlatList, Share } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,7 +14,7 @@ import { AddDuaModal } from '../components/dua/DuaModals';
 import { s } from '../components/dua/DuaStyles';
 import { DUAS_DATA } from '../components/dua/DuaConstants';
 
-const DuaScreen = ({ hideHeader, navigation }: any) => {
+const DuaScreen = ({ hideHeader, navigation }: EmbeddableScreenProps) => {
   const dispatch = useDispatch();
   const personalDuas = useSelector((state: RootState) => state.duas.personalDuas);
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -22,8 +23,8 @@ const DuaScreen = ({ hideHeader, navigation }: any) => {
   const [newDuaText, setNewDuaText] = useState('');
   const [newDuaRef, setNewDuaRef] = useState('');
 
-  const allDuas = [...DUAS_DATA, ...personalDuas.map((d: any) => ({ ...d, category: 'personal' }))];
-  const filteredDuas = allDuas.filter((d: any) =>
+  const allDuas = [...DUAS_DATA, ...personalDuas.map((d) => ({ ...d, category: 'personal' }))];
+  const filteredDuas = allDuas.filter((d) =>
     (selectedCategory === 'all' || d.category === selectedCategory) &&
     (d.text.includes(searchQuery) || d.ref.includes(searchQuery)),
   );
@@ -35,7 +36,7 @@ const DuaScreen = ({ hideHeader, navigation }: any) => {
 
   const handleAddDua = () => {
     if (!newDuaText.trim()) return;
-    dispatch(addPersonalDua({ id: Date.now().toString(), text: newDuaText.trim(), ref: newDuaRef.trim() || 'دعاء شخصي', category: 'personal' as any } as any));
+    dispatch(addPersonalDua({ id: Date.now().toString(), text: newDuaText.trim(), ref: newDuaRef.trim() || 'دعاء شخصي', category: 'personal' }));
     setNewDuaText(''); setNewDuaRef(''); setShowAddModal(false);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };

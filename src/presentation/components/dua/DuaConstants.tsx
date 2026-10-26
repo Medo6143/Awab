@@ -1,3 +1,4 @@
+import { Dua } from '../../../domain/entities/types';
 import { BookOpen, Heart, User, Sun, LifeBuoy, LucideIcon } from 'lucide-react-native';
 
 export const DUA_CATEGORIES: { id: string; name: string; icon: LucideIcon }[] = [
@@ -8,7 +9,7 @@ export const DUA_CATEGORIES: { id: string; name: string; icon: LucideIcon }[] = 
   { id: 'personal', name: 'أدعية شخصية', icon: User },
 ];
 
-export const DUAS_DATA = [
+export const DUAS_DATA: Dua[] = [
   {
     id: 'q1',
     category: 'quranic',

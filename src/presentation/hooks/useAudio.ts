@@ -1,3 +1,4 @@
+import type { AVPlaybackStatus } from 'expo-av';
 import { useCallback, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { AudioService, RECITER_MAP } from '../../data/services/AudioService';
@@ -33,7 +34,7 @@ export const useAudio = () => {
     }));
   }, [playbackState, progress.position, progress.duration, dispatch]);
 
-  const onStatusUpdate = useCallback((status: any) => {
+  const onStatusUpdate = useCallback((status: AVPlaybackStatus) => {
     // Only used for Azan (expo-av) now
     if (status.isLoaded) {
       dispatch(setAudioState({

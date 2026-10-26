@@ -1,3 +1,4 @@
+import type { Reciter } from '../../../data/services/AudioService';
 import React from 'react';
 import { View, Text, Modal, ScrollView, TouchableOpacity } from 'react-native';
 import { X, Star } from 'lucide-react-native';
@@ -8,7 +9,7 @@ import { RECITER_MAP } from '../../../data/services/AudioService';
 interface Props {
   visible: boolean;
   onClose: () => void;
-  activeReciter: any;
+  activeReciter?: Reciter;
   onReciterChange: (id: string) => void;
 }
 

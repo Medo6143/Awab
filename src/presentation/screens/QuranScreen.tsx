@@ -1,3 +1,4 @@
+import { ScreenProps } from '../navigation/types';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Text, ActivityIndicator, TouchableOpacity, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -25,12 +26,12 @@ import {
     Ayah, SurahMeta, H 
 } from '../components/quran/QuranConstants';
 
-const QuranScreen = ({ navigation }: any) => {
+const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const dispatch = useDispatch();
   
-  const currentPage = useSelector((state: RootState) => (state as any).quran?.currentPage ?? 1);
-  const bookmarkedPages = useSelector((state: RootState) => (state as any).quran?.bookmarkedPages ?? []);
-  const bookmarks = useSelector((state: RootState) => (state as any).quran?.bookmarks ?? []);
+  const currentPage = useSelector((state: RootState) => state.quran.currentPage ?? 1);
+  const bookmarkedPages = useSelector((state: RootState) => state.quran.bookmarkedPages ?? []);
+  const bookmarks = useSelector((state: RootState) => state.quran.bookmarks ?? []);
   
   const { selectedTafsirId, tafsirStyle, tafsirFontSize } = useSelector((state: RootState) => state.settings);
 
@@ -62,7 +63,7 @@ const QuranScreen = ({ navigation }: any) => {
     String(s.number).includes(searchQuery)
   );
 
-  const onPageSelected = useCallback((e: any) => {
+  const onPageSelected = useCallback((e: { nativeEvent: { position: number } }) => {
     const newPos = e.nativeEvent.position; // 0=prev, 1=current, 2=next
     if (newPos === 1 || isTransitioning.current) return;
     

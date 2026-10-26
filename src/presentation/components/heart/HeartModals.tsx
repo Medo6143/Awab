@@ -6,7 +6,7 @@ import { colors } from '../../../shared/theme/tokens';
 import { toAr } from './HeartJourneyConstants';
 import { SURAH_NAMES } from '../../../shared/constants/surahs';
 
-export const JuzSelectionModal = ({ visible, onClose, onSelectJuz }: any) => (
+export const JuzSelectionModal = ({ visible, onClose, onSelectJuz }: { visible: boolean; onClose: () => void; onSelectJuz: (juzIndex: number) => void }) => (
   <Modal visible={visible} transparent animationType="fade">
     <View style={s.modalOverlay}>
       <View style={s.modalContent}>
@@ -26,7 +26,7 @@ export const JuzSelectionModal = ({ visible, onClose, onSelectJuz }: any) => (
   </Modal>
 );
 
-export const BulkMarkModal = ({ visible, onClose, onSelectSurah }: any) => (
+export const BulkMarkModal = ({ visible, onClose, onSelectSurah }: { visible: boolean; onClose: () => void; onSelectSurah: (surahId: number) => void }) => (
   <Modal visible={visible} transparent animationType="fade">
     <View style={s.modalOverlay}>
       <View style={s.modalContent}>

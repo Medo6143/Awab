@@ -8,9 +8,12 @@ import { colors, icon } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 import { formatCountdown } from '../../../shared/utils/format';
 
-type NextPrayer = { name: string; arName: string; time: string; remaining: number } | null;
+import { NextPrayerView } from '../../hooks/usePrayerTimes';
+import { PrayerDate } from '../../store/slices/prayerSlice';
 
-export const PrayerCountdown = ({ nextPrayer, date }: { nextPrayer: NextPrayer; date?: any }) => {
+type NextPrayer = NextPrayerView | null;
+
+export const PrayerCountdown = ({ nextPrayer, date }: { nextPrayer: NextPrayer; date?: PrayerDate }) => {
   const hijri = date?.hijri;
   const isTomorrow = !!nextPrayer && nextPrayer.remaining < 0;
   return (

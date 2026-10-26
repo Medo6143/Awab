@@ -1,3 +1,4 @@
+import type { Reciter } from '../../../data/services/AudioService';
 import React from 'react';
 import { View, Text, Modal, TouchableOpacity, TextInput, FlatList, ActivityIndicator, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,7 +22,7 @@ interface Props {
   onRetrySurahs?: () => void;
   onSurahSelect: (n: number) => void;
   onJuzSelect: (n: number) => void;
-  activeReciter: any;
+  activeReciter?: Reciter;
   currentSurahId: number | null;
   isPlaying: boolean;
   isBuffering: boolean;

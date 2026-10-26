@@ -1,3 +1,4 @@
+import { PlainRoute, ScreenProps } from '../navigation/types';
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,7 +17,7 @@ import { DailyReportModal } from '../components/home/DailyReportModal';
 
 const todayKey = () => new Date().toISOString().split('T')[0];
 
-const HomeScreen = ({ navigation }: any) => {
+const HomeScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const dispatch = useDispatch();
   const accent = useAccent();
   const [reportVisible, setReportVisible] = useState(false);
@@ -44,7 +45,7 @@ const HomeScreen = ({ navigation }: any) => {
     return { title: 'مساء الخير', sub: 'تقبل الله طاعاتكم في هذا المساء', isHoliday: false };
   };
 
-  const navigateTo = (route: string, params?: any) => navigation.navigate(route, params);
+  const navigateTo = (route: PlainRoute) => navigation.navigate(route);
   const today = dailyRecords[todayKey()];
 
   return (
@@ -57,7 +58,7 @@ const HomeScreen = ({ navigation }: any) => {
       />
 
       <NextPrayerHero
-        nextPrayer={nextPrayer as any}
+        nextPrayer={nextPrayer}
         loading={loading}
         error={error}
         hasLocation={hasLocation}

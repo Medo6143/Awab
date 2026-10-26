@@ -1,53 +1,9 @@
-export type Surah = {
-  number: number;
-  name: string;
-  englishName: string;
-  englishNameTranslation: string;
-  numberOfAyahs: number;
-  revelationType: 'Meccan' | 'Medinan';
-  startPage?: number;
-  startJuz?: number;
-  hizbCount?: number;
-};
-
-export type Ayah = {
-  number: number;
-  text: string;
-  numberInSurah: number;
-  juz: number;
-  manzil: number;
-  page: number;
-  ruku: number;
-  hizbQuarter: number;
-};
-
-export type QuranProgress = {
-  surahId: number;
-  completedAyahs: number;
-  totalAyahs: number;
-};
-
-export type PrayerTime = {
-  name: string;
-  time: string; // HH:mm
-  isNext: boolean;
-};
-
+/** A dua as stored and shown: built-in ones and the user's own share this shape. */
 export type Dua = {
   id: string;
-  content: string;
-  translation?: string;
-  transliteration?: string;
-  isPersonal: boolean;
-  isFavorite: boolean;
-  category?: string;
-};
-
-export type Tasbeeh = {
-  id: string;
-  name: string;
-  count: number;
-  goal?: number;
+  text: string;
+  ref: string;
+  category: string;
 };
 
 export type Coordinates = {

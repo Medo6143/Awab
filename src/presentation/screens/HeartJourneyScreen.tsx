@@ -1,3 +1,4 @@
+import { ScreenProps } from '../navigation/types';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Animated } from 'react-native';
 import { Screen } from '../components/ui';
@@ -16,10 +17,10 @@ import { HeartJourneyHeader, HeartNarrative } from '../components/heart/HeartJou
 import { JuzSelectionModal, BulkMarkModal } from '../components/heart/HeartModals';
 import { JUZ_SURAH_RANGES, toAr } from '../components/heart/HeartJourneyConstants';
 
-const HeartJourneyScreen = ({ navigation }: any) => {
+const HeartJourneyScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const dispatch = useDispatch();
   const completedSurahs = useSelector((state: RootState) => state.quran.completedSurahs as number[] || []);
-  const khatmaCount = useSelector((state: RootState) => (state.quran as any).khatmaCount as number || 0);
+  const khatmaCount = useSelector((state: RootState) => state.quran.khatmaCount || 0);
 
   const [showJuzModal, setShowJuzModal] = useState(false);
   const [showBulkModal, setShowBulkModal] = useState(false);

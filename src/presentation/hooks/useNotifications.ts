@@ -1,18 +1,20 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { Alert, DeviceEventEmitter, NativeModules, Platform } from 'react-native';
+import { Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import { useDependencies } from '../providers/DependencyProvider';
-import { AzanSettings, DEFAULT_AZAN_SETTINGS, DEFAULT_NOTIFICATION_PREFS, parseClock } from '../../domain/entities/notifications';
+import { AzanSettings, DEFAULT_AZAN_SETTINGS, DEFAULT_NOTIFICATION_PREFS } from '../../domain/entities/notifications';
 import { usePrayerTimes } from './usePrayerTimes';
 import { showAzanModal } from '../store/slices/uiSlice';
+import { AudioService } from '../../data/services/AudioService';
+import { PRAYER_AR_NAMES, prayerFromNotification, prayerJustStarted } from '../../domain/entities/prayer';
 
 // We avoid top-level imports of expo-notifications to prevent early JSI binding attempts
 const getNotifications = () => require('expo-notifications');
 
 export const useNotifications = () => {
   const dispatch = useDispatch();
-  const { notifications } = useDependencies();
+  const { notifications, azanAlarms } = useDependencies();
   const { timings } = usePrayerTimes();
   const { notificationPrefs, notificationsEnabled, azanSettings: rawAzanSettings } = useSelector((state: RootState) => state.settings);
   
@@ -27,42 +29,24 @@ export const useNotifications = () => {
   useEffect(() => {
     let isMounted = true;
 
+    // shows the azan screen and plays the adhan unless the user chose silent
+    const raiseAzan = (prayerName: string) => {
+      dispatch(showAzanModal(prayerName));
+      if (azanSettings.type !== 'none') AudioService.playAzan(azanSettings.type);
+    };
+
     const checkInitialNotification = async () => {
       const lastResponse = await getNotifications().getLastNotificationResponseAsync();
-      const now = new Date();
+      if (!isMounted || !azanSettings.visualAzanEnabled) return;
 
-      if (lastResponse && isMounted) {
+      if (lastResponse) {
         const { title, data } = lastResponse.notification.request.content;
-        console.log('useNotifications: App launched via notification:', title, data);
-        const prayerNameFromData = (data as any)?.prayerName;
-        
-        if (((title as string)?.includes('صلاة') || (data as any)?.type === 'prayer') && azanSettings?.visualAzanEnabled) {
-          const prayerName = prayerNameFromData || (title as string)?.replace('صلاة ', '').trim() || 'الصلاة';
-          dispatch(showAzanModal(prayerName));
-          
-          const { AudioService } = require('../../data/services/AudioService');
-          AudioService.playAzan(azanSettings?.type || 'full');
-        }
-      } else if (timings && azanSettings?.visualAzanEnabled) {
-        // Handle fullScreenIntent launch (which often carries no 'response' in expo-notifications)
-        const nowMinutes = now.getHours() * 60 + now.getMinutes();
-        
-        Object.entries(timings).forEach(([prayerId, time]: [string, any]) => {
-          const parsed = parseClock(time);
-          if (!parsed) return;
-          
-          const prayerMinutes = parsed.hours * 60 + parsed.minutes;
-          const diff = nowMinutes - prayerMinutes;
-          
-          // Trigger if we are within 3 minutes AFTER the prayer time
-          if (diff >= 0 && diff <= 3) {
-            console.log(`useNotifications: App launched within ${diff}m of prayer ${prayerId}. Triggering Azan.`);
-            const arabicNames: any = { Fajr: 'الفجر', Dhuhr: 'الظهر', Asr: 'العصر', Maghrib: 'المغرب', Isha: 'العشاء' };
-            dispatch(showAzanModal(arabicNames[prayerId] || prayerId));
-            const { AudioService } = require('../../data/services/AudioService');
-            AudioService.playAzan(azanSettings?.type || 'full');
-          }
-        });
+        const prayer = prayerFromNotification(title, data);
+        if (prayer) raiseAzan(prayer);
+      } else if (timings) {
+        // a full-screen-intent launch often carries no response: fall back to the clock
+        const justStarted = prayerJustStarted(timings, new Date());
+        if (justStarted) raiseAzan(PRAYER_AR_NAMES[justStarted]);
       }
     };
 
@@ -87,7 +71,7 @@ export const useNotifications = () => {
 
         const now = new Date();
         const currentHHmm = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-        const isAtPrayerTime = Object.values(timings).some((t: any) => t.includes(currentHHmm));
+        const isAtPrayerTime = Object.values(timings).some((t) => typeof t === 'string' && t.includes(currentHHmm));
         
         // Only block re-scheduling if we already have notifications. 
         // If count is 0, we must schedule even if it's prayer time.
@@ -134,73 +118,47 @@ export const useNotifications = () => {
       if (isMounted) initNotifications();
     }, 1500);
 
-    const subscription = getNotifications().addNotificationReceivedListener((notification: any) => {
+    const N = getNotifications();
+    type Received = { request: { content: { title?: string | null; data?: Record<string, unknown> | null } } };
+
+    const subscription = N.addNotificationReceivedListener((notification: Received) => {
       const { title, data } = notification.request.content;
-      console.log('useNotifications: Notification received:', title, data);
-      
-      if ((title?.includes('صلاة') || data?.type === 'prayer') && azanSettings?.type !== 'none') {
-        const { AudioService } = require('../../data/services/AudioService');
-        AudioService.playAzan(azanSettings?.type || 'full');
-
-        if (azanSettings?.visualAzanEnabled) {
-          const prayerName = data?.prayerName || title.replace('صلاة ', '').trim() || 'الصلاة';
-          dispatch(showAzanModal(prayerName));
-        }
-      } 
+      const prayer = prayerFromNotification(title, data);
+      if (!prayer || azanSettings.type === 'none') return;
+      AudioService.playAzan(azanSettings.type);
+      if (azanSettings.visualAzanEnabled) dispatch(showAzanModal(prayer));
     });
 
-    const responseSubscription = getNotifications().addNotificationResponseReceivedListener((response: any) => {
+    const responseSubscription = N.addNotificationResponseReceivedListener((response: { notification: Received }) => {
       const { title, data } = response.notification.request.content;
-      console.log('useNotifications: Notification click response:', title, data);
-      
-      if (((title as string)?.includes('صلاة') || (data as any)?.type === 'prayer') && azanSettings?.visualAzanEnabled) {
-        const prayerName = (data as any)?.prayerName || (title as string)?.replace('صلاة ', '').trim() || 'الصلاة';
-        dispatch(showAzanModal(prayerName));
-        
-        const { AudioService } = require('../../data/services/AudioService');
-        AudioService.playAzan(azanSettings?.type || 'full');
-      }
+      const prayer = prayerFromNotification(title, data);
+      if (prayer && azanSettings.visualAzanEnabled) raiseAzan(prayer);
     });
 
-    console.log('useNotifications: Subscribing to onAzanTriggered (DeviceEventEmitter)...');
-    const azanListener = DeviceEventEmitter.addListener('onAzanTriggered', (event) => {
-      console.log('useNotifications: Native Azan event received via DeviceEventEmitter! Data:', event);
-      if (azanSettings?.visualAzanEnabled) {
-        console.log('useNotifications: Visual Azan is enabled. Dispatching modal for:', event.prayerName);
-        dispatch(showAzanModal(event.prayerName || 'الصلاة'));
-      } else {
-        console.log('useNotifications: Visual Azan is DISABLED in settings. Ignoring event.');
-      }
+    const offAzan = azanAlarms.onTriggered((prayerName) => {
+      if (azanSettings.visualAzanEnabled) dispatch(showAzanModal(prayerName));
     });
 
-    // Check for pending Azan on start
-    if (Platform.OS === 'android' && NativeModules.AzanModule) {
-      NativeModules.AzanModule.getPendingAzan().then((pendingPrayer: string | null) => {
-        if (pendingPrayer && azanSettings?.visualAzanEnabled) {
-          console.log('useNotifications: Found pending Azan on start:', pendingPrayer);
-          dispatch(showAzanModal(pendingPrayer));
-        }
-      });
+    // an alarm that fired while the app was closed
+    azanAlarms.getPending().then((pending) => {
+      if (pending && azanSettings.visualAzanEnabled) dispatch(showAzanModal(pending));
+    });
 
-      // If the phone was rebooted and we couldn't re-arm the alarms (e.g. exact-alarm
-      // permission was revoked), BootReceiver sets this flag instead of failing silently.
-      NativeModules.AzanModule.didBootRescheduleFail?.().then((failed: boolean) => {
-        if (failed) {
-          console.warn('useNotifications: Boot reschedule failed — azan alarms may be missing.');
-          Alert.alert(
-            'تنبيه: الأذان متوقف',
-            'بعد إعادة تشغيل الجهاز لم يتمكن التطبيق من إعادة جدولة الأذان بسبب نقص إذن "المنبهات المجدولة". يرجى فتح إعدادات الأذان ومنح الإذن مجددًا.',
-            [{ text: 'حسنًا', onPress: () => NativeModules.AzanModule.clearBootRescheduleFailedFlag?.() }]
-          );
-        }
-      }).catch(() => {});
-    }
+    // after a reboot the alarms could not be re-armed (e.g. exact-alarm permission revoked)
+    azanAlarms.didBootRescheduleFail().then((failed) => {
+      if (!failed) return;
+      Alert.alert(
+        'تنبيه: الأذان متوقف',
+        'بعد إعادة تشغيل الجهاز لم يتمكن التطبيق من إعادة جدولة الأذان بسبب نقص إذن "المنبهات المجدولة". يرجى فتح إعدادات الأذان ومنح الإذن مجددًا.',
+        [{ text: 'حسنًا', onPress: () => azanAlarms.clearBootRescheduleFailed() }],
+      );
+    });
 
     return () => { 
       isMounted = false; 
       subscription.remove();
       responseSubscription.remove();
-      azanListener.remove();
+      offAzan();
     };
-  }, [timings, safePrefs, notificationsEnabled, azanSettings, dispatch]);
+  }, [timings, safePrefs, notificationsEnabled, azanSettings, dispatch, notifications, azanAlarms]);
 };

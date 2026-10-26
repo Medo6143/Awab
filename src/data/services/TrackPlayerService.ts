@@ -76,8 +76,8 @@ export const initializeTrackPlayer = async () => {
       progressUpdateEventInterval: 2,
     });
     return true;
-  } catch (e: any) {
-    if (e.code === 'player_already_initialized') {
+  } catch (e) {
+    if ((e as { code?: string } | null)?.code === 'player_already_initialized') {
       console.log('TrackPlayerService: Player already initialized.');
       return true;
     }

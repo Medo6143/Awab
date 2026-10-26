@@ -12,7 +12,7 @@ interface PrayerTimings {
   Midnight: string;
 }
 
-interface PrayerDate {
+export interface PrayerDate {
   readable: string;
   timestamp: string;
   gregorian: {
@@ -36,7 +36,7 @@ interface PrayerDate {
 interface PrayerData {
   timings: PrayerTimings;
   date: PrayerDate;
-  meta: any;
+  meta: { method: { id: number; name?: string } } & Record<string, unknown>;
 }
 
 interface PrayerState {

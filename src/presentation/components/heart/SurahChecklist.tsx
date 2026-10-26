@@ -17,7 +17,7 @@ const normalize = (t: string) =>
     .trim()
     .toLowerCase();
 
-export const SurahChecklist = ({ completedSurahs, onToggle }: any) => {
+export const SurahChecklist = ({ completedSurahs, onToggle }: { completedSurahs: number[]; onToggle: (surahId: number) => void }) => {
   const [query, setQuery] = useState('');
 
   const items = useMemo(() => {

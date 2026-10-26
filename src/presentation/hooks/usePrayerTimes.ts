@@ -1,17 +1,21 @@
 import { useState, useEffect, useCallback } from 'react';
-import { NativeModules, Platform } from 'react-native';
 import { useLocation } from './useLocation';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import { PrayerTimeService } from '../../data/services/PrayerTimeService';
+import { useDependencies } from '../providers/DependencyProvider';
+import { NextPrayer } from '../../domain/entities/prayer';
+
+export type NextPrayerView = NextPrayer & { arName: string };
 import { setPrayerData, setLoading as setPrayerLoading, setFailed as setPrayerFailed } from '../store/slices/prayerSlice';
 
 export const usePrayerTimes = () => {
   const dispatch = useDispatch();
+  const { prayerWidget } = useDependencies();
   const { coords, countryCode, error: locationError } = useLocation();
   const { calculationMethod: manualMethod } = useSelector((state: RootState) => state.settings);
   const { cachedData, lastFetchedDate, status } = useSelector((state: RootState) => state.prayer);
-  const [nextPrayer, setNextPrayer] = useState<any>(null);
+  const [nextPrayer, setNextPrayer] = useState<NextPrayer | null>(null);
   const [retryTick, setRetryTick] = useState(0);
 
   const toArName = (name: string) => {
@@ -26,17 +30,13 @@ export const usePrayerTimes = () => {
     return map[name] || name;
   };
 
-  const updateWidget = (next: any) => {
-    if (Platform.OS === 'android' && NativeModules.PrayerWidget && next) {
-        // next.remaining is in minutes, convert to milliseconds
-        const targetTimeMillis = Date.now() + (next.remaining * 60 * 1000);
-        
-        NativeModules.PrayerWidget.updateWidgetData({
-            prayerName: toArName(next.name),
-            prayerTime: next.time,
-            targetTimeMillis: targetTimeMillis
-        });
-    }
+  const updateWidget = (next: NextPrayer | null) => {
+    if (!next) return;
+    prayerWidget.update({
+      prayerName: toArName(next.name),
+      prayerTime: next.time,
+      targetTimeMillis: Date.now() + next.remaining * 60 * 1000, // remaining is in minutes
+    });
   };
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export const usePrayerTimes = () => {
         
         if (cachedData && cachedData.date.gregorian.date === todayStr && cachedData.meta.method.id === targetMethod) {
           console.log('usePrayerTimes: Using persistent cached data for', todayStr, 'Method:', targetMethod);
-          const next = PrayerTimeService.getNextPrayer(cachedData.timings as any);
+          const next = PrayerTimeService.getNextPrayer(cachedData.timings);
           setNextPrayer(next);
           updateWidget(next);
           return;
@@ -74,7 +74,7 @@ export const usePrayerTimes = () => {
         
         if (times) {
           dispatch(setPrayerData(times));
-          const next = PrayerTimeService.getNextPrayer(times.timings as any);
+          const next = PrayerTimeService.getNextPrayer(times.timings);
           setNextPrayer(next);
           updateWidget(next);
         } else {
@@ -89,10 +89,10 @@ export const usePrayerTimes = () => {
     if (!cachedData) return;
     
     const interval = setInterval(() => {
-      const next = PrayerTimeService.getNextPrayer(cachedData.timings as any);
-      setNextPrayer((prev: any) => {
-        // Only update the Native widget if the prayer has actually changed
-        if (!prev || prev.name !== next.name) {
+      const next = PrayerTimeService.getNextPrayer(cachedData.timings);
+      setNextPrayer((prev) => {
+        // Only update the native widget if the prayer has actually changed
+        if (!prev || prev.name !== next?.name) {
           updateWidget(next);
         }
         return next;
@@ -110,7 +110,7 @@ export const usePrayerTimes = () => {
   return { 
     timings: cachedData?.timings, 
     date: cachedData?.date, 
-    nextPrayer: nextPrayer ? { ...nextPrayer, arName: toArName(nextPrayer.name) } : null,
+    nextPrayer: (nextPrayer ? { ...nextPrayer, arName: toArName(nextPrayer.name) } : null) as NextPrayerView | null,
     // Location still resolving counts as loading; only a definite location error is "no location".
     loading: status === 'loading' || (!coords && !locationError) || (!cachedData && !!coords && status !== 'failed'),
     error: status === 'failed',

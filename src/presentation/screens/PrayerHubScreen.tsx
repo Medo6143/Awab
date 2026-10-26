@@ -1,3 +1,4 @@
+import { ScreenProps } from '../navigation/types';
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,12 +13,13 @@ import QiblaScreen from './QiblaScreen';
 
 type Tab = 'times' | 'qibla';
 
-const PrayerHubScreen = ({ route }: any) => {
+const PrayerHubScreen = ({ route }: Partial<ScreenProps<'TabPrayer'>>) => {
   const [activeTab, setActiveTab] = useState<Tab>(route?.params?.screen === 'qibla' ? 'qibla' : 'times');
   const accent = useAccent();
 
   useEffect(() => {
-    if (route?.params?.screen) setActiveTab(route.params.screen);
+    const screen = route?.params?.screen;
+    if (screen) setActiveTab(screen);
   }, [route?.params?.screen]);
 
   const iconColor = (id: Tab) => (activeTab === id ? accent.accentText : colors.textMuted);

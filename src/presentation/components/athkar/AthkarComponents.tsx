@@ -1,3 +1,4 @@
+type AthkarTab = 'morning' | 'evening';
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { RotateCcw, Sun, Moon, CheckCircle2 } from 'lucide-react-native';
@@ -8,7 +9,7 @@ import { colors, icon } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 import { toAr } from '../../../shared/utils/format';
 
-export const AthkarHeader = ({ onBack, onReset, hideHeader, isTab }: any) => {
+export const AthkarHeader = ({ onBack, onReset, hideHeader, isTab }: { onBack: () => void; onReset: () => void; hideHeader?: boolean; isTab?: boolean }) => {
   if (hideHeader) return null;
   return (
     <ScreenHeader
@@ -24,7 +25,7 @@ export const AthkarHeader = ({ onBack, onReset, hideHeader, isTab }: any) => {
   );
 };
 
-export const AthkarTabs = ({ activeTab, onTabChange }: any) => {
+export const AthkarTabs = ({ activeTab, onTabChange }: { activeTab: AthkarTab; onTabChange: (tab: AthkarTab) => void }) => {
   const accent = useAccent();
   const c = (id: string) => (activeTab === id ? accent.accentText : colors.textMuted);
   return (
@@ -35,7 +36,7 @@ export const AthkarTabs = ({ activeTab, onTabChange }: any) => {
   );
 };
 
-export const AthkarProgressBar = ({ progressPercent, totalCompleted, totalPossible }: any) => (
+export const AthkarProgressBar = ({ progressPercent, totalCompleted, totalPossible }: { progressPercent: number; totalCompleted: number; totalPossible: number }) => (
   <View style={s.progressSection}>
     <View style={s.progressHeader}>
       <Text style={s.progressSub}>{toAr(totalCompleted)} من {toAr(totalPossible)} تسبيحة</Text>

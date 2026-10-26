@@ -1,3 +1,4 @@
+import { IbadaTask } from '../../store/slices/ibadaSlice';
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { CheckCircle2, Circle } from 'lucide-react-native';
@@ -8,7 +9,7 @@ import { colors, icon } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 import { toAr } from '../../../shared/utils/format';
 
-export const IbadaProgressCard = ({ completedCount, totalCount, progress }: any) => (
+export const IbadaProgressCard = ({ completedCount, totalCount, progress }: { completedCount: number; totalCount: number; progress: number }) => (
   <View style={s.hero}>
     <ProgressRing
       progress={progress}
@@ -20,7 +21,7 @@ export const IbadaProgressCard = ({ completedCount, totalCount, progress }: any)
   </View>
 );
 
-export const TaskItem = ({ task, onToggle }: any) => {
+export const TaskItem = ({ task, onToggle }: { task: IbadaTask; onToggle: () => void }) => {
   const accent = useAccent();
   const category = IBADA_CATEGORIES.find((c) => c.id === task.category);
   return (

@@ -1,12 +1,14 @@
 import React from 'react';
 import { Text, TouchableOpacity, View, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { Bell, BookOpen, MapPin, Info, ChevronLeft } from 'lucide-react-native';
+import { Bell, MapPin, Info, ChevronLeft } from 'lucide-react-native';
+import { ScreenProps } from '../navigation/types';
+import { DEFAULT_AZAN_SETTINGS, DEFAULT_NOTIFICATION_PREFS } from '../../domain/entities/notifications';
 import { RootState } from '../store';
 import {
   toggleNotifications, toggleLocation, setTafsirId, setTafsirStyle, setTafsirFontSize,
   setAccentTheme, setReciterId, toggleNotificationCategory, setAzanSettings,
-  setPrePrayerReminderOffset, setDailyWardTime, setEncouragementInterval,
+  setDailyWardTime, setEncouragementInterval,
 } from '../store/slices/settingsSlice';
 import { setFloatingScale, setFloatingBubbleColor, toggleFloatingBorder, toggleFloatingReset, setFloatingReminderInterval } from '../store/slices/tasbeehSlice';
 import { useAzanPermissions } from '../../shared/hooks/useAzanPermissions';
@@ -22,7 +24,7 @@ import { s } from '../components/settings/SettingsStyles';
 import { FloatingTasbeehToggle } from '../components/tasbeeh/FloatingTasbeeh';
 import { useDependencies } from '../providers/DependencyProvider';
 
-const SettingsScreen = ({ navigation }: any) => {
+const SettingsScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const dispatch = useDispatch();
   const { testAzanAfterDelay } = useAzanPermissions();
   const { notifications } = useDependencies();
@@ -31,14 +33,9 @@ const SettingsScreen = ({ navigation }: any) => {
     accentTheme, selectedReciterId, notificationPrefs, azanSettings: rawAzanSettings,
   } = useSelector((state: RootState) => state.settings);
   const { floatingScale, floatingBubbleColor, floatingShowBorder, floatingShowReset, floatingReminderInterval } = useSelector((state: RootState) => state.tasbeeh);
-  const azanSettings = rawAzanSettings || { type: 'full', visualAzanEnabled: true };
-
-  const onToggleCategory = (id: any) => {
-    if (typeof id === 'object' && id.id === 'prePrayerReminderOffset') dispatch(setPrePrayerReminderOffset(id.value));
-    else if (typeof id === 'object' && id.id === 'dailyWardTime') dispatch(setDailyWardTime(id.value));
-    else if (typeof id === 'object' && id.id === 'encouragementInterval') dispatch(setEncouragementInterval(id.value));
-    else dispatch(toggleNotificationCategory(id));
-  };
+  // persisted state from older versions may lack newer keys
+  const azanSettings = { ...DEFAULT_AZAN_SETTINGS, ...rawAzanSettings };
+  const prefs = { ...DEFAULT_NOTIFICATION_PREFS, ...notificationPrefs };
 
   const testAzan = async () => {
     const hasPerm = await notifications.request();
@@ -53,19 +50,25 @@ const SettingsScreen = ({ navigation }: any) => {
   return (
     <Screen scroll contentStyle={s.content} header={<ScreenHeader title="الإعدادات" subtitle="تخصيص تجربة أوّاب" large onBack={navigation?.canGoBack?.() ? () => navigation.goBack() : undefined} />}>
       <SettingSection title="التنبيهات">
-        <ItemRow first icon={Bell} label="التنبيهات العامة" value={notificationsEnabled} isToggle onValueChange={() => dispatch(toggleNotifications())} />
-        {notificationsEnabled && <NotificationSettings notificationPrefs={notificationPrefs} onToggleCategory={onToggleCategory} />}
-        <ItemRow icon={BookOpen} label="موعد الورد اليومي" value={notificationPrefs?.dailyWardEnabled} isToggle onValueChange={() => dispatch(toggleNotificationCategory('dailyWardEnabled' as any))} />
+        <ItemRow first icon={Bell} label="التنبيهات العامة" value={notificationsEnabled} onValueChange={() => dispatch(toggleNotifications())} />
+        {notificationsEnabled && (
+          <NotificationSettings
+            notificationPrefs={prefs}
+            onToggle={(key) => dispatch(toggleNotificationCategory(key))}
+            onWardTime={(time) => dispatch(setDailyWardTime(time))}
+            onEncouragementInterval={(h) => dispatch(setEncouragementInterval(h))}
+          />
+        )}
       </SettingSection>
 
       <SettingSection title="الأذان">
-        <AzanSelector azanSettings={azanSettings} onUpdate={(update: any) => dispatch(setAzanSettings(update))} onTest={testAzan} />
-        <ItemRow icon={MapPin} label="مواقيت الصلاة حسب الموقع" value={locationEnabled} isToggle onValueChange={() => dispatch(toggleLocation())} />
+        <AzanSelector azanSettings={azanSettings} onUpdate={(update) => dispatch(setAzanSettings(update))} onTest={testAzan} />
+        <ItemRow icon={MapPin} label="مواقيت الصلاة حسب الموقع" value={locationEnabled} onValueChange={() => dispatch(toggleLocation())} />
       </SettingSection>
       <View style={{ marginTop: 12 }}><AzanReadinessCard /></View>
 
       <SettingSection title="المسبحة العائمة">
-        <View style={{ padding: 4 }}><FloatingTasbeehToggle accentTheme={accentTheme} /></View>
+        <View style={{ padding: 4 }}><FloatingTasbeehToggle /></View>
         <FloatingTasbeehSettings
           floatingScale={floatingScale} onUpdateScale={(v: number) => dispatch(setFloatingScale(v))}
           floatingBubbleColor={floatingBubbleColor} onUpdateColor={(c: string) => dispatch(setFloatingBubbleColor(c))}
@@ -76,7 +79,7 @@ const SettingsScreen = ({ navigation }: any) => {
       </SettingSection>
 
       <SettingSection title="المظهر">
-        <ThemeSelector accentTheme={accentTheme} onSelect={(id: any) => dispatch(setAccentTheme(id))} />
+        <ThemeSelector accentTheme={accentTheme} onSelect={(id) => dispatch(setAccentTheme(id))} />
       </SettingSection>
 
       <SettingSection title="التلاوة">
@@ -86,7 +89,7 @@ const SettingsScreen = ({ navigation }: any) => {
       <SettingSection title="المصحف والتفسير">
         <TafsirSettings
           selectedTafsirId={selectedTafsirId} onSelectTafsir={(id: number) => dispatch(setTafsirId(id))}
-          tafsirStyle={tafsirStyle} onSelectStyle={(style: any) => dispatch(setTafsirStyle(style))}
+          tafsirStyle={tafsirStyle} onSelectStyle={(style) => dispatch(setTafsirStyle(style))}
           tafsirFontSize={tafsirFontSize} setFontSize={(size: number) => dispatch(setTafsirFontSize(size))}
         />
       </SettingSection>

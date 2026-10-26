@@ -25,7 +25,9 @@ export const MUEZZINS = [
   }
 ];
 
-export const AZAN_TYPES = [
+import { AzanType } from '../../../domain/entities/notifications';
+
+export const AZAN_TYPES: { id: AzanType; name: string }[] = [
   { id: 'none', name: 'صامت (تنبيه فقط)' },
   { id: 'takbir', name: 'تكبير فقط' },
   { id: 'full', name: 'الآذان كاملاً' },

@@ -1,3 +1,4 @@
+import type { VideoPlayer } from 'expo-video';
 import React, { useEffect, useState } from 'react';
 import { View, Text, Modal, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { X, Volume2 } from 'lucide-react-native';
@@ -20,7 +21,7 @@ const AzanVideoContent: React.FC<{ onClose: () => void, prayerName: string }> = 
   // Move expo-video logic inside the component using require to avoid top-level JSI init
   const { useVideoPlayer, VideoView } = require('expo-video');
 
-  const player = useVideoPlayer(videoSource, (player: any) => {
+  const player = useVideoPlayer(videoSource, (player: VideoPlayer) => {
     player.loop = true;
     player.muted = true;
     player.play();

@@ -67,7 +67,11 @@ export const TasbeehModals = ({
   showAddDhikr, setShowAddDhikr, newDhikr, setNewDhikr, onAddDhikr,
   showManualAdd, setShowManualAdd, manualCountVal, setManualCountVal, onManualAdd,
   showCustomTarget, setShowCustomTarget, customTargetVal, setCustomTargetVal, onCustomTarget
-}: any) => {
+}: {
+  showAddDhikr: boolean; setShowAddDhikr: (v: boolean) => void; newDhikr: string; setNewDhikr: (v: string) => void; onAddDhikr: (v: string) => void;
+  showManualAdd: boolean; setShowManualAdd: (v: boolean) => void; manualCountVal: string; setManualCountVal: (v: string) => void; onManualAdd: (v: string) => void;
+  showCustomTarget: boolean; setShowCustomTarget: (v: boolean) => void; customTargetVal: string; setCustomTargetVal: (v: string) => void; onCustomTarget: (v: string) => void;
+}) => {
   // Actually let's use the full text but display shortened
   const suggestions = [
     "سبحان الله", "الحمد لله", "لا إله إلا الله", "الله أكبر", 

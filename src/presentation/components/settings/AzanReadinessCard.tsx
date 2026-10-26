@@ -42,12 +42,12 @@ export const AzanReadinessCard = () => {
 
       {items.map((item, idx) => {
         const Icon = item.status === 'ok' ? CircleCheck : item.status === 'missing' ? CircleAlert : CircleHelp;
-        const tone = item.status === 'ok' ? 'success' : item.status === 'missing' ? 'danger' : 'muted';
+        const tone: 'success' | 'danger' | 'muted' = item.status === 'ok' ? 'success' : item.status === 'missing' ? 'danger' : 'muted';
         return (
           <View key={item.id}>
             {idx > 0 ? <View style={s.itemDivider} /> : null}
             <View style={s.readinessRow}>
-              <IconTile icon={Icon} tone={tone as any} />
+              <IconTile icon={Icon} tone={tone} />
               <View style={s.readinessText}>
                 <Text style={s.readinessTitle}>{item.label}</Text>
                 <Text style={s.readinessHint}>{item.hint}</Text>

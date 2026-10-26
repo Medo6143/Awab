@@ -11,6 +11,10 @@ import { Chip, IconTile, PillButton, SectionTitle } from '../ui';
 import { colors, icon } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 import { toAr } from '../../../shared/utils/format';
+import { AccentKey } from '../../../shared/theme/tokens';
+import { AzanSettings, NotificationPrefs } from '../../../domain/entities/notifications';
+import { TafsirStyle } from '../../store/slices/settingsSlice';
+import { AZAN_TYPES } from './AzanConstants';
 
 export const SettingSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <View style={s.section}>
@@ -19,9 +23,10 @@ export const SettingSection = ({ title, children }: { title: string; children: R
   </View>
 );
 
-type RowProps = { icon: LucideIcon; label: string; sub?: string; value?: any; onValueChange?: (v: boolean) => void; isToggle?: boolean; first?: boolean };
+type RowProps = { icon: LucideIcon; label: string; sub?: string; value: boolean; onValueChange: () => void; first?: boolean };
 
-export const ItemRow = ({ icon: Icon, label, sub, value, onValueChange, isToggle = false, first }: RowProps) => {
+/** A labelled on/off row. */
+export const ItemRow = ({ icon: Icon, label, sub, value, onValueChange, first }: RowProps) => {
   const accent = useAccent();
   return (
     <View>
@@ -34,11 +39,7 @@ export const ItemRow = ({ icon: Icon, label, sub, value, onValueChange, isToggle
             {sub ? <Text style={s.itemSub}>{sub}</Text> : null}
           </View>
         </View>
-        {isToggle ? (
-          <Switch value={!!value} onValueChange={onValueChange} trackColor={{ false: colors.surfaceRaised, true: accent.accent }} thumbColor={colors.text} />
-        ) : (
-          <View>{value}</View>
-        )}
+        <Switch value={value} onValueChange={onValueChange} trackColor={{ false: colors.surfaceRaised, true: accent.accent }} thumbColor={colors.text} />
       </View>
     </View>
   );
@@ -62,7 +63,7 @@ export const Stepper = ({ value, display, onDec, onInc }: { value: number; displ
   </View>
 );
 
-export const ThemeSelector = ({ accentTheme, onSelect }: any) => (
+export const ThemeSelector = ({ accentTheme, onSelect }: { accentTheme: AccentKey; onSelect: (id: AccentKey) => void }) => (
   <View style={[s.subSection, { borderTopWidth: 0 }]}>
     <SubLabel icon={Palette} text="لون التمييز" />
     <View style={s.themeGrid}>
@@ -79,7 +80,7 @@ export const ThemeSelector = ({ accentTheme, onSelect }: any) => (
   </View>
 );
 
-export const ReciterSelector = ({ selectedReciterId, onSelect }: any) => {
+export const ReciterSelector = ({ selectedReciterId, onSelect }: { selectedReciterId: string; onSelect: (id: string) => void }) => {
   const accent = useAccent();
   return (
     <View style={[s.subSection, { borderTopWidth: 0 }]}>
@@ -99,7 +100,13 @@ export const ReciterSelector = ({ selectedReciterId, onSelect }: any) => {
   );
 };
 
-export const TafsirSettings = ({ selectedTafsirId, onSelectTafsir, tafsirStyle, onSelectStyle, tafsirFontSize, setFontSize }: any) => (
+type TafsirSettingsProps = {
+  selectedTafsirId: number; onSelectTafsir: (id: number) => void;
+  tafsirStyle: TafsirStyle; onSelectStyle: (style: TafsirStyle) => void;
+  tafsirFontSize: number; setFontSize: (size: number) => void;
+};
+
+export const TafsirSettings = ({ selectedTafsirId, onSelectTafsir, tafsirStyle, onSelectStyle, tafsirFontSize, setFontSize }: TafsirSettingsProps) => (
   <>
     <View style={[s.subSection, { borderTopWidth: 0 }]}>
       <SubLabel icon={BookOpen} text="المفسّر" />
@@ -124,13 +131,22 @@ export const TafsirSettings = ({ selectedTafsirId, onSelectTafsir, tafsirStyle, 
   </>
 );
 
-const CATEGORY_ICONS: Record<string, LucideIcon> = {
+type ToggleKey = { [K in keyof NotificationPrefs]: NotificationPrefs[K] extends boolean ? K : never }[keyof NotificationPrefs];
+
+const CATEGORY_ICONS: Partial<Record<ToggleKey, LucideIcon>> = {
   prayers: Landmark, athkar: Moon, qiyam: Star, duha: Sun, dailyWardEnabled: BookOpen,
   encouragementEnabled: HeartHandshake, prePrayerReminderEnabled: Timer, dailyReminder: Sparkles,
 };
 
-export const NotificationSettings = ({ notificationPrefs, onToggleCategory }: any) => {
-  const categories = [
+type NotificationSettingsProps = {
+  notificationPrefs: NotificationPrefs;
+  onToggle: (key: ToggleKey) => void;
+  onWardTime: (time: string) => void;
+  onEncouragementInterval: (hours: number) => void;
+};
+
+export const NotificationSettings = ({ notificationPrefs, onToggle, onWardTime, onEncouragementInterval }: NotificationSettingsProps) => {
+  const categories: { id: ToggleKey; label: string; sub?: string }[] = [
     { id: 'prayers', label: 'مواقيت الصلاة' },
     { id: 'athkar', label: 'أذكار الصباح والمساء' },
     { id: 'qiyam', label: 'تنبيه قيام الليل' },
@@ -145,26 +161,26 @@ export const NotificationSettings = ({ notificationPrefs, onToggleCategory }: an
     <View style={s.subSection}>
       <SubLabel icon={BellRing} text="تخصيص التنبيهات" />
       {categories.map((cat, i) => (
-        <ItemRow key={cat.id} first={i === 0} icon={CATEGORY_ICONS[cat.id]} label={cat.label} sub={(cat as any).sub} value={notificationPrefs ? notificationPrefs[cat.id] : true} isToggle onValueChange={() => onToggleCategory(cat.id)} />
+        <ItemRow key={cat.id} first={i === 0} icon={CATEGORY_ICONS[cat.id] ?? BellRing} label={cat.label} sub={cat.sub} value={notificationPrefs[cat.id]} onValueChange={() => onToggle(cat.id)} />
       ))}
 
-      {notificationPrefs?.dailyWardEnabled && (
+      {notificationPrefs.dailyWardEnabled && (
         <View style={{ marginTop: 12 }}>
           <SubLabel icon={Clock3} text="توقيت الورد اليومي" />
           <View style={s.chipsWrap}>
             {['01:00', '05:00', '10:00', '16:00', '21:00', '23:00'].map((time) => (
-              <Chip key={time} label={toAr(time)} size="sm" selected={notificationPrefs.dailyWardTime === time} onPress={() => onToggleCategory({ id: 'dailyWardTime', value: time })} />
+              <Chip key={time} label={toAr(time)} size="sm" selected={notificationPrefs.dailyWardTime === time} onPress={() => onWardTime(time)} />
             ))}
           </View>
         </View>
       )}
 
-      {notificationPrefs?.encouragementEnabled && (
+      {notificationPrefs.encouragementEnabled && (
         <View style={{ marginTop: 12 }}>
           <SubLabel icon={Hourglass} text="تكرار رسائل التشجيع" />
           <View style={s.chipsWrap}>
             {[1, 2, 3, 4, 6, 8].map((h) => (
-              <Chip key={h} label={`كل ${toAr(h)} ${h === 1 ? 'ساعة' : h === 2 ? 'ساعتين' : 'ساعات'}`} size="sm" selected={notificationPrefs.encouragementInterval === h} onPress={() => onToggleCategory({ id: 'encouragementInterval', value: h })} />
+              <Chip key={h} label={`كل ${toAr(h)} ${h === 1 ? 'ساعة' : h === 2 ? 'ساعتين' : 'ساعات'}`} size="sm" selected={notificationPrefs.encouragementInterval === h} onPress={() => onEncouragementInterval(h)} />
             ))}
           </View>
         </View>
@@ -173,13 +189,12 @@ export const NotificationSettings = ({ notificationPrefs, onToggleCategory }: an
   );
 };
 
-export const AzanSelector = ({ azanSettings, onUpdate, onTest }: any) => {
-  const { AZAN_TYPES } = require('./AzanConstants');
+export const AzanSelector = ({ azanSettings, onUpdate, onTest }: { azanSettings: AzanSettings; onUpdate: (u: Partial<AzanSettings>) => void; onTest: () => void }) => {
   return (
     <View style={s.subSection}>
       <SubLabel icon={Volume2} text="صوت الأذان" />
       <View style={s.chipsWrap}>
-        {AZAN_TYPES.map((t: any) => <Chip key={t.id} label={t.name} size="sm" selected={azanSettings.type === t.id} onPress={() => onUpdate({ type: t.id })} />)}
+        {AZAN_TYPES.map((t) => <Chip key={t.id} label={t.name} size="sm" selected={azanSettings.type === t.id} onPress={() => onUpdate({ type: t.id })} />)}
       </View>
       <View style={{ marginTop: 16 }}>
         <PillButton label="تجربة الأذان بعد ٣٠ ثانية" variant="ghost" onPress={onTest} />
@@ -192,7 +207,13 @@ export const FloatingTasbeehSettings = ({
   floatingScale, onUpdateScale, floatingBubbleColor, onUpdateColor,
   floatingShowBorder, onToggleBorder, floatingShowReset, onToggleReset,
   floatingReminderInterval, onUpdateInterval,
-}: any) => {
+}: {
+  floatingScale: number; onUpdateScale: (v: number) => void;
+  floatingBubbleColor: string; onUpdateColor: (c: string) => void;
+  floatingShowBorder: boolean; onToggleBorder: () => void;
+  floatingShowReset: boolean; onToggleReset: () => void;
+  floatingReminderInterval: number; onUpdateInterval: (m: number) => void;
+}) => {
   const accent = useAccent();
   const safeScale = typeof floatingScale === 'number' ? floatingScale : 1.0;
   const COLORS = [
@@ -206,8 +227,8 @@ export const FloatingTasbeehSettings = ({
       <Stepper value={safeScale} display={`${toAr(safeScale.toFixed(1))}×`} onDec={() => onUpdateScale(Math.max(0.5, Number((safeScale - 0.1).toFixed(1))))} onInc={() => onUpdateScale(Math.min(2.0, Number((safeScale + 0.1).toFixed(1))))} />
 
       <View style={{ marginTop: 12 }}>
-        <ItemRow first icon={Square} label="إظهار إطار للسبحة" value={floatingShowBorder} isToggle onValueChange={onToggleBorder} />
-        <ItemRow icon={RotateCcw} label="إظهار زر التصفير" value={floatingShowReset} isToggle onValueChange={onToggleReset} />
+        <ItemRow first icon={Square} label="إظهار إطار للسبحة" value={!!floatingShowBorder} onValueChange={onToggleBorder} />
+        <ItemRow icon={RotateCcw} label="إظهار زر التصفير" value={!!floatingShowReset} onValueChange={onToggleReset} />
       </View>
 
       <View style={{ marginTop: 16 }}>

@@ -21,8 +21,9 @@ const ICONS: Record<string, LucideIcon> = {
  */
 export const GlassTabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
   const accent = useAccent();
-  const focusedOptions = descriptors[state.routes[state.index].key]?.options as any;
-  if (focusedOptions?.tabBarStyle?.display === 'none') return null;
+  const focusedOptions = descriptors[state.routes[state.index].key]?.options;
+  // the Quran tab hides the bar with tabBarStyle: { display: 'none' }
+  if ((focusedOptions?.tabBarStyle as { display?: string } | undefined)?.display === 'none') return null;
 
   const useBlur = Platform.OS === 'ios' || Platform.OS === 'android';
 

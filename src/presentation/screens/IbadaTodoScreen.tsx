@@ -1,3 +1,4 @@
+import { ScreenProps } from '../navigation/types';
 import React from 'react';
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,7 +11,7 @@ import { IbadaProgressCard, TaskItem } from '../components/ibada/IbadaComponents
 import { s } from '../components/ibada/IbadaStyles';
 import { IBADA_CATEGORIES } from '../components/ibada/IbadaConstants';
 
-const IbadaTodoScreen = ({ navigation }: any) => {
+const IbadaTodoScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const dispatch = useDispatch();
   const { tasks } = useSelector((state: RootState) => state.ibada);
 

@@ -1,4 +1,5 @@
-import { NativeModules, Platform } from 'react-native';
+import { Platform } from 'react-native';
+import { azanNative } from '../services/nativeModules';
 import { ReminderScheduler, ScheduleContext } from '../../domain/services/Notifications';
 import { minusMinutes, parseClock, PRAYER_IDS, PrayerId } from '../../domain/entities/notifications';
 import { rtl, scheduleDaily } from './expo';
@@ -20,8 +21,8 @@ const PRAYERS: Record<PrayerId, { name: string; body: string }> = {
 export class PrayerScheduler implements ReminderScheduler {
   readonly ids = PRAYER_IDS.flatMap((p) => [`prayer-${p}`, `pre-prayer-${p}`]);
 
-  private get azanModule(): any {
-    return Platform.OS === 'android' ? NativeModules.AzanModule : undefined;
+  private get azanModule() {
+    return azanNative();
   }
 
   async schedule({ prefs, azan, timings }: ScheduleContext) {
@@ -73,6 +74,7 @@ export class PrayerScheduler implements ReminderScheduler {
 
   async cancelExtra() {
     const mod = this.azanModule;
-    if (mod?.cancelAzan) PRAYER_IDS.forEach((id) => mod.cancelAzan(id));
+    const cancel = mod?.cancelAzan;
+    if (cancel) PRAYER_IDS.forEach((id) => cancel.call(mod, id));
   }
 }

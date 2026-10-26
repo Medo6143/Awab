@@ -9,7 +9,9 @@ import { colors } from '../../../shared/theme/tokens';
 const { width } = Dimensions.get('window');
 
 // ── Tasbeeh Counter ────────────────────────────────────────────────────────
-export const TasbeehCounter = ({ count, target, selectedDhikr, scaleAnim, onPress, accentColor }: any) => {
+export const TasbeehCounter = ({ count, target, selectedDhikr, scaleAnim, onPress, accentColor }: {
+  count: number; target: number; selectedDhikr: string; scaleAnim: Animated.Value; onPress: () => void; accentColor: string;
+}) => {
   const isBlack = accentColor === '#000000';
   const textColor = isBlack ? '#FFFFFF' : (accentColor || '#fcd34d');
   const size = Math.min(width * 0.86, 360);

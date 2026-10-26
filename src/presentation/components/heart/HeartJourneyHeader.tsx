@@ -6,7 +6,7 @@ import { ScreenHeader } from '../ui';
 import { colors } from '../../../shared/theme/tokens';
 import { toAr } from './HeartJourneyConstants';
 
-export const HeartJourneyHeader = ({ completedCount, onBack }: any) => (
+export const HeartJourneyHeader = ({ completedCount, onBack }: { completedCount: number; onBack: () => void }) => (
   <ScreenHeader
     title="نور القرآن في قلبك"
     onBack={onBack}
@@ -14,7 +14,10 @@ export const HeartJourneyHeader = ({ completedCount, onBack }: any) => (
   />
 );
 
-export const HeartNarrative = ({ khatmaCount, completedCount, onShowJuz, onShowBulk, onFinish }: any) => (
+export const HeartNarrative = ({ khatmaCount, completedCount, onShowJuz, onShowBulk, onFinish }: {
+  khatmaCount: number; completedCount: number;
+  onShowJuz: () => void; onShowBulk: () => void; onFinish: () => void;
+}) => (
   <View style={s.narrative}>
     <View style={s.narrativeHeader}>
       <View>

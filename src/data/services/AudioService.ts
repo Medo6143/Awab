@@ -1,10 +1,14 @@
+import type { AVPlaybackStatus } from 'expo-av';
+import type { Sound } from 'expo-av/build/Audio';
 import TrackPlayer from 'react-native-track-player';
 import { initializeTrackPlayer } from './TrackPlayerService';
 import { Image } from 'react-native';
 
 const DEFAULT_ARTWORK = Image.resolveAssetSource(require('../../../assets/images/mosque_bg.png')).uri;
 
-export const RECITER_MAP: Record<string, { folder: string, server: string, serverNum: string, name: string }> = {
+export type Reciter = { folder: string; server: string; serverNum: string; name: string };
+
+export const RECITER_MAP: Record<string, Reciter> = {
   'alafasy': { folder: 'Alafasy_128kbps', server: 'afs', serverNum: '8', name: 'مشاري العفاسي' },
   'abdulbasit': { folder: 'Abdul_Basit_Murattal_64kbps', server: 'basit', serverNum: '7', name: 'عبد الباسط (مرتل)' },
   'husary': { folder: 'Husary_128kbps', server: 'husr', serverNum: '13', name: 'الحصري' },
@@ -14,7 +18,7 @@ export const RECITER_MAP: Record<string, { folder: string, server: string, serve
 
 
 export class AudioService {
-  private static sound: any | null = null;
+  private static sound: Sound | null = null;
   private static isTrackPlayerInitialized: boolean = false;
   private static currentSequence: { surahId: number, ayahNumber: number }[] = [];
   private static currentIndex: number = -1;
@@ -97,8 +101,8 @@ export class AudioService {
       );
       this.sound = sound;
 
-      sound.setOnPlaybackStatusUpdate((status: any) => {
-        if (status.didJustFinish) {
+      sound.setOnPlaybackStatusUpdate((status: AVPlaybackStatus) => {
+        if (status.isLoaded && status.didJustFinish) {
           this._handleAyahFinish();
         }
       });

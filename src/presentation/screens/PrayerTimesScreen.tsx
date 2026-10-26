@@ -1,3 +1,4 @@
+import { EmbeddableScreenProps } from '../navigation/types';
 import React from 'react';
 import { View } from 'react-native';
 import { MapPin } from 'lucide-react-native';
@@ -12,10 +13,10 @@ import { space } from '../../shared/theme/tokens';
 const HIDDEN = ['Imsak', 'Sunset', 'Midnight', 'Firstthird', 'Lastthird'];
 
 /** Standalone (stack) or embedded in PrayerHub with `hideHeader` + `tab`. */
-const PrayerTimesScreen = ({ navigation, hideHeader, tab }: any) => {
+const PrayerTimesScreen = ({ navigation, hideHeader, tab }: EmbeddableScreenProps) => {
   const { timings, date, nextPrayer, loading, error, hasLocation, retry } = usePrayerTimes();
   const notificationsEnabled = useSelector((st: RootState) => st.settings.notificationsEnabled);
-  const prayersPref = useSelector((st: RootState) => (st.settings.notificationPrefs as any)?.prayers ?? true);
+  const prayersPref = useSelector((st: RootState) => st.settings.notificationPrefs?.prayers ?? true);
   const notify = !!notificationsEnabled && !!prayersPref;
 
   let body: React.ReactNode;
@@ -34,7 +35,7 @@ const PrayerTimesScreen = ({ navigation, hideHeader, tab }: any) => {
   } else {
     body = (
       <>
-        <PrayerCountdown nextPrayer={nextPrayer as any} date={date} />
+        <PrayerCountdown nextPrayer={nextPrayer} date={date} />
         <View style={s.list}>
           {Object.entries(timings)
             .filter(([k]) => !HIDDEN.includes(k))
@@ -51,7 +52,7 @@ const PrayerTimesScreen = ({ navigation, hideHeader, tab }: any) => {
       scroll
       tab={tab}
       edges={hideHeader ? [] : ['top']}
-      header={!hideHeader ? <ScreenHeader title="مواقيت الصلاة" onBack={() => navigation.goBack()} /> : undefined}
+      header={!hideHeader ? <ScreenHeader title="مواقيت الصلاة" onBack={() => navigation?.goBack()} /> : undefined}
     >
       {body}
     </Screen>

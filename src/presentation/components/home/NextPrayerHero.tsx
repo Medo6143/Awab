@@ -6,7 +6,9 @@ import { StatNumber, ErrorState, EmptyState, Skeleton } from '../ui';
 import { colors, icon } from '../../../shared/theme/tokens';
 import { formatCountdown, toAr } from '../../../shared/utils/format';
 
-type NextPrayer = { name: string; arName: string; time: string; remaining: number } | null;
+import { NextPrayerView } from '../../hooks/usePrayerTimes';
+
+type NextPrayer = NextPrayerView | null;
 
 type Props = {
   nextPrayer: NextPrayer;

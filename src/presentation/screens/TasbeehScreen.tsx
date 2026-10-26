@@ -1,3 +1,4 @@
+import { EmbeddableScreenProps } from '../navigation/types';
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Animated, Vibration, ScrollView } from 'react-native';
 import * as Haptics from 'expo-haptics';
@@ -17,7 +18,7 @@ import { s } from '../components/tasbeeh/TasbeehStyles';
 import { toAr } from '../components/tasbeeh/TasbeehConstants';
 import { colors, icon } from '../../shared/theme/tokens';
 
-const TasbeehScreen = ({ hideHeader, navigation }: any) => {
+const TasbeehScreen = ({ hideHeader, navigation }: EmbeddableScreenProps) => {
   const dispatch = useDispatch();
   const { count, target, targets, totalCount, selectedDhikr, dhikrList, floatingBubbleColor } = useSelector((state: RootState) => state.tasbeeh);
 

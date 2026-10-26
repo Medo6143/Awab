@@ -1,3 +1,12 @@
+import type { IbadaTask as ReportTask } from '../store/slices/ibadaSlice';
+
+type ReportData = {
+  type: 'day' | 'month' | 'year';
+  name: string;
+  tasks: ReportTask[];
+  stats: { dhikrCount: number; dhikrDetails?: Record<string, number>; quranPages: number };
+};
+import { ScreenProps } from '../navigation/types';
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -18,12 +27,12 @@ const WEEKDAYS = ['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خم�
 const QIYAM_IDS = ['qiyam_al_layl', 'qiyan_al_layl'];
 const localKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
-const StatsScreen = ({ navigation }: any) => {
+const StatsScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const accent = useAccent();
   const [activeTab, setActiveTab] = useState<'day' | 'month'>('day');
   const [expandedMonths, setExpandedMonths] = useState<Record<string, boolean>>({});
   const [reportVisible, setReportVisible] = useState(false);
-  const [reportData, setReportData] = useState<any>(null);
+  const [reportData, setReportData] = useState<ReportData | null>(null);
 
   const { dailyRecords } = useSelector((state: RootState) => state.stats);
   const { tasks } = useSelector((state: RootState) => state.ibada);

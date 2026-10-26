@@ -1,3 +1,4 @@
+import { PlainRoute } from '../../navigation/types';
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -8,12 +9,12 @@ import { MORNING_ATHKAR, EVENING_ATHKAR } from '../../../shared/constants/athkar
 import { TOTAL_SURAHS } from './HomeConstants';
 
 /** Three rings replacing three cards: today's ibada, the khatma, and today's athkar. */
-export const ProgressRow = ({ onNavigate }: { onNavigate: (route: string, params?: any) => void }) => {
+export const ProgressRow = ({ onNavigate }: { onNavigate: (route: PlainRoute) => void }) => {
   const tasks = useSelector((s: RootState) => s.ibada.tasks);
   const completedSurahs = useSelector((s: RootState) => s.quran.completedSurahs?.length || 0);
-  const athkarCounts = useSelector((s: RootState) => (s as any).athkar?.completionCounts || {});
+  const athkarCounts = useSelector((s: RootState) => s.athkar?.completionCounts || {});
 
-  const ibada = tasks.length ? tasks.filter((t: any) => t.isCompleted).length / tasks.length : 0;
+  const ibada = tasks.length ? tasks.filter((t) => t.isCompleted).length / tasks.length : 0;
   const khatma = completedSurahs / TOTAL_SURAHS;
 
   let done = 0, total = 0;
@@ -23,7 +24,7 @@ export const ProgressRow = ({ onNavigate }: { onNavigate: (route: string, params
   }
   const athkar = total ? done / total : 0;
 
-  const rings = [
+  const rings: { key: string; progress: number; caption: string; route: PlainRoute }[] = [
     { key: 'ibada', progress: ibada, caption: 'العبادات', route: 'العبادات' },
     { key: 'khatma', progress: khatma, caption: 'الختمة', route: 'نور_القلب' },
     { key: 'athkar', progress: athkar, caption: 'الأذكار', route: 'TabAthkar' },

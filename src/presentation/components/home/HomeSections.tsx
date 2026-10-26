@@ -1,3 +1,4 @@
+import { PlainRoute } from '../../navigation/types';
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import {
@@ -7,7 +8,7 @@ import { styles } from './HomeStyles';
 import { Card, IconTile, SectionTitle } from '../ui';
 import { DAILY_VERSES } from './HomeConstants';
 
-type GridItem = { label: string; route: string; icon: LucideIcon; params?: any };
+type GridItem = { label: string; route: PlainRoute; icon: LucideIcon };
 
 const GRID: GridItem[] = [
   { label: 'القرآن', route: 'TabQuran', icon: BookOpen },
@@ -21,7 +22,7 @@ const GRID: GridItem[] = [
 ];
 
 /** 4-column mono-icon grid. All icons share the accent; identity comes from the glyph. */
-export const HomeGrid = ({ onNavigate }: { onNavigate: (route: string, params?: any) => void }) => (
+export const HomeGrid = ({ onNavigate }: { onNavigate: (route: PlainRoute) => void }) => (
   <View>
     <SectionTitle title="الوصول السريع" />
     <View style={styles.grid}>
@@ -29,7 +30,7 @@ export const HomeGrid = ({ onNavigate }: { onNavigate: (route: string, params?: 
         <TouchableOpacity
           key={item.route}
           style={styles.gridItem}
-          onPress={() => onNavigate(item.route, item.params)}
+          onPress={() => onNavigate(item.route)}
           accessibilityRole="button"
           accessibilityLabel={item.label}
           activeOpacity={0.8}

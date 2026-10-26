@@ -1,3 +1,4 @@
+import { ScreenProps } from '../navigation/types';
 import React, { useState } from 'react';
 import { View, Text } from 'react-native';
 import { Wallet, Info } from 'lucide-react-native';
@@ -7,7 +8,7 @@ import { s } from '../components/zakat/ZakatStyles';
 import { NISAB_GOLD, GOLD_PRICE_GRAM, toAr } from '../components/zakat/ZakatConstants';
 import { colors, icon } from '../../shared/theme/tokens';
 
-const ZakatScreen = ({ navigation }: any) => {
+const ZakatScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const [cash, setCash] = useState('');
   const amount = Number(cash) || 0;
   const nisab = NISAB_GOLD * GOLD_PRICE_GRAM;

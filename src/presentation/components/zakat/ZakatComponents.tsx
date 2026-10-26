@@ -1,10 +1,11 @@
+import { LucideIcon } from 'lucide-react-native';
 import React from 'react';
 import { View, Text, TextInput } from 'react-native';
 import { s } from './ZakatStyles';
 import { Card, IconTile } from '../ui';
 import { colors } from '../../../shared/theme/tokens';
 
-export const ZakatInput = ({ label, value, onChange, icon, unit }: any) => (
+export const ZakatInput = ({ label, value, onChange, icon, unit }: { label: string; value: string; onChange: (text: string) => void; icon: LucideIcon; unit: string }) => (
   <View style={s.inputWrapper}>
     <Text style={s.inputLabel}>{label}</Text>
     <View style={s.inputRow}>

@@ -1,4 +1,5 @@
-import { DeviceEventEmitter, NativeModules, Platform } from 'react-native';
+import { DeviceEventEmitter } from 'react-native';
+import { floatingBubbleNative, FloatingBubbleNativeModule } from './nativeModules';
 import { FloatingSebha, FloatingSebhaConfig, FloatingSebhaDiagnostics } from '../../domain/services/FloatingSebha';
 
 const DEFAULT_LABEL = 'سبحان الله';
@@ -9,19 +10,19 @@ const DEFAULT_LABEL = 'سبحان الله';
  * turned into a safe result instead of crashing the JS side.
  */
 export class NativeFloatingSebha implements FloatingSebha {
-  private get mod(): any {
-    return NativeModules.RNFloatingBubble;
+  private get mod() {
+    return floatingBubbleNative();
   }
 
   get isAvailable() {
-    return Platform.OS === 'android' && !!this.mod;
+    return !!this.mod;
   }
 
-  private call<T>(name: string, fallback: T, ...args: unknown[]): T | Promise<T> {
-    const fn = this.mod?.[name];
+  private call<T>(name: keyof FloatingBubbleNativeModule, fallback: T, ...args: unknown[]): T | Promise<T> {
+    const fn = this.mod?.[name] as ((...a: unknown[]) => T | Promise<T>) | undefined;
     if (typeof fn !== 'function') return fallback;
     try {
-      return fn(...args);
+      return fn.apply(this.mod, args);
     } catch (e) {
       console.warn(`FloatingSebha.${name} failed`, e);
       return fallback;

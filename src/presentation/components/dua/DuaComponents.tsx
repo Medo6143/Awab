@@ -1,3 +1,4 @@
+import { Dua } from '../../../domain/entities/types';
 import React from 'react';
 import { View, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { Plus, Search, X, Share2, Copy } from 'lucide-react-native';
@@ -7,7 +8,7 @@ import { ScreenHeader, IconButton, Chip } from '../ui';
 import { colors, icon } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 
-export const DuaHeader = ({ onAdd, onBack, hideHeader }: any) => {
+export const DuaHeader = ({ onAdd, onBack, hideHeader }: { onAdd: () => void; onBack: () => void; hideHeader?: boolean }) => {
   if (hideHeader) return null;
   return (
     <ScreenHeader
@@ -22,7 +23,7 @@ export const DuaHeader = ({ onAdd, onBack, hideHeader }: any) => {
   );
 };
 
-export const DuaSearch = ({ query, onChange }: any) => (
+export const DuaSearch = ({ query, onChange }: { query: string; onChange: (text: string) => void }) => (
   <View style={s.searchSection}>
     <View style={s.searchBar}>
       {query !== '' ? (
@@ -45,7 +46,7 @@ export const DuaSearch = ({ query, onChange }: any) => (
   </View>
 );
 
-export const DuaCategories = ({ selected, onSelect }: any) => {
+export const DuaCategories = ({ selected, onSelect }: { selected: string; onSelect: (id: string) => void }) => {
   const accent = useAccent();
   return (
     <View style={s.categoriesScroll}>
@@ -66,7 +67,7 @@ export const DuaCategories = ({ selected, onSelect }: any) => {
   );
 };
 
-export const DuaCard = ({ item, onShare, onCopy }: any) => (
+export const DuaCard = ({ item, onShare, onCopy }: { item: Dua; onShare: (text: string, ref: string) => void; onCopy: (text: string) => void }) => (
   <View style={s.duaCard}>
     <Text style={s.duaText}>{item.text}</Text>
     <View style={s.duaFooter}>
