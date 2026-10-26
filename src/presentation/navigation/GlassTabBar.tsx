@@ -2,16 +2,18 @@ import React from 'react';
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BlurView } from 'expo-blur';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { House, Clock3, BookOpen, CircleDot, Sparkles, LucideIcon } from 'lucide-react-native';
+import {
+  CrescentStarIcon, IconComponent, MihrabClockIcon, MosqueIcon, QuranStandIcon, TasbihIcon,
+} from '../components/icons/IslamicIcons';
 import { colors, elevation, icon, layout, radius, space, type } from '../../shared/theme/tokens';
 import { useAccent } from '../../shared/theme/useAccent';
 
-const ICONS: Record<string, LucideIcon> = {
-  TabHome: House,
-  TabPrayer: Clock3,
-  TabQuran: BookOpen,
-  TabTasbeeh: CircleDot,
-  TabAthkar: Sparkles,
+const ICONS: Record<string, IconComponent> = {
+  TabHome: MosqueIcon,
+  TabPrayer: MihrabClockIcon,
+  TabQuran: QuranStandIcon,
+  TabTasbeeh: TasbihIcon,
+  TabAthkar: CrescentStarIcon,
 };
 
 /**
@@ -40,7 +42,7 @@ export const GlassTabBar = ({ state, descriptors, navigation }: BottomTabBarProp
             const { options } = descriptors[route.key];
             const label = (options.title ?? route.name) as string;
             const focused = state.index === index;
-            const Icon = ICONS[route.name] ?? CircleDot;
+            const Icon = ICONS[route.name] ?? MosqueIcon;
 
             const onPress = () => {
               const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });

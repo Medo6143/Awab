@@ -4,7 +4,7 @@ import { FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Haptics from 'expo-haptics';
-import { Sparkles } from 'lucide-react-native';
+import { CrescentStarIcon } from '../components/icons/IslamicIcons';
 import { RootState } from '../store';
 import { incrementAthkarCount, syncDailyReset, resetAthkarCounts } from '../store/slices/athkarSlice';
 import { logDhikr } from '../store/slices/statsSlice';
@@ -55,7 +55,7 @@ const AthkarScreen = ({ route, navigation, hideHeader }: EmbeddableScreenProps<'
         contentContainerStyle={s.listPadding}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={allDone ? (
-          <EmptyState icon={Sparkles} title={activeTab === 'morning' ? 'أتممت أذكار الصباح' : 'أتممت أذكار المساء'} message="تقبّل الله منك. يمكنك إعادة الضبط لتكرارها." />
+          <EmptyState icon={CrescentStarIcon} title={activeTab === 'morning' ? 'أتممت أذكار الصباح' : 'أتممت أذكار المساء'} message="تقبّل الله منك. يمكنك إعادة الضبط لتكرارها." />
         ) : null}
         style={{ backgroundColor: colors.bg }}
       />

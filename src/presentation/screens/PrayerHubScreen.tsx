@@ -2,7 +2,7 @@ import { ScreenProps } from '../navigation/types';
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Sunrise, Compass } from 'lucide-react-native';
+import { KaabaIcon, MihrabClockIcon } from '../components/icons/IslamicIcons';
 import { ScreenHeader, Chip } from '../components/ui';
 import { colors, icon } from '../../shared/theme/tokens';
 import { useAccent } from '../../shared/theme/useAccent';
@@ -32,13 +32,13 @@ const PrayerHubScreen = ({ route }: Partial<ScreenProps<'TabPrayer'>>) => {
           label="المواقيت"
           selected={activeTab === 'times'}
           onPress={() => setActiveTab('times')}
-          icon={<Sunrise size={icon.size.md} color={iconColor('times')} strokeWidth={icon.stroke} />}
+          icon={<MihrabClockIcon size={icon.size.md} color={iconColor('times')} strokeWidth={icon.stroke} />}
         />
         <Chip
           label="القبلة"
           selected={activeTab === 'qibla'}
           onPress={() => setActiveTab('qibla')}
-          icon={<Compass size={icon.size.md} color={iconColor('qibla')} strokeWidth={icon.stroke} />}
+          icon={<KaabaIcon size={icon.size.md} color={iconColor('qibla')} strokeWidth={icon.stroke} />}
         />
       </View>
       <View style={{ flex: 1 }}>

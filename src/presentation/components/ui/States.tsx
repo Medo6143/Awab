@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
-import { AlertTriangle, LucideIcon } from 'lucide-react-native';
+import { AlertTriangle } from 'lucide-react-native';
+import type { IconComponent } from '../icons/IslamicIcons';
 import { colors, icon, radius, space, type } from '../../../shared/theme/tokens';
 import { PillButton } from './PillButton';
 
-type EmptyProps = { icon?: LucideIcon; title: string; message?: string; action?: { label: string; onPress: () => void } };
+type EmptyProps = { icon?: IconComponent; title: string; message?: string; action?: { label: string; onPress: () => void } };
 
 export const EmptyState = ({ icon: Icon, title, message, action }: EmptyProps) => (
   <View style={styles.wrap} accessibilityRole="summary">

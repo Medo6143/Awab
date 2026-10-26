@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { LucideIcon } from 'lucide-react-native';
+import type { IconComponent } from '../icons/IslamicIcons';
 import { colors, icon, radius } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 
-type Props = { icon: LucideIcon; size?: 'md' | 'lg'; tone?: 'accent' | 'muted' | 'success' | 'danger'; style?: object };
+type Props = { icon: IconComponent; size?: 'md' | 'lg'; tone?: 'accent' | 'muted' | 'success' | 'danger'; style?: object };
 
 /** The mono-icon square used in grids, settings rows and task rows. */
 export const IconTile = ({ icon: Icon, size = 'md', tone = 'accent', style }: Props) => {

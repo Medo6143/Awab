@@ -2,7 +2,7 @@ import { ScreenProps } from '../navigation/types';
 import React from 'react';
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { ListChecks } from 'lucide-react-native';
+import { PrayerMatIcon } from '../components/icons/IslamicIcons';
 import { RootState } from '../store';
 import { toggleTask, syncIbadaDailyReset, IbadaTask } from '../store/slices/ibadaSlice';
 import { logPrayer } from '../store/slices/statsSlice';
@@ -23,7 +23,7 @@ const IbadaTodoScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   return (
     <Screen scroll contentStyle={s.content} header={<ScreenHeader title="مهام العبادات" onBack={() => navigation.goBack()} />}>
       {tasks.length === 0 ? (
-        <EmptyState icon={ListChecks} title="لا توجد مهام اليوم" message="ستظهر مهام العبادات هنا عند بداية يوم جديد." />
+        <EmptyState icon={PrayerMatIcon} title="لا توجد مهام اليوم" message="ستظهر مهام العبادات هنا عند بداية يوم جديد." />
       ) : (
         <>
           <IbadaProgressCard completedCount={completedCount} totalCount={tasks.length} progress={progress} />

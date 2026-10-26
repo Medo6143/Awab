@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
-import { HandHeart } from 'lucide-react-native';
+import { DuaHandsIcon } from '../components/icons/IslamicIcons';
 import { RootState } from '../store';
 import { addPersonalDua } from '../store/slices/duasSlice';
 import { EmptyState } from '../components/ui';
@@ -62,7 +62,7 @@ const DuaScreen = ({ hideHeader, navigation }: EmbeddableScreenProps) => {
         keyboardShouldPersistTaps="handled"
         ListEmptyComponent={
           <EmptyState
-            icon={HandHeart}
+            icon={DuaHandsIcon}
             title={emptyTitle}
             message={selectedCategory === 'personal' ? 'أضف دعاءك الخاص ليظهر هنا' : 'جرّب كلمة أخرى أو تصنيفاً مختلفاً'}
             action={selectedCategory === 'personal' ? { label: 'إضافة دعاء', onPress: () => setShowAddModal(true) } : undefined}

@@ -2,7 +2,8 @@ import React, { useMemo, useRef, useState } from 'react';
 import { Animated, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
-import { ChevronLeft, HeartPulse } from 'lucide-react-native';
+import { ChevronLeft } from 'lucide-react-native';
+import { HeartLightIcon } from '../components/icons/IslamicIcons';
 import { ScreenProps } from '../navigation/types';
 import { RootState } from '../store';
 import { finishedCount, HeartMode, Khatma } from '../store/slices/quranSlice';
@@ -54,7 +55,7 @@ const KhatmatScreen = ({ navigation, route }: ScreenProps<'الختمات'>) => 
         )}
         ListEmptyComponent={unlogged > 0 ? null : (
           <EmptyState
-            icon={HeartPulse}
+            icon={HeartLightIcon}
             title={mode === 'reading' ? 'لم تكتمل ختمة قراءة بعد' : 'لم تكتمل ختمة حفظ بعد'}
             message="عند إتمام الختمة يُحفظ قلبها هنا مع تاريخ البداية والنهاية"
           />

@@ -1,22 +1,23 @@
 import { PlainRoute } from '../../navigation/types';
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
+import { BarChart3, Settings } from 'lucide-react-native';
 import {
-  BookOpen, Compass, HandHeart, HeartPulse, ListChecks, Coins, BarChart3, Settings, LucideIcon,
-} from 'lucide-react-native';
+  DuaHandsIcon, HeartLightIcon, IconComponent, KaabaIcon, PrayerMatIcon, QuranStandIcon, ZakatCoinIcon,
+} from '../icons/IslamicIcons';
 import { styles } from './HomeStyles';
 import { Card, IconTile, SectionTitle } from '../ui';
 import { DAILY_VERSES } from './HomeConstants';
 
-type GridItem = { label: string; route: PlainRoute; icon: LucideIcon };
+type GridItem = { label: string; route: PlainRoute; icon: IconComponent };
 
 const GRID: GridItem[] = [
-  { label: 'القرآن', route: 'TabQuran', icon: BookOpen },
-  { label: 'القبلة', route: 'القبلة', icon: Compass },
-  { label: 'الأدعية', route: 'الأدعية', icon: HandHeart },
-  { label: 'نور القلب', route: 'نور_القلب', icon: HeartPulse },
-  { label: 'العبادات', route: 'العبادات', icon: ListChecks },
-  { label: 'الزكاة', route: 'الزكاة', icon: Coins },
+  { label: 'القرآن', route: 'TabQuran', icon: QuranStandIcon },
+  { label: 'القبلة', route: 'القبلة', icon: KaabaIcon },
+  { label: 'الأدعية', route: 'الأدعية', icon: DuaHandsIcon },
+  { label: 'نور القلب', route: 'نور_القلب', icon: HeartLightIcon },
+  { label: 'العبادات', route: 'العبادات', icon: PrayerMatIcon },
+  { label: 'الزكاة', route: 'الزكاة', icon: ZakatCoinIcon },
   { label: 'الإحصائيات', route: 'الإحصائيات', icon: BarChart3 },
   { label: 'الإعدادات', route: 'الإعدادات', icon: Settings },
 ];
