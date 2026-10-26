@@ -94,10 +94,10 @@ index 41a92ab..8a476d0 100644
 \ No newline at end of file
 diff --git a/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/FloatingBubbleService.java b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/FloatingBubbleService.java
 new file mode 100644
-index 0000000..6da8470
+index 0000000..0e34cd6
 --- /dev/null
 +++ b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/FloatingBubbleService.java
-@@ -0,0 +1,723 @@
+@@ -0,0 +1,713 @@
 +package com.reactlibrary;
 +
 +import android.app.AlarmManager;
@@ -418,7 +418,6 @@ index 0000000..6da8470
 +    }
 +
 +    private void doReset() {
-+        hideReminder();
 +        tasbeehCount = 0;
 +        prefs.saveCount(tasbeehCount);
 +        updateCounterDisplay();
@@ -437,7 +436,6 @@ index 0000000..6da8470
 +                final WoodCounterView c = counter();
 +                switch (event.getAction()) {
 +                    case MotionEvent.ACTION_DOWN:
-+                        hideReminder();
 +                        dragging = false;
 +                        initialX = params.x;
 +                        initialY = params.y;
@@ -678,10 +676,6 @@ index 0000000..6da8470
 +                        int len = currentDhikr == null ? 0 : currentDhikr.length();
 +                        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, len > 120 ? 14 : len > 60 ? 16 : len > 30 ? 18 : 21);
 +                    }
-+                    reminderView.setOnClickListener(new View.OnClickListener() {
-+                        @Override
-+                        public void onClick(View v) { hideReminder(); }
-+                    });
 +
 +                    int layoutType;
 +                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -691,34 +685,30 @@ index 0000000..6da8470
 +                    }
 +
 +                    android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
-+                    int margin = dp(16), gap = dp(10);
++                    int margin = dp(16);
 +                    int cardW = Math.min(dm.widthPixels - margin * 2, dp(300));
 +                    reminderView.measure(
 +                            View.MeasureSpec.makeMeasureSpec(cardW, View.MeasureSpec.AT_MOST),
 +                            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
 +                    int w = reminderView.getMeasuredWidth(), h = reminderView.getMeasuredHeight();
 +
++                    // Centered on screen. It ignores touches (they reach whatever is under it):
++                    // the only way to dismiss it is a count on the sebha (doCount).
 +                    WindowManager.LayoutParams rp = new WindowManager.LayoutParams(
 +                            w, h, layoutType,
-+                            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
++                            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
 +                            PixelFormat.TRANSLUCENT);
-+                    rp.gravity = Gravity.TOP | Gravity.LEFT;
-+
-+                    // Sit next to the sebha, never on top of it: above if it fits, else below,
-+                    // else in the half of the screen the sebha is not in.
-+                    int bx = FloatingBubbleService.this.params.x, by = FloatingBubbleService.this.params.y;
-+                    int bw = FloatingBubbleService.this.params.width, bh = FloatingBubbleService.this.params.height;
-+                    int screenH = dm.heightPixels;
-+                    int top = dp(24), bottom = screenH - dp(24);
-+                    int y;
-+                    if (by - gap - h >= top) y = by - gap - h;
-+                    else if (by + bh + gap + h <= bottom) y = by + bh + gap;
-+                    else y = (by + bh / 2 > screenH / 2) ? top : bottom - h;
-+                    int x = bx + bw / 2 - w / 2;
-+                    x = Math.max(margin, Math.min(x, dm.widthPixels - margin - w));
-+                    rp.x = x;
-+                    rp.y = y;
++                    rp.gravity = Gravity.CENTER;
 +                    windowManager.addView(reminderView, rp);
++
++                    // If the sebha sits under the card, lift it back on top so its counter stays visible.
++                    WindowManager.LayoutParams bp = FloatingBubbleService.this.params;
++                    int cx = (dm.widthPixels - w) / 2, cy = (dm.heightPixels - h) / 2;
++                    boolean overlaps = bp.x < cx + w && bp.x + bp.width > cx && bp.y < cy + h && bp.y + bp.height > cy;
++                    if (overlaps && bubbleView != null && bubbleView.getParent() != null) {
++                        windowManager.removeViewImmediate(bubbleView);
++                        windowManager.addView(bubbleView, bp);
++                    }
 +                } catch (Exception e) {
 +                }
 +            }
@@ -1681,7 +1671,7 @@ index 0000000..e04a683
 +</LinearLayout>
 diff --git a/node_modules/react-native-floating-bubble/android/src/main/res/layout/reminder_layout.xml b/node_modules/react-native-floating-bubble/android/src/main/res/layout/reminder_layout.xml
 new file mode 100644
-index 0000000..37e6cb4
+index 0000000..d85d7f7
 --- /dev/null
 +++ b/node_modules/react-native-floating-bubble/android/src/main/res/layout/reminder_layout.xml
 @@ -0,0 +1,47 @@
@@ -1727,7 +1717,7 @@ index 0000000..37e6cb4
 +    <TextView
 +        android:layout_width="wrap_content"
 +        android:layout_height="wrap_content"
-+        android:text="اضغط هنا أو على السبحة للإخفاء"
++        android:text="اضغط على العداد للإخفاء"
 +        android:textColor="#A89F93"
 +        android:textSize="10sp"
 +        android:layout_marginTop="10dp" />
