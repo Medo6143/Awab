@@ -14,7 +14,6 @@ import { HeartZoomModal } from '../components/heart/HeartZoomModal';
 import { SurahChecklist } from '../components/heart/SurahChecklist';
 import { HeartJourneyHeader, HeartNarrative } from '../components/heart/HeartJourneyHeader';
 import { JuzSelectionModal, BulkMarkModal } from '../components/heart/HeartModals';
-import { s } from '../components/heart/HeartJourneyStyles';
 import { JUZ_SURAH_RANGES, toAr } from '../components/heart/HeartJourneyConstants';
 
 const HeartJourneyScreen = ({ navigation }: any) => {

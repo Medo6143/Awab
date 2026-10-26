@@ -1,6 +1,5 @@
 import { StyleSheet, Dimensions } from 'react-native';
 import { colors, radius, space, type } from '../../../shared/theme/tokens';
-import { HEART_VB_W, HEART_VB_H } from './heartCells';
 
 const { width } = Dimensions.get('window');
 
@@ -11,8 +10,6 @@ export const s = StyleSheet.create({
   progressBadgeText: { ...type.label, color: colors.goldText, flexShrink: 0 },
 
   scrollContent: { paddingBottom: space[10] },
-  heartContainer: { height: (width * 0.9 * HEART_VB_H) / HEART_VB_W, alignItems: 'center', justifyContent: 'center', marginTop: space[1], marginBottom: space[6] },
-  heartZoomBtn: { position: 'absolute', top: 8, left: 20, width: 44, height: 44, borderRadius: radius.tile, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', zIndex: 2 },
 
   // ── Zoom modal ──
   zoomRoot: { flex: 1, backgroundColor: colors.bg },

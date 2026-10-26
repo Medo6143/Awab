@@ -52,7 +52,8 @@ export const ImageShareModal = ({ visible, title, onClose, children }: Props) =>
   const onSave = async () => {
     setBusy('save');
     try {
-      const perm = await MediaLibrary.requestPermissionsAsync(true, ['photo']);
+      // write-only: the app never reads the gallery, so it asks for no read permission
+      const perm = await MediaLibrary.requestPermissionsAsync(true);
       if (!perm.granted) { Alert.alert('لا يوجد إذن', 'اسمح لأوّاب بحفظ الصور من إعدادات الهاتف.'); return; }
       const uri = await capture();
       await MediaLibrary.saveToLibraryAsync(uri);

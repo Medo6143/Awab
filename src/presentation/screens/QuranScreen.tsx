@@ -36,6 +36,8 @@ const QuranScreen = ({ navigation }: any) => {
   const [selectedAyah, setSelectedAyah] = useState<Ayah | null>(null);
   const [tafsir, setTafsir] = useState<string | null>(null);
   const [tafsirLoading, setTafsirLoading] = useState(false);
+  const [tafsirError, setTafsirError] = useState(false);
+  const tafsirRequest = useRef(0); // ignore answers for an ayah the user already left
   const [showSurahPicker, setShowSurahPicker] = useState(false);
   const [showBookmarks, setShowBookmarks] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -88,20 +90,30 @@ const QuranScreen = ({ navigation }: any) => {
   const getTafsir = async (ayah: Ayah) => {
     setSelectedAyah(ayah);
     setHighlightedAyah(ayah.number);
-    setTafsirLoading(true);
-    setTafsir(null);
     openBottomSheet();
+    loadTafsir(ayah);
+  };
 
+  // The error is its own state: it must never end up as tafsir text (the share image
+  // uses the tafsir as its excerpt).
+  const loadTafsir = async (ayah: Ayah) => {
+    const req = ++tafsirRequest.current;
+    setTafsirLoading(true);
+    setTafsirError(false);
+    setTafsir(null);
     try {
       const res = await fetch(
         `https://api.quran.com/api/v4/tafsirs/${selectedTafsirId}/by_ayah/${ayah.surah.number}:${ayah.numberInSurah}`
       );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      setTafsir(data.tafsir.text);
-    } catch (error) {
-      setTafsir('عذراً، حدث خطأ أثناء جلب التفسير.');
+      const html: unknown = data?.tafsir?.text;
+      if (typeof html !== 'string' || !html.trim()) throw new Error('empty tafsir');
+      if (req === tafsirRequest.current) setTafsir(html);
+    } catch {
+      if (req === tafsirRequest.current) setTafsirError(true);
     } finally {
-      setTafsirLoading(false);
+      if (req === tafsirRequest.current) setTafsirLoading(false);
     }
   };
 
@@ -250,6 +262,8 @@ const QuranScreen = ({ navigation }: any) => {
         tafsir={tafsir}
         tafsirName={TAFSIR_LIST.find((t) => t.id === selectedTafsirId)?.name}
         tafsirLoading={tafsirLoading}
+        tafsirError={tafsirError}
+        onRetryTafsir={() => selectedAyah && loadTafsir(selectedAyah)}
         tafsirStyle={tafsirStyle}
         tafsirFontSize={tafsirFontSize}
         bottomSheetAnim={bottomSheetAnim}

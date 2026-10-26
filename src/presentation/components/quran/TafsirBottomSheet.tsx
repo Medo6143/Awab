@@ -16,6 +16,8 @@ interface Props {
   tafsir: string | null;          // raw HTML from the API
   tafsirName?: string;
   tafsirLoading: boolean;
+  tafsirError: boolean;
+  onRetryTafsir: () => void;
   tafsirStyle: string;
   tafsirFontSize: number;
   bottomSheetAnim: Animated.Value;
@@ -26,7 +28,7 @@ interface Props {
 }
 
 export const TafsirBottomSheet = ({
-  visible, selectedAyah, tafsir, tafsirName, tafsirLoading, tafsirStyle, tafsirFontSize,
+  visible, selectedAyah, tafsir, tafsirName, tafsirLoading, tafsirError, onRetryTafsir, tafsirStyle, tafsirFontSize,
   bottomSheetAnim, bookmarks, onClose, onToggleBookmark, onPlayAyah
 }: Props) => {
 
@@ -54,6 +56,17 @@ export const TafsirBottomSheet = ({
         <View style={s.tafsirLoader}>
           <ActivityIndicator color={colors.goldDeep} />
           <Text style={s.loadingTextSmall}>إحضار التفسير...</Text>
+        </View>
+      );
+    }
+
+    if (tafsirError) {
+      return (
+        <View style={s.tafsirLoader}>
+          <Text style={s.pageErrorText}>تعذّر تحميل التفسير. تأكد من الاتصال بالإنترنت.</Text>
+          <TouchableOpacity style={s.pageRetryBtn} onPress={onRetryTafsir} accessibilityRole="button">
+            <Text style={s.pageRetryText}>إعادة المحاولة</Text>
+          </TouchableOpacity>
         </View>
       );
     }
