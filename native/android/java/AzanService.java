@@ -28,6 +28,7 @@ public class AzanService extends Service {
     public  static final String ACTION_STOP      = "STOP_AZAN";
 
     private MediaPlayer       mediaPlayer;
+    private PowerManager.WakeLock screenLock;
 
     /** The running service, so AzanModule can report the playback position to JS. */
     private static AzanService current;
@@ -75,6 +76,10 @@ public class AzanService extends Service {
         // ► MUST call startForeground within 5 seconds of startForegroundService
         startForeground(NOTIFICATION_ID, buildNotification(prayerName));
 
+        // Light the screen like an alarm clock. Works on every phone, so even where the maker
+        // blocks the adhan screen over the lock screen, the user sees the notification + stop.
+        wakeScreen();
+
         // Optional: Open app on lock screen (only if overlay permission granted)
         launchActivityIfAllowed(prayerName);
 
@@ -86,6 +91,7 @@ public class AzanService extends Service {
     @Override
     public void onDestroy() {
         if (current == this) current = null;
+        releaseScreenLock();
         releaseMediaPlayer();
         abandonAudioFocus();
         super.onDestroy();
@@ -161,7 +167,30 @@ public class AzanService extends Service {
         }
     }
 
+    @SuppressWarnings("deprecation") // the only way for a service to turn the screen on
+    private void wakeScreen() {
+        try {
+            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+            if (pm == null || pm.isInteractive()) return;
+            releaseScreenLock();
+            screenLock = pm.newWakeLock(
+                    PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE,
+                    "owwab:azan-screen");
+            screenLock.acquire(60 * 1000L); // the screen may dim again after a minute
+        } catch (Exception e) {
+            Log.w(TAG, "wakeScreen failed", e);
+        }
+    }
+
+    private void releaseScreenLock() {
+        try {
+            if (screenLock != null && screenLock.isHeld()) screenLock.release();
+        } catch (Exception ignored) {}
+        screenLock = null;
+    }
+
     private void stopAzan() {
+        releaseScreenLock();
         releaseMediaPlayer();
         abandonAudioFocus();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

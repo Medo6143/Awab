@@ -31,6 +31,10 @@ export class NativeAzanAlarms implements AzanAlarms {
     try { this.mod?.stopAzan?.(); } catch {}
   }
 
+  releaseLockScreen() {
+    try { this.mod?.releaseLockScreen?.(); } catch {}
+  }
+
   onTriggered(listener: (prayerName: string) => void) {
     const sub = DeviceEventEmitter.addListener('onAzanTriggered', (e: { prayerName?: string }) => listener(e?.prayerName || 'الصلاة'));
     return () => sub.remove();

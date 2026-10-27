@@ -12,6 +12,7 @@ export interface AzanNativeModule {
   /** ms into the adhan the native service is playing, or -1. */
   getAzanPositionMs?(): Promise<number>;
   stopAzan?(): void;
+  releaseLockScreen?(): void;
   didBootRescheduleFail?(): Promise<boolean>;
   clearBootRescheduleFailedFlag?(): void;
 }

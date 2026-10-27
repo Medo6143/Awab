@@ -235,6 +235,31 @@ public class AzanModule extends ReactContextBaseJavaModule {
         promise.resolve(AzanService.currentPositionMs());
     }
 
+    /**
+     * The activity shows over the lock screen and wakes the screen only while an adhan is
+     * on screen (MainActivity sets this for the adhan intent). Called when the azan screen
+     * closes, so the app is not usable over the lock screen afterwards.
+     */
+    @ReactMethod
+    public void releaseLockScreen() {
+        final android.app.Activity activity = getCurrentActivity();
+        if (activity == null) return;
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                    activity.setShowWhenLocked(false);
+                    activity.setTurnScreenOn(false);
+                } else {
+                    activity.getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                            | android.view.WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                            | android.view.WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+                }
+                activity.getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            }
+        });
+    }
+
     /** Stops the adhan the alarm service is playing, from the in-app azan screen. */
     @ReactMethod
     public void stopAzan() {

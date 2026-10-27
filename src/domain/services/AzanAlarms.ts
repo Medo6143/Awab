@@ -11,4 +11,6 @@ export interface AzanAlarms {
   playbackPosition(): Promise<number | null>;
   /** Stops the adhan the alarm is playing, if any. */
   stop(): void;
+  /** The azan screen closed: stop showing the app over the lock screen. */
+  releaseLockScreen(): void;
 }

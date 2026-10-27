@@ -77,6 +77,9 @@ const AzanContent = ({ onClose, prayerName }: { onClose: () => void; prayerName:
     Animated.timing(phrase, { toValue: 1, duration: 450, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
   }, [line]);
 
+  // the app shows over the lock screen only while the adhan is on screen
+  useEffect(() => () => azanAlarms.releaseLockScreen(), [azanAlarms]);
+
   const handleClose = async () => {
     azanAlarms.stop();
     await AudioService.stop();

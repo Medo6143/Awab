@@ -176,19 +176,9 @@ function withAzanIntent(config) {
       src = src.replace('import android.os.Bundle', 'import android.os.Bundle\nimport android.view.WindowManager');
     }
 
-    // Wake the screen and show over the keyguard when the adhan launches the activity.
-    const wakeScreenCode = `    // Wake Screen and Bypass Keyguard for Azan
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-      setShowWhenLocked(true)
-      setTurnScreenOn(true)
-    } else {
-      window.addFlags(
-        WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-        WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
-        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-      )
-    }
-    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    // Wake the screen and show over the keyguard only when the adhan launches the activity;
+    // AzanModule.releaseLockScreen() undoes it when the azan screen closes.
+    const wakeScreenCode = `    applyAzanWindow(intent)
     super.onCreate(null)
     checkAzanIntent(intent)`;
 
@@ -198,11 +188,23 @@ function withAzanIntent(config) {
   override fun onNewIntent(intent: android.content.Intent) {
     super.onNewIntent(intent)
     setIntent(intent)
+    applyAzanWindow(intent)
+    checkAzanIntent(intent)
+  }
+
+  /** Over the lock screen, screen on, kept on: like an alarm clock, for the adhan only. */
+  private fun applyAzanWindow(intent: android.content.Intent?) {
+    if (intent?.getBooleanExtra("isAzanTriggered", false) != true) return
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
       setShowWhenLocked(true)
       setTurnScreenOn(true)
+    } else {
+      window.addFlags(
+        WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+      )
     }
-    checkAzanIntent(intent)
+    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
   }
 
   private fun checkAzanIntent(intent: android.content.Intent?) {
