@@ -20,7 +20,7 @@ const PrayerTimesScreen = ({ navigation, hideHeader, tab }: EmbeddableScreenProp
   const notify = !!notificationsEnabled && !!prayersPref;
 
   let body: React.ReactNode;
-  if (!hasLocation && !loading) {
+  if (!timings && !hasLocation && !loading) {
     body = <EmptyState icon={MapPin} title="حدّد موقعك" message="نحتاج الموقع لحساب مواقيت الصلاة في مدينتك" action={{ label: 'تفعيل الموقع', onPress: retry }} />;
   } else if (error) {
     body = <ErrorState message="تعذّر تحميل مواقيت الصلاة. تأكد من الاتصال بالإنترنت." onRetry={retry} />;

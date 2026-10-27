@@ -17,6 +17,7 @@ export const s = StyleSheet.create({
     borderRadius: radius.card, backgroundColor: colors.surface,
   },
   rowActive: { backgroundColor: colors.surfaceRaised },
+  prayerIcon: { width: 40, height: 40, borderRadius: 12, backgroundColor: colors.surfaceRaised, alignItems: 'center', justifyContent: 'center' },
   rowRight: { flexDirection: 'row', alignItems: 'center', gap: space[3] },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: 'transparent' },
   rowName: { ...type.bodyMedium, color: colors.textMuted },

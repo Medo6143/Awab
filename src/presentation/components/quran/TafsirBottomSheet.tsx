@@ -7,6 +7,7 @@ import { colors } from '../../../shared/theme/tokens';
 import { toAr, Ayah } from './QuranConstants';
 import { TafsirBlocks } from './TafsirBlocks';
 import { parseTafsir, tafsirExcerpt } from './tafsirParser';
+import { TafsirSwitcher } from './TafsirSwitcher';
 import { ImageShareModal } from '../share/ImageShareModal';
 import { AyahShare } from '../share/StoryCard';
 import { ShareStylePicker } from '../share/ShareStylePicker';
@@ -103,6 +104,7 @@ export const TafsirBottomSheet = ({
                       {selectedAyah.surah.name} ﴿{toAr(selectedAyah.numberInSurah)}﴾
                     </Text>
                   </View>
+                  <TafsirSwitcher />
                   {renderTafsirContent()}
                   <View style={{ height: 120 }} /> 
                 </>

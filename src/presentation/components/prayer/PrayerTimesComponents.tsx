@@ -5,6 +5,11 @@ import { s } from './PrayerTimesStyles';
 import { toAr, PRAYER_NAME_MAP } from './PrayerTimesConstants';
 import { Card, StatNumber, Skeleton } from '../ui';
 import { colors, icon } from '../../../shared/theme/tokens';
+import { AsrIcon, DhuhrIcon, FajrIcon, IconComponent, IshaIcon, MaghribIcon, SunriseIcon } from '../icons/IslamicIcons';
+
+const PRAYER_ICONS: Record<string, IconComponent> = {
+  Fajr: FajrIcon, Sunrise: SunriseIcon, Dhuhr: DhuhrIcon, Asr: AsrIcon, Maghrib: MaghribIcon, Isha: IshaIcon,
+};
 import { useAccent } from '../../../shared/theme/useAccent';
 import { formatCountdown } from '../../../shared/utils/format';
 
@@ -42,16 +47,23 @@ export const PrayerCountdown = ({ nextPrayer, date }: { nextPrayer: NextPrayer; 
 export const PrayerTimeRow = ({ name, time, isActive, notify }: { name: string; time: string; isActive: boolean; notify: boolean }) => {
   const accent = useAccent();
   const BellIcon = notify ? Bell : BellOff;
+  const PrayerIcon = PRAYER_ICONS[name];
   return (
     <View style={[s.row, isActive && s.rowActive]} accessibilityLabel={`${PRAYER_NAME_MAP[name] || name} ${time}`}>
       <View style={s.rowRight}>
-        <View style={[s.dot, isActive && { backgroundColor: accent.accent }]} />
+        {PrayerIcon ? (
+          <View style={[s.prayerIcon, isActive && { backgroundColor: accent.accentSoft }]}>
+            <PrayerIcon size={22} color={isActive ? accent.accent : colors.textMuted} />
+          </View>
+        ) : (
+          <View style={[s.dot, isActive && { backgroundColor: accent.accent }]} />
+        )}
         <Text style={[s.rowName, isActive && s.rowNameActive]}>{PRAYER_NAME_MAP[name] || name}</Text>
         {isActive ? <View style={s.nowPill}><Text style={s.nowPillText}>القادمة</Text></View> : null}
       </View>
       <View style={s.rowLeft}>
         <Text style={[s.rowTime, isActive && s.rowTimeActive]}>{toAr(time)}</Text>
-        <BellIcon size={icon.size.md} color={notify ? (isActive ? accent.accent : colors.textFaint) : colors.textFaint} strokeWidth={icon.stroke} />
+        <BellIcon size={icon.size.sm} color={notify ? (isActive ? accent.accent : colors.textFaint) : colors.textFaint} strokeWidth={icon.stroke} />
       </View>
     </View>
   );

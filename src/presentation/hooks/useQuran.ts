@@ -71,7 +71,11 @@ export const useTafsir = (tafsirId: number) => {
   }, [tafsir, tafsirId]);
 
   const retry = useCallback(() => { if (lastRef.current) load(lastRef.current); }, [load]);
-  const cancel = useCallback(() => { request.current++; setLoading(false); }, []);
+  // closing the sheet forgets the ayah, so a later source change does not fetch in the background
+  const cancel = useCallback(() => { request.current++; lastRef.current = null; setLoading(false); }, []);
+
+  // switching the source while the sheet is open reloads the same ayah from the new tafsir
+  useEffect(() => { if (lastRef.current) load(lastRef.current); }, [load]);
 
   return { html, loading, error, load, retry, cancel };
 };

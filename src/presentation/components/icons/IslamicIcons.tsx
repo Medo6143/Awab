@@ -104,6 +104,49 @@ export const HadithScrollIcon = make(<>
   <Path d="M12 11h4M12 14h4M12 17h2.5" />
 </>, 'HadithScrollIcon');
 
+// ── the five prayers and sunrise: where the sun is at each time ──
+/** Fajr: first light over the horizon, a star still out. */
+export const FajrIcon = make(<>
+  <Path d="M3 19h18" />
+  <Path d="M7.5 19a4.5 4.5 0 0 1 9 0" />
+  <Path d="M12 11.5v-1.5M6.2 13.8l-1-1M17.8 13.8l1-1" strokeOpacity={0.6} />
+  <Path d="M18 4.5l.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2-1.2-.5 1.2-.5z" />
+</>, 'FajrIcon');
+
+/** Sunrise: the sun coming up. */
+export const SunriseIcon = make(<>
+  <Path d="M3 19h18" />
+  <Path d="M7 19a5 5 0 0 1 10 0" />
+  <Path d="M12 3v6M9.5 5.5 12 3l2.5 2.5" />
+</>, 'SunriseIcon');
+
+/** Dhuhr: the sun at its height. */
+export const DhuhrIcon = make(<>
+  <Circle cx={12} cy={12} r={4} />
+  <Path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4" />
+</>, 'DhuhrIcon');
+
+/** Asr: the sun lower, toward the west. */
+export const AsrIcon = make(<>
+  <Path d="M3 19h18" />
+  <Circle cx={15.5} cy={11} r={3.2} />
+  <Path d="M15.5 5v1.4M21 11h-1.4M19.4 7.1l-1 1M11.6 7.1l1 1" />
+  <Path d="M5 16h6" strokeOpacity={0.6} />
+</>, 'AsrIcon');
+
+/** Maghrib: the sun going down. */
+export const MaghribIcon = make(<>
+  <Path d="M3 19h18" />
+  <Path d="M7 19a5 5 0 0 1 10 0" />
+  <Path d="M12 9V3M9.5 6.5 12 9l2.5-2.5" />
+</>, 'MaghribIcon');
+
+/** Isha: night, a crescent and stars. */
+export const IshaIcon = make(<>
+  <Path d="M13.5 4a7.5 7.5 0 1 0 6.5 11.5A6 6 0 0 1 13.5 4z" />
+  <Path d="M19 4.2l.4 1 1 .4-1 .4-.4 1-.4-1-1-.4 1-.4zM20.5 9.5l.3.7.7.3-.7.3-.3.7-.3-.7-.7-.3.7-.3z" />
+</>, 'IshaIcon');
+
 /** Two open palms raised in supplication. */
 export const DuaHandsIcon = make(<>
   <Path d="M9 21v-3.5L6.2 14V7.5a1.1 1.1 0 0 1 2.2 0V12" />

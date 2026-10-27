@@ -15,7 +15,8 @@ export const usePrayerTimes = () => {
   const { coords, countryCode, error: locationError } = useLocation();
   const { calculationMethod: manualMethod } = useSelector((state: RootState) => state.settings);
   const { cachedData, lastFetchedDate, status } = useSelector((state: RootState) => state.prayer);
-  const [nextPrayer, setNextPrayer] = useState<NextPrayer | null>(null);
+  // stored times show at once; a slow GPS fix only refreshes them later
+  const [nextPrayer, setNextPrayer] = useState<NextPrayer | null>(() => (cachedData ? PrayerTimeService.getNextPrayer(cachedData.timings) : null));
   const [retryTick, setRetryTick] = useState(0);
 
   const toArName = (name: string) => {
@@ -111,8 +112,9 @@ export const usePrayerTimes = () => {
     timings: cachedData?.timings, 
     date: cachedData?.date, 
     nextPrayer: (nextPrayer ? { ...nextPrayer, arName: toArName(nextPrayer.name) } : null) as NextPrayerView | null,
-    // Location still resolving counts as loading; only a definite location error is "no location".
-    loading: status === 'loading' || (!coords && !locationError) || (!cachedData && !!coords && status !== 'failed'),
+    // With stored times there is nothing to wait for. Without them, a location still resolving
+    // counts as loading; only a definite location error is "no location".
+    loading: !cachedData && (status === 'loading' || (!coords && !locationError) || (!!coords && status !== 'failed')),
     error: status === 'failed',
     hasLocation: !!coords || !locationError,
     retry,
