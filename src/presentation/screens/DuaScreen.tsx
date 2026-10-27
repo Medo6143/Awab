@@ -14,7 +14,8 @@ import { AddDuaModal } from '../components/dua/DuaModals';
 import { s } from '../components/dua/DuaStyles';
 import { DUAS_DATA } from '../components/dua/DuaConstants';
 import { ImageShareModal } from '../components/share/ImageShareModal';
-import { DuaShareCard } from '../components/share/DuaShareCard';
+import { DuaShare } from '../components/share/StoryCard';
+import { ShareStylePicker } from '../components/share/ShareStylePicker';
 
 const DuaScreen = ({ hideHeader, navigation }: EmbeddableScreenProps) => {
   const dispatch = useDispatch();
@@ -78,8 +79,8 @@ const DuaScreen = ({ hideHeader, navigation }: EmbeddableScreenProps) => {
         onSave={handleAddDua}
       />
 
-      <ImageShareModal visible={!!shareDua} title="مشاركة الدعاء كصورة" onClose={() => setShareDua(null)}>
-        {shareDua ? <DuaShareCard text={shareDua.text} source={shareDua.ref} /> : null}
+      <ImageShareModal visible={!!shareDua} title="مشاركة الدعاء كصورة" onClose={() => setShareDua(null)} toolbar={<ShareStylePicker />}>
+        {shareDua ? <DuaShare text={shareDua.text} source={shareDua.ref} /> : null}
       </ImageShareModal>
     </SafeAreaView>
   );

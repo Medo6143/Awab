@@ -2,8 +2,10 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AzanSettings, DEFAULT_NOTIFICATION_PREFS, NotificationPrefs } from '../../../domain/entities/notifications';
 
 export type TafsirStyle = 'simple' | 'book' | 'modern';
-/** Pixel size of shared images: small 720×1280, medium 1080×1920, high 1440×2560. */
-export type ShareImageSize = 'small' | 'medium' | 'high';
+/** Look of the ayah/dua share image ('classic' is the original card). */
+export type ShareCardStyle = 'classic' | 'gold' | 'paper' | 'night' | 'mihrab';
+/** Largest size the ayah/dua text may take on the share image. */
+export type ShareTextSize = 'small' | 'medium' | 'large';
 
 interface SettingsState {
   notificationsEnabled: boolean;
@@ -17,7 +19,8 @@ interface SettingsState {
   notificationPrefs: NotificationPrefs;
   calculationMethod: number;
   azanSettings: AzanSettings;
-  shareImageSize: ShareImageSize;
+  shareCardStyle: ShareCardStyle;
+  shareTextSize: ShareTextSize;
   tasbeehHaptics: boolean;     // a light buzz on every count
   tasbeehTargetAlert: boolean; // a stronger buzz when the target is reached
 }
@@ -37,7 +40,8 @@ const initialState: SettingsState = {
     type: 'full',
     visualAzanEnabled: true,
   },
-  shareImageSize: 'medium',
+  shareCardStyle: 'gold',
+  shareTextSize: 'medium',
   tasbeehHaptics: true,
   tasbeehTargetAlert: true,
 };
@@ -64,8 +68,11 @@ export const settingsSlice = createSlice({
     setTafsirStyle: (state, action: PayloadAction<TafsirStyle>) => {
       state.tafsirStyle = action.payload;
     },
-    setShareImageSize: (state, action: PayloadAction<ShareImageSize>) => {
-      state.shareImageSize = action.payload;
+    setShareCardStyle: (state, action: PayloadAction<ShareCardStyle>) => {
+      state.shareCardStyle = action.payload;
+    },
+    setShareTextSize: (state, action: PayloadAction<ShareTextSize>) => {
+      state.shareTextSize = action.payload;
     },
     // `?? true`: state persisted before these settings existed lacks the keys
     toggleTasbeehHaptics: (state) => {
@@ -121,7 +128,8 @@ export const {
   setAccentTheme,
   setTafsirId, 
   setTafsirStyle,
-  setShareImageSize,
+  setShareCardStyle,
+  setShareTextSize,
   toggleTasbeehHaptics,
   toggleTasbeehTargetAlert, 
   setTafsirFontSize,

@@ -8,7 +8,8 @@ import { toAr, Ayah } from './QuranConstants';
 import { TafsirBlocks } from './TafsirBlocks';
 import { parseTafsir, tafsirExcerpt } from './tafsirParser';
 import { ImageShareModal } from '../share/ImageShareModal';
-import { AyahShareCard } from '../share/AyahShareCard';
+import { AyahShare } from '../share/StoryCard';
+import { ShareStylePicker } from '../share/ShareStylePicker';
 
 interface Props {
   visible: boolean;
@@ -132,8 +133,8 @@ export const TafsirBottomSheet = ({
         </Animated.View>
       </View>
       {selectedAyah ? (
-        <ImageShareModal visible={shareOpen} title="مشاركة الآية كصورة" onClose={() => setShareOpen(false)}>
-          <AyahShareCard
+        <ImageShareModal visible={shareOpen} title="مشاركة الآية كصورة" onClose={() => setShareOpen(false)} toolbar={<ShareStylePicker />}>
+          <AyahShare
             ayahText={selectedAyah.text}
             surahName={selectedAyah.surah.name}
             ayahNumber={selectedAyah.numberInSurah}

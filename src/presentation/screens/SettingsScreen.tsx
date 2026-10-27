@@ -8,7 +8,7 @@ import { RootState } from '../store';
 import {
   toggleNotifications, toggleLocation, setTafsirId, setTafsirStyle, setTafsirFontSize,
   setAccentTheme, setReciterId, toggleNotificationCategory, setAzanSettings,
-  setDailyWardTime, setEncouragementInterval, setShareImageSize, toggleTasbeehHaptics, toggleTasbeehTargetAlert,
+  setDailyWardTime, setEncouragementInterval, toggleTasbeehHaptics, toggleTasbeehTargetAlert,
 } from '../store/slices/settingsSlice';
 import { setFloatingScale, setFloatingBubbleColor, toggleFloatingBorder, toggleFloatingReset, setFloatingReminderInterval } from '../store/slices/tasbeehSlice';
 import { colors, icon } from '../../shared/theme/tokens';
@@ -16,7 +16,7 @@ import { colors, icon } from '../../shared/theme/tokens';
 import { Screen, ScreenHeader } from '../components/ui';
 import {
   SettingSection, ItemRow, ThemeSelector, ReciterSelector, TafsirSettings,
-  NotificationSettings, AzanSelector, FloatingTasbeehSettings, ShareImageSizeSelector,
+  NotificationSettings, AzanSelector, FloatingTasbeehSettings,
 } from '../components/settings/SettingsComponents';
 import { AzanReadinessCard } from '../components/settings/AzanReadinessCard';
 import { s } from '../components/settings/SettingsStyles';
@@ -27,7 +27,7 @@ const SettingsScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const {
     notificationsEnabled, locationEnabled, selectedTafsirId, tafsirStyle, tafsirFontSize,
     accentTheme, selectedReciterId, notificationPrefs, azanSettings: rawAzanSettings,
-    shareImageSize = 'medium', tasbeehHaptics = true, tasbeehTargetAlert = true,
+    tasbeehHaptics = true, tasbeehTargetAlert = true,
   } = useSelector((state: RootState) => state.settings);
   const { floatingScale, floatingBubbleColor, floatingShowBorder, floatingShowReset, floatingReminderInterval } = useSelector((state: RootState) => state.tasbeeh);
   // persisted state from older versions may lack newer keys
@@ -72,10 +72,6 @@ const SettingsScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
 
       <SettingSection title="المظهر">
         <ThemeSelector accentTheme={accentTheme} onSelect={(id) => dispatch(setAccentTheme(id))} />
-      </SettingSection>
-
-      <SettingSection title="مشاركة الصور">
-        <ShareImageSizeSelector value={shareImageSize} onSelect={(v) => dispatch(setShareImageSize(v))} />
       </SettingSection>
 
       <SettingSection title="التلاوة">

@@ -3,15 +3,17 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../../shared/theme/tokens';
 import { useShareCardSize } from './ImageShareModal';
 import { layoutAyahCard } from './ayahCardLayout';
+import { useShareTextMax } from './storyThemes';
 
 const LOGO = require('../../../../assets/icon.png');
 
 /** 9:16 story card for a dua: brand, the dua in Amiri, its source. */
 export const DuaShareCard = ({ text, source }: { text: string; source: string }) => {
   const { w, h } = useShareCardSize();
+  const maxU = useShareTextMax('classic');
   const u = w / 100;
   const body = text.trim();
-  const { ayahSize } = layoutAyahCard(body.length, 0, w, h);
+  const { ayahSize } = layoutAyahCard(body.length, 0, w, h, maxU);
 
   return (
     <View style={[st.card, { width: w, height: h, padding: 7 * u }]}>

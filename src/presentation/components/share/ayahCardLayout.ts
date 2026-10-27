@@ -10,7 +10,7 @@ const linesFor = (chars: number, fontSize: number, width: number, advance: numbe
  * Picks the ayah font size (and whether the tafsir excerpt fits) from the space the
  * middle of the card actually has, so even al-Baqarah 282 stays inside the card.
  */
-export const layoutAyahCard = (ayahLen: number, excerptLen: number, w: number, h: number) => {
+export const layoutAyahCard = (ayahLen: number, excerptLen: number, w: number, h: number, maxU = 8.4) => {
   const u = w / 100;
   const textW = w - 14 * u;                                // card padding 7u per side
   const middleH = h - 14 * u - 11 * u - 4.5 * u - 6 * u;   // padding, brand, footer, breathing room
@@ -24,7 +24,7 @@ export const layoutAyahCard = (ayahLen: number, excerptLen: number, w: number, h
 
   for (const withTafsir of excerptLen ? [true, false] : [false]) {
     const room = middleH - surahH - (withTafsir ? tafsirH : 0);
-    for (let f = 8.4; f >= 3; f -= 0.2) {
+    for (let f = maxU; f >= 3; f -= 0.2) {
       if (ayahH(f * u) <= room) return { ayahSize: f * u, showTafsir: withTafsir, exSize };
     }
   }
