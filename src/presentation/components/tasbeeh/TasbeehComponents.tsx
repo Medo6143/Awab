@@ -1,6 +1,6 @@
 import React, { useRef, useCallback } from 'react';
 import { View, Text, TouchableOpacity, Animated, FlatList, Dimensions } from 'react-native';
-import { Target, Plus } from 'lucide-react-native';
+import { Hash, Target, Plus } from 'lucide-react-native';
 import { s } from './TasbeehStyles';
 import { toAr } from './TasbeehConstants';
 import { SebhaSvg } from './SebhaSvg';
@@ -102,8 +102,9 @@ export const TargetCarousel = ({
 
     if (item.type === 'custom') {
       return (
-        <TouchableOpacity activeOpacity={0.75} onPress={onCustom} style={s.carouselIconItem}>
-          <Target size={20} color={colors.gold} />
+        <TouchableOpacity activeOpacity={0.75} onPress={onCustom} style={s.carouselAddItem} accessibilityRole="button" accessibilityLabel="إضافة هدف جديد">
+          <Plus size={16} color={colors.goldText} />
+          <Text style={s.carouselAddText}>هدف</Text>
         </TouchableOpacity>
       );
     }
@@ -114,8 +115,10 @@ export const TargetCarousel = ({
         activeOpacity={0.75}
         onPress={onManual}
         style={s.carouselIconItem}
+        accessibilityRole="button"
+        accessibilityLabel="إضافة عدد يدويًا"
       >
-        <Plus size={20} color={colors.goldText} />
+        <Hash size={18} color={colors.textMuted} />
       </TouchableOpacity>
     );
   }, [currentTarget, targets]);

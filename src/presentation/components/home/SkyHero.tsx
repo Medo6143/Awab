@@ -8,7 +8,7 @@ import type { PrayerScheduleTimes } from '../../../domain/entities/prayer';
 import { toAr } from '../../../shared/utils/format';
 import { colors, space } from '../../../shared/theme/tokens';
 
-type Phase = 'night' | 'dawn' | 'morning' | 'noon' | 'golden' | 'dusk';
+export type Phase = 'night' | 'dawn' | 'morning' | 'noon' | 'golden' | 'dusk';
 
 /** Sky colours, top to bottom; the last stop is the app background so the sky melts into the page. */
 const SKY: Record<Phase, string[]> = {
@@ -69,13 +69,46 @@ export const SkyButton = ({ onPress, label, children }: { onPress: () => void; l
 );
 
 /**
+ * The sky itself: gradient for the phase, a few stars when it is dark, and the title row.
+ * Shared by home, prayer times and athkar so every sky page has the same colours.
+ */
+export const SkyBackdrop = ({ phase, title, subtitle, actions, children }: {
+  phase: Phase; title: string; subtitle: string; actions?: React.ReactNode; children?: React.ReactNode;
+}) => {
+  const { width: W } = useWindowDimensions();
+  const top = useSafeAreaInsets().top;
+  return (
+    <View style={{ width: W }}>
+      <LinearGradient colors={SKY[phase] as [string, string, ...string[]]} locations={[0, 0.38, 0.68, 1]} style={StyleSheet.absoluteFill} />
+
+      {/* a few stars before dawn and after dusk */}
+      {(phase === 'night' || phase === 'dusk' || phase === 'dawn') ? (
+        <Svg width={W} height={260} style={StyleSheet.absoluteFill} pointerEvents="none">
+          {[[0.12, 70], [0.3, 40], [0.48, 95], [0.66, 55], [0.82, 85], [0.9, 35], [0.22, 120], [0.58, 130]].map(([fx, y], i) => (
+            <Circle key={i} cx={fx * W} cy={y + top} r={i % 3 === 0 ? 1.4 : 1} fill="#fff" opacity={phase === 'dawn' ? 0.35 : 0.7} />
+          ))}
+        </Svg>
+      ) : null}
+
+      <View style={[st.head, { paddingTop: top + space[3] }]}>
+        <View style={{ flex: 1 }}>
+          <Text style={st.greeting} numberOfLines={1}>{title}</Text>
+          <Text style={st.date} numberOfLines={1}>{subtitle}</Text>
+        </View>
+        {actions}
+      </View>
+      {children}
+    </View>
+  );
+};
+
+/**
  * Home hero: a sky whose colour follows the time of day, the five prayers on the sun's
  * arc (done ones filled, the next one lit), the sun (or moon at night) at the current
  * moment, and the countdown to the next prayer.
  */
 export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loading, onPressPrayer, actions, showTimes }: Props) => {
   const { width } = useWindowDimensions();
-  const top = useSafeAreaInsets().top;
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 60_000);
@@ -112,25 +145,7 @@ export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loadin
   const countdown = next ? (hours ? `${toAr(hours)}:${toAr(String(mins).padStart(2, '0'))}` : `${toAr(mins)} د`) : '—';
 
   return (
-    <View style={{ width: W }}>
-      <LinearGradient colors={SKY[phase] as [string, string, ...string[]]} locations={[0, 0.38, 0.68, 1]} style={StyleSheet.absoluteFill} />
-
-      {/* a few stars before dawn and after dusk */}
-      {(night || phase === 'dusk' || phase === 'dawn') ? (
-        <Svg width={W} height={260} style={StyleSheet.absoluteFill} pointerEvents="none">
-          {[[0.12, 70], [0.3, 40], [0.48, 95], [0.66, 55], [0.82, 85], [0.9, 35], [0.22, 120], [0.58, 130]].map(([fx, y], i) => (
-            <Circle key={i} cx={fx * W} cy={y + top} r={i % 3 === 0 ? 1.4 : 1} fill="#fff" opacity={phase === 'dawn' ? 0.35 : 0.7} />
-          ))}
-        </Svg>
-      ) : null}
-
-      <View style={[st.head, { paddingTop: top + space[3] }]}>
-        <View style={{ flex: 1 }}>
-          <Text style={st.greeting} numberOfLines={1}>{greeting}</Text>
-          <Text style={st.date} numberOfLines={1}>{dateLine}</Text>
-        </View>
-        {actions}
-      </View>
+    <SkyBackdrop phase={phase} title={greeting} subtitle={dateLine} actions={actions}>
 
       <Pressable onPress={onPressPrayer} disabled={!onPressPrayer} accessibilityRole="button" accessibilityLabel={next ? `الصلاة القادمة ${next.arName}` : 'مواقيت الصلاة'}>
         {/* direction ltr: the arc is drawn in absolute coordinates (Fajr east on the right) */}
@@ -186,7 +201,7 @@ export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loadin
           {next ? <Text style={st.countAt}>{toAr(next.time)}</Text> : null}
         </View>
       </Pressable>
-    </View>
+    </SkyBackdrop>
   );
 };
 

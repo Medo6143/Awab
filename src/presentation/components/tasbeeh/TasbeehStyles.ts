@@ -18,6 +18,8 @@ export const s = StyleSheet.create({
   carouselItemActive: { backgroundColor: colors.goldSoft },
   carouselItemText: { ...type.label, fontSize: 16, color: colors.textMuted },
   carouselItemTextActive: { color: colors.goldText },
+  carouselAddItem: { height: 44, borderRadius: radius.pill, borderWidth: 1, borderStyle: 'dashed', borderColor: colors.goldLine, flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: space[4] },
+  carouselAddText: { ...type.label, fontSize: 15, color: colors.goldText },
   carouselIconItem: { width: 44, height: 44, borderRadius: radius.pill, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
   dotsRow: { flexDirection: 'row', justifyContent: 'center', gap: 6, marginTop: space[2] },
   dot: { width: 5, height: 5, borderRadius: 3, backgroundColor: colors.surfaceRaised },
