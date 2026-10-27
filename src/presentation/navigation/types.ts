@@ -16,7 +16,9 @@ export type RootStackParamList = {
   'نور_القلب': undefined;
   'الختمات': { mode?: 'reading' | 'hifz' } | undefined;
   'الفضائل': { topic: 'dua' | 'dhikr' };
-  'رسائل_القرآن': undefined;
+  'رسائل_القرآن': { mood?: string } | undefined;
+  'الأحاديث': { categoryId?: number; favorites?: boolean } | undefined;
+  'الحديث': { id: number };
   'القبلة': undefined;
   'الصلاة': undefined;
   'الزكاة': undefined;

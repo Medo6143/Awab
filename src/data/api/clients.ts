@@ -10,6 +10,11 @@ export const tafsirApi = axios.create({
   timeout: 15000,
 });
 
+export const hadithApi = axios.create({
+  baseURL: 'https://hadeethenc.com/api/v1',
+  timeout: 15000,
+});
+
 export const prayerApi = axios.create({
   baseURL: 'https://api.aladhan.com/v1',
 });

@@ -163,6 +163,19 @@ export const AyahShare = (p: AyahProps) => {
   );
 };
 
+/** A hadith share image: the text, its grade and source, and a line of its explanation. */
+export const HadithShare = ({ text, grade, attribution, explanation }: { text: string; grade: string; attribution: string; explanation?: string }) => {
+  const { style } = useShareStyle();
+  const source = [grade, attribution].filter(Boolean).join(' · ');
+  if (style === 'classic') return <DuaShareCard text={text} source={source} />;
+  return (
+    <StoryCard
+      themeId={style}
+      content={{ label: 'حديث شريف', text: text.trim(), reference: source, tafsirName: 'الشرح', tafsir: explanation?.trim() || undefined }}
+    />
+  );
+};
+
 /** The dua share image in the design chosen in the share screen. */
 export const DuaShare = ({ text, source }: { text: string; source: string }) => {
   const { style } = useShareStyle();

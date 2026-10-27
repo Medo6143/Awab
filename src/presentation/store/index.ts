@@ -16,6 +16,7 @@ import tasbeehReducer from './slices/tasbeehSlice';
 import uiReducer from './slices/uiSlice';
 import prayerReducer from './slices/prayerSlice';
 import audioReducer from './slices/audioSlice';
+import favoritesReducer from './slices/favoritesSlice';
 
 const STORE_VERSION = 6;
 
@@ -40,6 +41,7 @@ const rootReducer = combineReducers({
   ui: uiReducer,
   prayer: prayerReducer,
   audio: audioReducer,
+  favorites: favoritesReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -2,7 +2,9 @@
  * Composition root: the only place that picks concrete classes. Presentation receives
  * these through DependencyProvider and sees only the domain interfaces.
  */
-import { quranApi, tafsirApi } from './api/clients';
+import { hadithApi, quranApi, tafsirApi } from './api/clients';
+import { HadeethEncRepository } from './repositories/HadeethEncRepository';
+import { HadithRepository } from '../domain/entities/hadith';
 import { QuranApiRepository, QuranComTafsirRepository } from './repositories/QuranApiRepository';
 import { NativeFloatingSebha } from './services/NativeFloatingSebha';
 import { NativePrayerWidget } from './services/NativePrayerWidget';
@@ -19,6 +21,7 @@ import { AzanAlarms } from '../domain/services/AzanAlarms';
 export type AppDependencies = {
   quran: QuranRepository;
   tafsir: TafsirRepository;
+  hadith: HadithRepository;
   floatingSebha: FloatingSebha;
   notifications: NotificationCenter;
   prayerWidget: PrayerWidget;
@@ -28,6 +31,7 @@ export type AppDependencies = {
 export const createDependencies = (): AppDependencies => ({
   quran: new QuranApiRepository(quranApi),
   tafsir: new QuranComTafsirRepository(tafsirApi),
+  hadith: new HadeethEncRepository(hadithApi),
   floatingSebha: new NativeFloatingSebha(),
   prayerWidget: new NativePrayerWidget(),
   azanAlarms: new NativeAzanAlarms(),

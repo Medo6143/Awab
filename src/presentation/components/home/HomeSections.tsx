@@ -1,13 +1,11 @@
 import { PlainRoute } from '../../navigation/types';
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Settings } from 'lucide-react-native';
 import {
-  DuaHandsIcon, HeartLightIcon, IconComponent, KaabaIcon, PrayerMatIcon, QuranMessageIcon, QuranStandIcon, ZakatCoinIcon,
+  DuaHandsIcon, HadithScrollIcon, HeartLightIcon, IconComponent, KaabaIcon, PrayerMatIcon, QuranMessageIcon, QuranStandIcon, ZakatCoinIcon,
 } from '../icons/IslamicIcons';
 import { styles } from './HomeStyles';
-import { Card, IconTile, SectionTitle } from '../ui';
-import { DAILY_VERSES } from './HomeConstants';
+import { IconTile, SectionTitle } from '../ui';
 
 type GridItem = { label: string; route: PlainRoute; icon: IconComponent };
 
@@ -19,7 +17,7 @@ const GRID: GridItem[] = [
   { label: 'العبادات', route: 'العبادات', icon: PrayerMatIcon },
   { label: 'الزكاة', route: 'الزكاة', icon: ZakatCoinIcon },
   { label: 'رسائل القرآن', route: 'رسائل_القرآن', icon: QuranMessageIcon },
-  { label: 'الإعدادات', route: 'الإعدادات', icon: Settings },
+  { label: 'الأحاديث', route: 'الأحاديث', icon: HadithScrollIcon },
 ];
 
 /** 4-column mono-icon grid. All icons share the accent; identity comes from the glyph. */
@@ -45,17 +43,3 @@ export const HomeGrid = ({ onNavigate }: { onNavigate: (route: PlainRoute) => vo
 );
 
 /** One quiet verse card at the bottom of Home; rotates daily. */
-export const DailyVerseCard = () => {
-  const dayIndex = Math.floor(Date.now() / 86_400_000) % DAILY_VERSES.length;
-  const verse = DAILY_VERSES[dayIndex];
-  return (
-    <View>
-      <SectionTitle title="آية وتأمل" />
-      <Card padding={5}>
-        <View style={styles.verseTag}><Text style={styles.verseTagText}>{verse.tag}</Text></View>
-        <Text style={styles.verseText}>{verse.text}</Text>
-        <Text style={styles.verseRef}>{verse.ref}</Text>
-      </Card>
-    </View>
-  );
-};

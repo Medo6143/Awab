@@ -96,6 +96,14 @@ export const QuranMessageIcon = make(<>
   <Path d="M12 7.2s-2.6-1.5-2.6-3.3A1.4 1.4 0 0 1 12 3.4a1.4 1.4 0 0 1 2.6.5C14.6 5.7 12 7.2 12 7.2z" />
 </>, 'QuranMessageIcon');
 
+/** A scroll with written lines: the hadith library. */
+export const HadithScrollIcon = make(<>
+  <Path d="M7 4h11a2 2 0 0 1 2 2v1H9" />
+  <Path d="M7 4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7" />
+  <Path d="M7 4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2" />
+  <Path d="M12 11h4M12 14h4M12 17h2.5" />
+</>, 'HadithScrollIcon');
+
 /** Two open palms raised in supplication. */
 export const DuaHandsIcon = make(<>
   <Path d="M9 21v-3.5L6.2 14V7.5a1.1 1.1 0 0 1 2.2 0V12" />
