@@ -16,8 +16,8 @@ interface ModalProps {
   suggestions?: string[];
 }
 
-const CustomModal = ({ visible, onClose, onConfirm, title, subtitle, placeholder, keyboardType, value, setValue, suggestions }: ModalProps) => (
-  <Modal visible={visible} transparent animationType="fade">
+export const InputModal = ({ visible, onClose, onConfirm, title, subtitle, placeholder, keyboardType, value, setValue, suggestions }: ModalProps) => (
+  <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
     <View style={s.modalOverlay}>
       <View style={s.modalContent}>
         <Text style={s.modalTitle}>{title}</Text>
@@ -80,7 +80,7 @@ export const TasbeehModals = ({
 
   return (
     <>
-      <CustomModal 
+      <InputModal 
         visible={showAddDhikr} 
         onClose={() => setShowAddDhikr(false)} 
         onConfirm={onAddDhikr}
@@ -90,7 +90,7 @@ export const TasbeehModals = ({
         setValue={setNewDhikr}
         suggestions={suggestions}
       />
-      <CustomModal 
+      <InputModal 
         visible={showManualAdd} 
         onClose={() => setShowManualAdd(false)} 
         onConfirm={onManualAdd}
@@ -101,7 +101,7 @@ export const TasbeehModals = ({
         value={manualCountVal}
         setValue={setManualCountVal}
       />
-      <CustomModal 
+      <InputModal 
         visible={showCustomTarget} 
         onClose={() => setShowCustomTarget(false)} 
         onConfirm={onCustomTarget}

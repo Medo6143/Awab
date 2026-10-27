@@ -2,10 +2,9 @@ import { EmbeddableScreenProps } from '../navigation/types';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Check, ChevronRight, MapPin } from 'lucide-react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import * as Haptics from 'expo-haptics';
+import { useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { toggleTask } from '../store/slices/ibadaSlice';
+import { useToggleIbada } from '../hooks/useToggleIbada';
 import { usePrayerTimes } from '../hooks/usePrayerTimes';
 import { Screen, ErrorState, EmptyState, Skeleton } from '../components/ui';
 import { SkyButton, SkyHero } from '../components/home/SkyHero';
@@ -35,7 +34,7 @@ const WEEKDAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأر�
  * five prayers, each one checked off here (shared with the worship tasks and the home arc).
  */
 const PrayerTimesScreen = ({ navigation, tab, onOpenQibla }: EmbeddableScreenProps & { onOpenQibla?: () => void }) => {
-  const dispatch = useDispatch();
+  const toggleIbada = useToggleIbada();
   const { timings, date, nextPrayer, loading, error, hasLocation, retry } = usePrayerTimes();
   const tasks = useSelector((s: RootState) => s.ibada.tasks);
   const meta = useSelector((s: RootState) => s.prayer.cachedData?.meta);
@@ -47,10 +46,7 @@ const PrayerTimesScreen = ({ navigation, tab, onOpenQibla }: EmbeddableScreenPro
   const method = meta?.method?.id != null ? METHODS[meta.method.id] : undefined;
   const school = meta?.school === 'HANAFI' ? 'الحنفي' : meta?.school === 'STANDARD' ? 'الجمهور' : undefined;
 
-  const toggle = (task: string) => {
-    Haptics.selectionAsync();
-    dispatch(toggleTask(task));
-  };
+  const toggle = (task: string) => toggleIbada(task, done.has(task));
 
   let body: React.ReactNode;
   if (!timings && !hasLocation && !loading) {

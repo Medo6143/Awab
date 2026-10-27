@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { ChevronLeft, Flame } from 'lucide-react-native';
 import { s } from './StatsStyles';
 import { Card, SectionTitle, ProgressBar, StatNumber } from '../ui';
 import { colors } from '../../../shared/theme/tokens';
@@ -80,3 +81,40 @@ export const StatusRow = ({ icon, title, sub, last }: { icon: React.ReactNode; t
 );
 
 export const colorsRef = colors;
+
+/** The streak, with the longest one so far. */
+export const StreakCard = ({ streak, longest, onPress }: { streak: number; longest: number; onPress: () => void }) => (
+  <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={s.streakCard} accessibilityRole="button" accessibilityLabel={`${streak} يوم متتالي، اضغط لعرض التقرير`}>
+    <View style={s.streakIcon}><Flame size={26} color={colors.goldText} /></View>
+    <View style={{ flex: 1 }}>
+      <Text style={s.streakValue}>
+        {toAr(streak)}<Text style={s.streakUnit}> {streak === 1 ? 'يوم' : 'يوم متتالي'}</Text>
+      </Text>
+      <Text style={s.streakSub}>{longest > streak ? `أطول سلسلة: ${toAr(longest)} يوم` : streak > 1 ? 'أطول سلسلة لك حتى الآن' : 'بداية مباركة، استمر'}</Text>
+    </View>
+    <ChevronLeft size={20} color={colors.gold} />
+  </TouchableOpacity>
+);
+
+const HEAT = ['rgba(255,255,255,0.06)', 'rgba(212,175,55,0.3)', 'rgba(212,175,55,0.6)', colors.gold];
+
+/** The last 12 weeks, a square per day, darker gold for a fuller day. */
+export const Heatmap = ({ levels }: { levels: number[][] }) => (
+  <View>
+    <SectionTitle title="الاستمرار" />
+    <Card>
+      <View style={s.heatGrid}>
+        {levels.map((week, w) => (
+          <View key={w} style={s.heatCol}>
+            {week.map((l, d) => <View key={d} style={[s.heatCell, { backgroundColor: l < 0 ? 'transparent' : HEAT[l] }]} />)}
+          </View>
+        ))}
+      </View>
+      <View style={s.heatLegend}>
+        <Text style={s.heatLegendText}>أقل</Text>
+        {HEAT.map((c) => <View key={c} style={[s.heatLegendCell, { backgroundColor: c }]} />)}
+        <Text style={s.heatLegendText}>أكثر</Text>
+      </View>
+    </Card>
+  </View>
+);

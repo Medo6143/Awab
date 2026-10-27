@@ -10,21 +10,22 @@ import { ScreenProps } from '../navigation/types';
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
-import { Calendar, BookOpen, ChevronDown, ChevronUp, Star, Moon, Sun, Flame, BarChart3 } from 'lucide-react-native';
+import { Calendar, BookOpen, ChevronDown, ChevronUp, Star, Moon, Sun, BarChart3 } from 'lucide-react-native';
 import { RootState } from '../store';
 import { IbadaTask } from '../store/slices/ibadaSlice';
 import { useAccent } from '../../shared/theme/useAccent';
 import { colors, icon } from '../../shared/theme/tokens';
 import { toAr } from '../../shared/utils/format';
 
-import { Screen, ScreenHeader, Chip, Card, SectionTitle, StatNumber, IconTile, EmptyState } from '../components/ui';
-import { StatCard, WeeklyActivityChart, DhikrBreakdownChart, StatusRow } from '../components/stats/StatsComponents';
+import { Screen, ScreenHeader, Chip, Card, SectionTitle, IconTile, EmptyState } from '../components/ui';
+import { StatCard, WeeklyActivityChart, DhikrBreakdownChart, StatusRow, StreakCard, Heatmap } from '../components/stats/StatsComponents';
 import { DailyReportModal } from '../components/home/DailyReportModal';
 import { s } from '../components/stats/StatsStyles';
 
 const MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 const WEEKDAYS = ['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
 const QIYAM_IDS = ['qiyam_al_layl', 'qiyan_al_layl'];
+const FARD_IDS = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
 const localKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
 const StatsScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
@@ -65,6 +66,55 @@ const StatsScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
     return n;
   }, [records, todayKey]);
 
+  // older versions saved days under Date.toDateString(); fold everything onto YYYY-MM-DD
+  const byDay = useMemo(() => {
+    const out: typeof records = {};
+    Object.entries(records).forEach(([k, r]) => {
+      const iso = /^\d{4}-\d{2}-\d{2}$/.test(k);
+      const d = new Date(iso ? `${k}T12:00:00` : k);
+      if (isNaN(d.getTime())) return;
+      const key = localKey(d);
+      if (iso || !out[key]) out[key] = r;
+    });
+    return out;
+  }, [records]);
+
+  const longest = useMemo(() => {
+    let best = 0, run = 0, prev: Date | null = null;
+    Object.keys(byDay).sort().forEach((k) => {
+      const d = new Date(`${k}T12:00:00`);
+      run = prev && Math.round((d.getTime() - prev.getTime()) / 86400000) === 1 ? run + 1 : 1;
+      best = Math.max(best, run);
+      prev = d;
+    });
+    return best;
+  }, [byDay]);
+
+  // obligatory prayers kept, as a share of the days counted (never more than since the first record)
+  const fardOf = (k: string) => (byDay[k]?.prayers || []).filter((p: string) => FARD_IDS.includes(p)).length;
+  const prayerShare = (days: number) => {
+    const first = Object.keys(byDay).sort()[0];
+    const since = first ? Math.floor((Date.now() - new Date(`${first}T00:00:00`).getTime()) / 86400000) + 1 : 1;
+    const n = Math.max(1, Math.min(days, since));
+    let kept = 0;
+    for (let i = 0; i < n; i++) { const d = new Date(); d.setDate(d.getDate() - i); kept += fardOf(localKey(d)); }
+    return Math.round((kept / (n * 5)) * 100);
+  };
+
+  // 12 weeks, oldest first, each a column Sunday..Saturday; -1 for days still to come
+  const heat = useMemo(() => {
+    const start = new Date(); start.setHours(12, 0, 0, 0);
+    start.setDate(start.getDate() - start.getDay() - 7 * 11);
+    return Array.from({ length: 12 }, (_, w) => Array.from({ length: 7 }, (__, d) => {
+      const day = new Date(start); day.setDate(start.getDate() + w * 7 + d);
+      if (day.getTime() > Date.now()) return -1;
+      const r = byDay[localKey(day)];
+      if (!r) return 0;
+      const score = (r.prayers || []).length + (r.dhikrCount ? 1 : 0) + ((r.quranPages || []).length ? 1 : 0);
+      return score >= 6 ? 3 : score >= 3 ? 2 : score > 0 ? 1 : 0;
+    }));
+  }, [byDay]);
+
   const monthStats = getRangeStats(30);
   const todayQiyam = (todayStats.prayers || []).some((p: string) => QIYAM_IDS.includes(p));
   const todayFasting = (todayStats.prayers || []).includes('fasting');
@@ -73,15 +123,15 @@ const StatsScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
     ? { prayers: (todayStats.prayers || []).length, dhikr: todayStats.dhikrCount || 0, pages: (todayStats.quranPages || []).length, label: 'تسبيحة اليوم', details: todayStats.dhikrDetails || {} }
     : { prayers: monthStats.prayers, dhikr: monthStats.dhikr, pages: monthStats.pages, label: 'تسبيحة في ٣٠ يوماً', details: monthStats.allDhikrDetails };
 
-  const groupedHistory = useMemo(() => Object.keys(records)
-    .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+  const groupedHistory = useMemo(() => Object.keys(byDay)
+    .sort((a, b) => b.localeCompare(a))
     .reduce((acc, dateStr) => {
-      const d = new Date(dateStr);
+      const d = new Date(`${dateStr}T12:00:00`);
       if (isNaN(d.getTime())) return acc;
       const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
       (acc[k] = acc[k] || []).push(dateStr);
       return acc;
-    }, {} as Record<string, string[]>), [records]);
+    }, {} as Record<string, string[]>), [byDay]);
 
   useEffect(() => {
     const d = new Date();
@@ -97,7 +147,7 @@ const StatsScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const showReport = (type: 'day' | 'month', dateKey?: string) => {
     if (type === 'day') {
       const target = dateKey || todayKey;
-      const r = records[target] || { prayers: [], dhikrCount: 0, quranPages: [], dhikrDetails: {} };
+      const r = byDay[target] || { prayers: [], dhikrCount: 0, quranPages: [], dhikrDetails: {} };
       let name = target;
       try { name = new Date(target).toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' }); } catch {}
       setReportData({ type, stats: { dhikrCount: r.dhikrCount, dhikrDetails: r.dhikrDetails, quranPages: (r.quranPages || []).length }, name, tasks: tasks.map((t: IbadaTask) => ({ ...t, isCompleted: (r.prayers || []).includes(t.id) })) });
@@ -110,7 +160,7 @@ const StatsScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const hasAnyData = Object.keys(records).length > 0;
 
   return (
-    <Screen scroll header={<ScreenHeader title="الإحصائيات" subtitle="تتبّع رحلتك الروحانية" onBack={() => navigation.goBack()} />}>
+    <Screen scroll header={<ScreenHeader title="رحلتك" subtitle="الإحصائيات وتتبّع الاستمرار" onBack={() => navigation.goBack()} />}>
       {!hasAnyData ? (
         <EmptyState icon={BarChart3} title="لا توجد إحصائيات بعد" message="ابدأ بالتسبيح أو قراءة صفحة من المصحف أو إتمام مهمة، وستظهر رحلتك هنا." />
       ) : (
@@ -120,22 +170,16 @@ const StatsScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
             <Chip label="آخر ٣٠ يوم" selected={activeTab === 'month'} onPress={() => setActiveTab('month')} />
           </View>
 
-          <Card padding={5} onPress={() => showReport(activeTab)} accessibilityLabel="عرض التقرير">
-            <StatNumber value={display.dhikr} caption={display.label} size="display" />
-            {streak > 0 ? (
-              <View style={s.streakPill}>
-                <Flame size={icon.size.sm} color={colors.goldText} strokeWidth={icon.stroke} />
-                <Text style={s.streakText}>{streak > 1 ? `مستمر منذ ${toAr(streak)} أيام` : 'بداية مباركة اليوم'}</Text>
-              </View>
-            ) : null}
-            <Text style={s.heroCaption}>اضغط لعرض التقرير التفصيلي</Text>
-          </Card>
+          <StreakCard streak={streak} longest={longest} onPress={() => showReport(activeTab)} />
 
           <View style={s.statsRow}>
-            <StatCard value={display.prayers} label="الصلوات والمهام" />
+            <StatCard value={`${toAr(prayerShare(activeTab === 'day' ? 1 : 30))}٪`} label="الصلوات" />
             <StatCard value={display.pages} label="صفحات القرآن" />
-            <StatCard value={streak} label="أيام متتالية" />
+            <StatCard value={display.dhikr} label={activeTab === 'day' ? 'تسبيحات اليوم' : 'تسبيحات'} />
           </View>
+
+          <WeeklyActivityChart chartData={chartData} maxDhikr={maxDhikr} />
+          <Heatmap levels={heat} />
 
           <SectionTitle title="قيام وصيام" />
           <Card padding={4}>
@@ -153,7 +197,6 @@ const StatsScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
           </Card>
 
           <DhikrBreakdownChart details={display.details} />
-          <WeeklyActivityChart chartData={chartData} maxDhikr={maxDhikr} />
 
           <SectionTitle title="دفتر العبادات" />
           {Object.entries(groupedHistory).map(([mKey, days]) => {
@@ -165,14 +208,14 @@ const StatsScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
                   <View style={s.monthDisplay}>
                     <Calendar size={icon.size.md} color={accent.accent} strokeWidth={icon.stroke} />
                     <Text style={s.monthLabel}>{MONTHS[parseInt(m, 10) - 1] || mKey} {toAr(year)}</Text>
-                    <Text style={s.monthCount}>· {toAr(days.length)} يوم</Text>
+                    <Text style={s.monthCount}>({toAr(days.length)} يوم)</Text>
                   </View>
                   {isExpanded ? <ChevronUp color={colors.textMuted} size={icon.size.md} /> : <ChevronDown color={colors.textMuted} size={icon.size.md} />}
                 </TouchableOpacity>
 
                 {isExpanded && days.map((date) => {
-                  const dObj = new Date(date);
-                  const rec = records[date];
+                  const dObj = new Date(`${date}T12:00:00`);
+                  const rec = byDay[date];
                   const qiyam = (rec.prayers || []).some((p: string) => QIYAM_IDS.includes(p));
                   return (
                     <TouchableOpacity key={date} style={s.historyCard} onPress={() => showReport('day', date)} activeOpacity={0.8} accessibilityRole="button">

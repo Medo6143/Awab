@@ -44,4 +44,18 @@ export const s = StyleSheet.create({
   hBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: space[2], paddingVertical: 3, borderRadius: radius.pill, backgroundColor: colors.surfaceRaised },
   hBadgeText: { ...type.caption, fontSize: 11, color: colors.textMuted },
   historySummaryText: { ...type.caption, color: colors.textMuted },
+  streakCard: {
+    flexDirection: 'row', alignItems: 'center', gap: space[3], padding: space[4], marginBottom: space[3],
+    borderRadius: radius.card, backgroundColor: colors.surfaceRaised, borderWidth: 1, borderColor: colors.goldLine,
+  },
+  streakIcon: { width: 52, height: 52, borderRadius: 26, backgroundColor: colors.goldSoft, alignItems: 'center', justifyContent: 'center' },
+  streakValue: { fontFamily: 'Tajawal_800ExtraBold', fontSize: 30, lineHeight: 38, color: colors.text },
+  streakUnit: { fontFamily: 'Tajawal_500Medium', fontSize: 14, color: colors.textMuted },
+  streakSub: { ...type.caption, color: colors.textMuted },
+  heatGrid: { flexDirection: 'row', gap: 3 },
+  heatCol: { flex: 1, gap: 3 },
+  heatCell: { aspectRatio: 1, borderRadius: 3 },
+  heatLegend: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: space[3] },
+  heatLegendCell: { width: 10, height: 10, borderRadius: 2 },
+  heatLegendText: { ...type.caption, color: colors.textMuted },
 });
