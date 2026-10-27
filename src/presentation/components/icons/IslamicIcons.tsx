@@ -89,6 +89,13 @@ export const HeartLightIcon = make(<>
   <Path d="M12 2.5v1.7M7 4l.8 1.4M17 4l-.8 1.4" />
 </>, 'HeartLightIcon');
 
+/** An open mushaf with a small heart above it: a message from the Quran. */
+export const QuranMessageIcon = make(<>
+  <Path d="M3.5 9.5C6.5 8.5 9.5 9 12 11c2.5-2 5.5-2.5 8.5-1.5v9c-3-1-6-.5-8.5 1.5-2.5-2-5.5-2.5-8.5-1.5z" />
+  <Path d="M12 11v9" />
+  <Path d="M12 7.2s-2.6-1.5-2.6-3.3A1.4 1.4 0 0 1 12 3.4a1.4 1.4 0 0 1 2.6.5C14.6 5.7 12 7.2 12 7.2z" />
+</>, 'QuranMessageIcon');
+
 /** Two open palms raised in supplication. */
 export const DuaHandsIcon = make(<>
   <Path d="M9 21v-3.5L6.2 14V7.5a1.1 1.1 0 0 1 2.2 0V12" />

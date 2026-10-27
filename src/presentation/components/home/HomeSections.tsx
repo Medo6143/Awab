@@ -1,9 +1,9 @@
 import { PlainRoute } from '../../navigation/types';
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { BarChart3, Settings } from 'lucide-react-native';
+import { Settings } from 'lucide-react-native';
 import {
-  DuaHandsIcon, HeartLightIcon, IconComponent, KaabaIcon, PrayerMatIcon, QuranStandIcon, ZakatCoinIcon,
+  DuaHandsIcon, HeartLightIcon, IconComponent, KaabaIcon, PrayerMatIcon, QuranMessageIcon, QuranStandIcon, ZakatCoinIcon,
 } from '../icons/IslamicIcons';
 import { styles } from './HomeStyles';
 import { Card, IconTile, SectionTitle } from '../ui';
@@ -18,7 +18,7 @@ const GRID: GridItem[] = [
   { label: 'نور القلب', route: 'نور_القلب', icon: HeartLightIcon },
   { label: 'العبادات', route: 'العبادات', icon: PrayerMatIcon },
   { label: 'الزكاة', route: 'الزكاة', icon: ZakatCoinIcon },
-  { label: 'الإحصائيات', route: 'الإحصائيات', icon: BarChart3 },
+  { label: 'رسائل القرآن', route: 'رسائل_القرآن', icon: QuranMessageIcon },
   { label: 'الإعدادات', route: 'الإعدادات', icon: Settings },
 ];
 
