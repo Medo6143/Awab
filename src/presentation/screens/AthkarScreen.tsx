@@ -10,6 +10,7 @@ import { incrementAthkarCount, syncDailyReset, resetAthkarCounts } from '../stor
 import { logDhikr } from '../store/slices/statsSlice';
 import { MORNING_ATHKAR, EVENING_ATHKAR, AthkarItem } from '../../shared/constants/athkar';
 import { EmptyState, useBottomInset } from '../components/ui';
+import { VirtueBanner } from '../components/guidance/GuidanceBlocks';
 import { AthkarHeader, AthkarTabs, AthkarProgressBar, AthkarCard } from '../components/athkar/AthkarComponents';
 import { s } from '../components/athkar/AthkarStyles';
 import { colors } from '../../shared/theme/tokens';
@@ -55,9 +56,19 @@ const AthkarScreen = ({ route, navigation, hideHeader }: EmbeddableScreenProps<'
         keyExtractor={(item) => item.id}
         contentContainerStyle={[s.listPadding, { paddingBottom: listBottom }]}
         showsVerticalScrollIndicator={false}
-        ListHeaderComponent={allDone ? (
-          <EmptyState icon={CrescentStarIcon} title={activeTab === 'morning' ? 'أتممت أذكار الصباح' : 'أتممت أذكار المساء'} message="تقبّل الله منك. يمكنك إعادة الضبط لتكرارها." />
-        ) : null}
+        ListHeaderComponent={
+          <>
+            <VirtueBanner
+              icon={CrescentStarIcon}
+              title="فضل الذكر"
+              sub="لماذا نذكر الله؟ آيات وأحاديث صحيحة في أجر الذاكرين"
+              onPress={() => navigation?.navigate('الفضائل', { topic: 'dhikr' })}
+            />
+            {allDone ? (
+              <EmptyState icon={CrescentStarIcon} title={activeTab === 'morning' ? 'أتممت أذكار الصباح' : 'أتممت أذكار المساء'} message="تقبّل الله منك. يمكنك إعادة الضبط لتكرارها." />
+            ) : null}
+          </>
+        }
         style={{ backgroundColor: colors.bg }}
       />
     </SafeAreaView>

@@ -15,6 +15,8 @@ export interface QuranRepository {
   getSurahs(): Promise<SurahMeta[]>;
   /** Mushaf page a surah starts on. */
   getSurahStartPage(surah: number): Promise<number>;
+  /** Uthmani text of ayahs `from..to` of a surah, in order. Rejects when it cannot be loaded. */
+  getAyahs(surah: number, from: number, to: number): Promise<string[]>;
 }
 
 /** Tafsir text as HTML, so presentation can keep its structure. */

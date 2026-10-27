@@ -43,6 +43,24 @@ export class QuranApiRepository implements QuranRepository {
     return res.data?.data ?? [];
   }
 
+  private ayahs = new Map<string, string[]>();
+
+  async getAyahs(surah: number, from: number, to: number): Promise<string[]> {
+    const key = `${surah}:${from}-${to}`;
+    const cached = this.ayahs.get(key);
+    if (cached) return cached;
+    const res = await this.api.get(`/surah/${surah}/quran-uthmani`, { params: { offset: from - 1, limit: to - from + 1 } });
+    const list: { text?: string }[] = res.data?.data?.ayahs ?? [];
+    if (list.length !== to - from + 1) throw new Error(`ayahs ${key} not found`);
+    // the API prefixes each surah's first ayah with the basmala
+    const texts = list.map((a, i) => {
+      const t = (a.text ?? '').trim();
+      return surah !== 1 && from + i === 1 && t.startsWith('بِسْمِ') ? t.replace(/^\S+\s+\S+\s+\S+\s+\S+\s+/, '') : t;
+    });
+    this.ayahs.set(key, texts);
+    return texts;
+  }
+
   async getSurahStartPage(surah: number): Promise<number> {
     const res = await this.api.get(`/surah/${surah}`);
     const page: unknown = res.data?.data?.ayahs?.[0]?.page;

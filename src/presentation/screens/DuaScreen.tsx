@@ -15,6 +15,7 @@ import { s } from '../components/dua/DuaStyles';
 import { DUAS_DATA } from '../components/dua/DuaConstants';
 import { ImageShareModal } from '../components/share/ImageShareModal';
 import { DuaShare } from '../components/share/StoryCard';
+import { VirtueBanner } from '../components/guidance/GuidanceBlocks';
 import { ShareStylePicker } from '../components/share/ShareStylePicker';
 
 const DuaScreen = ({ hideHeader, navigation }: EmbeddableScreenProps) => {
@@ -61,6 +62,14 @@ const DuaScreen = ({ hideHeader, navigation }: EmbeddableScreenProps) => {
         renderItem={({ item }) => <DuaCard item={item} onShare={handleShare} onShareText={handleShareText} onCopy={handleCopy} />}
         contentContainerStyle={s.listContent}
         keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={!searchQuery ? (
+          <VirtueBanner
+            icon={DuaHandsIcon}
+            title="لماذا ندعو؟"
+            sub="فضل الدعاء، وكيف يستجيب الله للمضطر إذا دعاه"
+            onPress={() => navigation?.navigate('الفضائل', { topic: 'dua' })}
+          />
+        ) : null}
         ListEmptyComponent={
           <EmptyState
             icon={DuaHandsIcon}

@@ -38,6 +38,10 @@ const load = (): Entry[] => {
   return index;
 };
 
+/** Plain (undiacritized) text of ayahs `from..to`: the offline fallback for verse cards. */
+export const plainAyahs = (surah: number, from: number, to: number): string[] =>
+  load().filter((e) => e.surah === surah && e.ayah >= from && e.ayah <= to).map((e) => e.text);
+
 /** Builds the index ahead of the first query (call when the search UI opens). */
 export const warmAyahIndex = () => { load(); };
 
