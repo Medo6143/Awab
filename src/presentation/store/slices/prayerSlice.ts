@@ -36,7 +36,7 @@ export interface PrayerDate {
 interface PrayerData {
   timings: PrayerTimings;
   date: PrayerDate;
-  meta: { method: { id: number; name?: string } } & Record<string, unknown>;
+  meta: { method: { id: number; name?: string }; school?: string } & Record<string, unknown>;
 }
 
 interface PrayerState {

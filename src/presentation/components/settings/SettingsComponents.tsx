@@ -13,7 +13,7 @@ import { useAccent } from '../../../shared/theme/useAccent';
 import { toAr } from '../../../shared/utils/format';
 import { AccentKey } from '../../../shared/theme/tokens';
 import { AzanSettings, NotificationPrefs } from '../../../domain/entities/notifications';
-import { TafsirStyle } from '../../store/slices/settingsSlice';
+import { AsrMethod, TafsirStyle } from '../../store/slices/settingsSlice';
 import { AZAN_TYPES } from './AzanConstants';
 
 export const SettingSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -99,6 +99,25 @@ export const ReciterSelector = ({ selectedReciterId, onSelect }: { selectedRecit
     </View>
   );
 };
+
+const ASR_METHODS: { id: AsrMethod; name: string }[] = [
+  { id: 'auto', name: 'تلقائي' },
+  { id: 'shafii', name: 'الجمهور' },
+  { id: 'hanafi', name: 'الحنفي' },
+];
+
+/** How Asr is timed: by country (Hanafi in Pakistan/India/Bangladesh/Afghanistan), majority, or Hanafi. */
+export const AsrMethodSelector = ({ value, onSelect }: { value: AsrMethod; onSelect: (v: AsrMethod) => void }) => (
+  <View style={s.subSection}>
+    <SubLabel icon={Clock3} text="حساب وقت العصر" />
+    <View style={s.row}>
+      {ASR_METHODS.map((o) => <Chip key={o.id} label={o.name} size="sm" selected={value === o.id} onPress={() => onSelect(o.id)} style={{ flex: 1, justifyContent: 'center' }} />)}
+    </View>
+    <Text style={[s.itemSub, { marginTop: 8 }]}>
+      الجمهور (الشافعي والمالكي والحنبلي) هو المعتمد في مصر ومعظم الدول. التلقائي يختار الحنفي في باكستان والهند وبنغلاديش وأفغانستان فقط.
+    </Text>
+  </View>
+);
 
 type TafsirSettingsProps = {
   selectedTafsirId: number; onSelectTafsir: (id: number) => void;

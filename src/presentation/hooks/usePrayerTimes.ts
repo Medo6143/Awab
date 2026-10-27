@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useLocation } from './useLocation';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
-import { PrayerTimeService } from '../../data/services/PrayerTimeService';
+import { PrayerTimeService, asrSchoolFor } from '../../data/services/PrayerTimeService';
 import { useDependencies } from '../providers/DependencyProvider';
 import { NextPrayer } from '../../domain/entities/prayer';
 
@@ -13,7 +13,7 @@ export const usePrayerTimes = () => {
   const dispatch = useDispatch();
   const { prayerWidget } = useDependencies();
   const { coords, countryCode, error: locationError } = useLocation();
-  const { calculationMethod: manualMethod } = useSelector((state: RootState) => state.settings);
+  const { calculationMethod: manualMethod, asrMethod } = useSelector((state: RootState) => state.settings);
   const { cachedData, lastFetchedDate, status } = useSelector((state: RootState) => state.prayer);
   // stored times show at once; a slow GPS fix only refreshes them later
   const [nextPrayer, setNextPrayer] = useState<NextPrayer | null>(() => (cachedData ? PrayerTimeService.getNextPrayer(cachedData.timings) : null));
@@ -58,10 +58,14 @@ export const usePrayerTimes = () => {
           targetMethod = 4; // جامعة أم القرى
         }
 
-        // 2. Check if we already have data for TODAY in cache for THIS method
+        const school = asrSchoolFor(asrMethod, countryCode);
+
+        // 2. Check if we already have data for TODAY in cache for THIS method and Asr school
+        // (stored times from before the school was chosen were Hanafi: they refetch)
         const todayStr = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
-        
-        if (cachedData && cachedData.date.gregorian.date === todayStr && cachedData.meta.method.id === targetMethod) {
+        const cachedSchool = cachedData?.meta.school === 'HANAFI' ? 1 : cachedData?.meta.school === 'STANDARD' ? 0 : -1;
+
+        if (cachedData && cachedData.date.gregorian.date === todayStr && cachedData.meta.method.id === targetMethod && cachedSchool === school) {
           console.log('usePrayerTimes: Using persistent cached data for', todayStr, 'Method:', targetMethod);
           const next = PrayerTimeService.getNextPrayer(cachedData.timings);
           setNextPrayer(next);
@@ -71,7 +75,7 @@ export const usePrayerTimes = () => {
 
         console.log('usePrayerTimes: Fetching fresh prayer times for', todayStr, 'Country:', countryCode, 'Method:', targetMethod);
         dispatch(setPrayerLoading());
-        const times = await PrayerTimeService.getPrayerTimes(coords.latitude, coords.longitude, targetMethod);
+        const times = await PrayerTimeService.getPrayerTimes(coords.latitude, coords.longitude, targetMethod, school);
         
         if (times) {
           dispatch(setPrayerData(times));
@@ -83,7 +87,7 @@ export const usePrayerTimes = () => {
         }
       })();
     }
-  }, [coords, countryCode, manualMethod, dispatch, retryTick]);
+  }, [coords, countryCode, manualMethod, asrMethod, dispatch, retryTick]);
 
   // Update remaining time for the App UI every minute
   useEffect(() => {

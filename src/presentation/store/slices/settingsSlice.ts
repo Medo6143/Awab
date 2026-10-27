@@ -2,6 +2,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AzanSettings, DEFAULT_NOTIFICATION_PREFS, NotificationPrefs } from '../../../domain/entities/notifications';
 
 export type TafsirStyle = 'simple' | 'book' | 'modern';
+/** Asr time: automatic by country, Shafi'i (majority, Egypt) or Hanafi. */
+export type AsrMethod = 'auto' | 'shafii' | 'hanafi';
 /** Look of the ayah/dua share image ('classic' is the original card). */
 export type ShareCardStyle = 'classic' | 'gold' | 'paper' | 'night' | 'mihrab';
 /** Largest size the ayah/dua text may take on the share image. */
@@ -22,6 +24,7 @@ interface SettingsState {
   shareCardStyle: ShareCardStyle;
   shareTextSize: ShareTextSize;
   tasbeehHaptics: boolean;     // a light buzz on every count
+  asrMethod: AsrMethod;
   tasbeehTargetAlert: boolean; // a stronger buzz when the target is reached
 }
 
@@ -43,6 +46,7 @@ const initialState: SettingsState = {
   shareCardStyle: 'gold',
   shareTextSize: 'medium',
   tasbeehHaptics: true,
+  asrMethod: 'auto',
   tasbeehTargetAlert: true,
 };
 
@@ -67,6 +71,9 @@ export const settingsSlice = createSlice({
     },
     setTafsirStyle: (state, action: PayloadAction<TafsirStyle>) => {
       state.tafsirStyle = action.payload;
+    },
+    setAsrMethod: (state, action: PayloadAction<AsrMethod>) => {
+      state.asrMethod = action.payload;
     },
     setShareCardStyle: (state, action: PayloadAction<ShareCardStyle>) => {
       state.shareCardStyle = action.payload;
@@ -129,6 +136,7 @@ export const {
   setTafsirId, 
   setTafsirStyle,
   setShareCardStyle,
+  setAsrMethod,
   setShareTextSize,
   toggleTasbeehHaptics,
   toggleTasbeehTargetAlert, 
