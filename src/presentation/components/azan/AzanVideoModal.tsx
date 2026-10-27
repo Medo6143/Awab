@@ -4,7 +4,7 @@ import { X } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AudioService } from '../../../data/services/AudioService';
 import { verseForPrayer } from '../../../domain/entities/prayerVerses';
-import { ADHAN_LINES, adhanLineAt } from '../../../domain/entities/adhan';
+import { ADHAN_END, ADHAN_LINES, POST_ADHAN_DUA, adhanLineAt } from '../../../domain/entities/adhan';
 import { useDependencies } from '../../providers/DependencyProvider';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { toAr } from '../../../shared/utils/format';
@@ -20,23 +20,30 @@ const MOSQUE = require('../../../../assets/images/mosque_bg.png');
 /**
  * Follows the adhan being played: the native alarm service when it is the one playing,
  * otherwise the in-app player, otherwise the time since the screen opened. Returns the
- * index of the line being called.
+ * index of the line being called, and `done` once the adhan has finished: the player
+ * that was playing stopped, or the recording's length has passed.
  */
 const useAdhanLine = () => {
   const { azanAlarms } = useDependencies();
   const openedAt = useRef(Date.now()).current;
   const [line, setLine] = useState(0);
+  const [done, setDone] = useState(false);
   useEffect(() => {
     let alive = true;
+    let heardPlayer = false;
     const tick = async () => {
-      const pos = (await azanAlarms.playbackPosition()) ?? (await AudioService.azanPosition()) ?? (Date.now() - openedAt) / 1000;
-      if (alive) setLine(adhanLineAt(pos));
+      const played = (await azanAlarms.playbackPosition()) ?? (await AudioService.azanPosition());
+      if (played != null) heardPlayer = true;
+      const pos = played ?? (Date.now() - openedAt) / 1000;
+      if (!alive) return;
+      setLine(adhanLineAt(pos));
+      if ((heardPlayer && played == null) || pos >= ADHAN_END) setDone(true);
     };
     tick();
     const id = setInterval(tick, 400);
     return () => { alive = false; clearInterval(id); };
   }, [azanAlarms, openedAt]);
-  return line;
+  return { line, done };
 };
 
 const formatTime = (d: Date) => {
@@ -50,7 +57,7 @@ const AzanContent = ({ onClose, prayerName }: { onClose: () => void; prayerName:
   const { azanAlarms } = useDependencies();
   const navBar = useSafeAreaInsets().bottom;
   const verse = verseForPrayer(prayerName);
-  const line = useAdhanLine();
+  const { line, done } = useAdhanLine();
   const [now, setNow] = useState(new Date());
 
   // slow camera move over the mosque, a breathing light in its doorway, a fade per adhan line
@@ -75,7 +82,7 @@ const AzanContent = ({ onClose, prayerName }: { onClose: () => void; prayerName:
   useEffect(() => {
     phrase.setValue(0);
     Animated.timing(phrase, { toValue: 1, duration: 450, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
-  }, [line]);
+  }, [line, done]);
 
   // the app shows over the lock screen only while the adhan is on screen
   useEffect(() => () => azanAlarms.releaseLockScreen(), [azanAlarms]);
@@ -119,17 +126,31 @@ const AzanContent = ({ onClose, prayerName }: { onClose: () => void; prayerName:
           <Text allowFontScaling={false} style={s.time}>{formatTime(now)}</Text>
         </View>
 
-        <View style={s.phraseWrap}>
-          <Animated.Text
-            allowFontScaling={false}
-            style={[s.phrase, { opacity: phrase, transform: [{ translateY: phrase.interpolate({ inputRange: [0, 1], outputRange: [10, 0] }) }] }]}
-          >
-            {ADHAN_LINES[line].text}
-          </Animated.Text>
-          <View style={s.dots}>
-            {ADHAN_LINES.map((_, i) => <View key={i} style={[s.dot, i <= line && s.dotOn]} />)}
+        {done ? (
+          // after the adhan: the dua for al-Wasila
+          <Animated.View style={[s.duaCard, { opacity: phrase }]}>
+            <Text allowFontScaling={false} style={s.duaLabel}>دعاء ما بعد الأذان</Text>
+            <Text allowFontScaling={false} style={s.duaIntro}>{POST_ADHAN_DUA.intro}</Text>
+            <Text allowFontScaling={false} style={s.duaText}>{POST_ADHAN_DUA.text}</Text>
+            <Text allowFontScaling={false} style={s.duaVirtue}>{POST_ADHAN_DUA.virtue} · {POST_ADHAN_DUA.source}</Text>
+          </Animated.View>
+        ) : (
+          <View style={s.phraseWrap}>
+            <Animated.Text
+              allowFontScaling={false}
+              style={[s.phrase, { opacity: phrase, transform: [{ translateY: phrase.interpolate({ inputRange: [0, 1], outputRange: [10, 0] }) }] }]}
+            >
+              {ADHAN_LINES[line].text}
+            </Animated.Text>
+            {/* the listener repeats each line, except the hayya'alas (مسلم ٣٨٥) */}
+            <Animated.Text allowFontScaling={false} style={[s.response, { opacity: phrase }]}>
+              قل: {ADHAN_LINES[line].response ?? ADHAN_LINES[line].text}
+            </Animated.Text>
+            <View style={s.dots}>
+              {ADHAN_LINES.map((_, i) => <View key={i} style={[s.dot, i <= line && s.dotOn]} />)}
+            </View>
           </View>
-        </View>
+        )}
 
         <View>
           <View style={s.verseCard}>
@@ -179,6 +200,12 @@ const s = StyleSheet.create({
   prayerName: { fontFamily: 'Amiri_700Bold', fontSize: 58, lineHeight: 92, color: '#fff', textShadowColor: 'rgba(0,0,0,0.6)', textShadowRadius: 12 },
   time: { fontFamily: 'Tajawal_700Bold', fontSize: 20, color: 'rgba(255,255,255,0.85)' },
   phraseWrap: { alignItems: 'center', paddingHorizontal: 8 },
+  response: { fontFamily: 'Tajawal_500Medium', fontSize: 15, color: 'rgba(243,213,122,0.9)', marginTop: 2, textShadowColor: 'rgba(0,0,0,0.7)', textShadowRadius: 8 },
+  duaCard: { alignSelf: 'stretch', alignItems: 'center', borderRadius: 20, paddingVertical: 16, paddingHorizontal: 14, backgroundColor: 'rgba(12,8,5,0.72)', borderWidth: 1, borderColor: 'rgba(212,175,55,0.5)' },
+  duaLabel: { fontFamily: 'Tajawal_700Bold', fontSize: 14, color: '#d4af37' },
+  duaIntro: { fontFamily: 'Tajawal_500Medium', fontSize: 13, color: '#c8b99f', marginTop: 6 },
+  duaText: { fontFamily: 'Amiri_700Bold', fontSize: 19, lineHeight: 36, color: '#f5efe6', textAlign: 'center', marginTop: 6 },
+  duaVirtue: { fontFamily: 'Tajawal_500Medium', fontSize: 12, color: '#c8b99f', textAlign: 'center', marginTop: 8 },
   phrase: { fontFamily: 'Amiri_700Bold', fontSize: 34, lineHeight: 60, color: '#fff', textAlign: 'center', textShadowColor: 'rgba(0,0,0,0.75)', textShadowRadius: 14 },
   dots: { flexDirection: 'row', gap: 6, marginTop: 12 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.25)' },
