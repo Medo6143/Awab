@@ -12,7 +12,8 @@ import { Screen, SectionTitle } from '../components/ui';
 import { HomeHeader } from '../components/home/HomeHeader';
 import { NextPrayerHero } from '../components/home/NextPrayerHero';
 import { ProgressRow } from '../components/home/ProgressRow';
-import { HomeGrid, DailyVerseCard } from '../components/home/HomeSections';
+import { HomeGrid } from '../components/home/HomeSections';
+import { DailyMessageCard } from '../components/home/DailyMessageCard';
 import { DailyReportModal } from '../components/home/DailyReportModal';
 
 const todayKey = () => new Date().toISOString().split('T')[0];
@@ -72,7 +73,10 @@ const HomeScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
 
       <HomeGrid onNavigate={navigateTo} />
 
-      <DailyVerseCard />
+      <DailyMessageCard
+        onOpenMessage={(mood) => navigation.navigate('رسائل_القرآن', { mood })}
+        onOpenHadith={(id) => navigation.navigate('الحديث', { id })}
+      />
       <View style={{ height: space[4] }} />
 
       <DailyReportModal

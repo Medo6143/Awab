@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { ChevronLeft, Share2 } from 'lucide-react-native';
+import { ChevronLeft, Play, Share2 } from 'lucide-react-native';
 import type { IconComponent } from '../icons/IslamicIcons';
 import type { Hadith, Supplication, VerseRef } from '../../../domain/entities/guidance';
 import { SURAH_NAMES } from '../../../shared/constants/surahs';
@@ -38,7 +38,7 @@ export const SectionHeading = ({ title, sub }: { title: string; sub?: string }) 
 );
 
 /** A verse from its reference, with al-Sa'di's tafsir underneath when asked. */
-export const VerseCard = ({ verse, withTafsir, onShare }: { verse: VerseRef; withTafsir?: boolean; onShare?: (p: { text: string; excerpt: string }) => void }) => {
+export const VerseCard = ({ verse, withTafsir, onShare, onListen }: { verse: VerseRef; withTafsir?: boolean; onShare?: (p: { text: string; excerpt: string }) => void; onListen?: () => void }) => {
   const { texts, offline, loading } = useVerseText(verse);
   const tafsir = useVerseTafsir(verse, !!withTafsir);
   const [more, setMore] = useState(false);
@@ -50,6 +50,12 @@ export const VerseCard = ({ verse, withTafsir, onShare }: { verse: VerseRef; wit
         <Text style={st.verseText}>{text}</Text>
       )}
       <Text style={st.verseRef}>{verseLabel(verse)}{offline ? ' · نص بدون تشكيل (لا يوجد اتصال)' : ''}</Text>
+      {onListen ? (
+        <TouchableOpacity style={st.listen} onPress={onListen} accessibilityRole="button" accessibilityLabel="استمع للآية">
+          <Play size={14} color={colors.onGold} fill={colors.onGold} />
+          <Text style={st.listenText}>استمع للآية</Text>
+        </TouchableOpacity>
+      ) : null}
 
       {withTafsir ? (
         <View style={st.tafsirBox}>
@@ -79,13 +85,21 @@ export const VerseCard = ({ verse, withTafsir, onShare }: { verse: VerseRef; wit
   );
 };
 
-export const HadithCard = ({ hadith }: { hadith: Hadith }) => (
+export const HadithCard = ({ hadith, onShare }: { hadith: Hadith; onShare?: () => void }) => (
   <View style={st.hadithCard}>
     <Text style={st.hadithLead}>{hadith.lead ?? 'قال رسول الله ﷺ'}</Text>
     <Text style={st.hadithText}>{hadith.text}</Text>
     <Text style={st.hadithSource}>{hadith.source}</Text>
     {hadith.meaning ? <Meaning text={hadith.meaning} /> : null}
+    {onShare ? <ShareLink onPress={onShare} /> : null}
   </View>
+);
+
+const ShareLink = ({ onPress }: { onPress: () => void }) => (
+  <TouchableOpacity style={st.shareBtn} onPress={onPress} accessibilityRole="button">
+    <Share2 size={16} color={colors.gold} />
+    <Text style={st.more}>مشاركة كصورة</Text>
+  </TouchableOpacity>
 );
 
 /** "المعنى": the explanation under a hadith or dua (summarized from الدرر السنية). */
@@ -96,12 +110,13 @@ const Meaning = ({ text }: { text: string }) => (
   </View>
 );
 
-export const SupplicationCard = ({ dua, title = 'دعاء' }: { dua: Supplication; title?: string }) => (
+export const SupplicationCard = ({ dua, title = 'دعاء', onShare }: { dua: Supplication; title?: string; onShare?: () => void }) => (
   <View style={st.duaCard}>
     <Text style={st.duaTitle}>{title}</Text>
     <Text style={st.duaText}>{dua.text}</Text>
     <Text style={st.hadithSource}>{dua.source}</Text>
     {dua.meaning ? <Meaning text={dua.meaning} /> : null}
+    {onShare ? <ShareLink onPress={onShare} /> : null}
   </View>
 );
 
@@ -122,6 +137,8 @@ const st = StyleSheet.create({
   tafsirName: { ...type.label, color: colors.gold, marginBottom: space[1] },
   tafsirText: { ...type.body, color: colors.textSoft, lineHeight: 26 },
   more: { ...type.label, color: colors.gold, marginTop: space[2] },
+  listen: { flexDirection: 'row', alignItems: 'center', gap: space[2], alignSelf: 'center', backgroundColor: colors.gold, borderRadius: radius.pill, paddingHorizontal: space[4], paddingVertical: space[2], marginTop: space[3] },
+  listenText: { ...type.label, color: colors.onGold },
   shareBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space[2], marginTop: space[2] },
 
   hadithCard: { backgroundColor: colors.surface, borderRadius: radius.card, padding: space[4], marginBottom: space[3], borderStartWidth: 3, borderStartColor: colors.gold },

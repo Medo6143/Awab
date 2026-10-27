@@ -50,7 +50,7 @@ export const QURAN_MESSAGES: QuranMessage[] = [
     icon: Waves,
     comfort: 'كل ضيق مهما اشتد له عند الله مخرج. لست وحدك في هذا؛ فالله أقرب إليك من همّك، وقد علّمنا النبي ﷺ كلمات نقولها عند الكرب.',
     verses: [
-      { surah: 65, from: 2, to: 3, key: 'مخرجا' },
+      { surah: 65, from: 3, key: 'فهو حسبه' },
       { surah: 27, from: 62, key: 'المضطر' },
       { surah: 21, from: 87, to: 88, key: 'الظالمين' },
       { surah: 13, from: 28, key: 'تطمئن القلوب' },
@@ -89,7 +89,7 @@ export const QURAN_MESSAGES: QuranMessage[] = [
     icon: Wallet,
     comfort: 'رزقك مكتوب لن يأخذه غيرك، والله الذي يرزق الطير يرزقك. خذ بالأسباب واطمئن، فبعد العسر يسر، وعد من الله لا يُخلف.',
     verses: [
-      { surah: 65, from: 2, to: 3, key: 'يرزقه' },
+      { surah: 65, from: 3, key: 'يرزقه' },
       { surah: 11, from: 6, key: 'رزقها' },
       { surah: 2, from: 280, key: 'ميسرة' },
       { surah: 94, from: 5, to: 6, key: 'يسرا' },
