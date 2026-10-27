@@ -4,7 +4,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Check, ChevronRight, MapPin } from 'lucide-react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { useToggleIbada } from '../hooks/useToggleIbada';
+import { prayerNotYet, useToggleIbada } from '../hooks/useToggleIbada';
 import { usePrayerTimes } from '../hooks/usePrayerTimes';
 import { Screen, ErrorState, EmptyState, Skeleton } from '../components/ui';
 import { SkyButton, SkyHero } from '../components/home/SkyHero';
@@ -65,14 +65,15 @@ const PrayerTimesScreen = ({ navigation, tab, onOpenQibla }: EmbeddableScreenPro
         {PRAYERS.map(({ key, task, ar, Icon }) => {
           const isNext = nextPrayer?.name === key;
           const checked = done.has(task);
+          const locked = !checked && !!prayerNotYet(task, timings as unknown as Record<string, string>);
           return (
             <TouchableOpacity
               key={key}
               activeOpacity={0.8}
               onPress={() => toggle(task)}
-              style={[st.row, isNext && st.rowNext]}
+              style={[st.row, isNext && st.rowNext, locked && st.locked]}
               accessibilityRole="checkbox"
-              accessibilityState={{ checked }}
+              accessibilityState={{ checked, disabled: locked }}
               accessibilityLabel={`${ar} ${timings[key as keyof typeof timings] ?? ''}`}
             >
               <View style={[st.icon, isNext && st.iconNext]}>
@@ -119,6 +120,7 @@ const PrayerTimesScreen = ({ navigation, tab, onOpenQibla }: EmbeddableScreenPro
 };
 
 const st = StyleSheet.create({
+  locked: { opacity: 0.55 },
   body: { paddingHorizontal: 20, marginTop: -space[3] },
   listHead: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: space[2] },
   listTitle: { ...type.h2, color: colors.text },

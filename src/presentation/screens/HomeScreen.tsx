@@ -22,6 +22,7 @@ import { DailyReportModal } from '../components/home/DailyReportModal';
 const todayKey = () => new Date().toISOString().split('T')[0];
 
 const PRAYER_TASKS: Record<string, string> = { fajr: 'Fajr', dhuhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha' };
+const ATHKAR_TEXTS = new Set([...MORNING_ATHKAR, ...EVENING_ATHKAR].map((a) => a.text));
 const WEEKDAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 
 /** Surah the given mushaf page belongs to (the last surah starting on or before it). */
@@ -39,7 +40,6 @@ const HomeScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const { tasks } = useSelector((state: RootState) => state.ibada);
   const { dailyRecords } = useSelector((state: RootState) => state.stats);
   const currentPage = useSelector((state: RootState) => state.quran.currentPage ?? 1);
-  const tasbeehCount = useSelector((state: RootState) => state.tasbeeh.count ?? 0);
   const athkarCounts = useSelector((state: RootState) => state.athkar.completionCounts ?? {});
 
   useEffect(() => { dispatch(syncIbadaDailyReset()); }, [dispatch]);
@@ -64,6 +64,8 @@ const HomeScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
 
   const navigateTo = (route: PlainRoute) => navigation.navigate(route);
   const today = dailyRecords[todayKey()];
+  // the day's tasbih from the sebha and the floating bead; athkar taps are logged by their text and left out
+  const tasbeehCount = Object.entries(today?.dhikrDetails ?? {}).reduce((sum, [name, n]) => (ATHKAR_TEXTS.has(name) ? sum : sum + n), 0);
 
   const greeting = getDynamicContent();
   const dateLine = [WEEKDAYS[new Date().getDay()], hijriDateStr].filter(Boolean).join(' · ');

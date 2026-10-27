@@ -22,16 +22,18 @@ export const IbadaRings = ({ groups }: { groups: RingGroup[] }) => (
 );
 
 /** The five prayers side by side; the next one has a gold edge. */
-export const PrayerSquares = ({ tasks, nextId, onToggle }: { tasks: IbadaTask[]; nextId?: string; onToggle: (t: IbadaTask) => void }) => (
+export const PrayerSquares = ({ tasks, nextId, isLocked, onToggle }: {
+  tasks: IbadaTask[]; nextId?: string; isLocked?: (t: IbadaTask) => boolean; onToggle: (t: IbadaTask) => void;
+}) => (
   <View style={st.squares}>
     {tasks.map((t) => (
       <TouchableOpacity
         key={t.id}
         activeOpacity={0.8}
         onPress={() => onToggle(t)}
-        style={[st.square, t.isCompleted ? st.squareDone : t.id === nextId ? st.squareNext : null]}
+        style={[st.square, t.isCompleted ? st.squareDone : t.id === nextId ? st.squareNext : null, isLocked?.(t) && { opacity: 0.55 }]}
         accessibilityRole="checkbox"
-        accessibilityState={{ checked: t.isCompleted }}
+        accessibilityState={{ checked: t.isCompleted, disabled: isLocked?.(t) }}
         accessibilityLabel={t.name}
       >
         <View style={[st.dot, t.isCompleted && st.dotOn]}>{t.isCompleted ? <Check size={13} color="#fff" strokeWidth={3} /> : null}</View>
