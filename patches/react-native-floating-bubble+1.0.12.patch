@@ -94,10 +94,10 @@ index 41a92ab..8a476d0 100644
 \ No newline at end of file
 diff --git a/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/FloatingBubbleService.java b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/FloatingBubbleService.java
 new file mode 100644
-index 0000000..95dd5f6
+index 0000000..d60698f
 --- /dev/null
 +++ b/node_modules/react-native-floating-bubble/android/src/main/java/com/reactlibrary/FloatingBubbleService.java
-@@ -0,0 +1,713 @@
+@@ -0,0 +1,748 @@
 +package com.reactlibrary;
 +
 +import android.app.AlarmManager;
@@ -330,8 +330,9 @@ index 0000000..95dd5f6
 +                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
 +                    PixelFormat.TRANSLUCENT);
 +            params.gravity = Gravity.TOP | Gravity.LEFT;
-+            params.x = x;
-+            params.y = y;
++            // a saved position may be off-screen (older versions did not keep it in bounds)
++            params.x = clampX(x, widthPx);
++            params.y = clampY(y, heightPx);
 +
 +            applyConfigToBubble();
 +            setupBubbleTouchListener();
@@ -451,8 +452,10 @@ index 0000000..95dd5f6
 +                            if (c != null) c.setPressedPart(WoodCounterView.PART_NONE);
 +                        }
 +                        if (dragging) {
-+                            params.x = initialX + deltaX;
-+                            params.y = initialY + deltaY;
++                            // stay on screen: past the edge Android pins the window but the
++                            // position kept growing, so dragging back felt stuck
++                            params.x = clampX(initialX + deltaX, params.width);
++                            params.y = clampY(initialY + deltaY, params.height);
 +                            windowManager.updateViewLayout(bubbleView, params);
 +                            showStopTarget();
 +                            updateStopTargetHighlight(event.getRawX(), event.getRawY());
@@ -463,7 +466,7 @@ index 0000000..95dd5f6
 +                        if (c != null) c.setPressedPart(WoodCounterView.PART_NONE);
 +                        return true;
 +                    case MotionEvent.ACTION_UP:
-+                        boolean droppedOnStop = stopTargetView != null
++                        boolean droppedOnStop = stopTargetView != null && stopTargetView.getVisibility() == View.VISIBLE
 +                                && isViewTouched(stopTargetView, event.getRawX(), event.getRawY());
 +                        hideStopTarget();
 +                        if (droppedOnStop) {
@@ -569,8 +572,17 @@ index 0000000..95dd5f6
 +    // Stop target (shown while dragging; drop the bubble on it to stop)
 +    // ──────────────────────────────────────────────────────────────
 +
++    /**
++     * The stop target is added once and then only shown/hidden. Adding and removing its window
++     * on every drag froze the app: removeViewImmediate() inside the touch handler waits on the
++     * render thread to free the window's surface, and on some GPUs that never returns (ANR).
++     */
 +    private void showStopTarget() {
-+        if (stopTargetView != null || !hasPermission())
++        if (stopTargetView != null) {
++            if (stopTargetView.getVisibility() != View.VISIBLE) stopTargetView.setVisibility(View.VISIBLE);
++            return;
++        }
++        if (!hasPermission())
 +            return;
 +        try {
 +            LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -607,8 +619,16 @@ index 0000000..95dd5f6
 +    private void hideStopTarget() {
 +        overStopTarget = false;
 +        if (stopTargetView == null) return;
++        stopTargetView.setScaleX(1f);
++        stopTargetView.setScaleY(1f);
++        stopTargetView.setVisibility(View.GONE);
++    }
++
++    /** Removes the stop target's window for good (service stopping); asynchronous, not from a touch. */
++    private void removeStopTarget() {
++        if (stopTargetView == null) return;
 +        try {
-+            windowManager.removeViewImmediate(stopTargetView);
++            windowManager.removeView(stopTargetView);
 +        } catch (Exception ignored) {}
 +        stopTargetView = null;
 +    }
@@ -619,7 +639,7 @@ index 0000000..95dd5f6
 +        isBeingKilledBySystem = false;
 +        handler.removeCallbacks(timerRunnable);
 +        hideReminder();
-+        hideStopTarget();
++        removeStopTarget();
 +        hideFloatingBubble();
 +        try {
 +            stopForeground(true);
@@ -731,6 +751,20 @@ index 0000000..95dd5f6
 +        });
 +    }
 +
++    /** Keeps the bubble's left edge within the screen width. */
++    private int clampX(int x, int w) {
++        int max = Math.max(0, getResources().getDisplayMetrics().widthPixels - w);
++        return Math.max(0, Math.min(x, max));
++    }
++
++    /** Keeps the bubble's top edge within the screen height (full physical height, so it reaches the bottom). */
++    private int clampY(int y, int h) {
++        android.util.DisplayMetrics real = new android.util.DisplayMetrics();
++        try { windowManager.getDefaultDisplay().getRealMetrics(real); } catch (Exception e) { real = getResources().getDisplayMetrics(); }
++        int max = Math.max(0, real.heightPixels - h);
++        return Math.max(0, Math.min(y, max));
++    }
++
 +    private int dp(int v) {
 +        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, getResources().getDisplayMetrics());
 +    }
@@ -800,6 +834,7 @@ index 0000000..95dd5f6
 +        // Always clean up the views since they can't survive process death
 +        hideFloatingBubble();
 +        hideReminder();
++        removeStopTarget();
 +        handler.removeCallbacks(timerRunnable);
 +
 +        instance = null;
