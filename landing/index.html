@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>أوّاب: سبحة عائمة وأذان على شاشة القفل</title>
+<meta name="description" content="أوّاب تطبيق أندرويد مجاني: سبحة عائمة فوق أي تطبيق، أذان يظهر على شاشة القفل، أذكار وقرآن ورسائل من القرآن حسب حالتك. بدون إعلانات وبدون حساب.">
+<meta property="og:title" content="أوّاب: حوّل وقت الشاشة لوقت ذكر">
+<meta property="og:description" content="سبحة عائمة فوق أي تطبيق، وأذان على شاشة القفل. مجاني وبدون إعلانات.">
+<meta property="og:image" content="/media/home.jpg">
+<meta name="theme-color" content="#0e0a07">
+<link rel="icon" href="/media/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0a07; --surface: #1a140f; --raised: #241b14; --line: rgba(255,255,255,0.08);
+    --gold: #d4af37; --gold-text: #fcd34d; --gold-line: rgba(212,175,55,0.45);
+    --text: #f5efe6; --muted: #a89f93; --soft: #cfc6ba; --night: #141a3a;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Tajawal', system-ui, sans-serif; line-height: 1.7; }
+  a { color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 800; font-size: 22px; color: var(--gold); }
+  .brand img { width: 36px; height: 36px; border-radius: 10px; }
+  .links { display: flex; gap: 22px; font-size: 15px; color: var(--soft); }
+  .links a { text-decoration: none; }
+  .links a:hover { color: var(--gold-text); }
+
+  .hero { background: linear-gradient(180deg, #0b1030 0%, var(--night) 45%, var(--bg) 100%); position: relative; overflow: hidden; }
+  .stars { position: absolute; inset: 0; pointer-events: none; }
+  .stars i { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #fff; opacity: .6; }
+  .hero-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; padding: 40px 0 80px; position: relative; }
+  .eyebrow { color: var(--gold-text); font-weight: 500; font-size: 15px; margin: 0 0 10px; }
+  h1 { font-size: clamp(32px, 5vw, 52px); line-height: 1.3; margin: 0 0 16px; font-weight: 800; }
+  h1 span { color: var(--gold-text); }
+  .lead { font-size: 18px; color: var(--soft); margin: 0 0 28px; max-width: 520px; }
+  .cta { display: inline-flex; align-items: center; gap: 10px; background: var(--gold); color: #1a140f; text-decoration: none; font-weight: 800; font-size: 18px; padding: 14px 28px; border-radius: 999px; }
+  .cta:hover { background: var(--gold-text); }
+  .cta svg { width: 22px; height: 22px; }
+  .meta { margin-top: 12px; font-size: 14px; color: var(--muted); }
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  .badge { font-size: 13px; color: var(--soft); border: 1px solid var(--line); background: rgba(255,255,255,0.04); padding: 6px 12px; border-radius: 999px; }
+
+  .phone { width: 280px; margin: 0 auto; border-radius: 40px; padding: 10px; background: #050403; border: 1px solid #3a2f24; box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+  .phone video, .phone img { display: block; width: 100%; border-radius: 30px; aspect-ratio: 9 / 20; object-fit: cover; background: var(--surface); }
+
+  section { padding: 80px 0; }
+  h2 { font-size: clamp(26px, 3.6vw, 36px); margin: 0 0 12px; font-weight: 800; }
+  .sub { color: var(--soft); font-size: 17px; margin: 0 0 40px; max-width: 640px; }
+
+  .problem { text-align: center; }
+  .problem .big { font-size: clamp(56px, 10vw, 104px); font-weight: 800; color: var(--gold-text); line-height: 1.1; margin: 8px 0; }
+  .problem .sub { margin: 0 auto; }
+  .src { font-size: 12px; color: var(--muted); margin-top: 14px; }
+
+  .feature { display: grid; grid-template-columns: 280px 1fr; gap: 56px; align-items: center; padding: 40px 0; border-top: 1px solid var(--line); }
+  .feature:nth-child(even) { grid-template-columns: 1fr 280px; }
+  .feature:nth-child(even) .phone { order: 2; }
+  .feature .tag { color: var(--gold); font-size: 14px; font-weight: 700; }
+  .feature h3 { font-size: 28px; margin: 6px 0 10px; }
+  .feature p { color: var(--soft); font-size: 17px; margin: 0 0 12px; }
+  .feature ul { margin: 0; padding: 0 18px 0 0; color: var(--soft); }
+  .feature li { margin-bottom: 6px; }
+
+  .more { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px; }
+  .card h4 { margin: 0 0 6px; font-size: 18px; color: var(--gold-text); }
+  .card p { margin: 0; color: var(--soft); font-size: 15px; }
+
+  .privacy { background: var(--surface); border: 1px solid var(--gold-line); border-radius: 24px; padding: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; }
+  .privacy div strong { display: block; font-size: 20px; color: var(--gold-text); margin-bottom: 4px; }
+  .privacy div span { color: var(--soft); font-size: 15px; }
+
+  ol.steps { counter-reset: s; list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+  ol.steps li { counter-increment: s; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px 18px 20px; display: flex; gap: 16px; align-items: flex-start; color: var(--soft); }
+  ol.steps li::before { content: counter(s); flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--raised); border: 1px solid var(--gold-line); color: var(--gold-text); display: grid; place-items: center; font-weight: 800; }
+  ol.steps strong { color: var(--text); }
+
+  details { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px 20px; margin-bottom: 10px; }
+  summary { cursor: pointer; font-weight: 700; font-size: 17px; }
+  details p { color: var(--soft); margin: 10px 0 0; }
+
+  .final { text-align: center; }
+  .verse { font-family: 'Amiri', serif; font-size: 30px; color: var(--gold-text); margin: 0 0 6px; }
+  footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: 14px; text-align: center; }
+
+  @media (max-width: 820px) {
+    .links { display: none; }
+    .hero-grid { grid-template-columns: 1fr; text-align: center; padding-bottom: 56px; }
+    .lead { margin-left: auto; margin-right: auto; }
+    .badges { justify-content: center; }
+    .feature, .feature:nth-child(even) { grid-template-columns: 1fr; gap: 24px; text-align: center; }
+    .feature:nth-child(even) .phone { order: 0; }
+    .feature ul { list-style: none; padding: 0; }
+    .phone { width: 240px; }
+    section { padding: 56px 0; }
+    .privacy { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="stars" aria-hidden="true"></div>
+  <div class="wrap">
+    <nav>
+      <a class="brand" href="#"><img src="/media/icon.png" alt="">أوّاب</a>
+      <div class="links">
+        <a href="#features">المميزات</a>
+        <a href="#privacy">الخصوصية</a>
+        <a href="#install">طريقة التثبيت</a>
+        <a href="#faq">أسئلة</a>
+      </div>
+    </nav>
+    <div class="hero-grid">
+      <div>
+        <p class="eyebrow">تطبيق أندرويد مجاني</p>
+        <h1>بتقضي ٤ ساعات يوميًا على الموبايل<br><span>خلّي منها دقايق لله</span></h1>
+        <p class="lead">أوّاب بيوصلك وإنت على الموبايل: سبحة عائمة فوق أي تطبيق بتفكّرك تذكر الله، وأذان بيظهر حتى لو الشاشة مقفولة، وأذكار وقرآن في مكان واحد.</p>
+        <a class="cta" href="/owwab.apk" download>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+          حمّل أوّاب لأندرويد
+        </a>
+        <div class="meta">الإصدار ١٫٠٫٠ · ملف APK · ٧٠ ميجا · أندرويد ٧ أو أحدث</div>
+        <div class="badges">
+          <span class="badge">بدون إعلانات</span>
+          <span class="badge">بدون حساب</span>
+          <span class="badge">بدون تتبّع</span>
+          <span class="badge">مجاني بالكامل</span>
+        </div>
+      </div>
+      <div class="phone"><video src="/media/floating.mp4" poster="/media/floating.jpg" autoplay muted loop playsinline aria-label="السبحة العائمة فوق تطبيق فيديو"></video></div>
+    </div>
+  </div>
+</header>
+
+<section class="problem">
+  <div class="wrap">
+    <h2>المشكلة مش إننا مش عايزين نذكر الله</h2>
+    <div class="big">٤ س ٩ د</div>
+    <p class="sub">ده متوسط وقت المصري على الموبايل في اليوم. التطبيقات الإسلامية بتستناك تفتحها، وإحنا بنفتح تيك توك. أوّاب بيروح لك هو، في المكان اللي إنت فيه.</p>
+    <p class="src">المصدر: <a href="https://explodingtopics.com/blog/screen-time-stats" target="_blank" rel="noopener">Exploding Topics</a>، بيانات الربع الثالث ٢٠٢٤</p>
+  </div>
+</section>
+
+<section id="video" style="padding-top:0">
+  <div class="wrap" style="text-align:center">
+    <h2>أوّاب في دقيقة</h2>
+    <p class="sub" style="margin:0 auto 28px">شوف التطبيق وهو شغال، بالصوت.</p>
+    <div class="phone"><video src="/media/owwab_tiktok.mp4" poster="/media/tiktok.jpg" controls playsinline preload="none" style="aspect-ratio:9/16"></video></div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <h2>جرّبه قبل ما تحمّله</h2>
+    <p class="sub">كل فيديو هنا متصوّر من التطبيق نفسه وهو شغال.</p>
+
+    <div class="features">
+      <article class="feature">
+        <div class="phone"><video data-src="/media/floating.mp4" poster="/media/floating.jpg" muted loop playsinline aria-label="السبحة العائمة"></video></div>
+        <div>
+          <span class="tag">الميزة الأهم</span>
+          <h3>سبحة عائمة فوق أي تطبيق</h3>
+          <p>وإنت بتتفرج على فيديو أو بتقرا شات، السبحة جنبك على الشاشة. اضغط وسبّح من غير ما تقفل اللي بتعمله.</p>
+          <ul>
+            <li>تفكّرك كل ١٠ دقايق بهزة خفيفة، وتقدر تغيّر المدة</li>
+            <li>اسحبها لأي مكان في الشاشة</li>
+            <li>كل تسبيحة بتتحسب في إجمالي يومك</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="phone"><video data-src="/media/azan.mp4" poster="/media/azan.jpg" muted loop playsinline aria-label="شاشة الأذان"></video></div>
+        <div>
+          <span class="tag">الأذان</span>
+          <h3>الأذان بيوصلك حتى والشاشة مقفولة</h3>
+          <p>في وقت الصلاة الشاشة بتنوّر لوحدها وتعرض اسم الصلاة، وكل جملة من الأذان وتحتها الترديد بتاعها، ومعاها آية عن الصلاة دي.</p>
+          <ul>
+            <li>بعد الأذان يظهر الدعاء الوارد: «اللهم رب هذه الدعوة التامة»</li>
+            <li>زر واحد يوقف الأذان</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="phone"><video data-src="/media/home.mp4" poster="/media/home.jpg" muted loop playsinline aria-label="الشاشة الرئيسية"></video></div>
+        <div>
+          <span class="tag">الرئيسية</span>
+          <h3>سماء بتتغير مع يومك</h3>
+          <p>الشمس ماشية على قوس الصلوات، والسماء بتتغير من الفجر للعشاء. تعرف الصلاة الجاية والوقت الباقي عليها من أول نظرة، ومعاها وردك من القرآن وتسبيحك وأذكارك النهارده.</p>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="phone"><video data-src="/media/messages.mp4" poster="/media/messages.jpg" muted loop playsinline aria-label="رسائل من القرآن"></video></div>
+        <div>
+          <span class="tag">رسائل من القرآن</span>
+          <h3>قول إنت حاسس بإيه، والقرآن يرد عليك</h3>
+          <p>حزن، أو قلق، أو دَين، أو فقد عزيز. اختار حالتك وهتلاقي آيات بتفسير السعدي، وأحاديث صحيحة بمصادرها، ودعاء ونصايح.</p>
+          <ul>
+            <li>الآيات من نص المصحف نفسه، مش مكتوبة بإيد</li>
+            <li>كل حديث مكتوب معاه مصدره ودرجته</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="phone"><video data-src="/media/athkar.mp4" poster="/media/athkar.jpg" muted loop playsinline aria-label="أذكار الصباح والمساء"></video></div>
+        <div>
+          <span class="tag">الأذكار</span>
+          <h3>أذكار الصباح والمساء خطوة بخطوة</h3>
+          <p>الذكر الحالي قدامك بخط واضح، واضغط عليه عشان تعدّ. اللي خلّصته بيصغر، فتعرف وصلت لحد فين.</p>
+        </div>
+      </article>
+
+      <article class="feature">
+        <div class="phone"><video data-src="/media/stats.mp4" poster="/media/stats.jpg" muted loop playsinline aria-label="الإحصائيات"></video></div>
+        <div>
+          <span class="tag">رحلتك</span>
+          <h3>شوف استمرارك</h3>
+          <p>عدد الأيام اللي كمّلتها ورا بعض، ونشاطك في الأسبوع، وخريطة لآخر ١٢ أسبوع، وتفاصيل كل ذكر قلته.</p>
+        </div>
+      </article>
+    </div>
+
+    <h2 style="margin-top:56px">وكمان</h2>
+    <div class="more">
+      <div class="card"><h4>مواقيت الصلاة</h4><p>حسب موقعك وطريقة الحساب الرسمية في بلدك، وتعلّم كل صلاة بعد ما تصلّيها.</p></div>
+      <div class="card"><h4>المسبحة</h4><p>سبحة بخرز حقيقي، وأهداف ٣٣ و٩٩ و١٠٠، وتقدر تحط هدفك إنت.</p></div>
+      <div class="card"><h4>القرآن والختمة</h4><p>المصحف كامل، وبيفتكر إنت وقفت فين، وبيتابع ختمتك.</p></div>
+      <div class="card"><h4>ويدجت للشاشة الرئيسية</h4><p>الصلاة الجاية والوقت الباقي عليها من غير ما تفتح التطبيق.</p></div>
+      <div class="card"><h4>عبادات اليوم</h4><p>الفرائض والسنن والأذكار والورد في قائمة واحدة.</p></div>
+      <div class="card"><h4>القبلة والزكاة والأدعية</h4><p>بوصلة القبلة، وحاسبة الزكاة، والأدعية والأحاديث.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="privacy">
+  <div class="wrap">
+    <h2>عبادتك بينك وبين ربنا</h2>
+    <p class="sub">مفيش أي حاجة من عبادتك بتتبعت لسيرفر.</p>
+    <div class="privacy">
+      <div><strong>بدون حساب</strong><span>مش بنطلب اسمك ولا إيميلك ولا رقمك.</span></div>
+      <div><strong>بدون إعلانات</strong><span>ولا أدوات تتبّع ولا تحليلات.</span></div>
+      <div><strong>على موبايلك بس</strong><span>تسبيحك وأذكارك وختمتك متخزنين على جهازك.</span></div>
+      <div><strong>الموقع للمواقيت بس</strong><span>بيُستخدم لحساب مواقيت الصلاة والقبلة، وتقدر تقفله.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap">
+    <h2>التثبيت في ٣ خطوات</h2>
+    <p class="sub">أوّاب لسه مش على جوجل بلاي، فهتحمّل ملف APK وتثبّته بنفسك.</p>
+    <ol class="steps">
+      <li><div><strong>حمّل الملف</strong> من الزرار تحت. لو المتصفح سألك «تحتفظ بالملف؟» اختار «تحميل».</div></li>
+      <li><div><strong>افتح الملف</strong> من الإشعارات أو من فولدر التنزيلات. أول مرة هيطلب منك تسمح للمتصفح بتثبيت التطبيقات، اسمح وارجع.</div></li>
+      <li><div><strong>افتح أوّاب واسمح بالأذونات</strong> اللي في كارت «جاهزية الأذان»، عشان الأذان يشتغل في ميعاده. لو موبايلك شاومي، فعّل كمان «الظهور على شاشة القفل» و«فتح النوافذ من الخلفية».</div></li>
+    </ol>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <h2>أسئلة</h2>
+    <details><summary>التطبيق مجاني؟</summary><p>أيوه، مجاني بالكامل ومن غير إعلانات.</p></details>
+    <details><summary>ليه موبايلي بيقول إن الملف ممكن يكون ضار؟</summary><p>أندرويد بيقول كده لأي تطبيق متحمّل من برّه جوجل بلاي. أوّاب ما بيطلبش أي إذن غير اللي محتاجه للأذان والسبحة العائمة والموقع.</p></details>
+    <details><summary>السبحة العائمة بتصرف بطارية؟</summary><p>هي صورة صغيرة فوق الشاشة ومش بتعمل حاجة غير لما تضغط عليها أو ييجي ميعاد التذكير. وتقدر تقفلها وتفتحها من شاشة المسبحة في أي وقت.</p></details>
+    <details><summary>فيه نسخة آيفون؟</summary><p>لسه، أوّاب على أندرويد بس دلوقتي.</p></details>
+    <details><summary>الأذان ما اشتغلش في ميعاده، أعمل إيه؟</summary><p>افتح الإعدادات في التطبيق، وفعّل كل حاجة في كارت «جاهزية الأذان». بعض الشركات زي شاومي وأوبو بتقفل التطبيقات اللي شغالة في الخلفية، والكارت ده بيوديك للإعدادات اللي محتاجها.</p></details>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <p class="verse">﴿ نِعْمَ الْعَبْدُ إِنَّهُ أَوَّابٌ ﴾</p>
+    <p class="src" style="margin:0 0 28px">سورة ص · ٣٠</p>
+    <a class="cta" href="/owwab.apk" download>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+      حمّل أوّاب لأندرويد
+    </a>
+    <div class="meta">ملف APK · ٧٠ ميجا</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">أوّاب · صدقة جارية · مجاني وبدون إعلانات</div>
+</footer>
+
+<script>
+  // a few stars over the night hero
+  const sky = document.querySelector('.stars');
+  for (let i = 0; i < 40; i++) {
+    const s = document.createElement('i');
+    s.style.top = Math.random() * 60 + '%';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.opacity = (0.25 + Math.random() * 0.6).toFixed(2);
+    sky.appendChild(s);
+  }
+  // feature videos load and play only while on screen
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(({ target: v, isIntersecting }) => {
+      if (isIntersecting) {
+        if (!v.src) v.src = v.dataset.src;
+        v.play().catch(() => {});
+      } else {
+        v.pause();
+      }
+    });
+  }, { threshold: 0.35 });
+  document.querySelectorAll('video[data-src]').forEach((v) => io.observe(v));
+</script>
+</body>
+</html>

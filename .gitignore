@@ -41,3 +41,7 @@ yarn-error.*
 /android
 
 *.tgz
+
+# landing page build output
+landing/owwab.apk
+landing/.vercel
