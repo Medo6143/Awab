@@ -19,6 +19,8 @@ export type RootStackParamList = {
   'رسائل_القرآن': { mood?: string } | undefined;
   'الأحاديث': { categoryId?: number; favorites?: boolean } | undefined;
   'الحديث': { id: number };
+  'الخصوصية': undefined;
+  'عن_التطبيق': undefined;
   'القبلة': undefined;
   'الصلاة': undefined;
   'الزكاة': undefined;

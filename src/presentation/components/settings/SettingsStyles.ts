@@ -53,10 +53,4 @@ export const s = StyleSheet.create({
   readinessHint: { ...type.caption, color: colors.textMuted, marginTop: 2 },
   readinessSummary: { ...type.body, color: colors.textMuted, marginBottom: space[2] },
 
-  // About / credit
-  aboutBtn: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: colors.surface, borderRadius: radius.card, padding: space[4], marginTop: space[6] },
-  aboutText: { ...type.bodyMedium, color: colors.text },
-  credit: { alignItems: 'center', marginTop: space[8] },
-  creditText: { ...type.caption, color: colors.textFaint },
-  creditName: { ...type.label, color: colors.gold, marginTop: 4 },
 });

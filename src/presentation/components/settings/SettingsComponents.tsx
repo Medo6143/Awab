@@ -83,7 +83,7 @@ export const ThemeSelector = ({ accentTheme, onSelect }: { accentTheme: AccentKe
 export const ReciterSelector = ({ selectedReciterId, onSelect }: { selectedReciterId: string; onSelect: (id: string) => void }) => {
   const accent = useAccent();
   return (
-    <View style={[s.subSection, { borderTopWidth: 0 }]}>
+    <View style={s.subSection}>
       <SubLabel icon={UserRound} text="القارئ المفضل" />
       <View style={s.reciterGrid}>
         {Object.entries(RECITER_MAP).map(([id, r]) => {
