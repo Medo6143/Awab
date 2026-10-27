@@ -8,15 +8,27 @@ import { usePrayerTimes } from '../hooks/usePrayerTimes';
 import { useAccent } from '../../shared/theme/useAccent';
 import { space } from '../../shared/theme/tokens';
 
-import { Screen, SectionTitle } from '../components/ui';
-import { HomeHeader } from '../components/home/HomeHeader';
-import { NextPrayerHero } from '../components/home/NextPrayerHero';
-import { ProgressRow } from '../components/home/ProgressRow';
+import { Screen } from '../components/ui';
+import { SkyHero } from '../components/home/SkyHero';
+import { ContinueCard, DayStats } from '../components/home/DayCards';
 import { HomeGrid } from '../components/home/HomeSections';
+import { MORNING_ATHKAR, EVENING_ATHKAR } from '../../shared/constants/athkar';
+import { SURAH_START_PAGE } from '../../domain/entities/surahPages';
+import { SURAH_NAMES } from '../../shared/constants/surahs';
 import { DailyMessageCard } from '../components/home/DailyMessageCard';
 import { DailyReportModal } from '../components/home/DailyReportModal';
 
 const todayKey = () => new Date().toISOString().split('T')[0];
+
+const PRAYER_TASKS: Record<string, string> = { fajr: 'Fajr', dhuhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha' };
+const WEEKDAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+
+/** Surah the given mushaf page belongs to (the last surah starting on or before it). */
+const surahOfPage = (page: number) => {
+  let i = 0;
+  while (i + 1 < SURAH_START_PAGE.length && SURAH_START_PAGE[i + 1] <= page) i++;
+  return SURAH_NAMES[i];
+};
 
 const HomeScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const dispatch = useDispatch();
@@ -25,10 +37,13 @@ const HomeScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
 
   const { tasks } = useSelector((state: RootState) => state.ibada);
   const { dailyRecords } = useSelector((state: RootState) => state.stats);
+  const currentPage = useSelector((state: RootState) => state.quran.currentPage ?? 1);
+  const tasbeehCount = useSelector((state: RootState) => state.tasbeeh.count ?? 0);
+  const athkarCounts = useSelector((state: RootState) => state.athkar.completionCounts ?? {});
 
   useEffect(() => { dispatch(syncIbadaDailyReset()); }, [dispatch]);
 
-  const { date: apiDate, nextPrayer, loading, error, hasLocation, retry } = usePrayerTimes();
+  const { date: apiDate, timings, nextPrayer, loading } = usePrayerTimes();
   const hijri = apiDate?.hijri;
   const hijriDateStr = hijri ? `${hijri.day} ${hijri.month.ar} ${hijri.year}` : '';
 
@@ -49,35 +64,47 @@ const HomeScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const navigateTo = (route: PlainRoute) => navigation.navigate(route);
   const today = dailyRecords[todayKey()];
 
+  const greeting = getDynamicContent();
+  const dateLine = [WEEKDAYS[new Date().getDay()], hijriDateStr].filter(Boolean).join(' · ');
+  const donePrayers = new Set(tasks.filter((t) => PRAYER_TASKS[t.id] && t.isCompleted).map((t) => PRAYER_TASKS[t.id]));
+
+  // morning athkar until mid-afternoon, evening after
+  const evening = new Date().getHours() >= 15;
+  const athkarList = evening ? EVENING_ATHKAR : MORNING_ATHKAR;
+  const athkarDone = athkarList.filter((a) => (athkarCounts[a.id] ?? 0) >= a.count).length;
+
   return (
-    <Screen scroll tab>
-      <HomeHeader
-        dynamicContent={getDynamicContent()}
-        hijriDateStr={hijriDateStr}
-        onSettingsPress={() => navigateTo('الإعدادات')}
-        onStatsPress={() => navigateTo('الإحصائيات')}
-      />
-
-      <NextPrayerHero
-        nextPrayer={nextPrayer}
+    <Screen scroll tab padded={false} edges={[]}>
+      <SkyHero
+        greeting={greeting.title}
+        dateLine={dateLine}
+        timings={timings}
+        next={nextPrayer}
+        donePrayers={donePrayers}
         loading={loading}
-        error={error}
-        hasLocation={hasLocation}
-        onRetry={retry}
-        onPress={() => navigateTo('TabPrayer')}
-        onLocate={retry}
+        onPressPrayer={() => navigateTo('TabPrayer')}
+        onSettings={() => navigateTo('الإعدادات')}
+        onStats={() => navigateTo('الإحصائيات')}
       />
 
-      <SectionTitle title="يومك" action={{ label: 'التقرير اليومي', onPress: () => setReportVisible(true) }} />
-      <ProgressRow onNavigate={navigateTo} />
+      <View style={{ paddingHorizontal: 20, marginTop: -space[4] }}>
+      <ContinueCard surahName={`سورة ${surahOfPage(currentPage)}`} page={currentPage} onPress={() => navigateTo('TabQuran')} />
+      <DayStats
+        items={[
+          { key: 'athkar', label: evening ? 'أذكار المساء' : 'أذكار الصباح', value: athkarDone, total: athkarList.length, onPress: () => navigateTo('TabAthkar') },
+          { key: 'tasbeeh', label: 'المسبحة اليوم', value: tasbeehCount, onPress: () => navigateTo('TabTasbeeh') },
+          { key: 'prayers', label: 'الصلوات', value: donePrayers.size, total: 5, onPress: () => navigateTo('العبادات') },
+        ]}
+      />
 
-      <HomeGrid onNavigate={navigateTo} />
+      <HomeGrid onNavigate={navigateTo} onReport={() => setReportVisible(true)} />
 
       <DailyMessageCard
         onOpenMessage={(mood) => navigation.navigate('رسائل_القرآن', { mood })}
         onOpenHadith={(id) => navigation.navigate('الحديث', { id })}
       />
       <View style={{ height: space[4] }} />
+      </View>
 
       <DailyReportModal
         visible={reportVisible}

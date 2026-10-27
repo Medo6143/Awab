@@ -21,9 +21,9 @@ const GRID: GridItem[] = [
 ];
 
 /** 4-column mono-icon grid. All icons share the accent; identity comes from the glyph. */
-export const HomeGrid = ({ onNavigate }: { onNavigate: (route: PlainRoute) => void }) => (
+export const HomeGrid = ({ onNavigate, onReport }: { onNavigate: (route: PlainRoute) => void; onReport?: () => void }) => (
   <View>
-    <SectionTitle title="الوصول السريع" />
+    <SectionTitle title="الأقسام" action={onReport ? { label: 'التقرير اليومي', onPress: onReport } : undefined} />
     <View style={styles.grid}>
       {GRID.map((item) => (
         <TouchableOpacity
