@@ -3,7 +3,6 @@ import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-na
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Defs, Path, RadialGradient, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Activity, Settings } from 'lucide-react-native';
 import { parseClock } from '../../../domain/entities/notifications';
 import type { PrayerScheduleTimes } from '../../../domain/entities/prayer';
 import { toAr } from '../../../shared/utils/format';
@@ -55,17 +54,26 @@ type Props = {
   next?: { name: string; arName: string; time: string; remaining: number } | null;
   donePrayers: Set<string>;
   loading: boolean;
-  onPressPrayer: () => void;
-  onSettings: () => void;
-  onStats: () => void;
+  onPressPrayer?: () => void;
+  /** Buttons on the far side of the title (settings, qibla...). */
+  actions?: React.ReactNode;
+  /** Prayer times next to the names on the arc, and sunrise as a small mark. */
+  showTimes?: boolean;
 };
+
+/** A round glass button for the sky header. */
+export const SkyButton = ({ onPress, label, children }: { onPress: () => void; label: string; children: React.ReactNode }) => (
+  <Pressable onPress={onPress} style={st.iconBtn} accessibilityRole="button" accessibilityLabel={label}>
+    {children}
+  </Pressable>
+);
 
 /**
  * Home hero: a sky whose colour follows the time of day, the five prayers on the sun's
  * arc (done ones filled, the next one lit), the sun (or moon at night) at the current
  * moment, and the countdown to the next prayer.
  */
-export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loading, onPressPrayer, onSettings, onStats }: Props) => {
+export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loading, onPressPrayer, actions, showTimes }: Props) => {
   const { width } = useWindowDimensions();
   const top = useSafeAreaInsets().top;
   const [now, setNow] = useState(() => new Date());
@@ -94,7 +102,9 @@ export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loadin
     });
     const nowM = now.getHours() * 60 + now.getMinutes();
     const body = arcPoint(tOf(nowM), W, base, peak, pad);
-    return { points, body };
+    const sr = minutesOf(timings?.Sunrise);
+    const sunrise = sr == null ? null : arcPoint(tOf(sr), W, base, peak, pad);
+    return { points, body, sunrise };
   }, [timings, now, W]);
 
   const hours = next ? Math.floor(next.remaining / 60) : 0;
@@ -119,15 +129,10 @@ export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loadin
           <Text style={st.greeting} numberOfLines={1}>{greeting}</Text>
           <Text style={st.date} numberOfLines={1}>{dateLine}</Text>
         </View>
-        <Pressable onPress={onStats} style={st.iconBtn} accessibilityRole="button" accessibilityLabel="الإحصائيات">
-          <Activity size={19} color="#fff" />
-        </Pressable>
-        <Pressable onPress={onSettings} style={st.iconBtn} accessibilityRole="button" accessibilityLabel="الإعدادات">
-          <Settings size={19} color="#fff" />
-        </Pressable>
+        {actions}
       </View>
 
-      <Pressable onPress={onPressPrayer} accessibilityRole="button" accessibilityLabel={next ? `الصلاة القادمة ${next.arName}` : 'مواقيت الصلاة'}>
+      <Pressable onPress={onPressPrayer} disabled={!onPressPrayer} accessibilityRole="button" accessibilityLabel={next ? `الصلاة القادمة ${next.arName}` : 'مواقيت الصلاة'}>
         {/* direction ltr: the arc is drawn in absolute coordinates (Fajr east on the right) */}
         <View style={{ direction: 'ltr' }}>
           <Svg width={W} height={H}>
@@ -147,6 +152,7 @@ export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loadin
                 </React.Fragment>
               );
             })}
+            {showTimes && arc?.sunrise ? <Circle cx={arc.sunrise.x} cy={arc.sunrise.y} r={3} fill="#fff" opacity={0.5} /> : null}
             {arc && !night ? (
               <>
                 <Circle cx={arc.body.x} cy={arc.body.y} r={22} fill="url(#glow)" />
@@ -165,9 +171,10 @@ export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loadin
             return (
               <Text
                 key={`l${p.key}`}
-                style={[st.arcLabel, isNext && st.arcLabelNext, { left: p.x - 40, top: below ? p.y + 8 : p.y - 24 }]}
+                style={[st.arcLabel, isNext && st.arcLabelNext, { left: p.x - 40, top: below ? p.y + 8 : p.y - (showTimes ? 38 : 24) }]}
               >
                 {p.ar}
+                {showTimes && timings?.[p.key] ? `\n${toAr(String(timings[p.key]).slice(0, 5))}` : ''}
               </Text>
             );
           })}

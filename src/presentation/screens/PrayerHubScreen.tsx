@@ -24,13 +24,16 @@ const PrayerHubScreen = ({ route }: Partial<ScreenProps<'TabPrayer'>>) => {
 
   const iconColor = (id: Tab) => (activeTab === id ? accent.accentText : colors.textMuted);
 
+  // the times live under their own sky (with a qibla button); the qibla keeps the hub header
+  if (activeTab === 'times') return <PrayerTimesScreen tab onOpenQibla={() => setActiveTab('qibla')} />;
+
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
       <ScreenHeader title="الصلاة" large />
       <View style={s.hubTabs}>
         <Chip
           label="المواقيت"
-          selected={activeTab === 'times'}
+          selected={false}
           onPress={() => setActiveTab('times')}
           icon={<MihrabClockIcon size={icon.size.md} color={iconColor('times')} strokeWidth={icon.stroke} />}
         />
@@ -42,7 +45,7 @@ const PrayerHubScreen = ({ route }: Partial<ScreenProps<'TabPrayer'>>) => {
         />
       </View>
       <View style={{ flex: 1 }}>
-        {activeTab === 'times' ? <PrayerTimesScreen hideHeader tab /> : <QiblaScreen hideHeader tab />}
+        <QiblaScreen hideHeader tab />
       </View>
     </SafeAreaView>
   );

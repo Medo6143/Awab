@@ -9,7 +9,8 @@ import { useAccent } from '../../shared/theme/useAccent';
 import { space } from '../../shared/theme/tokens';
 
 import { Screen } from '../components/ui';
-import { SkyHero } from '../components/home/SkyHero';
+import { SkyButton, SkyHero } from '../components/home/SkyHero';
+import { Activity, Settings } from 'lucide-react-native';
 import { ContinueCard, DayStats } from '../components/home/DayCards';
 import { HomeGrid } from '../components/home/HomeSections';
 import { MORNING_ATHKAR, EVENING_ATHKAR } from '../../shared/constants/athkar';
@@ -83,8 +84,12 @@ const HomeScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
         donePrayers={donePrayers}
         loading={loading}
         onPressPrayer={() => navigateTo('TabPrayer')}
-        onSettings={() => navigateTo('الإعدادات')}
-        onStats={() => navigateTo('الإحصائيات')}
+        actions={
+          <>
+            <SkyButton onPress={() => navigateTo('الإحصائيات')} label="الإحصائيات"><Activity size={19} color="#fff" /></SkyButton>
+            <SkyButton onPress={() => navigateTo('الإعدادات')} label="الإعدادات"><Settings size={19} color="#fff" /></SkyButton>
+          </>
+        }
       />
 
       <View style={{ paddingHorizontal: 20, marginTop: -space[4] }}>
