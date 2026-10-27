@@ -15,12 +15,12 @@ const VirtuesScreen = ({ navigation, route }: ScreenProps<'الفضائل'>) => 
         <React.Fragment key={sec.title}>
           <SectionHeading title={sec.title} sub={sec.sub} />
           {sec.intro ? <Text style={st.intro}>{sec.intro}</Text> : null}
-          {sec.verses.map((v) => <VerseCard key={`${v.surah}:${v.from}`} verse={v} />)}
+          {sec.verses.map((v) => <VerseCard key={`${v.surah}:${v.from}`} verse={v} withTafsir />)}
           {sec.hadiths.map((h) => <HadithCard key={h.source + h.text.slice(0, 12)} hadith={h} />)}
           {sec.duas?.map((d) => <SupplicationCard key={d.source + d.text.slice(0, 12)} dua={d} />)}
         </React.Fragment>
       ))}
-      <Text style={st.note}>الآيات من نص المصحف، والأحاديث صحيحة أو حسنة مع مصادرها، روجعت على موسوعة الدرر السنية.</Text>
+      <Text style={st.note}>الآيات من نص المصحف وتفسيرها من تفسير السعدي، والأحاديث صحيحة أو حسنة مع مصادرها وشرحها، روجعت على موسوعة الدرر السنية.</Text>
     </Screen>
   );
 };

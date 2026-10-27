@@ -84,6 +84,15 @@ export const HadithCard = ({ hadith }: { hadith: Hadith }) => (
     <Text style={st.hadithLead}>{hadith.lead ?? 'قال رسول الله ﷺ'}</Text>
     <Text style={st.hadithText}>{hadith.text}</Text>
     <Text style={st.hadithSource}>{hadith.source}</Text>
+    {hadith.meaning ? <Meaning text={hadith.meaning} /> : null}
+  </View>
+);
+
+/** "المعنى": the explanation under a hadith or dua (summarized from الدرر السنية). */
+const Meaning = ({ text }: { text: string }) => (
+  <View style={st.meaningBox}>
+    <Text style={st.meaningLabel}>المعنى</Text>
+    <Text style={st.meaningText}>{text}</Text>
   </View>
 );
 
@@ -92,6 +101,7 @@ export const SupplicationCard = ({ dua, title = 'دعاء' }: { dua: Supplicatio
     <Text style={st.duaTitle}>{title}</Text>
     <Text style={st.duaText}>{dua.text}</Text>
     <Text style={st.hadithSource}>{dua.source}</Text>
+    {dua.meaning ? <Meaning text={dua.meaning} /> : null}
   </View>
 );
 
@@ -119,6 +129,9 @@ const st = StyleSheet.create({
   hadithText: { fontFamily: 'Amiri_400Regular', fontSize: 18, lineHeight: 34, color: colors.text },
   hadithSource: { ...type.caption, color: colors.textMuted, marginTop: space[2] },
 
+  meaningBox: { marginTop: space[3], paddingTop: space[3], borderTopWidth: 1, borderTopColor: colors.goldLineSoft },
+  meaningLabel: { ...type.label, color: colors.gold, marginBottom: 2 },
+  meaningText: { ...type.body, color: colors.textSoft, lineHeight: 25 },
   duaCard: { backgroundColor: colors.goldSoft, borderRadius: radius.card, padding: space[4], marginBottom: space[3] },
   duaTitle: { ...type.label, color: colors.gold, marginBottom: space[1] },
   duaText: { fontFamily: 'Amiri_700Bold', fontSize: 19, lineHeight: 36, color: colors.text, textAlign: 'center' },

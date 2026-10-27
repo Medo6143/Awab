@@ -17,10 +17,14 @@ export interface Hadith {
   source: string;
   /** Who says it, when not the Prophet ﷺ himself (e.g. a Companion's report). */
   lead?: string;
+  /** Short explanation, summarized from الدرر السنية's شرح of this hadith. */
+  meaning?: string;
 }
 
 /** A supplication from the Quran or authentic Sunnah. */
 export interface Supplication {
   text: string;
   source: string;
+  /** Short explanation, summarized from الدرر السنية's شرح. */
+  meaning?: string;
 }
