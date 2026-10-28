@@ -1,6 +1,7 @@
 import { CloudFog, CloudRain, HeartCrack, Scale, Shield, Stethoscope, Undo2, UserRound, Wallet, Waves } from 'lucide-react-native';
 import type { Hadith, Supplication, VerseRef } from './guidance';
 import { DUA, H } from './hadiths';
+import { MORE_MESSAGE_VERSES } from './quranMessageVerses';
 
 type Icon = typeof CloudRain;
 
@@ -20,7 +21,7 @@ export interface QuranMessage {
 }
 
 /** "رسائل من القرآن": one entry per state a Muslim may be going through. */
-export const QURAN_MESSAGES: QuranMessage[] = [
+const BASE_MESSAGES: QuranMessage[] = [
   {
     id: 'sadness',
     name: 'الحزن',
@@ -223,3 +224,10 @@ export const QURAN_MESSAGES: QuranMessage[] = [
     ],
   },
 ];
+
+/** Each state with its extra verses added (no duplicates), so messages vary. */
+export const QURAN_MESSAGES: QuranMessage[] = BASE_MESSAGES.map((m) => {
+  const seen = new Set(m.verses.map((x) => `${x.surah}:${x.from}`));
+  const more = (MORE_MESSAGE_VERSES[m.id] ?? []).filter((x) => !seen.has(`${x.surah}:${x.from}`) && seen.add(`${x.surah}:${x.from}`));
+  return { ...m, verses: [...m.verses, ...more] };
+});

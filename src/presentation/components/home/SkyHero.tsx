@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Defs, Path, RadialGradient, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -20,9 +20,49 @@ const SKY: Record<Phase, string[]> = {
   dusk: ['#0f1430', '#2e2550', '#6a3a55', colors.bg],
 };
 
-/** The sky follows the prayer that is coming next. */
-const PHASE_BY_NEXT: Record<string, Phase> = {
-  Fajr: 'night', Sunrise: 'dawn', Dhuhr: 'morning', Asr: 'noon', Maghrib: 'golden', Isha: 'dusk',
+/**
+ * The sky follows the clock against today's times: night from an hour after isha to fajr,
+ * dawn until sunrise, then morning, noon from asr, golden before maghrib, dusk to night.
+ */
+export const phaseAt = (now: Date, timings?: PrayerScheduleTimes): Phase => {
+  const m = now.getHours() * 60 + now.getMinutes();
+  const t = (k: keyof PrayerScheduleTimes) => minutesOf(timings?.[k] as string | undefined);
+  const fajr = t('Fajr'), sunrise = t('Sunrise'), dhuhr = t('Dhuhr'), asr = t('Asr'), maghrib = t('Maghrib'), isha = t('Isha');
+  if (fajr == null || maghrib == null || isha == null) return m >= 18 * 60 || m < 5 * 60 ? 'night' : 'morning';
+  if (m < fajr || m >= isha + 60) return 'night';
+  if (m < (sunrise ?? fajr + 80)) return 'dawn';
+  if (m < (asr ?? dhuhr ?? 15 * 60)) return 'morning';
+  if (m < maghrib - 40) return 'noon';
+  if (m < maghrib) return 'golden';
+  return 'dusk';
+};
+
+/** Fixed star positions (fraction of width, px from the top) so the sky doesn't reshuffle. */
+const STARS = Array.from({ length: 42 }, (_, i) => {
+  const r = (n: number) => ((Math.sin(i * 12.9898 + n * 78.233) * 43758.5453) % 1 + 1) % 1;
+  return { x: r(1), y: 8 + r(2) * 230, size: r(3) > 0.85 ? 2.6 : r(3) > 0.5 ? 1.8 : 1.2, group: i % 3 };
+});
+
+/** Stars in three groups that fade in and out at different speeds, so the night twinkles. */
+const Stars = ({ width, top, dim }: { width: number; top: number; dim: boolean }) => {
+  const groups = useRef([0, 1, 2].map(() => new Animated.Value(1))).current;
+  useEffect(() => {
+    const loops = groups.map((v, i) => Animated.loop(Animated.sequence([
+      Animated.timing(v, { toValue: 0.25, duration: 1400 + i * 700, useNativeDriver: true }),
+      Animated.timing(v, { toValue: 1, duration: 1400 + i * 700, useNativeDriver: true }),
+    ])));
+    loops.forEach((l) => l.start());
+    return () => loops.forEach((l) => l.stop());
+  }, [groups]);
+  return (
+    // ltr: star positions are absolute from the left edge
+    <View style={[StyleSheet.absoluteFill, { direction: 'ltr' }]} pointerEvents="none">
+      {STARS.filter((_, i) => !dim || i % 3 === 0).map((s, i) => (
+        <Animated.View key={i} style={{ position: 'absolute', left: s.x * width, top: top + s.y, width: s.size, height: s.size, borderRadius: s.size,
+          backgroundColor: '#fff', opacity: Animated.multiply(groups[s.group], dim ? 0.4 : 0.85) }} />
+      ))}
+    </View>
+  );
 };
 
 const ARC_PRAYERS = [
@@ -81,14 +121,8 @@ export const SkyBackdrop = ({ phase, title, subtitle, actions, children }: {
     <View style={{ width: W }}>
       <LinearGradient colors={SKY[phase] as [string, string, ...string[]]} locations={[0, 0.38, 0.68, 1]} style={StyleSheet.absoluteFill} />
 
-      {/* a few stars before dawn and after dusk */}
-      {(phase === 'night' || phase === 'dusk' || phase === 'dawn') ? (
-        <Svg width={W} height={260} style={StyleSheet.absoluteFill} pointerEvents="none">
-          {[[0.12, 70], [0.3, 40], [0.48, 95], [0.66, 55], [0.82, 85], [0.9, 35], [0.22, 120], [0.58, 130]].map(([fx, y], i) => (
-            <Circle key={i} cx={fx * W} cy={y + top} r={i % 3 === 0 ? 1.4 : 1} fill="#fff" opacity={phase === 'dawn' ? 0.35 : 0.7} />
-          ))}
-        </Svg>
-      ) : null}
+      {/* a full sky of twinkling stars at night, a few at dusk and dawn */}
+      {(phase === 'night' || phase === 'dusk' || phase === 'dawn') ? <Stars width={W} top={top} dim={phase !== 'night'} /> : null}
 
       <View style={[st.head, { paddingTop: top + space[3] }]}>
         <View style={{ flex: 1 }}>
@@ -115,7 +149,7 @@ export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loadin
     return () => clearInterval(id);
   }, []);
 
-  const phase: Phase = next ? PHASE_BY_NEXT[next.name] ?? 'night' : 'night';
+  const phase: Phase = phaseAt(now, timings);
   const night = phase === 'night';
 
   const W = width;
@@ -134,7 +168,12 @@ export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loadin
       return { ...p, ...(m == null ? arcPoint(0, W, base, peak, pad) : arcPoint(tOf(m), W, base, peak, pad)) };
     });
     const nowM = now.getHours() * 60 + now.getMinutes();
-    const body = arcPoint(tOf(nowM), W, base, peak, pad);
+    // at night the moon crosses the same arc, from isha (left) back to fajr (right)
+    const nightLen = 1440 - (isha - fajr);
+    const intoNight = ((nowM - isha) % 1440 + 1440) % 1440;
+    const body = nowM >= fajr && nowM < isha
+      ? arcPoint(tOf(nowM), W, base, peak, pad)
+      : arcPoint(1 - Math.min(1, intoNight / nightLen), W, base, peak, pad);
     const sr = minutesOf(timings?.Sunrise);
     const sunrise = sr == null ? null : arcPoint(tOf(sr), W, base, peak, pad);
     return { points, body, sunrise };
@@ -174,8 +213,15 @@ export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loadin
                 <Circle cx={arc.body.x} cy={arc.body.y} r={9} fill="#ffd27a" />
               </>
             ) : null}
-            {night ? (
-              // crescent high in the night sky
+            {arc && night ? (
+              <>
+                <Circle cx={arc.body.x} cy={arc.body.y} r={26} fill="url(#glow)" />
+                {/* crescent: a lit disc with a sky-coloured disc over its edge */}
+                <Circle cx={arc.body.x} cy={arc.body.y} r={11} fill="#eef2ff" />
+                <Circle cx={arc.body.x + 5} cy={arc.body.y - 3} r={9.5} fill={SKY.night[1]} />
+              </>
+            ) : null}
+            {!arc && night ? (
               <Path d={`M${W * 0.25} 26 a14 14 0 1 0 11 22 a11 11 0 1 1 -11 -22z`} fill="#e8eeff" opacity={0.9} />
             ) : null}
           </Svg>

@@ -5,30 +5,22 @@ import { ChevronLeft, RefreshCw, Shuffle } from 'lucide-react-native';
 import { Card, SectionTitle } from '../ui';
 import { QURAN_MESSAGES } from '../../../domain/entities/quranMessages';
 import type { HadithIndexEntry } from '../../../domain/entities/hadith';
-import { hadithOfTheDay, randomHadith } from '../../../data/hadith/hadithLibrary';
+import { randomHadith } from '../../../data/hadith/hadithLibrary';
 import { useVerseText } from '../../hooks/useGuidance';
 import { verseLabel } from '../guidance/GuidanceBlocks';
 import { colors, radius, space, type } from '../../../shared/theme/tokens';
-
-const dayNumber = () => {
-  const d = new Date();
-  return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86_400_000);
-};
 
 /** Every (state, verse) pair across the Quran messages, as [moodIndex, verseIndex]. */
 const ALL_VERSES = QURAN_MESSAGES.flatMap((m, i) => m.verses.map((_, j) => [i, j] as const));
 
 /**
  * "رسالة لك" on home: a verse from one of the Quran messages (text from the mushaf source)
- * and a hadith. Opens on the day's pick; "رسالة تانية", "آية تانية" and "حديث تاني" draw
+ * and a hadith, drawn at random each time the app opens; "رسالة تانية", "آية تانية" and "حديث تاني" draw
  * new ones at random, as many times as the reader likes.
  */
 export const DailyMessageCard = ({ onOpenMessage, onOpenHadith }: { onOpenMessage: (mood: string) => void; onOpenHadith: (id: number) => void }) => {
-  const [pick, setPick] = useState<readonly [number, number]>(() => {
-    const day = dayNumber();
-    const m = day % QURAN_MESSAGES.length;
-    return [m, Math.floor(day / QURAN_MESSAGES.length) % QURAN_MESSAGES[m].verses.length];
-  });
+  // a fresh verse every time the app opens, not the same one all day
+  const [pick, setPick] = useState<readonly [number, number]>(() => ALL_VERSES[Math.floor(Math.random() * ALL_VERSES.length)]);
   const mood = QURAN_MESSAGES[pick[0]];
   const verse = mood.verses[pick[1]];
   const { texts, loading } = useVerseText(verse);
@@ -36,7 +28,7 @@ export const DailyMessageCard = ({ onOpenMessage, onOpenHadith }: { onOpenMessag
 
   // the hadith index is ~2 MB: build it after the home screen has painted
   useEffect(() => {
-    const t = setTimeout(() => setHadith(hadithOfTheDay()), 600);
+    const t = setTimeout(() => setHadith(randomHadith()), 600);
     return () => clearTimeout(t);
   }, []);
 
