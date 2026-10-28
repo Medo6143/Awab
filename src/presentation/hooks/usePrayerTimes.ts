@@ -31,12 +31,14 @@ export const usePrayerTimes = () => {
     return map[name] || name;
   };
 
-  const updateWidget = (next: NextPrayer | null) => {
+  const updateWidget = (next: NextPrayer | null, timings?: Record<string, string>) => {
     if (!next) return;
     prayerWidget.update({
       prayerName: toArName(next.name),
       prayerTime: next.time,
       targetTimeMillis: Date.now() + next.remaining * 60 * 1000, // remaining is in minutes
+      // today's times let the widget move to the next prayer and draw its sky on its own
+      timings: JSON.stringify(timings ?? {}),
     });
   };
 
@@ -69,7 +71,7 @@ export const usePrayerTimes = () => {
           console.log('usePrayerTimes: Using persistent cached data for', todayStr, 'Method:', targetMethod);
           const next = PrayerTimeService.getNextPrayer(cachedData.timings);
           setNextPrayer(next);
-          updateWidget(next);
+          updateWidget(next, cachedData.timings as unknown as Record<string, string>);
           return;
         }
 
@@ -81,7 +83,7 @@ export const usePrayerTimes = () => {
           dispatch(setPrayerData(times));
           const next = PrayerTimeService.getNextPrayer(times.timings);
           setNextPrayer(next);
-          updateWidget(next);
+          updateWidget(next, times.timings as unknown as Record<string, string>);
         } else {
           dispatch(setPrayerFailed());
         }
@@ -98,7 +100,7 @@ export const usePrayerTimes = () => {
       setNextPrayer((prev) => {
         // Only update the native widget if the prayer has actually changed
         if (!prev || prev.name !== next?.name) {
-          updateWidget(next);
+          updateWidget(next, cachedData.timings as unknown as Record<string, string>);
         }
         return next;
       });
