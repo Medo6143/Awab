@@ -99,11 +99,11 @@ class PrayerWidgetProvider : AppWidgetProvider() {
             // the sky at the widget's real size (options are in dp)
             val opts = manager.getAppWidgetOptions(id)
             val density = context.resources.displayMetrics.density
-            val wDp = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 320).takeIf { it > 0 } ?: 320
+            val wDp = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 320).takeIf { it > 0 } ?: 320
             val hDp = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 180).takeIf { it > 0 } ?: 180
             val scale = (density.coerceAtMost(2f))
             try {
-                views.setImageViewBitmap(R.id.widget_sky, WidgetSky.draw((wDp * scale).toInt(), (hDp * scale).toInt(), now, t, nxt?.first, 22 * scale))
+                views.setImageViewBitmap(R.id.widget_sky, WidgetSky.draw((wDp * scale).toInt(), (hDp * scale).toInt(), now, t, nxt?.first, 22 * scale, prefs.getString("dateLine", "") ?: ""))
             } catch (e: Exception) { /* keep the previous sky */ }
 
             val launch = context.packageManager.getLaunchIntentForPackage(context.packageName)

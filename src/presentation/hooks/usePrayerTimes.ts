@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { toAr } from '../../shared/utils/format';
 import { useLocation } from './useLocation';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
@@ -31,7 +32,13 @@ export const usePrayerTimes = () => {
     return map[name] || name;
   };
 
-  const updateWidget = (next: NextPrayer | null, timings?: Record<string, string>) => {
+  // "الأربعاء · ١٧ جمادى الأولى" for the widget's top row
+  const widgetDate = (h?: { day: string | number; month: { ar: string } }) => {
+    const day = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'][new Date().getDay()];
+    return h ? `${day} · ${toAr(String(h.day))} ${h.month.ar}` : day;
+  };
+
+  const updateWidget = (next: NextPrayer | null, timings?: Record<string, string>, hijri?: { day: string | number; month: { ar: string } }) => {
     if (!next) return;
     prayerWidget.update({
       prayerName: toArName(next.name),
@@ -39,6 +46,7 @@ export const usePrayerTimes = () => {
       targetTimeMillis: Date.now() + next.remaining * 60 * 1000, // remaining is in minutes
       // today's times let the widget move to the next prayer and draw its sky on its own
       timings: JSON.stringify(timings ?? {}),
+      dateLine: widgetDate(hijri),
     });
   };
 
@@ -71,7 +79,7 @@ export const usePrayerTimes = () => {
           console.log('usePrayerTimes: Using persistent cached data for', todayStr, 'Method:', targetMethod);
           const next = PrayerTimeService.getNextPrayer(cachedData.timings);
           setNextPrayer(next);
-          updateWidget(next, cachedData.timings as unknown as Record<string, string>);
+          updateWidget(next, cachedData.timings as unknown as Record<string, string>, cachedData.date?.hijri);
           return;
         }
 
@@ -83,7 +91,7 @@ export const usePrayerTimes = () => {
           dispatch(setPrayerData(times));
           const next = PrayerTimeService.getNextPrayer(times.timings);
           setNextPrayer(next);
-          updateWidget(next, times.timings as unknown as Record<string, string>);
+          updateWidget(next, times.timings as unknown as Record<string, string>, times.date?.hijri);
         } else {
           dispatch(setPrayerFailed());
         }
@@ -100,7 +108,7 @@ export const usePrayerTimes = () => {
       setNextPrayer((prev) => {
         // Only update the native widget if the prayer has actually changed
         if (!prev || prev.name !== next?.name) {
-          updateWidget(next, cachedData.timings as unknown as Record<string, string>);
+          updateWidget(next, cachedData.timings as unknown as Record<string, string>, cachedData.date?.hijri);
         }
         return next;
       });

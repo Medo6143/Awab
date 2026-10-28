@@ -41,7 +41,7 @@ object WidgetSky {
         }
     }
 
-    fun draw(w: Int, h: Int, now: Int, t: Map<String, Int>, next: String?, radius: Float): Bitmap {
+    fun draw(w: Int, h: Int, now: Int, t: Map<String, Int>, next: String?, radius: Float, dateLine: String): Bitmap {
         val bmp = Bitmap.createBitmap(w.coerceAtLeast(1), h.coerceAtLeast(1), Bitmap.Config.ARGB_8888)
         val c = Canvas(bmp)
         val ph = phase(now, t)
@@ -51,7 +51,7 @@ object WidgetSky {
 
         val sky = SKY[ph]!!
         c.drawRect(0f, 0f, w.toFloat(), h.toFloat(), Paint().apply {
-            shader = LinearGradient(0f, 0f, 0f, h * 1.35f, sky, floatArrayOf(0f, 0.38f, 0.7f, 1f), Shader.TileMode.CLAMP)
+            shader = LinearGradient(0f, 0f, 0f, h * 1.15f, sky, floatArrayOf(0f, 0.38f, 0.75f, 1f), Shader.TileMode.CLAMP)
         })
 
         if (ph == "night" || ph == "dusk" || ph == "dawn") {
@@ -70,7 +70,7 @@ object WidgetSky {
         val fajr = t["Fajr"]; val isha = t["Isha"]
         if (fajr != null && isha != null && isha > fajr) {
             // the arc sits in the top half; the countdown is laid out under it like the app
-            val pad = w * 0.09f; val base = h * 0.46f; val peak = h * 0.06f
+            val pad = w * 0.09f; val base = h * 0.38f; val peak = h * 0.1f
             fun point(tt: Float): Pair<Float, Float> {
                 val u = 1 - tt
                 val x = u * u * (w - pad) + 2 * u * tt * (w / 2f) + tt * tt * pad
@@ -84,16 +84,10 @@ object WidgetSky {
                 pathEffect = DashPathEffect(floatArrayOf(5f, 10f), 0f)
             })
             val dot = Paint(Paint.ANTI_ALIAS_FLAG)
-            val label = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER; textSize = h * 0.075f }
-            val names = mapOf("Fajr" to "الفجر", "Dhuhr" to "الظهر", "Asr" to "العصر", "Maghrib" to "المغرب", "Isha" to "العشاء")
             for (k in listOf("Fajr", "Dhuhr", "Asr", "Maghrib", "Isha")) {
                 val m = t[k] ?: continue
                 val (x, y) = point(tOf(m))
                 val isNext = k == next
-                label.color = if (isNext) 0xFFFFD27A.toInt() else Color.argb(210, 255, 255, 255)
-                label.isFakeBoldText = isNext
-                val below = y > base - h * 0.1f
-                c.drawText(names[k]!!, x, if (below) y + h * 0.11f else y - h * 0.05f, label)
                 dot.style = if (isNext || m <= now) Paint.Style.FILL else Paint.Style.STROKE
                 dot.strokeWidth = 2.5f
                 dot.color = if (isNext) 0xFFFFD27A.toInt() else Color.argb(200, 255, 255, 255)
@@ -116,12 +110,39 @@ object WidgetSky {
             }
         }
 
-        // darken the bottom so the text reads on any phase
-        c.drawRect(0f, 0f, w.toFloat(), h.toFloat(), Paint().apply {
-            shader = LinearGradient(0f, h * 0.55f, 0f, h.toFloat(), Color.TRANSPARENT, Color.argb(120, 14, 10, 7), Shader.TileMode.CLAMP)
-        })
+        // top row: the date on the right, the app's name on the left
+        val small = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = h * 0.058f; color = Color.argb(215, 255, 255, 255) }
+        val ty = h * 0.085f
+        c.drawText(dateLine, w - w * 0.05f, ty, Paint(small).apply { textAlign = Paint.Align.RIGHT })
+        c.drawText("أوّاب", w * 0.05f, ty, Paint(small).apply { textAlign = Paint.Align.LEFT })
+
+        // bottom row: the five prayers with their times, the next one in gold
+        val rowTop = h * 0.78f
+        c.drawRect(0f, rowTop, w.toFloat(), h.toFloat(), Paint().apply { color = Color.argb(115, 14, 10, 7) })
+        val keys = listOf("Isha", "Maghrib", "Asr", "Dhuhr", "Fajr") // left to right: fajr on the right like the arc
+        val names = mapOf("Fajr" to "الفجر", "Dhuhr" to "الظهر", "Asr" to "العصر", "Maghrib" to "المغرب", "Isha" to "العشاء")
+        val cell = w / 5f
+        val nameP = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER; textSize = h * 0.055f }
+        val timeP = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER; textSize = h * 0.068f; isFakeBoldText = true }
+        for ((i, k) in keys.withIndex()) {
+            val on = k == next
+            if (on) c.drawRect(i * cell, rowTop, (i + 1) * cell, h.toFloat(), Paint().apply { color = Color.argb(70, 212, 175, 55) })
+            val cx = i * cell + cell / 2
+            nameP.color = if (on) 0xFFFCD34D.toInt() else Color.argb(190, 255, 255, 255)
+            timeP.color = if (on) 0xFFFCD34D.toInt() else Color.WHITE
+            c.drawText(names[k]!!, cx, rowTop + (h - rowTop) * 0.42f, nameP)
+            val m = t[k]
+            c.drawText(if (m == null) "—" else clock12(m), cx, rowTop + (h - rowTop) * 0.82f, timeP)
+        }
         return bmp
     }
 
     private fun frac(x: Double) = abs(x) % 1.0
+
+    /** 12-hour clock in Arabic digits, e.g. ٦:١١. */
+    private fun clock12(m: Int): String {
+        val hr = ((m / 60) + 11) % 12 + 1
+        val s = hr.toString() + ":" + String.format("%02d", m % 60)
+        return s.map { if (it in '0'..'9') '٠' + (it - '0') else it }.joinToString("")
+    }
 }

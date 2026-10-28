@@ -26,6 +26,7 @@ class PrayerWidgetModule(reactContext: ReactApplicationContext) : ReactContextBa
         editor.putString("prayerTime", prayerTime)
         editor.putLong("targetTimeMillis", targetTimeMillis)
         if (data.hasKey("timings")) editor.putString("timings", data.getString("timings"))
+        if (data.hasKey("dateLine")) editor.putString("dateLine", data.getString("dateLine"))
         editor.apply()
 
         // Trigger widget update

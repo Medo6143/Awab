@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Same as the app's home sky: the arc with the prayers (a bitmap from WidgetSky), and under
-     it "باقي على …", the countdown ticking in seconds, and the prayer's time. -->
+<!-- Design 1: the living sky (bitmap from WidgetSky: date, arc with the sun or moon, and the
+     row of today's five prayers), with "باقي على …" and the seconds countdown in the middle. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_container"
     android:layout_width="match_parent"
@@ -17,35 +17,38 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center_horizontal|bottom"
-        android:orientation="vertical"
-        android:paddingBottom="16dp">
+        android:orientation="vertical">
+
+        <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="40" />
 
         <TextView
             android:id="@+id/widget_prayer_name"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="باقي على الفجر"
-            android:textColor="#CCFFFFFF"
-            android:textSize="16sp" />
+            android:textColor="#E6FFFFFF"
+            android:textSize="15sp" />
 
         <!-- ticks every second on the launcher, no app process needed -->
         <Chronometer
             android:id="@+id/widget_countdown"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:textColor="#FFFFFF"
-            android:textSize="46sp"
+            android:textSize="44sp"
             android:textStyle="bold"
-            android:shadowColor="#99000000"
-            android:shadowRadius="10" />
+            android:shadowColor="#80000000"
+            android:shadowRadius="12" />
 
         <TextView
             android:id="@+id/widget_prayer_time"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="٠٤:٣٠"
-            android:textColor="#B3FFFFFF"
-            android:textSize="14sp" />
+            android:gravity="center"
+            android:visibility="gone" />
+
+        <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="28" />
     </LinearLayout>
 </FrameLayout>
