@@ -103,6 +103,14 @@
   }
   h3.group { font-size: 15px; letter-spacing: 0; color: var(--gold-text); margin: 48px 0 8px; display: flex; align-items: center; gap: 10px; }
   h3.group::after { content: ""; flex: 1; height: 1px; background: var(--gold-line); }
+  .cmp { border: 1px solid var(--line); border-radius: 20px; overflow: hidden; background: var(--surface); }
+  .cmp-row { display: grid; grid-template-columns: 1.1fr 1.2fr 1fr; gap: 10px; padding: 13px 16px; border-top: 1px solid var(--line); align-items: center; font-size: 15px; }
+  .cmp-row:first-child { border-top: 0; }
+  .cmp-head { background: var(--raised); font-weight: 700; color: var(--gold-text); }
+  .cmp-row b.y { color: #fff; font-weight: 600; }
+  .cmp-row b.y::before { content: "✓ "; color: var(--gold); }
+  .cmp-row i { font-style: normal; color: #9a8f82; font-size: 14px; }
+  @media (max-width: 600px) { .cmp-row { grid-template-columns: 1fr 1fr; } .cmp-row > span:first-child { grid-column: 1 / -1; color: #b8ab98; font-size: 13px; } .cmp-head > span:first-child { display: none; } }
 </style>
 </head>
 <body>
@@ -115,6 +123,7 @@
       <div class="links">
         <a href="#why">ليه أوّاب؟</a>
         <a href="#features">المميزات</a>
+        <a href="#compare">ليه أوّاب مختلف؟</a>
         <a href="#privacy">الخصوصية</a>
         <a href="#install">طريقة التثبيت</a>
         <a href="#faq">أسئلة</a>
@@ -158,7 +167,7 @@
     <div class="more">
       <div class="card"><h4>تفتكر ربنا وإنت على الموبايل</h4><p>السبحة العائمة فوق أي تطبيق، وتذكير خفيف كل شوية، ورسالة من القرآن كل ما تفتح.</p></div>
       <div class="card"><h4>تحافظ على صلاتك وعبادتك</h4><p>أذان بيصحّي الشاشة، ومنبّه لقيام الليل وأي عبادة تختارها، وورد يومي إنت اللي تحدده.</p></div>
-      <div class="card"><h4>تلاقي مواساة لما تتعب</h4><p>قول إنت حاسس بإيه، وتلاقي آيات بتفسيرها وأحاديث صحيحة ودعاء، كل مرة رسالة مختلفة.</p></div>
+      <div class="card"><h4>رسالة من القرآن كل يوم</h4><p>اختار حالتك، وتطلعلك آية بتفسيرها وحديث صحيح ودعاء، ومع كل ضغطة رسالة جديدة.</p></div>
     </div>
   </div>
 </section>
@@ -309,7 +318,7 @@
       </article>
     </div>
 
-    <h3 class="group">طمأنينة القلب</h3>
+    <h3 class="group">رسائل القرآن والأدعية</h3>
     <div class="features">
       <article class="feature">
         <div class="phone"><video data-src="/media/qmessages.mp4" poster="/media/qmessages.jpg" muted loop playsinline aria-label="رسائل من القرآن"></video></div>
@@ -372,6 +381,29 @@
       <div class="card"><h4>مناسبات السنة</h4><p>الرئيسية بتتغير في رمضان والعيدين ويوم الجمعة.</p></div>
       <div class="card"><h4>ألوان التطبيق</h4><p>ذهبي أو زمردي أو ليلي، اختار اللي يريحك.</p></div>
       <div class="card"><h4>إعدادات بسيطة</h4><p>كل قسم في صفحة لوحده، وملخص فوق بحالة الأذان والإشعارات وتذكيراتك.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="compare">
+  <div class="wrap">
+    <h2>ليه أوّاب مختلف؟</h2>
+    <p class="sub">التطبيقات الإسلامية الشهيرة كتير منها بيعتمد على إعلانات أو اشتراك شهري عشان تفتح كل المميزات، وكتير منها بيستناك إنت تفتحه. أوّاب اتعمل بطريقة تانية.</p>
+    <div class="cmp">
+      <div class="cmp-row cmp-head"><span></span><span>أوّاب</span><span>أغلب التطبيقات</span></div>
+      <div class="cmp-row"><span>كل المميزات مجانًا</span><b class="y">مجاني بالكامل</b><i>جزء مدفوع باشتراك</i></div>
+      <div class="cmp-row"><span>الإعلانات</span><b class="y">مفيش</b><i>في النسخة المجانية</i></div>
+      <div class="cmp-row"><span>حساب وتتبّع</span><b class="y">مفيش، وبياناتك على موبايلك</b><i>غالبًا حساب وأدوات تحليل</i></div>
+      <div class="cmp-row"><span>بيوصلك وإنت على الموبايل</span><b class="y">سبحة عائمة فوق أي تطبيق</b><i>لازم تفتح التطبيق</i></div>
+      <div class="cmp-row"><span>قيام الليل</span><b class="y">منبّه بشاشة كاملة وتلاوة</b><i>إشعار عادي</i></div>
+      <div class="cmp-row"><span>رسالة من القرآن على حالتك</span><b class="y">كل مرة رسالة جديدة</b><i>آية يوم ثابتة</i></div>
+      <div class="cmp-row"><span>ختمتك</span><b class="y">قلب بينوّر مع كل سورة</b><i>شريط تقدّم</i></div>
+      <div class="cmp-row"><span>الأذان</span><b class="y">على شاشة القفل بالترديد والدعاء</b><i>صوت وإشعار</i></div>
+    </div>
+    <div class="more" style="margin-top:28px">
+      <div class="card"><h4>كله في مكان واحد</h4><p>بدل تطبيق للمواقيت، وتاني للمصحف، وتالت للسبحة: الصلاة، والقرآن بالتفسير والتلاوة، والأذكار، والأدعية، والأحاديث، والتذكيرات في تطبيق واحد.</p></div>
+      <div class="card"><h4>بالعربي وبلهجتك</h4><p>معمول لينا من الأول، مش مترجم: الكلام، والمواقيت بالهيئة المصرية وأم القرى، والأذان بأصوات الحرمين.</p></div>
+      <div class="card"><h4>المحتوى مراجَع</h4><p>الآيات من نص المصحف نفسه، والأحاديث صحيحة أو حسنة بمصادرها، والتفسير من كتب التفسير المعروفة.</p></div>
     </div>
   </div>
 </section>
