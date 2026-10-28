@@ -15,6 +15,11 @@ export interface AzanNativeModule {
   releaseLockScreen?(): void;
   didBootRescheduleFail?(): Promise<boolean>;
   clearBootRescheduleFailedFlag?(): void;
+  scheduleReminder?(json: string): Promise<void>;
+  cancelAllReminders?(): Promise<void>;
+  snoozeReminder?(json: string, minutes: number): Promise<void>;
+  getRingingReminder?(): Promise<string | null>;
+  previewReminderSound?(sound: string): void;
 }
 
 export interface FloatingBubbleNativeModule {

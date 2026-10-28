@@ -333,6 +333,52 @@ public class AzanModule extends ReactContextBaseJavaModule {
         prefs.edit().putBoolean("boot_reschedule_failed", false).apply();
     }
 
+    // ── user reminders shown as an alarm (see ReminderAlarms) ──
+
+    @ReactMethod
+    public void scheduleReminder(String json, Promise promise) {
+        try {
+            ReminderAlarms.schedule(getReactApplicationContext(), new JSONObject(json));
+            promise.resolve(true);
+        } catch (JSONException e) {
+            promise.reject("BAD_JSON", e);
+        }
+    }
+
+    @ReactMethod
+    public void cancelAllReminders(Promise promise) {
+        ReminderAlarms.cancelAll(getReactApplicationContext());
+        promise.resolve(true);
+    }
+
+    /** Stops the ringing reminder and rings it again after `minutes`. */
+    @ReactMethod
+    public void snoozeReminder(String json, int minutes, Promise promise) {
+        try {
+            stopAzan();
+            ReminderAlarms.snooze(getReactApplicationContext(), new JSONObject(json), minutes);
+            promise.resolve(true);
+        } catch (JSONException e) {
+            promise.reject("BAD_JSON", e);
+        }
+    }
+
+    /** The reminder that is ringing now, as JSON, or null. */
+    @ReactMethod
+    public void getRingingReminder(Promise promise) {
+        promise.resolve(AzanService.currentReminder());
+    }
+
+    /** Plays a reminder sound for a few seconds, for the sound picker. */
+    @ReactMethod
+    public void previewReminderSound(String sound) {
+        Context context = getReactApplicationContext();
+        Intent intent = new Intent(context, AzanService.class);
+        intent.setAction(AzanService.ACTION_PREVIEW);
+        intent.putExtra("sound", sound);
+        context.startService(intent);
+    }
+
     @ReactMethod
     public void addListener(String eventName) {}
 

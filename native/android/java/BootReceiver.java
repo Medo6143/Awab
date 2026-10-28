@@ -31,6 +31,7 @@ public class BootReceiver extends BroadcastReceiver {
             Intent.ACTION_TIMEZONE_CHANGED.equals(action)) {
 
             rescheduleAzans(context);
+            ReminderAlarms.rearmAll(context);
         }
     }
 

@@ -8,6 +8,8 @@ export type TabParamList = {
   TabAthkar: { type?: 'morning' | 'evening' } | undefined;
 };
 
+export type SettingsSection = 'prayer' | 'alerts' | 'quran' | 'tasbeeh' | 'look';
+
 /** Stack routes keep their Arabic names; they are used across the app for navigate(). */
 export type RootStackParamList = {
   MainTabs: NavigatorScreenParams<TabParamList> | undefined;
@@ -25,8 +27,9 @@ export type RootStackParamList = {
   'الصلاة': undefined;
   'الزكاة': undefined;
   'العبادات': undefined;
-  'الإعدادات': undefined;
+  'الإعدادات': { section?: SettingsSection } | undefined;
   'الإحصائيات': undefined;
+  'التذكيرات': undefined;
 };
 
 /** Every screen can reach every stack route and every tab by name. */

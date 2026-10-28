@@ -2,7 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList, TabParamList } from './types';
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, createNavigationContainerRef } from '@react-navigation/native';
 import { View } from 'react-native';
 import { useAudio } from '../hooks/useAudio';
 import { colors } from '../../shared/theme/tokens';
@@ -28,6 +28,7 @@ import ZakatScreen from '../screens/ZakatScreen';
 import IbadaTodoScreen from '../screens/IbadaTodoScreen';
 import PrayerHubScreen from '../screens/PrayerHubScreen';
 import StatsScreen from '../screens/StatsScreen';
+import RemindersScreen from '../screens/RemindersScreen';
 
 /**
  * Route names:
@@ -53,6 +54,9 @@ const TabNavigator = () => (
   </Tab.Navigator>
 );
 
+/** For screens shown outside the navigator, e.g. the reminder alarm opening the mushaf. */
+export const navigationRef = createNavigationContainerRef<RootStackParamList & TabParamList>();
+
 const navTheme = {
   ...DefaultTheme,
   dark: true,
@@ -64,7 +68,7 @@ const AppNavigation = () => {
   useAudio();
 
   return (
-    <NavigationContainer theme={navTheme}>
+    <NavigationContainer ref={navigationRef} theme={navTheme}>
       <View style={{ flex: 1, backgroundColor: colors.bg }}>
         <Stack.Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: colors.bg } }}>
           <Stack.Screen name="MainTabs" component={TabNavigator} />
@@ -84,6 +88,7 @@ const AppNavigation = () => {
           <Stack.Screen name="العبادات" component={IbadaTodoScreen} />
           <Stack.Screen name="الإعدادات" component={SettingsScreen} />
           <Stack.Screen name="الإحصائيات" component={StatsScreen} />
+          <Stack.Screen name="التذكيرات" component={RemindersScreen} />
         </Stack.Navigator>
       </View>
     </NavigationContainer>

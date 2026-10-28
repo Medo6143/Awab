@@ -76,7 +76,7 @@ const IbadaTodoScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
       <SectionTitle title="الفرائض" />
       <PrayerSquares tasks={obligatory} isLocked={(t) => !t.isCompleted && !!prayerNotYet(t.id, timings as unknown as Record<string, string>)} nextId={nextPrayer ? PRAYER_IDS[nextPrayer.name] : undefined} onToggle={onToggle} />
 
-      <SectionTitle title="السنن والنوافل" />
+      <SectionTitle title="السنن والنوافل" action={{ label: 'ذكّرني بيها', onPress: () => navigation.navigate('التذكيرات') }} />
       {sunnah.map((t) => <TaskRow key={t.id} task={t} onToggle={() => onToggle(t)} />)}
 
       <SectionTitle title="الأذكار والورد" />

@@ -26,6 +26,7 @@ const queryClient = new QueryClient();
 import { syncDailyReset } from './src/presentation/store/slices/athkarSlice';
 import { useNotifications } from './src/presentation/hooks/useNotifications';
 import { AzanVideoModal } from './src/presentation/components/azan/AzanVideoModal';
+import { ReminderAlarm } from './src/presentation/components/reminders/ReminderAlarm';
 import { hideAzanModal } from './src/presentation/store/slices/uiSlice';
 import { RootState } from './src/presentation/store';
 import { useSelector } from 'react-redux';
@@ -95,6 +96,7 @@ const Bootstrapper = ({ children }: { children: React.ReactNode }) => {
         prayerName={azanModal.prayerName} 
         onClose={() => dispatch(hideAzanModal())} 
       />
+      <ReminderAlarm />
       <FloatingTasbeehController />
     </>
   );

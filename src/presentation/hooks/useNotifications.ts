@@ -5,7 +5,11 @@ import { RootState } from '../store';
 import { useDependencies } from '../providers/DependencyProvider';
 import { AzanSettings, DEFAULT_AZAN_SETTINGS, DEFAULT_NOTIFICATION_PREFS } from '../../domain/entities/notifications';
 import { usePrayerTimes } from './usePrayerTimes';
-import { showAzanModal } from '../store/slices/uiSlice';
+import { showAzanModal, showReminderAlarm } from '../store/slices/uiSlice';
+import { RECITER_MAP } from '../../data/services/AudioService';
+
+/** The native alarm opens the app with "reminder:<id>" for the user's own reminders. */
+const REMINDER_PREFIX = 'reminder:';
 import { AudioService } from '../../data/services/AudioService';
 import { PRAYER_AR_NAMES, prayerFromNotification, prayerJustStarted } from '../../domain/entities/prayer';
 
@@ -16,7 +20,9 @@ export const useNotifications = () => {
   const dispatch = useDispatch();
   const { notifications, azanAlarms } = useDependencies();
   const { timings } = usePrayerTimes();
-  const { notificationPrefs, notificationsEnabled, azanSettings: rawAzanSettings } = useSelector((state: RootState) => state.settings);
+  const { notificationPrefs, notificationsEnabled, azanSettings: rawAzanSettings, selectedReciterId } = useSelector((state: RootState) => state.settings);
+  const reminders = useSelector((state: RootState) => state.reminders?.list ?? []);
+  const reciterFolder = RECITER_MAP[selectedReciterId]?.folder;
   
   const azanSettings = useMemo<AzanSettings>(() => ({ ...DEFAULT_AZAN_SETTINGS, ...rawAzanSettings }), [rawAzanSettings]);
   // persisted state from older versions may lack newer keys
@@ -56,7 +62,7 @@ export const useNotifications = () => {
         return;
       }
 
-      const scheduleState = JSON.stringify({ timings, safePrefs, azanSettings, notificationsEnabled });
+      const scheduleState = JSON.stringify({ timings, safePrefs, azanSettings, notificationsEnabled, reminders, reciterFolder });
       if (scheduleState === lastScheduledRef.current) {
         console.log('useNotifications: Scheduling state unchanged. Skipping.');
         return;
@@ -97,7 +103,7 @@ export const useNotifications = () => {
         }
 
         console.log('useNotifications: Re-scheduling all...');
-        await notifications.rescheduleAll({ prefs: safePrefs, azan: azanSettings, timings });
+        await notifications.rescheduleAll({ prefs: safePrefs, azan: azanSettings, timings, reminders, reciterFolder });
         
         lastScheduledRef.current = scheduleState;
         
@@ -135,14 +141,14 @@ export const useNotifications = () => {
       if (prayer && azanSettings.visualAzanEnabled) raiseAzan(prayer);
     });
 
-    const offAzan = azanAlarms.onTriggered((prayerName) => {
-      if (azanSettings.visualAzanEnabled) dispatch(showAzanModal(prayerName));
-    });
+    const raiseAlarm = (name: string) => {
+      if (name.startsWith(REMINDER_PREFIX)) dispatch(showReminderAlarm(name.slice(REMINDER_PREFIX.length)));
+      else if (azanSettings.visualAzanEnabled) dispatch(showAzanModal(name));
+    };
+    const offAzan = azanAlarms.onTriggered(raiseAlarm);
 
     // an alarm that fired while the app was closed
-    azanAlarms.getPending().then((pending) => {
-      if (pending && azanSettings.visualAzanEnabled) dispatch(showAzanModal(pending));
-    });
+    azanAlarms.getPending().then((pending) => { if (pending) raiseAlarm(pending); });
 
     // after a reboot the alarms could not be re-armed (e.g. exact-alarm permission revoked)
     azanAlarms.didBootRescheduleFail().then((failed) => {
@@ -160,5 +166,5 @@ export const useNotifications = () => {
       responseSubscription.remove();
       offAzan();
     };
-  }, [timings, safePrefs, notificationsEnabled, azanSettings, dispatch, notifications, azanAlarms]);
+  }, [timings, safePrefs, notificationsEnabled, azanSettings, reminders, reciterFolder, dispatch, notifications, azanAlarms]);
 };

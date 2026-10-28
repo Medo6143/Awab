@@ -60,7 +60,8 @@
           "color": "#d4af37",
           "sounds": [
             "./assets/audio/azan.mp3",
-            "./assets/audio/sali_ala_nabii.mp3"
+            "./assets/audio/sali_ala_nabii.mp3",
+            "./assets/audio/takbir.mp3"
           ],
           "mode": "production",
           "android": {

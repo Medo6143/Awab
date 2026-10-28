@@ -11,6 +11,7 @@ import { NativePrayerWidget } from './services/NativePrayerWidget';
 import { NativeAzanAlarms } from './services/NativeAzanAlarms';
 import { ExpoNotificationCenter } from './notifications/ExpoNotificationCenter';
 import { PrayerScheduler } from './notifications/PrayerScheduler';
+import { CustomReminderScheduler } from './notifications/CustomReminderScheduler';
 import { AthkarScheduler, DailyWardScheduler, EncouragementScheduler, SpiritualScheduler } from './notifications/ReminderSchedulers';
 import { QuranRepository, TafsirRepository } from '../domain/repositories/QuranRepository';
 import { FloatingSebha } from '../domain/services/FloatingSebha';
@@ -42,6 +43,7 @@ export const createDependencies = (): AppDependencies => ({
     new SpiritualScheduler(),
     new DailyWardScheduler(),
     new EncouragementScheduler(),
+    new CustomReminderScheduler(),
   ]),
 });
 
