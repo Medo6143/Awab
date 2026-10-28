@@ -21,20 +21,19 @@ const SKY: Record<Phase, string[]> = {
 };
 
 /**
- * The sky follows the clock against today's times: night from an hour after isha to fajr,
- * dawn until sunrise, then morning, noon from asr, golden before maghrib, dusk to night.
+ * The sky follows the clock against today's times: dawn from fajr to sunrise, morning to
+ * dhuhr, noon to asr, golden to maghrib, and night (stars and moon) from maghrib to fajr.
  */
 export const phaseAt = (now: Date, timings?: PrayerScheduleTimes): Phase => {
   const m = now.getHours() * 60 + now.getMinutes();
   const t = (k: keyof PrayerScheduleTimes) => minutesOf(timings?.[k] as string | undefined);
   const fajr = t('Fajr'), sunrise = t('Sunrise'), dhuhr = t('Dhuhr'), asr = t('Asr'), maghrib = t('Maghrib'), isha = t('Isha');
   if (fajr == null || maghrib == null || isha == null) return m >= 18 * 60 || m < 5 * 60 ? 'night' : 'morning';
-  if (m < fajr || m >= isha + 60) return 'night';
+  if (m < fajr || m >= maghrib) return 'night';
   if (m < (sunrise ?? fajr + 80)) return 'dawn';
-  if (m < (asr ?? dhuhr ?? 15 * 60)) return 'morning';
-  if (m < maghrib - 40) return 'noon';
-  if (m < maghrib) return 'golden';
-  return 'dusk';
+  if (m < (dhuhr ?? 12 * 60)) return 'morning';
+  if (m < (asr ?? 15 * 60)) return 'noon';
+  return 'golden';
 };
 
 /** Fixed star positions (fraction of width, px from the top) so the sky doesn't reshuffle. */
@@ -168,10 +167,11 @@ export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loadin
       return { ...p, ...(m == null ? arcPoint(0, W, base, peak, pad) : arcPoint(tOf(m), W, base, peak, pad)) };
     });
     const nowM = now.getHours() * 60 + now.getMinutes();
-    // at night the moon crosses the same arc, from isha (left) back to fajr (right)
-    const nightLen = 1440 - (isha - fajr);
-    const intoNight = ((nowM - isha) % 1440 + 1440) % 1440;
-    const body = nowM >= fajr && nowM < isha
+    // at night the moon crosses the same arc, from maghrib (left) back to fajr (right)
+    const maghrib = minutesOf(timings?.Maghrib) ?? isha;
+    const nightLen = 1440 - (maghrib - fajr);
+    const intoNight = ((nowM - maghrib) % 1440 + 1440) % 1440;
+    const body = nowM >= fajr && nowM < maghrib
       ? arcPoint(tOf(nowM), W, base, peak, pad)
       : arcPoint(1 - Math.min(1, intoNight / nightLen), W, base, peak, pad);
     const sr = minutesOf(timings?.Sunrise);

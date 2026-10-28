@@ -85,7 +85,7 @@ class PrayerWidgetProvider : AppWidgetProvider() {
             val name = nxt?.first?.let { AR[it] } ?: prefs.getString("prayerName", "—")
             val time = nxt?.first?.let { k -> t[k]?.let { String.format("%02d:%02d", it / 60, it % 60) } } ?: prefs.getString("prayerTime", "--:--")
             val target = nxt?.second ?: prefs.getLong("targetTimeMillis", 0L)
-            views.setTextViewText(R.id.widget_prayer_name, name)
+            views.setTextViewText(R.id.widget_prayer_name, "باقي على $name")
             views.setTextViewText(R.id.widget_prayer_time, arDigits(time ?: ""))
 
             val remaining = target - System.currentTimeMillis()
@@ -100,7 +100,7 @@ class PrayerWidgetProvider : AppWidgetProvider() {
             val opts = manager.getAppWidgetOptions(id)
             val density = context.resources.displayMetrics.density
             val wDp = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 320).takeIf { it > 0 } ?: 320
-            val hDp = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 120).takeIf { it > 0 } ?: 120
+            val hDp = opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 180).takeIf { it > 0 } ?: 180
             val scale = (density.coerceAtMost(2f))
             try {
                 views.setImageViewBitmap(R.id.widget_sky, WidgetSky.draw((wDp * scale).toInt(), (hDp * scale).toInt(), now, t, nxt?.first, 22 * scale))

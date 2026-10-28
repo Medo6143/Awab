@@ -33,12 +33,11 @@ object WidgetSky {
         val fajr = t["Fajr"]; val maghrib = t["Maghrib"]; val isha = t["Isha"]
         if (fajr == null || maghrib == null || isha == null) return if (now >= 18 * 60 || now < 5 * 60) "night" else "morning"
         return when {
-            now < fajr || now >= isha + 60 -> "night"
+            now < fajr || now >= maghrib -> "night"
             now < (t["Sunrise"] ?: (fajr + 80)) -> "dawn"
-            now < (t["Asr"] ?: (15 * 60)) -> "morning"
-            now < maghrib - 40 -> "noon"
-            now < maghrib -> "golden"
-            else -> "dusk"
+            now < (t["Dhuhr"] ?: (12 * 60)) -> "morning"
+            now < (t["Asr"] ?: (15 * 60)) -> "noon"
+            else -> "golden"
         }
     }
 
@@ -70,7 +69,8 @@ object WidgetSky {
         // the arc: fajr on the right (east), isha on the left, like the app
         val fajr = t["Fajr"]; val isha = t["Isha"]
         if (fajr != null && isha != null && isha > fajr) {
-            val pad = w * 0.07f; val base = h * 0.82f; val peak = h * 0.12f
+            // the arc sits in the top half; the countdown is laid out under it like the app
+            val pad = w * 0.09f; val base = h * 0.46f; val peak = h * 0.06f
             fun point(tt: Float): Pair<Float, Float> {
                 val u = 1 - tt
                 val x = u * u * (w - pad) + 2 * u * tt * (w / 2f) + tt * tt * pad
@@ -84,19 +84,26 @@ object WidgetSky {
                 pathEffect = DashPathEffect(floatArrayOf(5f, 10f), 0f)
             })
             val dot = Paint(Paint.ANTI_ALIAS_FLAG)
+            val label = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER; textSize = h * 0.075f }
+            val names = mapOf("Fajr" to "الفجر", "Dhuhr" to "الظهر", "Asr" to "العصر", "Maghrib" to "المغرب", "Isha" to "العشاء")
             for (k in listOf("Fajr", "Dhuhr", "Asr", "Maghrib", "Isha")) {
                 val m = t[k] ?: continue
                 val (x, y) = point(tOf(m))
                 val isNext = k == next
+                label.color = if (isNext) 0xFFFFD27A.toInt() else Color.argb(210, 255, 255, 255)
+                label.isFakeBoldText = isNext
+                val below = y > base - h * 0.1f
+                c.drawText(names[k]!!, x, if (below) y + h * 0.11f else y - h * 0.05f, label)
                 dot.style = if (isNext || m <= now) Paint.Style.FILL else Paint.Style.STROKE
                 dot.strokeWidth = 2.5f
                 dot.color = if (isNext) 0xFFFFD27A.toInt() else Color.argb(200, 255, 255, 255)
                 c.drawCircle(x, y, if (isNext) 7f else 5f, dot)
             }
 
-            val nightLen = 1440 - (isha - fajr)
-            val into = ((now - isha) % 1440 + 1440) % 1440
-            val (bx, by) = if (now in fajr until isha) point(tOf(now)) else point(1f - (into.toFloat() / nightLen).coerceAtMost(1f))
+            val maghrib = t["Maghrib"] ?: isha
+            val nightLen = 1440 - (maghrib - fajr)
+            val into = ((now - maghrib) % 1440 + 1440) % 1440
+            val (bx, by) = if (now in fajr until maghrib) point(tOf(now)) else point(1f - (into.toFloat() / nightLen).coerceAtMost(1f))
             val glowColor = if (night) 0xFFDFE6FF.toInt() else 0xFFFFD27A.toInt()
             c.drawCircle(bx, by, 34f, Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 shader = RadialGradient(bx, by, 34f, Color.argb(140, Color.red(glowColor), Color.green(glowColor), Color.blue(glowColor)), Color.TRANSPARENT, Shader.TileMode.CLAMP)
@@ -111,7 +118,7 @@ object WidgetSky {
 
         // darken the bottom so the text reads on any phase
         c.drawRect(0f, 0f, w.toFloat(), h.toFloat(), Paint().apply {
-            shader = LinearGradient(0f, h * 0.35f, 0f, h.toFloat(), Color.TRANSPARENT, Color.argb(150, 14, 10, 7), Shader.TileMode.CLAMP)
+            shader = LinearGradient(0f, h * 0.55f, 0f, h.toFloat(), Color.TRANSPARENT, Color.argb(120, 14, 10, 7), Shader.TileMode.CLAMP)
         })
         return bmp
     }
