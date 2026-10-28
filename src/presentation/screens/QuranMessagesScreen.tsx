@@ -1,13 +1,12 @@
 import React, { useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import PagerView from 'react-native-pager-view';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Haptics from 'expo-haptics';
-import { ChevronLeft, ChevronRight, Heart, Shuffle } from 'lucide-react-native';
+import { Heart, Shuffle } from 'lucide-react-native';
 import { ScreenProps } from '../navigation/types';
 import { RootState } from '../store';
 import { toggleLikedCard } from '../store/slices/favoritesSlice';
-import { IconButton, Screen, ScreenHeader } from '../components/ui';
+import { Screen, ScreenHeader } from '../components/ui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HadithCard, SupplicationCard, VerseCard } from '../components/guidance/GuidanceBlocks';
 import { ImageShareModal } from '../components/share/ImageShareModal';
@@ -15,86 +14,58 @@ import { AyahShare, DuaShare } from '../components/share/StoryCard';
 import { ShareStylePicker } from '../components/share/ShareStylePicker';
 import { useAudio } from '../hooks/useAudio';
 import { QURAN_MESSAGES, QuranMessage } from '../../domain/entities/quranMessages';
-import type { Hadith, Supplication, VerseRef } from '../../domain/entities/guidance';
+import type { VerseRef } from '../../domain/entities/guidance';
 import { SURAH_NAMES } from '../../shared/constants/surahs';
 import { toAr } from '../../shared/utils/format';
 import { colors, icon, radius, space, type } from '../../shared/theme/tokens';
-
-type Card =
-  | { kind: 'comfort'; label: string }
-  | { kind: 'verse'; label: string; verse: VerseRef }
-  | { kind: 'hadith'; label: string; hadith: Hadith }
-  | { kind: 'dua'; label: string; dua: Supplication }
-  | { kind: 'tips'; label: string };
 
 type Share =
   | { kind: 'ayah'; text: string; excerpt: string; surah: number; ayah: number }
   | { kind: 'text'; text: string; source: string };
 
-const shuffled = <T,>(list: readonly T[]) => {
-  const a = [...list];
+const shuffled = (n: number) => {
+  const a = Array.from({ length: n }, (_, i) => i);
   for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
   return a;
 };
 
-/** Two verses and up to two hadiths per message, drawn at random so every "رسالة تانية" differs. */
-const VERSES_PER_MESSAGE = 2;
-const HADITHS_PER_MESSAGE = 2;
-
-/** The message for one state, as a deck: a word, verses, hadiths, the dua, then steps. */
-const deckFor = (m: QuranMessage, prev?: Card[]): Card[] => {
-  const seen = new Set((prev ?? []).map(cardKey));
-  // prefer verses and hadiths the last message didn't show
-  const fresh = <T extends Card>(cards: T[]) => [...cards.filter((c) => !seen.has(cardKey(c))), ...cards.filter((c) => seen.has(cardKey(c)))];
-  const verses = fresh(shuffled(m.verses).map((verse) => ({ kind: 'verse' as const, label: 'آية لك', verse }))).slice(0, VERSES_PER_MESSAGE);
-  const hadiths = fresh(shuffled(m.hadiths).map((hadith) => ({ kind: 'hadith' as const, label: 'من هدي النبي ﷺ', hadith }))).slice(0, HADITHS_PER_MESSAGE);
-  return [
-    { kind: 'comfort', label: 'كلمة لك' },
-    ...verses,
-    ...hadiths,
-    ...m.duas.map((dua) => ({ kind: 'dua' as const, label: 'ادعُ بهذا', dua })),
-    { kind: 'tips', label: 'خطوات تعينك' },
-  ];
-};
-
-/** Stable id of a card's content, for likes and for not repeating the last message. */
-const cardKey = (c: Card) =>
-  c.kind === 'verse' ? `v:${c.verse.surah}:${c.verse.from}` : c.kind === 'hadith' ? `h:${c.hadith.source}` : c.kind === 'dua' ? `d:${c.dua.source}` : c.kind;
+/**
+ * The order the state's verses, hadiths and duas come in: shuffled once when the state is
+ * opened, then message n takes item n of each list, so nothing repeats until a list runs out.
+ */
+type Order = { verses: number[]; hadiths: number[]; duas: number[]; n: number };
+const orderFor = (m: QuranMessage): Order => ({ verses: shuffled(m.verses.length), hadiths: shuffled(m.hadiths.length), duas: shuffled(m.duas.length), n: 0 });
+const at = <T,>(list: readonly T[], order: number[], n: number): T | undefined => (list.length ? list[order[n % order.length]] : undefined);
 
 /**
- * "رسائل من القرآن": pick what you are going through, then swipe through cards: a gentle
- * word, verses (listen + al-Sa'di's tafsir), verified hadiths with their explanation, a
- * dua and practical steps. Every card can be liked and shared as an image.
+ * "رسائل من القرآن": pick what you are going through and get one message: a gentle word, a
+ * verse (listen + al-Sa'di's tafsir), a verified hadith, a dua and practical steps.
+ * "رسالة تانية" replaces it with the next one. Each part can be liked and shared as an image.
  */
 const QuranMessagesScreen = ({ navigation, route }: ScreenProps<'رسائل_القرآن'>) => {
   const dispatch = useDispatch();
   const liked = useSelector((s: RootState) => s.favorites?.messageCards ?? []);
   const { playAyah, playSequence } = useAudio();
   const [mood, setMood] = useState<QuranMessage | null>(() => QURAN_MESSAGES.find((m) => m.id === route.params?.mood) ?? null);
-  const [page, setPage] = useState(0);
+  const [order, setOrder] = useState<Order | null>(() => (mood ? orderFor(mood) : null));
   const [shared, setShared] = useState<Share | null>(null);
-  const pager = useRef<PagerView>(null);
-  const navBar = useSafeAreaInsets().bottom;
-  const [deck, setDeck] = useState<Card[]>(() => (mood ? deckFor(mood) : []));
+  const scroll = useRef<ScrollView>(null);
+  const bottom = useSafeAreaInsets().bottom;
 
-  const open = (m: QuranMessage) => { setMood(m); setDeck(deckFor(m)); setPage(0); };
+  const open = (m: QuranMessage) => { setMood(m); setOrder(orderFor(m)); };
   const surprise = () => { Haptics.selectionAsync(); open(QURAN_MESSAGES[Math.floor(Math.random() * QURAN_MESSAGES.length)]); };
-  /** Same state, new verses and hadiths, back to the first card. */
   const another = () => {
-    if (!mood) return;
     Haptics.selectionAsync();
-    setDeck((prev) => deckFor(mood, prev));
-    setPage(0);
-    pager.current?.setPageWithoutAnimation(0);
+    setOrder((o) => (o ? { ...o, n: o.n + 1 } : o));
+    scroll.current?.scrollTo({ y: 0, animated: false });
   };
   const listen = (v: VerseRef) => {
     const to = v.to ?? v.from;
     if (to === v.from) playAyah(v.surah, v.from, SURAH_NAMES[v.surah - 1]);
     else playSequence(Array.from({ length: to - v.from + 1 }, (_, i) => ({ surahId: v.surah, ayahNumber: v.from + i })), `سورة ${SURAH_NAMES[v.surah - 1]}`);
   };
-  const go = (d: number) => pager.current?.setPage(Math.max(0, Math.min(deck.length - 1, page + d)));
 
-  if (!mood) {
+  if (!mood || !order) {
     return (
       <Screen scroll header={<ScreenHeader title="رسائل من القرآن" subtitle="بماذا تشعر الآن؟" onBack={() => navigation.goBack()} />}>
         <Text style={st.lead}>اختر ما تمرّ به، وستجد رسالة من كتاب الله وسنّة نبيه ﷺ تواسيك وتعينك.</Text>
@@ -118,69 +89,71 @@ const QuranMessagesScreen = ({ navigation, route }: ScreenProps<'رسائل_ال
     );
   }
 
-  const cardId = (i: number) => `${mood.id}:${cardKey(deck[i])}`;
+  const verse = at(mood.verses, order.verses, order.n);
+  const hadith = at(mood.hadiths, order.hadiths, order.n);
+  const dua = at(mood.duas, order.duas, order.n);
+  const total = Math.max(mood.verses.length, mood.hadiths.length, 1);
+
+  const Like = ({ id }: { id: string }) => {
+    const key = `${mood.id}:${id}`;
+    return (
+      <TouchableOpacity onPress={() => { Haptics.selectionAsync(); dispatch(toggleLikedCard(key)); }} hitSlop={10} accessibilityRole="button" accessibilityLabel="أعجبتني">
+        <Heart size={icon.size.md} color={colors.gold} fill={liked.includes(key) ? colors.gold : 'transparent'} />
+      </TouchableOpacity>
+    );
+  };
+  const Head = ({ label, id }: { label: string; id: string }) => (
+    <View style={st.cardHead}><Text style={st.cardLabel}>{label}</Text><Like id={id} /></View>
+  );
 
   return (
-    <Screen header={<ScreenHeader title={mood.name} subtitle="رسالة من القرآن" onBack={() => (route.params?.mood ? navigation.goBack() : setMood(null))}
-        right={<IconButton onPress={another} label="رسالة تانية"><Shuffle size={icon.size.md} color={colors.gold} strokeWidth={icon.stroke} /></IconButton>} />} padded={false}>
-      <View style={st.dots}>
-        {deck.map((c, i) => <View key={i} style={[st.dot, i === page && st.dotOn]} />)}
-      </View>
+    <Screen header={<ScreenHeader title={mood.name} subtitle={`رسالة ${toAr((order.n % total) + 1)} من ${toAr(total)}`} onBack={() => (route.params?.mood ? navigation.goBack() : setMood(null))} />} padded={false}>
+      <ScrollView ref={scroll} contentContainerStyle={st.scroll} showsVerticalScrollIndicator={false}>
+        <View style={st.comfort}><Text style={st.comfortText}>{mood.comfort}</Text></View>
 
-      {/* pinned RTL like the mushaf: swipe right for the next card */}
-      <PagerView key={deck.map(cardKey).join('|')} ref={pager} style={{ flex: 1 }} initialPage={0} layoutDirection="rtl" onPageSelected={(e) => setPage(e.nativeEvent.position)}>
-        {deck.map((card, i) => (
-          <View key={i} style={st.page}>
-            <ScrollView contentContainerStyle={st.cardScroll} showsVerticalScrollIndicator={false}>
-              <View style={st.cardHead}>
-                <Text style={st.cardLabel}>{card.label}</Text>
-                <TouchableOpacity onPress={() => { Haptics.selectionAsync(); dispatch(toggleLikedCard(cardId(i))); }} hitSlop={10} accessibilityRole="button" accessibilityLabel="أعجبتني">
-                  <Heart size={icon.size.md} color={colors.gold} fill={liked.includes(cardId(i)) ? colors.gold : 'transparent'} />
-                </TouchableOpacity>
-              </View>
-
-              {card.kind === 'comfort' ? (
-                <View style={st.comfort}><Text style={st.comfortText}>{mood.comfort}</Text></View>
-              ) : card.kind === 'verse' ? (
-                <VerseCard
-                  verse={card.verse}
-                  withTafsir
-                  onListen={() => listen(card.verse)}
-                  onShare={({ text, excerpt }) => setShared({ kind: 'ayah', text, excerpt, surah: card.verse.surah, ayah: card.verse.from })}
-                />
-              ) : card.kind === 'hadith' ? (
-                <HadithCard hadith={card.hadith} onShare={() => setShared({ kind: 'text', text: card.hadith.text, source: card.hadith.source })} />
-              ) : card.kind === 'dua' ? (
-                <SupplicationCard dua={card.dua} onShare={() => setShared({ kind: 'text', text: card.dua.text, source: card.dua.source })} />
-              ) : (
-                <View>
-                  {mood.tips.map((t) => (
-                    <View key={t} style={st.tip}>
-                      <View style={st.tipDot} />
-                      <Text style={st.tipText}>{t}</Text>
-                    </View>
-                  ))}
-                  {mood.care ? <Text style={st.care}>{mood.care}</Text> : null}
-                  <TouchableOpacity style={st.surprise} onPress={another} accessibilityRole="button" activeOpacity={0.85}>
-                    <Shuffle size={icon.size.md} color={colors.onGold} />
-                    <Text style={st.surpriseText}>رسالة تانية</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </ScrollView>
+        {verse ? (
+          <View style={st.block}>
+            <Head label="آية لك" id={`v:${verse.surah}:${verse.from}`} />
+            <VerseCard
+              key={`${verse.surah}:${verse.from}`}
+              verse={verse}
+              withTafsir
+              onListen={() => listen(verse)}
+              onShare={({ text, excerpt }) => setShared({ kind: 'ayah', text, excerpt, surah: verse.surah, ayah: verse.from })}
+            />
           </View>
-        ))}
-      </PagerView>
+        ) : null}
 
-      <View style={[st.nav, { paddingBottom: space[3] + navBar }]}>
-        <TouchableOpacity style={[st.navBtn, page === 0 && st.navOff]} onPress={() => go(-1)} disabled={page === 0} accessibilityLabel="السابق">
-          <ChevronRight size={icon.size.md} color={colors.gold} />
-          <Text style={st.navText}>السابق</Text>
-        </TouchableOpacity>
-        <Text style={st.navCount}>{toAr(page + 1)} / {toAr(deck.length)}</Text>
-        <TouchableOpacity style={[st.navBtn, page === deck.length - 1 && st.navOff]} onPress={() => go(1)} disabled={page === deck.length - 1} accessibilityLabel="التالي">
-          <Text style={st.navText}>التالي</Text>
-          <ChevronLeft size={icon.size.md} color={colors.gold} />
+        {hadith ? (
+          <View style={st.block}>
+            <Head label="من هدي النبي ﷺ" id={`h:${hadith.source}`} />
+            <HadithCard hadith={hadith} onShare={() => setShared({ kind: 'text', text: hadith.text, source: hadith.source })} />
+          </View>
+        ) : null}
+
+        {dua ? (
+          <View style={st.block}>
+            <Head label="ادعُ بهذا" id={`d:${dua.source}`} />
+            <SupplicationCard dua={dua} onShare={() => setShared({ kind: 'text', text: dua.text, source: dua.source })} />
+          </View>
+        ) : null}
+
+        <View style={st.block}>
+          <Text style={st.cardLabel}>خطوات تعينك</Text>
+          {mood.tips.map((t) => (
+            <View key={t} style={st.tip}>
+              <View style={st.tipDot} />
+              <Text style={st.tipText}>{t}</Text>
+            </View>
+          ))}
+          {mood.care ? <Text style={st.care}>{mood.care}</Text> : null}
+        </View>
+      </ScrollView>
+
+      <View style={[st.footer, { paddingBottom: space[3] + bottom }]}>
+        <TouchableOpacity style={st.another} onPress={another} accessibilityRole="button" activeOpacity={0.85}>
+          <Shuffle size={icon.size.md} color={colors.onGold} />
+          <Text style={st.surpriseText}>رسالة تانية</Text>
         </TouchableOpacity>
       </View>
 
@@ -205,25 +178,19 @@ const st = StyleSheet.create({
   moodName: { ...type.bodyMedium, fontFamily: 'Tajawal_700Bold', fontSize: 16, color: colors.text },
   moodHint: { ...type.caption, color: colors.textMuted },
 
-  dots: { flexDirection: 'row', justifyContent: 'center', gap: 5, paddingVertical: space[2] },
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.surfaceRaised },
-  dotOn: { width: 18, backgroundColor: colors.gold },
-  page: { flex: 1, paddingHorizontal: 20 },
-  cardScroll: { paddingBottom: space[6] },
+  scroll: { paddingHorizontal: 20, paddingBottom: space[6] },
+  block: { marginTop: space[6] },
   cardHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: space[3] },
-  cardLabel: { ...type.h2, color: colors.text },
-  comfort: { backgroundColor: colors.goldSoft, borderRadius: radius.card, padding: space[5] },
-  comfortText: { fontFamily: 'Tajawal_500Medium', fontSize: 18, color: colors.text, lineHeight: 32 },
+  cardLabel: { ...type.h2, color: colors.text, marginBottom: space[2] },
+  comfort: { backgroundColor: colors.goldSoft, borderRadius: radius.card, padding: space[5], marginTop: space[2] },
+  comfortText: { fontFamily: 'Tajawal_500Medium', fontSize: 17, color: colors.text, lineHeight: 30 },
   tip: { flexDirection: 'row', alignItems: 'flex-start', gap: space[3], marginBottom: space[3] },
   tipDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.gold, marginTop: 9 },
   tipText: { ...type.body, color: colors.textSoft, lineHeight: 25, flex: 1 },
   care: { ...type.caption, color: colors.textMuted, lineHeight: 20, marginTop: space[4], padding: space[3], borderRadius: radius.field, backgroundColor: colors.surface },
 
-  nav: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: space[3] },
-  navBtn: { flexDirection: 'row', alignItems: 'center', gap: space[1], backgroundColor: colors.surface, borderRadius: radius.pill, paddingHorizontal: space[4], paddingVertical: space[2] },
-  navOff: { opacity: 0.4 },
-  navText: { ...type.label, color: colors.gold },
-  navCount: { ...type.caption, color: colors.textMuted },
+  footer: { paddingHorizontal: 20, paddingTop: space[3], borderTopWidth: 1, borderTopColor: colors.hairline, backgroundColor: colors.bg },
+  another: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space[2], height: 52, borderRadius: radius.pill, backgroundColor: colors.gold },
 });
 
 export default QuranMessagesScreen;
