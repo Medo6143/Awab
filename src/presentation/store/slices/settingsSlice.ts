@@ -20,6 +20,8 @@ interface SettingsState {
   selectedReciterId: string;
   notificationPrefs: NotificationPrefs;
   calculationMethod: number;
+  /** 'auto' follows the country's official method (see prayerMethods.ts). */
+  prayerMethod?: 'auto' | number;
   azanSettings: AzanSettings;
   shareCardStyle: ShareCardStyle;
   shareTextSize: ShareTextSize;
@@ -104,6 +106,9 @@ export const settingsSlice = createSlice({
         (state.notificationPrefs as Record<string, unknown>)[key] = !current;
       }
     },
+    setPrayerMethod: (state, action: PayloadAction<'auto' | number>) => {
+      state.prayerMethod = action.payload;
+    },
     setCalculationMethod: (state, action: PayloadAction<number>) => {
       state.calculationMethod = action.payload;
     },
@@ -144,6 +149,7 @@ export const {
   setReciterId,
   toggleNotificationCategory,
   setCalculationMethod,
+  setPrayerMethod,
   setAzanSettings,
   setPrePrayerReminderOffset,
   setDailyWardTime,

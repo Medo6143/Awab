@@ -11,10 +11,11 @@ import { RootState } from '../store';
 import {
   toggleNotifications, toggleLocation, setTafsirId, setTafsirStyle, setTafsirFontSize,
   setAccentTheme, setReciterId, toggleNotificationCategory, setAzanSettings,
-  setDailyWardTime, setEncouragementInterval, toggleTasbeehHaptics, setAsrMethod, toggleTasbeehTargetAlert,
+  setDailyWardTime, setEncouragementInterval, toggleTasbeehHaptics, setAsrMethod, toggleTasbeehTargetAlert, setPrayerMethod,
 } from '../store/slices/settingsSlice';
 import { setFloatingScale, setFloatingBubbleColor, toggleFloatingBorder, toggleFloatingReset, setFloatingReminderInterval } from '../store/slices/tasbeehSlice';
 import { RECITER_MAP } from '../../data/services/AudioService';
+import { methodName } from '../../domain/entities/prayerMethods';
 import { AZAN_TYPES } from '../components/settings/AzanConstants';
 import { colors, icon, radius, space, type } from '../../shared/theme/tokens';
 import { toAr } from '../../shared/utils/format';
@@ -22,7 +23,7 @@ import { toAr } from '../../shared/utils/format';
 import { IconTile, Screen, ScreenHeader } from '../components/ui';
 import {
   SettingSection, ItemRow, ThemeSelector, ReciterSelector, TafsirSettings,
-  NotificationSettings, AzanSelector, FloatingTasbeehSettings, AsrMethodSelector,
+  NotificationSettings, AzanSelector, FloatingTasbeehSettings, AsrMethodSelector, PrayerMethodSelector,
 } from '../components/settings/SettingsComponents';
 import { AzanReadinessCard } from '../components/settings/AzanReadinessCard';
 import { s } from '../components/settings/SettingsStyles';
@@ -115,8 +116,10 @@ const SectionBody = ({ section, navigation }: { section: Section; navigation: Sc
   const {
     notificationsEnabled, locationEnabled, selectedTafsirId, tafsirStyle, tafsirFontSize,
     accentTheme, selectedReciterId, notificationPrefs, azanSettings: rawAzanSettings,
-    tasbeehHaptics = true, tasbeehTargetAlert = true, asrMethod = 'auto',
+    tasbeehHaptics = true, tasbeehTargetAlert = true, asrMethod = 'auto', prayerMethod = 'auto',
   } = useSelector((state: RootState) => state.settings);
+  // the method today's times were actually fetched with
+  const usedMethod = useSelector((state: RootState) => state.prayer.cachedData?.meta?.method?.id);
   const { floatingScale, floatingBubbleColor, floatingShowBorder, floatingShowReset, floatingReminderInterval } = useSelector((state: RootState) => state.tasbeeh);
   const reminders = useSelector((state: RootState) => state.reminders?.list ?? []);
   // persisted state from older versions may lack newer keys
@@ -130,6 +133,7 @@ const SectionBody = ({ section, navigation }: { section: Section; navigation: Sc
           <SettingSection title="الأذان">
             <AzanSelector azanSettings={azanSettings} onUpdate={(update) => dispatch(setAzanSettings(update))} />
             <ItemRow icon={MapPin} label="مواقيت الصلاة حسب الموقع" value={locationEnabled} onValueChange={() => dispatch(toggleLocation())} />
+            <PrayerMethodSelector value={prayerMethod} auto={usedMethod != null ? methodName(usedMethod) : 'هتظهر بعد تحديد موقعك'} onSelect={(v) => dispatch(setPrayerMethod(v))} />
             <AsrMethodSelector value={asrMethod} onSelect={(v) => dispatch(setAsrMethod(v))} />
           </SettingSection>
           <View style={{ marginTop: 12 }}><AzanReadinessCard /></View>

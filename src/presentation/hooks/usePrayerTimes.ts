@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toAr } from '../../shared/utils/format';
+import { methodForCountry } from '../../domain/entities/prayerMethods';
 import { useLocation } from './useLocation';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
@@ -14,7 +15,7 @@ export const usePrayerTimes = () => {
   const dispatch = useDispatch();
   const { prayerWidget } = useDependencies();
   const { coords, countryCode, error: locationError } = useLocation();
-  const { calculationMethod: manualMethod, asrMethod } = useSelector((state: RootState) => state.settings);
+  const { prayerMethod = 'auto', asrMethod } = useSelector((state: RootState) => state.settings);
   const { cachedData, lastFetchedDate, status } = useSelector((state: RootState) => state.prayer);
   // stored times show at once; a slow GPS fix only refreshes them later
   const [nextPrayer, setNextPrayer] = useState<NextPrayer | null>(() => (cachedData ? PrayerTimeService.getNextPrayer(cachedData.timings) : null));
@@ -59,14 +60,8 @@ export const usePrayerTimes = () => {
         // 2: Islamic Society of North America (ISNA) - Fallback or detect
         // 3: Muslim World League (MWL) - Common fallback
         
-        let targetMethod = manualMethod;
-        
-        // Auto-detect if user is in specialized zones to match their local authoritative timing
-        if (countryCode === 'EG') {
-          targetMethod = 5; // الهيئة المصرية العامة للمساحة
-        } else if (countryCode === 'SA') {
-          targetMethod = 4; // جامعة أم القرى
-        }
+        // the country's official method unless the user picked one (prayerMethods.ts)
+        const targetMethod = prayerMethod === 'auto' ? methodForCountry(countryCode) : prayerMethod;
 
         const school = asrSchoolFor(asrMethod, countryCode);
 
@@ -97,7 +92,7 @@ export const usePrayerTimes = () => {
         }
       })();
     }
-  }, [coords, countryCode, manualMethod, asrMethod, dispatch, retryTick]);
+  }, [coords, countryCode, prayerMethod, asrMethod, dispatch, retryTick]);
 
   // Update remaining time for the App UI every minute
   useEffect(() => {

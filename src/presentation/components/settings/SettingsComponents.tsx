@@ -1,3 +1,4 @@
+import { PRAYER_METHODS } from '../../../domain/entities/prayerMethods';
 import React from 'react';
 import { View, Text, Switch, TouchableOpacity } from 'react-native';
 import {
@@ -107,6 +108,20 @@ const ASR_METHODS: { id: AsrMethod; name: string }[] = [
 ];
 
 /** How Asr is timed: by country (Hanafi in Pakistan/India/Bangladesh/Afghanistan), majority, or Hanafi. */
+/** The calculation method: automatic by country, or one picked from the official ones. */
+export const PrayerMethodSelector = ({ value, auto, onSelect }: { value: 'auto' | number; auto: string; onSelect: (v: 'auto' | number) => void }) => (
+  <View style={s.subSection}>
+    <SubLabel icon={Clock3} text="طريقة حساب المواقيت" />
+    <View style={s.chipsWrap}>
+      <Chip label="تلقائي حسب بلدك" size="sm" selected={value === 'auto'} onPress={() => onSelect('auto')} />
+      {PRAYER_METHODS.map((m) => <Chip key={m.id} label={m.name} size="sm" selected={value === m.id} onPress={() => onSelect(m.id)} />)}
+    </View>
+    <Text style={[s.itemSub, { marginTop: 8 }]}>
+      {value === 'auto' ? `التلقائي بيستخدم الطريقة الرسمية في بلدك: ${auto}.` : 'غيّرها لو مواقيت مسجدك مختلفة.'}
+    </Text>
+  </View>
+);
+
 export const AsrMethodSelector = ({ value, onSelect }: { value: AsrMethod; onSelect: (v: AsrMethod) => void }) => (
   <View style={s.subSection}>
     <SubLabel icon={Clock3} text="حساب وقت العصر" />
@@ -114,7 +129,7 @@ export const AsrMethodSelector = ({ value, onSelect }: { value: AsrMethod; onSel
       {ASR_METHODS.map((o) => <Chip key={o.id} label={o.name} size="sm" selected={value === o.id} onPress={() => onSelect(o.id)} style={{ flex: 1, justifyContent: 'center' }} />)}
     </View>
     <Text style={[s.itemSub, { marginTop: 8 }]}>
-      الجمهور (الشافعي والمالكي والحنبلي) هو المعتمد في مصر ومعظم الدول. التلقائي يختار الحنفي في باكستان والهند وبنغلاديش وأفغانستان فقط.
+      الجمهور (الشافعي والمالكي والحنبلي) هو المعتمد في معظم الدول. التلقائي يختار الحنفي في باكستان والهند وبنغلاديش وأفغانستان فقط.
     </Text>
   </View>
 );

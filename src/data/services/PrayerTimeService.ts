@@ -14,7 +14,8 @@ export class PrayerTimeService {
   static async getPrayerTimes(latitude: number, longitude: number, method: number = 4, school: AsrSchool = 0) {
     try {
       const response = await prayerApi.get(`/timings`, {
-        params: { latitude, longitude, method, school },
+        // far north or south, fajr and isha never reach their angles in summer: use the angle-based rule
+        params: { latitude, longitude, method, school, ...(Math.abs(latitude) >= 48 && { latitudeAdjustmentMethod: 3 }) },
       });
       return response.data.data;
     } catch (error) {
