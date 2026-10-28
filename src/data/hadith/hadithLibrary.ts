@@ -68,3 +68,11 @@ export const hadithOfTheDay = (date = new Date()): HadithIndexEntry => {
   const day = Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
   return strip(entries[(day * 7919) % entries.length]);
 };
+
+/** Any hadith but `exceptId`, for "حديث تاني". */
+export const randomHadith = (exceptId?: number): HadithIndexEntry => {
+  const { entries } = load();
+  let e = entries[Math.floor(Math.random() * entries.length)];
+  if (e.id === exceptId && entries.length > 1) e = entries[(entries.indexOf(e) + 1) % entries.length];
+  return strip(e);
+};

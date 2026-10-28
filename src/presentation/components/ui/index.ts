@@ -8,3 +8,4 @@ export { StatNumber } from './StatNumber';
 export { ProgressBar, ProgressRing } from './Progress';
 export { EmptyState, ErrorState, Skeleton } from './States';
 export { IconTile } from './IconTile';
+export { Sheet } from './Sheet';

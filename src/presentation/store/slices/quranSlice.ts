@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { DEFAULT_WIRD, WirdMode, WirdState } from '../../../domain/entities/wird';
 
 /** The heart tracks two journeys through the 114 surahs. */
 export type HeartMode = 'reading' | 'hifz';
@@ -23,6 +24,7 @@ interface QuranState {
   memorizedSurahs: number[]; // surahIds memorized in the current hifz round
   khatmat: Khatma[];
   khatmaStartedAt: Partial<Record<HeartMode, string>>; // when the current round got its first surah
+  wird: WirdState;
 }
 
 const initialState: QuranState = {
@@ -36,6 +38,7 @@ const initialState: QuranState = {
   memorizedSurahs: [],
   khatmat: [],
   khatmaStartedAt: {},
+  wird: DEFAULT_WIRD,
 };
 
 const listOf = (state: QuranState, mode: HeartMode) =>
@@ -107,6 +110,20 @@ export const quranSlice = createSlice({
       },
       prepare: (p: { mode: HeartMode; ids: number[] }) => stamped(p),
     },
+    // `??=`: state persisted before the wird existed lacks it
+    setWirdGoal: (state, action: PayloadAction<{ pages: number; mode: WirdMode }>) => {
+      state.wird = { ...(state.wird ?? DEFAULT_WIRD), ...action.payload };
+    },
+    /** The goal for one day in "daily" mode. */
+    setTodayWird: (state, action: PayloadAction<{ date: string; pages: number }>) => {
+      (state.wird ??= { ...DEFAULT_WIRD }).today = action.payload;
+    },
+    /** "زوّد": more pages for today only, on top of the goal. */
+    addWirdToday: (state, action: PayloadAction<{ date: string; pages: number }>) => {
+      const w = (state.wird ??= { ...DEFAULT_WIRD });
+      const prev = w.extra?.date === action.payload.date ? w.extra.pages : 0;
+      w.extra = { date: action.payload.date, pages: Math.max(0, prev + action.payload.pages) };
+    },
     finishKhatma: {
       reducer: (state, action: PayloadAction<{ mode: HeartMode; now: string }>) => {
         const { mode, now } = action.payload;
@@ -126,6 +143,6 @@ export const quranSlice = createSlice({
 export const { 
   updateProgress, toggleBookmark, setCurrentSurah, 
   setCurrentPage, togglePageBookmark, toggleSurahCompleted,
-  setCompletedSurahs, finishKhatma
+  setCompletedSurahs, finishKhatma, setWirdGoal, setTodayWird, addWirdToday
 } = quranSlice.actions;
 export default quranSlice.reducer;

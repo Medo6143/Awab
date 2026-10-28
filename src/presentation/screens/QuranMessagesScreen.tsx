@@ -1,13 +1,13 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import PagerView from 'react-native-pager-view';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Haptics from 'expo-haptics';
-import { ChevronLeft, ChevronRight, Heart } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, Heart, Shuffle } from 'lucide-react-native';
 import { ScreenProps } from '../navigation/types';
 import { RootState } from '../store';
 import { toggleLikedCard } from '../store/slices/favoritesSlice';
-import { Screen, ScreenHeader } from '../components/ui';
+import { IconButton, Screen, ScreenHeader } from '../components/ui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HadithCard, SupplicationCard, VerseCard } from '../components/guidance/GuidanceBlocks';
 import { ImageShareModal } from '../components/share/ImageShareModal';
@@ -31,14 +31,35 @@ type Share =
   | { kind: 'ayah'; text: string; excerpt: string; surah: number; ayah: number }
   | { kind: 'text'; text: string; source: string };
 
-/** The message for one state, as a deck: a word, each verse, each hadith, the dua, then steps. */
-const deckFor = (m: QuranMessage): Card[] => [
-  { kind: 'comfort', label: 'كلمة لك' },
-  ...m.verses.map((verse) => ({ kind: 'verse' as const, label: 'آية لك', verse })),
-  ...m.hadiths.map((hadith) => ({ kind: 'hadith' as const, label: 'من هدي النبي ﷺ', hadith })),
-  ...m.duas.map((dua) => ({ kind: 'dua' as const, label: 'ادعُ بهذا', dua })),
-  { kind: 'tips', label: 'خطوات تعينك' },
-];
+const shuffled = <T,>(list: readonly T[]) => {
+  const a = [...list];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+};
+
+/** Two verses and up to two hadiths per message, drawn at random so every "رسالة تانية" differs. */
+const VERSES_PER_MESSAGE = 2;
+const HADITHS_PER_MESSAGE = 2;
+
+/** The message for one state, as a deck: a word, verses, hadiths, the dua, then steps. */
+const deckFor = (m: QuranMessage, prev?: Card[]): Card[] => {
+  const seen = new Set((prev ?? []).map(cardKey));
+  // prefer verses and hadiths the last message didn't show
+  const fresh = <T extends Card>(cards: T[]) => [...cards.filter((c) => !seen.has(cardKey(c))), ...cards.filter((c) => seen.has(cardKey(c)))];
+  const verses = fresh(shuffled(m.verses).map((verse) => ({ kind: 'verse' as const, label: 'آية لك', verse }))).slice(0, VERSES_PER_MESSAGE);
+  const hadiths = fresh(shuffled(m.hadiths).map((hadith) => ({ kind: 'hadith' as const, label: 'من هدي النبي ﷺ', hadith }))).slice(0, HADITHS_PER_MESSAGE);
+  return [
+    { kind: 'comfort', label: 'كلمة لك' },
+    ...verses,
+    ...hadiths,
+    ...m.duas.map((dua) => ({ kind: 'dua' as const, label: 'ادعُ بهذا', dua })),
+    { kind: 'tips', label: 'خطوات تعينك' },
+  ];
+};
+
+/** Stable id of a card's content, for likes and for not repeating the last message. */
+const cardKey = (c: Card) =>
+  c.kind === 'verse' ? `v:${c.verse.surah}:${c.verse.from}` : c.kind === 'hadith' ? `h:${c.hadith.source}` : c.kind === 'dua' ? `d:${c.dua.source}` : c.kind;
 
 /**
  * "رسائل من القرآن": pick what you are going through, then swipe through cards: a gentle
@@ -54,9 +75,18 @@ const QuranMessagesScreen = ({ navigation, route }: ScreenProps<'رسائل_ال
   const [shared, setShared] = useState<Share | null>(null);
   const pager = useRef<PagerView>(null);
   const navBar = useSafeAreaInsets().bottom;
-  const deck = useMemo(() => (mood ? deckFor(mood) : []), [mood]);
+  const [deck, setDeck] = useState<Card[]>(() => (mood ? deckFor(mood) : []));
 
-  const open = (m: QuranMessage) => { setMood(m); setPage(0); };
+  const open = (m: QuranMessage) => { setMood(m); setDeck(deckFor(m)); setPage(0); };
+  const surprise = () => { Haptics.selectionAsync(); open(QURAN_MESSAGES[Math.floor(Math.random() * QURAN_MESSAGES.length)]); };
+  /** Same state, new verses and hadiths, back to the first card. */
+  const another = () => {
+    if (!mood) return;
+    Haptics.selectionAsync();
+    setDeck((prev) => deckFor(mood, prev));
+    setPage(0);
+    pager.current?.setPageWithoutAnimation(0);
+  };
   const listen = (v: VerseRef) => {
     const to = v.to ?? v.from;
     if (to === v.from) playAyah(v.surah, v.from, SURAH_NAMES[v.surah - 1]);
@@ -68,6 +98,10 @@ const QuranMessagesScreen = ({ navigation, route }: ScreenProps<'رسائل_ال
     return (
       <Screen scroll header={<ScreenHeader title="رسائل من القرآن" subtitle="بماذا تشعر الآن؟" onBack={() => navigation.goBack()} />}>
         <Text style={st.lead}>اختر ما تمرّ به، وستجد رسالة من كتاب الله وسنّة نبيه ﷺ تواسيك وتعينك.</Text>
+        <TouchableOpacity style={st.surprise} onPress={surprise} accessibilityRole="button" activeOpacity={0.85}>
+          <Shuffle size={icon.size.md} color={colors.onGold} />
+          <Text style={st.surpriseText}>فاجئني برسالة</Text>
+        </TouchableOpacity>
         <View style={st.grid}>
           {QURAN_MESSAGES.map((m) => {
             const Icon = m.icon;
@@ -84,16 +118,17 @@ const QuranMessagesScreen = ({ navigation, route }: ScreenProps<'رسائل_ال
     );
   }
 
-  const cardId = (i: number) => `${mood.id}:${i}`;
+  const cardId = (i: number) => `${mood.id}:${cardKey(deck[i])}`;
 
   return (
-    <Screen header={<ScreenHeader title={mood.name} subtitle="رسالة من القرآن" onBack={() => (route.params?.mood ? navigation.goBack() : setMood(null))} />} padded={false}>
+    <Screen header={<ScreenHeader title={mood.name} subtitle="رسالة من القرآن" onBack={() => (route.params?.mood ? navigation.goBack() : setMood(null))}
+        right={<IconButton onPress={another} label="رسالة تانية"><Shuffle size={icon.size.md} color={colors.gold} strokeWidth={icon.stroke} /></IconButton>} />} padded={false}>
       <View style={st.dots}>
         {deck.map((c, i) => <View key={i} style={[st.dot, i === page && st.dotOn]} />)}
       </View>
 
       {/* pinned RTL like the mushaf: swipe right for the next card */}
-      <PagerView ref={pager} style={{ flex: 1 }} initialPage={0} layoutDirection="rtl" onPageSelected={(e) => setPage(e.nativeEvent.position)}>
+      <PagerView key={deck.map(cardKey).join('|')} ref={pager} style={{ flex: 1 }} initialPage={0} layoutDirection="rtl" onPageSelected={(e) => setPage(e.nativeEvent.position)}>
         {deck.map((card, i) => (
           <View key={i} style={st.page}>
             <ScrollView contentContainerStyle={st.cardScroll} showsVerticalScrollIndicator={false}>
@@ -126,6 +161,10 @@ const QuranMessagesScreen = ({ navigation, route }: ScreenProps<'رسائل_ال
                     </View>
                   ))}
                   {mood.care ? <Text style={st.care}>{mood.care}</Text> : null}
+                  <TouchableOpacity style={st.surprise} onPress={another} accessibilityRole="button" activeOpacity={0.85}>
+                    <Shuffle size={icon.size.md} color={colors.onGold} />
+                    <Text style={st.surpriseText}>رسالة تانية</Text>
+                  </TouchableOpacity>
                 </View>
               )}
             </ScrollView>
@@ -159,6 +198,8 @@ const QuranMessagesScreen = ({ navigation, route }: ScreenProps<'رسائل_ال
 const st = StyleSheet.create({
   lead: { ...type.body, color: colors.textSoft, lineHeight: 26, marginBottom: space[4] },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space[3] },
+  surprise: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space[2], height: 48, borderRadius: radius.pill, backgroundColor: colors.gold, marginVertical: space[4] },
+  surpriseText: { ...type.bodyMedium, fontFamily: 'Tajawal_700Bold', color: colors.onGold },
   moodCard: { width: '47%', flexGrow: 1, backgroundColor: colors.surface, borderRadius: radius.card, padding: space[4], gap: space[2] },
   moodIcon: { width: 44, height: 44, borderRadius: radius.tile, backgroundColor: colors.goldSoft, alignItems: 'center', justifyContent: 'center' },
   moodName: { ...type.bodyMedium, fontFamily: 'Tajawal_700Bold', fontSize: 16, color: colors.text },

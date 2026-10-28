@@ -11,15 +11,15 @@ import { space } from '../../shared/theme/tokens';
 import { Screen } from '../components/ui';
 import { SkyButton, SkyHero } from '../components/home/SkyHero';
 import { Activity, Settings } from 'lucide-react-native';
-import { ContinueCard, DayStats } from '../components/home/DayCards';
+import { DayStats } from '../components/home/DayCards';
+import { WirdCard } from '../components/home/WirdCard';
+import { getLocalToday } from '../store/slices/statsSlice';
 import { HomeGrid } from '../components/home/HomeSections';
 import { MORNING_ATHKAR, EVENING_ATHKAR } from '../../shared/constants/athkar';
 import { SURAH_START_PAGE } from '../../domain/entities/surahPages';
 import { SURAH_NAMES } from '../../shared/constants/surahs';
 import { DailyMessageCard } from '../components/home/DailyMessageCard';
 import { DailyReportModal } from '../components/home/DailyReportModal';
-
-const todayKey = () => new Date().toISOString().split('T')[0];
 
 const PRAYER_TASKS: Record<string, string> = { fajr: 'Fajr', dhuhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha' };
 const ATHKAR_TEXTS = new Set([...MORNING_ATHKAR, ...EVENING_ATHKAR].map((a) => a.text));
@@ -63,7 +63,7 @@ const HomeScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   };
 
   const navigateTo = (route: PlainRoute) => navigation.navigate(route);
-  const today = dailyRecords[todayKey()];
+  const today = dailyRecords[getLocalToday()];
   // the day's tasbih from the sebha and the floating bead; athkar taps are logged by their text and left out
   const tasbeehCount = Object.entries(today?.dhikrDetails ?? {}).reduce((sum, [name, n]) => (ATHKAR_TEXTS.has(name) ? sum : sum + n), 0);
 
@@ -95,7 +95,7 @@ const HomeScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
       />
 
       <View style={{ paddingHorizontal: 20, marginTop: -space[4] }}>
-      <ContinueCard surahName={`سورة ${surahOfPage(currentPage)}`} page={currentPage} onPress={() => navigateTo('TabQuran')} />
+      <WirdCard surahName={`سورة ${surahOfPage(currentPage)}`} page={currentPage} onRead={() => navigateTo('TabQuran')} />
       <DayStats
         items={[
           { key: 'athkar', label: evening ? 'أذكار المساء' : 'أذكار الصباح', value: athkarDone, total: athkarList.length, onPress: () => navigateTo('TabAthkar') },
