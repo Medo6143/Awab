@@ -252,6 +252,7 @@ public class AzanService extends Service {
                 .setContentTitle(title)
                 .setContentText(body == null || body.isEmpty() ? "حان موعد تذكيرك" : body)
                 .setSmallIcon(R.drawable.notification_icon)
+                .setLargeIcon(android.graphics.BitmapFactory.decodeResource(getResources(), R.drawable.owwab_logo)) // the app's coloured logo inside the notification
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -448,6 +449,7 @@ public class AzanService extends Service {
                 .setContentTitle("حان موعد صلاة " + prayerName)
                 .setContentText("حيَّ على الصلاة • حيَّ على الفلاح")
                 .setSmallIcon(R.drawable.notification_icon)
+                .setLargeIcon(android.graphics.BitmapFactory.decodeResource(getResources(), R.drawable.owwab_logo)) // the app's coloured logo inside the notification
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
