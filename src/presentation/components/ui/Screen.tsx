@@ -38,7 +38,8 @@ export const Screen = ({ children, scroll, tab, padded = true, header, style, co
           {children}
         </ScrollView>
       ) : (
-        <View style={[styles.fill, padding, contentStyle]}>{children}</View>
+        // tab screens keep their last row above the floating tab bar
+        <View style={[styles.fill, padding, contentStyle, tab && { paddingBottom: bottom }]}>{children}</View>
       )}
     </SafeAreaView>
   );
