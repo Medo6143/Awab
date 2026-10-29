@@ -7,7 +7,9 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "apk:emu": "node scripts/apk.js emu",
+    "apk:phone": "node scripts/apk.js phone"
   },
   "dependencies": {
     "@expo-google-fonts/amiri": "^0.4.1",
@@ -38,7 +40,6 @@
     "expo-splash-screen": "~31.0.13",
     "expo-status-bar": "~3.0.9",
     "expo-updates": "~29.0.19",
-    "expo-video": "~3.0.16",
     "lucide-react-native": "^0.577.0",
     "nativewind": "^4.2.2",
     "react": "19.1.0",

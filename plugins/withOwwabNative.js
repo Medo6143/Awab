@@ -19,6 +19,7 @@ const {
   withMainActivity,
   AndroidConfig,
   withAndroidStyles,
+  withGradleProperties,
 } = require('@expo/config-plugins');
 const fs = require('fs');
 const path = require('path');
@@ -260,11 +261,25 @@ function withDarkWindowBackground(config) {
   });
 }
 
+/**
+ * Default release builds to real phones only (arm64 + armv7). The emulator's x86_64
+ * libraries are ~18 MB per ABI no phone uses; build them on demand with
+ * -PreactNativeArchitectures=x86_64 (npm run apk:emu).
+ */
+function withPhoneArchitectures(config) {
+  return withGradleProperties(config, (cfg) => {
+    cfg.modResults = cfg.modResults.filter((p) => !(p.type === 'property' && p.key === 'reactNativeArchitectures'));
+    cfg.modResults.push({ type: 'property', key: 'reactNativeArchitectures', value: 'armeabi-v7a,arm64-v8a' });
+    return cfg;
+  });
+}
+
 module.exports = function withOwwabNative(config) {
   config = withNativeSources(config);
   config = withNativeManifest(config);
   config = withNativePackages(config);
   config = withAzanIntent(config);
   config = withDarkWindowBackground(config);
+  config = withPhoneArchitectures(config);
   return config;
 };

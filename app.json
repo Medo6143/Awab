@@ -69,7 +69,6 @@
           }
         }
       ],
-      "expo-video",
       [
         "expo-media-library",
         {

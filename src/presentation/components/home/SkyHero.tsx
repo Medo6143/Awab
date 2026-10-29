@@ -167,13 +167,11 @@ export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loadin
       return { ...p, ...(m == null ? arcPoint(0, W, base, peak, pad) : arcPoint(tOf(m), W, base, peak, pad)) };
     });
     const nowM = now.getHours() * 60 + now.getMinutes();
-    // at night the moon crosses the same arc, from maghrib (left) back to fajr (right)
+    // the sun travels fajr -> maghrib; at night the moon carries on from maghrib to isha and rests there until fajr
     const maghrib = minutesOf(timings?.Maghrib) ?? isha;
-    const nightLen = 1440 - (maghrib - fajr);
-    const intoNight = ((nowM - maghrib) % 1440 + 1440) % 1440;
     const body = nowM >= fajr && nowM < maghrib
       ? arcPoint(tOf(nowM), W, base, peak, pad)
-      : arcPoint(1 - Math.min(1, intoNight / nightLen), W, base, peak, pad);
+      : arcPoint(nowM >= maghrib ? tOf(nowM) : 1, W, base, peak, pad);
     const sr = minutesOf(timings?.Sunrise);
     const sunrise = sr == null ? null : arcPoint(tOf(sr), W, base, peak, pad);
     return { points, body, sunrise };

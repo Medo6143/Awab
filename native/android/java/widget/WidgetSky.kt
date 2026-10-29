@@ -95,9 +95,8 @@ object WidgetSky {
             }
 
             val maghrib = t["Maghrib"] ?: isha
-            val nightLen = 1440 - (maghrib - fajr)
-            val into = ((now - maghrib) % 1440 + 1440) % 1440
-            val (bx, by) = if (now in fajr until maghrib) point(tOf(now)) else point(1f - (into.toFloat() / nightLen).coerceAtMost(1f))
+            // the moon carries on from maghrib to isha, then rests at isha until fajr
+            val (bx, by) = if (now in fajr until maghrib) point(tOf(now)) else point(if (now >= maghrib) tOf(now) else 1f)
             val glowColor = if (night) 0xFFDFE6FF.toInt() else 0xFFFFD27A.toInt()
             c.drawCircle(bx, by, 34f, Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 shader = RadialGradient(bx, by, 34f, Color.argb(140, Color.red(glowColor), Color.green(glowColor), Color.blue(glowColor)), Color.TRANSPARENT, Shader.TileMode.CLAMP)

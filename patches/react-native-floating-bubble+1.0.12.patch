@@ -1369,7 +1369,7 @@ index 0000000..6d82c51
 +        int c;
 +        try { c = Color.parseColor(hex); } catch (Exception e) { return NATURAL_WOOD; }
 +        if (c == 0xFFB8860B || c == 0xFFD4AF37) return NATURAL_WOOD;
-+        float t = c == Color.BLACK ? 0.7f : 0.5f;
++        float t = c == Color.BLACK ? 0.8f : 0.88f;
 +        return mix(NATURAL_WOOD, c, t);
 +    }
 +
@@ -1468,14 +1468,14 @@ index 0000000..6d82c51
 +                if (s == 0) grain.moveTo(x, y); else grain.lineTo(x, y);
 +            }
 +            paint.setStrokeWidth(b.width() * (i % 3 == 0 ? 0.012f : 0.006f));
-+            paint.setColor(alpha(shade(wood, 0.55f), i % 3 == 0 ? 70 : 40));
++            paint.setColor(alpha(shade(wood, 0.5f), i % 3 == 0 ? 110 : 65));
 +            canvas.drawPath(grain, paint);
 +        }
 +        // a couple of soft knots of darker grain
 +        paint.setStyle(Paint.Style.STROKE);
 +        for (int k = 0; k < 3; k++) {
 +            paint.setStrokeWidth(b.width() * 0.006f);
-+            paint.setColor(alpha(shade(wood, 0.5f), 45));
++            paint.setColor(alpha(shade(wood, 0.45f), 75));
 +            float kx = b.left + b.width() * 0.22f, ky = b.top + b.height() * 0.62f;
 +            tmp.set(kx - b.width() * (0.05f + k * 0.03f), ky - b.width() * (0.02f + k * 0.015f),
 +                    kx + b.width() * (0.05f + k * 0.03f), ky + b.width() * (0.02f + k * 0.015f));

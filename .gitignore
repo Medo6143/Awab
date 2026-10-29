@@ -45,3 +45,4 @@ yarn-error.*
 # landing page build output
 landing/owwab.apk
 landing/.vercel
+videos/
