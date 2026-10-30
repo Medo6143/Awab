@@ -29,6 +29,7 @@ import IbadaTodoScreen from '../screens/IbadaTodoScreen';
 import PrayerHubScreen from '../screens/PrayerHubScreen';
 import StatsScreen from '../screens/StatsScreen';
 import RemindersScreen from '../screens/RemindersScreen';
+import TasmeeScreen from '../screens/TasmeeScreen';
 
 /**
  * Route names:
@@ -89,6 +90,7 @@ const AppNavigation = () => {
           <Stack.Screen name="الإعدادات" component={SettingsScreen} />
           <Stack.Screen name="الإحصائيات" component={StatsScreen} />
           <Stack.Screen name="التذكيرات" component={RemindersScreen} />
+          <Stack.Screen name="التسميع" component={TasmeeScreen} />
         </Stack.Navigator>
       </View>
     </NavigationContainer>

@@ -8,6 +8,15 @@ export type TabParamList = {
   TabAthkar: { type?: 'morning' | 'evening' } | undefined;
 };
 
+export type TasmeeParams = {
+  fromPage: number;
+  toPage: number;
+  help?: 'none' | 'firstWord' | 'firstLetter';
+  surah?: number;
+  startAyah?: number;
+  only?: number[];
+};
+
 export type SettingsSection = 'prayer' | 'alerts' | 'quran' | 'tasbeeh' | 'look';
 
 /** Stack routes keep their Arabic names; they are used across the app for navigate(). */
@@ -30,6 +39,11 @@ export type RootStackParamList = {
   'الإعدادات': { section?: SettingsSection } | undefined;
   'الإحصائيات': undefined;
   'التذكيرات': undefined;
+  /**
+   * Recite mushaf pages `fromPage..toPage` from memory. Optional filters narrow which ayahs
+   * are covered: one surah, from one ayah on (global number), or a list (retrying mistakes).
+   */
+  'التسميع': TasmeeParams;
 };
 
 /** Every screen can reach every stack route and every tab by name. */

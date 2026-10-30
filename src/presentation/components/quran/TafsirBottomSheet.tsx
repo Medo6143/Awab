@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, Modal, Pressable, Animated, ScrollView, TouchableOpacity, Share, ActivityIndicator, StyleSheet } from 'react-native';
-import { Share2, Copy, Star, Play, X } from 'lucide-react-native';
+import { Share2, Copy, Star, Play, X, Mic } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import { s } from './QuranStyles';
 import { colors } from '../../../shared/theme/tokens';
@@ -27,11 +27,13 @@ interface Props {
   onClose: () => void;
   onToggleBookmark: () => void;
   onPlayAyah: (surah: number, ayah: number, surahName?: string) => void;
+  /** Start tasmee from this ayah. */
+  onTasmeeFrom?: (ayah: Ayah) => void;
 }
 
 export const TafsirBottomSheet = ({
   visible, selectedAyah, tafsir, tafsirName, tafsirLoading, tafsirError, onRetryTafsir, tafsirStyle, tafsirFontSize,
-  bottomSheetAnim, bookmarks, onClose, onToggleBookmark, onPlayAyah
+  bottomSheetAnim, bookmarks, onClose, onToggleBookmark, onPlayAyah, onTasmeeFrom
 }: Props) => {
 
   const [shareOpen, setShareOpen] = useState(false);
@@ -103,6 +105,12 @@ export const TafsirBottomSheet = ({
                     <Text style={s.ayahPreviewRef}>
                       {selectedAyah.surah.name} ﴿{toAr(selectedAyah.numberInSurah)}﴾
                     </Text>
+                    {onTasmeeFrom ? (
+                      <TouchableOpacity style={s.tasmeeBtn} onPress={() => onTasmeeFrom(selectedAyah)} accessibilityRole="button" activeOpacity={0.85}>
+                        <Mic size={18} color={colors.paper} />
+                        <Text style={s.tasmeeBtnText}>سمّع من الآية دي</Text>
+                      </TouchableOpacity>
+                    ) : null}
                   </View>
                   <TafsirSwitcher />
                   {renderTafsirContent()}

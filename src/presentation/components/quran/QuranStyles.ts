@@ -76,6 +76,8 @@ export const s = StyleSheet.create({
   modernTitle: { ...type.h2, color: colors.paperInk },
   modernText: { fontFamily: 'Amiri_400Regular' },
 
+  tasmeeBtn: { flexDirection: 'row', alignSelf: 'center', alignItems: 'center', gap: space[2], marginTop: space[4], backgroundColor: colors.paperInk, borderRadius: radius.pill, paddingHorizontal: space[5], height: 42 },
+  tasmeeBtnText: { ...type.label, fontSize: 14, color: colors.paper },
   sheetToolBar: { flexDirection: 'row', paddingVertical: space[3], paddingHorizontal: space[5], justifyContent: 'space-around', backgroundColor: colors.paperDeep },
   sheetToolBtn: { alignItems: 'center', gap: 4 },
   sheetToolLab: { ...type.caption, color: colors.paperInk },

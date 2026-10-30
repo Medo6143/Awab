@@ -13,6 +13,12 @@ export interface Khatma {
   finishedAt: string;
 }
 
+/** Last self-check of one ayah in tasmee (memorization recital). */
+export interface TasmeeMark {
+  ok: boolean;
+  at: string; // ISO date of the recital
+}
+
 interface QuranState {
   progress: Record<number, number>; // surahId -> completedAyahs count
   completedSurahs: number[]; // surahIds marked as fully read
@@ -25,6 +31,7 @@ interface QuranState {
   khatmat: Khatma[];
   khatmaStartedAt: Partial<Record<HeartMode, string>>; // when the current round got its first surah
   wird: WirdState;
+  tasmee: Record<number, Record<number, TasmeeMark>>; // surahId -> ayah -> last result
 }
 
 const initialState: QuranState = {
@@ -39,6 +46,7 @@ const initialState: QuranState = {
   khatmat: [],
   khatmaStartedAt: {},
   wird: DEFAULT_WIRD,
+  tasmee: {},
 };
 
 const listOf = (state: QuranState, mode: HeartMode) =>
@@ -124,6 +132,24 @@ export const quranSlice = createSlice({
       const prev = w.extra?.date === action.payload.date ? w.extra.pages : 0;
       w.extra = { date: action.payload.date, pages: Math.max(0, prev + action.payload.pages) };
     },
+    /**
+     * Results of one tasmee session. When every ayah of the surah has passed, the surah
+     * joins the hifz heart, so memorizing is earned by reciting, not only by a tap.
+     */
+    recordTasmee: {
+      reducer: (state, action: PayloadAction<{ surah: number; total: number; results: { ayah: number; ok: boolean }[]; now: string }>) => {
+        const { surah, total, results, now } = action.payload;
+        const marks = ((state.tasmee ??= {})[surah] ??= {});
+        for (const r of results) marks[r.ayah] = { ok: r.ok, at: now };
+        const all = total > 0 && Array.from({ length: total }, (_, i) => marks[i + 1]?.ok).every(Boolean);
+        const list = listOf(state, 'hifz');
+        if (all && !list.includes(surah)) {
+          list.push(surah);
+          markStarted(state, 'hifz', now);
+        }
+      },
+      prepare: (p: { surah: number; total: number; results: { ayah: number; ok: boolean }[] }) => stamped(p),
+    },
     finishKhatma: {
       reducer: (state, action: PayloadAction<{ mode: HeartMode; now: string }>) => {
         const { mode, now } = action.payload;
@@ -143,6 +169,6 @@ export const quranSlice = createSlice({
 export const { 
   updateProgress, toggleBookmark, setCurrentSurah, 
   setCurrentPage, togglePageBookmark, toggleSurahCompleted,
-  setCompletedSurahs, finishKhatma, setWirdGoal, setTodayWird, addWirdToday
+  setCompletedSurahs, finishKhatma, setWirdGoal, setTodayWird, addWirdToday, recordTasmee
 } = quranSlice.actions;
 export default quranSlice.reducer;

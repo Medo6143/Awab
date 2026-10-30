@@ -62,3 +62,19 @@ export const searchAyahs = (query: string, limit = 60): { hits: AyahHit[]; total
   const all = phrase.concat(loose);
   return { hits: all.slice(0, limit).map(({ norm: _norm, ...hit }) => hit), total: all.length };
 };
+
+/** Ayahs printed on one mushaf page, in order (offline, from the bundled text). */
+export const ayahsOnPage = (page: number): { surah: number; ayah: number }[] =>
+  load().filter((e) => e.page === page).map((e) => ({ surah: e.surah, ayah: e.ayah }));
+
+/** Mushaf page an ayah is printed on, and its global number (1..6236). */
+export const ayahRef = (surah: number, ayah: number): { page: number; number: number } | undefined => {
+  const e = load().find((x) => x.surah === surah && x.ayah === ayah);
+  return e ? { page: e.page, number: e.number } : undefined;
+};
+
+/** First and last mushaf page of a surah. */
+export const surahPageRange = (surah: number): { from: number; to: number } => {
+  const pages = load().filter((e) => e.surah === surah).map((e) => e.page);
+  return { from: Math.min(...pages), to: Math.max(...pages) };
+};
