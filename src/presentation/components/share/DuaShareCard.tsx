@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
-import { colors, themed } from '../../../shared/theme/tokens';
+import { night } from '../../../shared/theme/tokens';
 import { useShareCardSize } from './ImageShareModal';
 import { layoutAyahCard } from './ayahCardLayout';
 import { useShareTextMax } from './storyThemes';
@@ -38,15 +38,15 @@ export const DuaShareCard = ({ text, source }: { text: string; source: string })
   );
 };
 
-const st = themed(() => ({
-  card: { backgroundColor: colors.bg, justifyContent: 'space-between', direction: 'rtl' },
-  frame: { position: 'absolute', borderWidth: 1.2, borderColor: colors.goldLine },
+const st = StyleSheet.create({
+  card: { backgroundColor: night.bg, justifyContent: 'space-between', direction: 'rtl' },
+  frame: { position: 'absolute', borderWidth: 1.2, borderColor: night.goldLine },
   brand: { flexDirection: 'row', alignItems: 'center' },
-  brandName: { fontFamily: 'Tajawal_800ExtraBold', color: colors.gold },
-  brandSub: { fontFamily: 'Tajawal_500Medium', color: colors.textMuted },
+  brandName: { fontFamily: 'Tajawal_800ExtraBold', color: night.gold },
+  brandSub: { fontFamily: 'Tajawal_500Medium', color: night.textMuted },
   middle: { flex: 1, justifyContent: 'center', overflow: 'hidden' },
-  label: { fontFamily: 'Tajawal_700Bold', color: colors.gold, textAlign: 'center' },
-  body: { fontFamily: 'Amiri_700Bold', color: colors.text, textAlign: 'center' },
-  source: { fontFamily: 'Tajawal_500Medium', color: colors.textMuted, textAlign: 'center' },
-  footer: { fontFamily: 'Tajawal_500Medium', color: colors.textFaint, textAlign: 'center' },
-}));
+  label: { fontFamily: 'Tajawal_700Bold', color: night.gold, textAlign: 'center' },
+  body: { fontFamily: 'Amiri_700Bold', color: night.text, textAlign: 'center' },
+  source: { fontFamily: 'Tajawal_500Medium', color: night.textMuted, textAlign: 'center' },
+  footer: { fontFamily: 'Tajawal_500Medium', color: night.textFaint, textAlign: 'center' },
+});

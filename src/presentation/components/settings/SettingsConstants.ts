@@ -1,4 +1,4 @@
-import { ACCENTS, AccentKey } from '../../../shared/theme/tokens';
+import { AccentKey } from '../../../shared/theme/tokens';
 import { TafsirStyle } from '../../store/slices/settingsSlice';
 
 /** The short tafsir; the "simple" style always uses it. */
@@ -18,8 +18,8 @@ export const STYLES_LIST: { id: TafsirStyle; name: string }[] = [
   { id: 'modern', name: 'عصري' },
 ];
 
-export const THEME_LIST: { id: AccentKey; name: string; color: string }[] = [
-  { id: 'gold', name: 'ذهبي', color: ACCENTS.gold.accent },
-  { id: 'emerald', name: 'زمردي', color: ACCENTS.emerald.accent },
-  { id: 'midnight', name: 'ليلي', color: ACCENTS.midnight.accent },
+export const THEME_LIST: { id: AccentKey; name: string }[] = [
+  { id: 'gold', name: 'ذهبي' },
+  { id: 'emerald', name: 'زمردي' },
+  { id: 'midnight', name: 'ليلي' },
 ];

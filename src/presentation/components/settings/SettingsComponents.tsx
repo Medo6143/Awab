@@ -9,7 +9,7 @@ import { s } from './SettingsStyles';
 import { TAFSIR_LIST, STYLES_LIST, THEME_LIST } from './SettingsConstants';
 import { RECITER_MAP } from '../../../data/services/AudioService';
 import { Chip, IconTile, SectionTitle } from '../ui';
-import { colors, icon } from '../../../shared/theme/tokens';
+import { ACCENTS, colors, icon } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 import { toAr } from '../../../shared/utils/format';
 import { AccentKey } from '../../../shared/theme/tokens';
@@ -88,7 +88,7 @@ export const ThemeSelector = ({ accentTheme, onSelect }: { accentTheme: AccentKe
         const active = accentTheme === t.id;
         return (
           <TouchableOpacity key={t.id} style={[s.themeBtn, active && { backgroundColor: colors.goldSoft }]} onPress={() => onSelect(t.id)} accessibilityRole="radio" accessibilityState={{ selected: active }}>
-            <View style={[s.colorCircle, { backgroundColor: t.color }]}>{active ? <Check size={16} color="#fff" style={{ margin: 6 }} /> : null}</View>
+            <View style={[s.colorCircle, { backgroundColor: ACCENTS[t.id].accent }]}>{active ? <Check size={16} color="#fff" style={{ margin: 6 }} /> : null}</View>
             <Text style={[s.themeBtnText, active && { color: colors.text }]}>{t.name}</Text>
           </TouchableOpacity>
         );

@@ -3,8 +3,7 @@ import { useColorScheme } from 'react-native';
 import { useSelector } from 'react-redux';
 import { StatusBar } from 'expo-status-bar';
 import { isLightTheme, setLightTheme } from './tokens';
-
-type ThemeMode = 'light' | 'dark' | 'system';
+import type { ThemeMode } from '../../presentation/store/slices/settingsSlice';
 
 /**
  * Picks the palette from the «المظهر» setting (or the phone's own setting) before anything
@@ -24,9 +23,3 @@ export const ThemeRoot = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-/** Whether the light palette is on screen, for code that picks colours outside the tokens. */
-export const useIsLight = () => {
-  const mode = useSelector((s: { settings?: { theme?: ThemeMode } }) => s.settings?.theme) ?? 'dark';
-  const system = useColorScheme();
-  return mode === 'light' || (mode === 'system' && system === 'light');
-};

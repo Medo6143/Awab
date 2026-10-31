@@ -59,6 +59,9 @@ const dark = {
 };
 export type Palette = { readonly [K in keyof typeof dark]: string };
 
+/** The dark palette whatever the theme: for full-screen art and shared images that keep one look. */
+export const night: Palette = dark;
+
 /** Warm paper-white; the gold is darker so it still reads on a light surface. */
 const light: Palette = {
   ...dark,
