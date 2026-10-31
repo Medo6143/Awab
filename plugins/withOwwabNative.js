@@ -272,7 +272,8 @@ function withDarkWindowBackground(config) {
  *
  * R8 shrinks the Java code and drops unused resources (about 20 MB). Classes reached only
  * from JNI or by name are kept: the app's own native code (azan, widget, battery), ONNX
- * Runtime, the mic stream, the floating bubble and the track player.
+ * Runtime, the mic stream, the floating bubble, the track player and expo-notifications
+ * (saved with Java serialization). The adhan sounds are kept by res/raw/owwab_keep.xml.
  */
 const PROPERTIES = {
   reactNativeArchitectures: 'arm64-v8a',
@@ -288,6 +289,18 @@ const KEEP_RULES = `
 -keep class com.doublesymmetry.** { *; }
 -keep class com.google.android.exoplayer2.** { *; }
 -dontwarn ai.onnxruntime.**
+
+# expo-notifications saves every scheduled notification with Java serialization, so the
+# class names and their writeObject/readObject have to survive or reminders never fire
+-keep class expo.modules.notifications.** { *; }
+-keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
+    private static final java.io.ObjectStreamField[] serialPersistentFields;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}
 `;
 
 function withPhoneArchitectures(config) {
@@ -299,7 +312,9 @@ function withPhoneArchitectures(config) {
   return withDangerousMod(config, ['android', (cfg) => {
     const file = path.join(cfg.modRequest.platformProjectRoot, 'app', 'proguard-rules.pro');
     const src = fs.readFileSync(file, 'utf8');
-    if (!src.includes('# owwab:')) fs.writeFileSync(file, src.trimEnd() + '\n' + KEEP_RULES);
+    // replace an older copy of the rules, so a change here reaches an existing android/ folder
+    const base = src.includes('# owwab:') ? src.slice(0, src.indexOf('# owwab:')) : src;
+    fs.writeFileSync(file, base.trimEnd() + '\n' + KEEP_RULES);
     return cfg;
   }]);
 }
