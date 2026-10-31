@@ -2,14 +2,14 @@
 /**
  * Builds the release APK for one target and installs it.
  *   npm run apk:emu    → x86_64 only (the Android emulator), installs on the running emulator
- *   npm run apk:phone  → arm64 + armv7 (real phones), installs on the USB-connected phone
+ *   npm run apk:phone  → arm64 (every phone since ~2017), installs on the USB-connected phone
  * Run `npx expo prebuild --platform android` first after changing app.json or plugins.
  */
 const { execSync, spawnSync } = require('child_process');
 const path = require('path');
 
 const target = process.argv[2];
-const ABIS = { emu: 'x86_64', phone: 'armeabi-v7a,arm64-v8a' };
+const ABIS = { emu: 'x86_64', phone: 'arm64-v8a' };
 if (!ABIS[target]) {
   console.error('usage: node scripts/apk.js <emu|phone>');
   process.exit(1);
