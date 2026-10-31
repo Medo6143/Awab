@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AzanService finds these sounds by name (getIdentifier), so resource shrinking cannot see
+     that they are used and would drop them from the APK. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@raw/azan,@raw/takbir,@raw/sali_ala_nabii" />
