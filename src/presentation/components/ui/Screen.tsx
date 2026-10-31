@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View, ViewStyle, StyleProp } from 'react-native';
 import { SafeAreaView, Edge, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, layout, space } from '../../../shared/theme/tokens';
+import { colors, layout, space, themed } from '../../../shared/theme/tokens';
 
 type Props = {
   children: React.ReactNode;
@@ -45,7 +45,7 @@ export const Screen = ({ children, scroll, tab, padded = true, header, style, co
   );
 };
 
-const styles = StyleSheet.create({
+const styles = themed(() => ({
   root: { flex: 1, backgroundColor: colors.bg },
   fill: { flex: 1 },
-});
+}));

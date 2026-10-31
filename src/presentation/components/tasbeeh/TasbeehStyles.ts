@@ -1,9 +1,9 @@
 import { StyleSheet, Dimensions } from 'react-native';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 
 const { width } = Dimensions.get('window');
 
-export const s = StyleSheet.create({
+export const s = themed(() => ({
   root: { flex: 1, backgroundColor: colors.bg },
   totalBadge: { backgroundColor: colors.goldSoft, paddingHorizontal: space[3], paddingVertical: 6, borderRadius: radius.pill },
   totalText: { ...type.label, color: colors.goldText },
@@ -48,4 +48,4 @@ export const s = StyleSheet.create({
   suggestionsLabel: { ...type.label, color: colors.textMuted, marginBottom: space[2] },
   suggestionChip: { backgroundColor: colors.goldSoft, paddingHorizontal: space[4], paddingVertical: space[2], borderRadius: radius.pill },
   suggestionText: { ...type.label, color: colors.goldText },
-});
+}));

@@ -155,9 +155,13 @@ function withNativePackages(config) {
       `add(${pkg}.widget.PrayerWidgetPackage())`,
       `add(${pkg}.AzanPackage())`,
       `add(${pkg}.OemBatteryPackage())`,
+      // Expo's autolinking leaves onnxruntime-react-native out of PackageList (its gradle
+      // project is still built), so the recitation model's native module is added here
+      'add(ai.onnxruntime.reactnative.OnnxruntimePackage())',
     ];
-    if (!src.includes('AzanPackage()')) {
-      src = src.replace(marker, `${marker}\n              ${lines.join('\n              ')}`);
+    const missing = lines.filter((l) => !src.includes(l));
+    if (missing.length) {
+      src = src.replace(marker, `${marker}\n              ${missing.join('\n              ')}`);
     }
     config.modResults.contents = src;
     return config;
@@ -262,16 +266,42 @@ function withDarkWindowBackground(config) {
 }
 
 /**
- * Default release builds to real phones only (arm64 + armv7). The emulator's x86_64
- * libraries are ~18 MB per ABI no phone uses; build them on demand with
- * -PreactNativeArchitectures=x86_64 (npm run apk:emu).
+ * Release builds for 64-bit phones only: every phone sold since about 2017 is arm64, and the
+ * 32-bit armv7 copies of the native libraries cost 37 MB (24 MB of it the recitation model's
+ * runtime). The emulator's x86_64 build is made on demand (npm run apk:emu).
+ *
+ * R8 shrinks the Java code and drops unused resources (about 20 MB). Classes reached only
+ * from JNI or by name are kept: the app's own native code (azan, widget, battery), ONNX
+ * Runtime, the mic stream, the floating bubble and the track player.
  */
+const PROPERTIES = {
+  reactNativeArchitectures: 'arm64-v8a',
+  'android.enableMinifyInReleaseBuilds': 'true',
+  'android.enableShrinkResourcesInReleaseBuilds': 'true',
+};
+const KEEP_RULES = `
+# owwab: classes reached from JNI, the manifest or by name
+-keep class com.mohamewael66sorganization.owwab.** { *; }
+-keep class ai.onnxruntime.** { *; }
+-keep class com.imxiqi.rnliveaudiostream.** { *; }
+-keep class com.reactlibrary.** { *; }
+-keep class com.doublesymmetry.** { *; }
+-keep class com.google.android.exoplayer2.** { *; }
+-dontwarn ai.onnxruntime.**
+`;
+
 function withPhoneArchitectures(config) {
-  return withGradleProperties(config, (cfg) => {
-    cfg.modResults = cfg.modResults.filter((p) => !(p.type === 'property' && p.key === 'reactNativeArchitectures'));
-    cfg.modResults.push({ type: 'property', key: 'reactNativeArchitectures', value: 'armeabi-v7a,arm64-v8a' });
+  config = withGradleProperties(config, (cfg) => {
+    cfg.modResults = cfg.modResults.filter((p) => !(p.type === 'property' && p.key in PROPERTIES));
+    for (const [key, value] of Object.entries(PROPERTIES)) cfg.modResults.push({ type: 'property', key, value });
     return cfg;
   });
+  return withDangerousMod(config, ['android', (cfg) => {
+    const file = path.join(cfg.modRequest.platformProjectRoot, 'app', 'proguard-rules.pro');
+    const src = fs.readFileSync(file, 'utf8');
+    if (!src.includes('# owwab:')) fs.writeFileSync(file, src.trimEnd() + '\n' + KEEP_RULES);
+    return cfg;
+  }]);
 }
 
 module.exports = function withOwwabNative(config) {

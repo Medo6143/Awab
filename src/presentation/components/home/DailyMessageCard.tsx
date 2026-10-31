@@ -8,7 +8,7 @@ import type { HadithIndexEntry } from '../../../domain/entities/hadith';
 import { randomHadith } from '../../../data/hadith/hadithLibrary';
 import { useVerseText } from '../../hooks/useGuidance';
 import { verseLabel } from '../guidance/GuidanceBlocks';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 
 /** Every (state, verse) pair across the Quran messages, as [moodIndex, verseIndex]. */
 const ALL_VERSES = QURAN_MESSAGES.flatMap((m, i) => m.verses.map((_, j) => [i, j] as const));
@@ -74,7 +74,7 @@ export const DailyMessageCard = ({ onOpenMessage, onOpenHadith }: { onOpenMessag
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   tag: { alignSelf: 'flex-start', backgroundColor: colors.goldSoft, borderRadius: radius.pill, paddingHorizontal: space[3], paddingVertical: 3, marginBottom: space[3] },
   tagText: { ...type.caption, color: colors.gold },
   verse: { fontFamily: 'Amiri_700Bold', fontSize: 20, lineHeight: 38, color: colors.text, textAlign: 'center' },
@@ -89,4 +89,4 @@ const st = StyleSheet.create({
   mainText: { ...type.label, color: colors.onGold },
   small: { flexDirection: 'row', alignItems: 'center', gap: 4, height: 40, paddingHorizontal: space[3], borderRadius: radius.pill, backgroundColor: colors.goldSoft },
   smallText: { ...type.label, color: colors.goldText },
-});
+}));

@@ -17,6 +17,11 @@ import { HeartJourneyHeader, HeartNarrative } from '../components/heart/HeartJou
 import { JuzSelectionModal, BulkMarkModal } from '../components/heart/HeartModals';
 import { JUZ_SURAH_RANGES, toAr } from '../components/heart/HeartJourneyConstants';
 import { ModeSwitch } from '../components/heart/ModeSwitch';
+import { HeartSurahSheet } from '../components/tasmee/HeartSurahSheet';
+import { TasmeeSetupSheet, TasmeeStart } from '../components/tasmee/TasmeeSetupSheet';
+import { ayahRef, surahPageRange } from '../../data/quran/ayahSearch';
+import { SURAH_NAMES } from '../../shared/constants/surahs';
+import { TasmeeParams } from '../navigation/types';
 
 const EMPTY: number[] = [];
 
@@ -32,6 +37,10 @@ const HeartJourneyScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => 
   const [showBulkModal, setShowBulkModal] = useState(false);
   const [showZoom, setShowZoom] = useState(false);
   const [showShare, setShowShare] = useState(false);
+  // hifz mode: the tapped surah's recital sheet, then optionally the range picker
+  const [hifzSurah, setHifzSurah] = useState<number | null>(null);
+  const [rangeFor, setRangeFor] = useState<{ surah: number; fromPage: number; toPage: number } | null>(null);
+  const hifzMarks = useSelector((state: RootState) => (hifzSurah ? state.quran.tasmee?.[hifzSurah] : undefined));
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
@@ -51,6 +60,32 @@ const HeartJourneyScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     dispatch(toggleSurahCompleted({ mode, id }));
   }, [dispatch, mode]);
+
+  // reading: a tap marks the surah. hifz: a tap opens its recital sheet (memorizing is earned)
+  const handleSurahPress = useCallback((id: number) => {
+    if (mode === 'reading') { handleToggle(id); return; }
+    Haptics.selectionAsync();
+    if (showZoom) { setShowZoom(false); setTimeout(() => setHifzSurah(id), 300); }
+    else setHifzSurah(id);
+  }, [mode, handleToggle, showZoom]);
+
+  const startTasmee = (t: TasmeeParams) => {
+    setHifzSurah(null);
+    setRangeFor(null);
+    navigation.navigate('التسميع', t);
+  };
+
+  /** Ayahs from..to of a surah as the mushaf pages they sit on; only that surah is recited. */
+  const reciteAyahs = (surah: number, from: number, to: number, only?: number[]) => {
+    const a = ayahRef(surah, from);
+    const b = ayahRef(surah, to);
+    if (!a || !b) return;
+    startTasmee({
+      fromPage: a.page, toPage: b.page, surah, help: 'none',
+      startAyah: only ? undefined : a.number,
+      only: only?.map((n) => ayahRef(surah, n)?.number ?? 0).filter(Boolean),
+    });
+  };
 
   const openZoom = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -100,7 +135,7 @@ const HeartJourneyScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => 
           pulseAnim={pulseAnim}
           completedSurahs={completedSurahs}
           progress={heartProgress}
-          onToggleSurah={handleToggle}
+          onToggleSurah={handleSurahPress}
           onOpenFullscreen={openZoom}
           onDownload={() => setShowShare(true)}
           onReset={confirmReset}
@@ -117,7 +152,7 @@ const HeartJourneyScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => 
           onShowLog={() => navigation.navigate('الختمات', { mode })}
         />
 
-        <SurahChecklist completedSurahs={completedSurahs} onToggle={handleToggle} />
+        <SurahChecklist completedSurahs={completedSurahs} onToggle={handleSurahPress} />
 
       <JuzSelectionModal visible={showJuzModal} onClose={() => setShowJuzModal(false)} onSelectJuz={markJuz} />
       <BulkMarkModal visible={showBulkModal} onClose={() => setShowBulkModal(false)} onSelectSurah={markUntilSurah} />
@@ -126,8 +161,34 @@ const HeartJourneyScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => 
         onClose={() => setShowZoom(false)}
         completedSurahs={completedSurahs}
         progress={heartProgress}
-        onToggleSurah={handleToggle}
+        onToggleSurah={handleSurahPress}
       />
+      <HeartSurahSheet
+        surah={hifzSurah}
+        marks={hifzMarks}
+        memorized={!!hifzSurah && completedSurahs.includes(hifzSurah)}
+        onClose={() => setHifzSurah(null)}
+        onRecite={(from, to, only) => hifzSurah && reciteAyahs(hifzSurah, from, to, only)}
+        onChooseRange={(from) => {
+          const surah = hifzSurah;
+          setHifzSurah(null);
+          const page = surah ? ayahRef(surah, from)?.page : undefined;
+          if (surah && page) setTimeout(() => setRangeFor({ surah, fromPage: page, toPage: page }), 300);
+        }}
+        onToggleMemorized={() => { if (hifzSurah) handleToggle(hifzSurah); setHifzSurah(null); }}
+      />
+      {rangeFor ? (
+        <TasmeeSetupSheet
+          visible
+          title={`تسميع سورة ${SURAH_NAMES[rangeFor.surah - 1]}`}
+          fromPage={rangeFor.fromPage}
+          toPage={rangeFor.toPage}
+          minPage={surahPageRange(rangeFor.surah).from}
+          maxPage={surahPageRange(rangeFor.surah).to}
+          onClose={() => setRangeFor(null)}
+          onStart={(t: TasmeeStart) => startTasmee({ ...t, surah: rangeFor.surah })}
+        />
+      ) : null}
       <ImageShareModal visible={showShare} title="صورة القلب" onClose={() => setShowShare(false)}>
         <HeartShareCard completedSurahs={completedSurahs} mode={mode} number={khatmaCount + 1} startedAt={startedAt ?? null} />
       </ImageShareModal>

@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 
-export const s = StyleSheet.create({
+export const s = themed(() => ({
   root: { flex: 1, backgroundColor: colors.bg },
   tabContainer: { flexDirection: 'row', gap: space[2], marginBottom: space[4] },
 
@@ -58,4 +58,4 @@ export const s = StyleSheet.create({
   heatLegend: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: space[3] },
   heatLegendCell: { width: 10, height: 10, borderRadius: 2 },
   heatLegendText: { ...type.caption, color: colors.textMuted },
-});
+}));

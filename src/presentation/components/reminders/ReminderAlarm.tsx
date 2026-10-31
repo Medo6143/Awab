@@ -15,7 +15,7 @@ import { Reminder, ReminderQuote, presetOf, resolveReminderTime } from '../../..
 import { REMINDER_ART } from './art';
 import { navigationRef } from '../../navigation/AppNavigation';
 import { toAr } from '../../../shared/utils/format';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { night, radius, space, type } from '../../../shared/theme/tokens';
 
 /** Ibada tasks a reminder's "done" button checks off. */
 const TASK_OF: Partial<Record<Reminder['kind'], string>> = { qiyam: 'qiyam_al_layl', duha: 'duha' };
@@ -75,7 +75,7 @@ export const ReminderAlarm = () => {
         <View style={st.hero}>
           <Image source={REMINDER_ART[reminder?.art ?? 'mosque']} style={st.heroImg} resizeMode="cover" />
           {/* the picture melts into the page: dim at the top for the status bar, dark at the bottom for the time */}
-          <LinearGradient style={StyleSheet.absoluteFill} colors={['rgba(14,10,7,0.45)', 'rgba(14,10,7,0)', 'rgba(14,10,7,0)', 'rgba(14,10,7,0.75)', colors.bg]} locations={[0, 0.18, 0.58, 0.88, 1]} />
+          <LinearGradient style={StyleSheet.absoluteFill} colors={['rgba(14,10,7,0.45)', 'rgba(14,10,7,0)', 'rgba(14,10,7,0)', 'rgba(14,10,7,0.75)', night.bg]} locations={[0, 0.18, 0.58, 0.88, 1]} />
           <Text style={[st.when, { top: insets.top + space[4] }]}>{whenLabel(reminder)}</Text>
           <View style={st.over}>
             <Text style={st.time}>{clock(now.getHours(), now.getMinutes())}</Text>
@@ -90,12 +90,12 @@ export const ReminderAlarm = () => {
 
         <View style={[st.footer, { paddingBottom: space[4] + insets.bottom }]}>
           <View style={st.chip}>
-            <Volume2 size={14} color={colors.goldText} />
+            <Volume2 size={14} color={night.goldText} />
             <Text style={st.chipText}>{SOUND_LABEL[reminder?.sound ?? 'takbir']}</Text>
           </View>
           {opensMushaf ? (
             <TouchableOpacity style={st.cta} onPress={done} activeOpacity={0.85} accessibilityRole="button">
-              <BookOpen size={20} color={colors.onGold} />
+              <BookOpen size={20} color={night.onGold} />
               <Text style={st.ctaText}>{preset.done}</Text>
             </TouchableOpacity>
           ) : (
@@ -106,7 +106,7 @@ export const ReminderAlarm = () => {
               <Text style={st.secondaryText}>أجّل {toAr(reminder?.snoozeMinutes ?? 10)} دقايق</Text>
             </TouchableOpacity>
             <TouchableOpacity style={st.secondary} onPress={close} accessibilityRole="button">
-              <Text style={[st.secondaryText, { color: colors.textMuted }]}>إيقاف</Text>
+              <Text style={[st.secondaryText, { color: night.textMuted }]}>إيقاف</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -167,7 +167,7 @@ const SlideToConfirm = ({ label, onConfirm }: { label: string; onConfirm: () => 
     <View style={st.slide} onLayout={(e) => { width.current = e.nativeEvent.layout.width; }} accessibilityRole="adjustable" accessibilityLabel={label}
       accessibilityActions={[{ name: 'activate' }]} onAccessibilityAction={onConfirm}>
       <Animated.View style={[st.knob, { transform: [{ translateX: x }] }]} {...pan.panHandlers}>
-        <ChevronsLeft size={24} color={colors.onGold} />
+        <ChevronsLeft size={24} color={night.onGold} />
       </Animated.View>
       <Text style={st.slideText}>{label}</Text>
     </View>
@@ -175,26 +175,26 @@ const SlideToConfirm = ({ label, onConfirm }: { label: string; onConfirm: () => 
 };
 
 const st = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.bg },
+  root: { flex: 1, backgroundColor: night.bg },
   hero: { height: '58%', width: '100%', justifyContent: 'flex-end', overflow: 'hidden' },
   heroImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
   when: { position: 'absolute', alignSelf: 'center', ...type.label, color: '#e9dcc6' },
   over: { alignItems: 'center', paddingBottom: space[2] },
-  time: { fontFamily: 'Tajawal_800ExtraBold', fontSize: 64, lineHeight: 72, color: colors.text },
-  title: { fontFamily: 'Amiri_700Bold', fontSize: 32, lineHeight: 48, color: colors.goldText, paddingHorizontal: space[5] },
+  time: { fontFamily: 'Tajawal_800ExtraBold', fontSize: 64, lineHeight: 72, color: night.text },
+  title: { fontFamily: 'Amiri_700Bold', fontSize: 32, lineHeight: 48, color: night.goldText, paddingHorizontal: space[5] },
   body: { paddingHorizontal: space[6], paddingTop: space[3], alignItems: 'center' },
-  quote: { fontFamily: 'Amiri_400Regular', fontSize: 20, lineHeight: 36, color: colors.text, textAlign: 'center' },
-  ref: { ...type.caption, color: colors.gold, textAlign: 'center', marginTop: 2 },
-  message: { ...type.body, color: colors.textSoft, textAlign: 'center', marginTop: space[3] },
+  quote: { fontFamily: 'Amiri_400Regular', fontSize: 20, lineHeight: 36, color: night.text, textAlign: 'center' },
+  ref: { ...type.caption, color: night.gold, textAlign: 'center', marginTop: 2 },
+  message: { ...type.body, color: night.textSoft, textAlign: 'center', marginTop: space[3] },
   footer: { paddingHorizontal: space[5], gap: space[3], alignItems: 'center' },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.goldSoft, borderWidth: 1, borderColor: colors.goldLineSoft, borderRadius: radius.pill, paddingHorizontal: space[4], paddingVertical: 5 },
-  chipText: { ...type.caption, color: colors.goldText },
-  cta: { alignSelf: 'stretch', height: 60, borderRadius: radius.card, backgroundColor: colors.gold, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space[2] },
-  ctaText: { fontFamily: 'Tajawal_800ExtraBold', fontSize: 17, color: colors.onGold },
-  slide: { alignSelf: 'stretch', height: 64, borderRadius: radius.pill, backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: colors.goldLine, flexDirection: 'row', alignItems: 'center', padding: 6 },
-  knob: { width: 52, height: 52, borderRadius: 26, backgroundColor: colors.gold, alignItems: 'center', justifyContent: 'center', zIndex: 2 },
-  slideText: { flex: 1, textAlign: 'center', fontFamily: 'Tajawal_700Bold', fontSize: 16, color: colors.text, marginEnd: 52 },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: night.goldSoft, borderWidth: 1, borderColor: night.goldLineSoft, borderRadius: radius.pill, paddingHorizontal: space[4], paddingVertical: 5 },
+  chipText: { ...type.caption, color: night.goldText },
+  cta: { alignSelf: 'stretch', height: 60, borderRadius: radius.card, backgroundColor: night.gold, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space[2] },
+  ctaText: { fontFamily: 'Tajawal_800ExtraBold', fontSize: 17, color: night.onGold },
+  slide: { alignSelf: 'stretch', height: 64, borderRadius: radius.pill, backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: night.goldLine, flexDirection: 'row', alignItems: 'center', padding: 6 },
+  knob: { width: 52, height: 52, borderRadius: 26, backgroundColor: night.gold, alignItems: 'center', justifyContent: 'center', zIndex: 2 },
+  slideText: { flex: 1, textAlign: 'center', fontFamily: 'Tajawal_700Bold', fontSize: 16, color: night.text, marginEnd: 52 },
   row: { flexDirection: 'row', gap: space[3], alignSelf: 'stretch' },
   secondary: { flex: 1, alignItems: 'center', paddingVertical: space[3], borderRadius: radius.card, backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  secondaryText: { ...type.bodyMedium, color: colors.text },
+  secondaryText: { ...type.bodyMedium, color: night.text },
 });

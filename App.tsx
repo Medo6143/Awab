@@ -33,6 +33,7 @@ import { useSelector } from 'react-redux';
 import { appDependencies } from './src/data/container';
 import { FloatingTasbeehController } from './src/presentation/components/tasbeeh/FloatingTasbeeh';
 import { initializeTrackPlayer } from './src/data/services/TrackPlayerService';
+import { ThemeRoot } from './src/shared/theme/ThemeRoot';
 
 // ────────── Error Boundary ──────────
 class ErrorBoundary extends React.Component<
@@ -190,7 +191,9 @@ export default function App() {
           <PersistGate loading={null} persistor={persistor}>
             <Bootstrapper>
               <QueryClientProvider client={queryClient}>
-                <AppNavigation />
+                <ThemeRoot>
+                  <AppNavigation />
+                </ThemeRoot>
               </QueryClientProvider>
               {showSplash ? <AnimatedSplash onDone={() => setShowSplash(false)} /> : null}
             </Bootstrapper>

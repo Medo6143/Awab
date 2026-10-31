@@ -50,10 +50,13 @@ export const prayerJustStarted = (timings: PrayerScheduleTimes, now: Date, windo
 /**
  * The prayer a notification announces, or null for any other notification. Prayer
  * notifications carry `type: 'prayer'` and `prayerName`; older ones only a title
- * like "صلاة العصر".
+ * like "صلاة العصر". A typed notification of another kind is never the adhan: the
+ * reminder before a prayer is titled "تنبيه: صلاة العصر" and used to start the adhan
+ * ten minutes early.
  */
 export const prayerFromNotification = (title?: string | null, data?: Record<string, unknown> | null): string | null => {
-  const isPrayer = data?.type === 'prayer' || !!title?.includes('صلاة');
+  const type = data?.type;
+  const isPrayer = type === 'prayer' || (type == null && !!title?.includes('صلاة') && !title.includes('تنبيه'));
   if (!isPrayer) return null;
   const fromData = typeof data?.prayerName === 'string' ? data.prayerName : '';
   const fromTitle = (title ?? '').replace(/‏/g, '').replace('صلاة ', '').trim();

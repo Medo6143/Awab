@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import PagerView from 'react-native-pager-view';
 import { colors } from '../../shared/theme/tokens';
 import { useDispatch, useSelector } from 'react-redux';
-import { Bookmark, BookOpen, ChevronLeft, ChevronRight, Play, Pause, Settings, Home } from 'lucide-react-native';
+import { Bookmark, BookOpen, ChevronLeft, ChevronRight, Play, Pause, Settings, Home, Mic } from 'lucide-react-native';
 import { useAudio } from '../hooks/useAudio';
 import { RootState } from '../store';
 import { setCurrentPage, togglePageBookmark, toggleBookmark } from '../store/slices/quranSlice';
@@ -19,7 +19,8 @@ import { GeometricFrame, StarBadge } from '../components/quran/MushafOrnaments';
 import { TafsirBottomSheet } from '../components/quran/TafsirBottomSheet';
 import { PickerTab, SurahPickerModal } from '../components/quran/SurahPickerModal';
 import { SURAH_START_PAGE } from '../../domain/entities/surahPages';
-import type { AyahHit } from '../../data/quran/ayahSearch';
+import { AyahHit, normalizeArabic } from '../../data/quran/ayahSearch';
+import { TasmeeSetupSheet, TasmeeStart } from '../components/tasmee/TasmeeSetupSheet';
 import { ReciterPickerModal } from '../components/quran/ReciterPickerModal';
 import { BookmarksModal } from '../components/quran/BookmarksModal';
 import { MUYASSAR_TAFSIR_ID, TAFSIR_LIST } from '../components/settings/SettingsConstants';
@@ -47,8 +48,11 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const [showBookmarks, setShowBookmarks] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [highlightedAyah, setHighlightedAyah] = useState<number | null>(null);
+  /** The searched ayah, scrolled into view on its page. */
+  const [revealAyah, setRevealAyah] = useState<number | null>(null);
   const [pickerTab, setPickerTab] = useState<PickerTab>('surah');
   const [showReciterPicker, setShowReciterPicker] = useState(false);
+  const [tasmee, setTasmee] = useState<{ fromPage: number; toPage: number; startAyah?: number; note?: string } | null>(null);
 
   const pagerRef = useRef<PagerView>(null);
   const isTransitioning = useRef(false);
@@ -62,10 +66,13 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const { data: surahsData, isLoading: surahsLoading, isError: surahsError, refetch: refetchSurahs } = useSurahs();
   
   const surahsList = (surahsData as SurahMeta[] | undefined) ?? [];
+  // names come fully voweled («سُورَةُ ٱلْفَاتِحَةِ»), so both sides are compared without marks;
+  // Arabic-Indic digits work for the surah number too
+  const query = normalizeArabic(searchQuery).replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x0660));
   const filteredSurahs = surahsList.filter(s =>
-    (s.name ?? '').includes(searchQuery) ||
-    (s.englishName ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    String(s.number).includes(searchQuery)
+    normalizeArabic(s.name ?? '').includes(query) ||
+    (s.englishName ?? '').toLowerCase().includes(query.toLowerCase()) ||
+    String(s.number).includes(query)
   );
 
   const onPageSelected = useCallback((e: { nativeEvent: { position: number } }) => {
@@ -120,21 +127,46 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
     });
   };
 
+  // the mic in the top bar: recite the open page
+  const openTasmeeForPage = () => setTasmee({ fromPage: currentPage, toPage: currentPage });
+
+  // «سمّع من الآية دي» in the tafsir sheet: the page, starting at that ayah
+  const openTasmeeFrom = (ayah: Ayah) => {
+    const next = { fromPage: ayah.page, toPage: ayah.page, startAyah: ayah.number, note: `من ${ayah.surah.name} ${toAr(ayah.numberInSurah)}` };
+    closeBottomSheet();
+    // after the tafsir modal's close animation (250ms): two modals at once misbehave on Android
+    setTimeout(() => setTasmee(next), 280);
+  };
+
+  const startTasmee = (t: TasmeeStart) => {
+    const startAyah = tasmee?.startAyah;
+    setTasmee(null);
+    navigation.navigate('التسميع', { ...t, startAyah: t.fromPage === tasmee?.fromPage ? startAyah : undefined });
+  };
+
   const handleSurahSelect = (surahNumber: number) => {
     setShowSurahPicker(false);
     setSearchQuery('');
     dispatch(setCurrentPage(SURAH_START_PAGE[surahNumber - 1] ?? 1));
   };
 
-  // open the page of a searched ayah and mark the ayah on it for a few seconds
-  const searchHighlight = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  // open the page of a searched ayah and mark the ayah on it, until the page is turned (it was
+  // marked for 4 s from the tap, often gone before the page had loaded and the index closed)
+  const searchedPage = useRef<number | null>(null);
   const handleAyahSelect = (hit: AyahHit) => {
     setShowSurahPicker(false);
+    searchedPage.current = hit.page;
     dispatch(setCurrentPage(hit.page));
     setHighlightedAyah(hit.number);
-    clearTimeout(searchHighlight.current);
-    searchHighlight.current = setTimeout(() => setHighlightedAyah((h) => (h === hit.number ? null : h)), 4000);
+    setRevealAyah(hit.number);
   };
+  useEffect(() => {
+    if (searchedPage.current !== null && searchedPage.current !== currentPage) {
+      searchedPage.current = null;
+      setHighlightedAyah(null);
+      setRevealAyah(null);
+    }
+  }, [currentPage]);
 
   const handleReciterChange = (id: string) => {
     changeReciter(id);
@@ -156,7 +188,7 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
             <Settings size={21} color={colors.gold} />
           </TouchableOpacity>
         </View>
-        <Text style={s.topTitle}>المصحف الشريف</Text>
+        <Text style={s.topTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>المصحف الشريف</Text>
         <View style={s.topActions}>
           <TouchableOpacity 
             onPress={async () => {
@@ -182,6 +214,9 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
             ) : (
               <Play size={21} color={colors.gold} fill={colors.gold} />
             )}
+          </TouchableOpacity>
+          <TouchableOpacity onPress={openTasmeeForPage} style={s.iconBtn} accessibilityRole="button" accessibilityLabel="تسميع الصفحة">
+            <Mic size={21} color={colors.gold} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setShowSurahPicker(true)} style={s.iconBtn}>
             <BookOpen size={21} color={colors.gold} />
@@ -210,6 +245,7 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
                   isCurrentPage={pageNum === currentPage}
                   bookmarks={bookmarks}
                   highlightedAyah={highlightedAyah}
+                  revealAyah={revealAyah}
                   isBookmarked={bookmarkedPages.includes(pageNum)}
                   onToggleBookmark={() => dispatch(togglePageBookmark(pageNum))}
                   onAyahPress={getTafsir}
@@ -262,7 +298,21 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
         onClose={closeBottomSheet}
         onToggleBookmark={() => selectedAyah && dispatch(toggleBookmark(selectedAyah.number))}
         onPlayAyah={playAyah}
+        onTasmeeFrom={openTasmeeFrom}
       />
+
+      {tasmee ? (
+        <TasmeeSetupSheet
+          visible
+          title="تسميع من المصحف"
+          fromPage={tasmee.fromPage}
+          toPage={tasmee.toPage}
+          currentPage={currentPage}
+          note={tasmee.note}
+          onClose={() => setTasmee(null)}
+          onStart={startTasmee}
+        />
+      ) : null}
 
       <SurahPickerModal
         visible={showSurahPicker}

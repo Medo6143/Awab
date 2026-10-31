@@ -1,9 +1,9 @@
 import { StyleSheet, Dimensions } from 'react-native';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 
 const { width } = Dimensions.get('window');
 
-export const s = StyleSheet.create({
+export const s = themed(() => ({
   root: { flex: 1, backgroundColor: colors.bg },
   backBtn: { width: 44, height: 44, borderRadius: radius.tile, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
   progressBadge: { backgroundColor: colors.goldSoft, paddingHorizontal: space[3], paddingVertical: 6, borderRadius: radius.pill, minWidth: 72, alignItems: 'center' },
@@ -58,4 +58,4 @@ export const s = StyleSheet.create({
   bulkItem: { flexDirection: 'row', justifyContent: 'space-between', padding: space[4], backgroundColor: colors.surfaceRaised, marginBottom: space[2], borderRadius: radius.field },
   bulkItemText: { ...type.bodyMedium, fontSize: 17, color: colors.text },
   bulkItemNum: { ...type.label, color: colors.goldText },
-});
+}));

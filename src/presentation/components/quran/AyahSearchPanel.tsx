@@ -4,7 +4,7 @@ import { Search, X } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState } from '../ui';
 import { AyahHit, searchAyahs, warmAyahIndex } from '../../../data/quran/ayahSearch';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 import { toAr } from '../../../shared/utils/format';
 import { s } from './QuranStyles';
 import { SurahMeta } from './QuranConstants';
@@ -78,10 +78,10 @@ export const AyahSearchPanel = ({ surahs, onSelect }: { surahs: SurahMeta[]; onS
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   list: { paddingHorizontal: space[5], paddingBottom: space[10] },
   count: { ...type.caption, color: colors.textMuted, marginBottom: space[2] },
   row: { backgroundColor: colors.surface, borderRadius: radius.card, padding: space[4], marginBottom: space[2] },
   text: { fontFamily: 'Amiri_400Regular', fontSize: 18, lineHeight: 34, color: colors.text, textAlign: 'right' },
   ref: { ...type.caption, color: colors.gold, marginTop: space[1] },
-});
+}));

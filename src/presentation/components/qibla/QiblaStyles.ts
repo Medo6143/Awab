@@ -1,10 +1,10 @@
 import { StyleSheet, Dimensions } from 'react-native';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 
 const { width } = Dimensions.get('window');
 export const COMPASS = Math.min(width * 0.82, 360);
 
-export const s = StyleSheet.create({
+export const s = themed(() => ({
   container: { flex: 1, alignItems: 'center', paddingTop: space[2] },
 
   compassWrapper: { width: COMPASS, height: COMPASS, alignItems: 'center', justifyContent: 'center', marginTop: space[4] },
@@ -37,4 +37,4 @@ export const s = StyleSheet.create({
   chipsRow: { flexDirection: 'row', gap: space[2], marginTop: space[4] },
   hint: { ...type.caption, color: colors.textMuted, textAlign: 'center', marginTop: space[3], paddingHorizontal: space[8] },
   pill: { borderRadius: radius.pill },
-});
+}));

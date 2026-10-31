@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
-import { colors, icon, layout, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, icon, layout, radius, space, type, themed } from '../../../shared/theme/tokens';
 
 type Props = {
   title: string;
@@ -39,7 +39,7 @@ export const IconButton = ({ children, onPress, label }: { children: React.React
   </TouchableOpacity>
 );
 
-const styles = StyleSheet.create({
+const styles = themed(() => ({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -58,4 +58,4 @@ const styles = StyleSheet.create({
     width: 44, height: 44, borderRadius: radius.tile,
     backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center',
   },
-});
+}));

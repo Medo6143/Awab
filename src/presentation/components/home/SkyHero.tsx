@@ -10,14 +10,14 @@ import { colors, space } from '../../../shared/theme/tokens';
 
 export type Phase = 'night' | 'dawn' | 'morning' | 'noon' | 'golden' | 'dusk';
 
-/** Sky colours, top to bottom; the last stop is the app background so the sky melts into the page. */
-const SKY: Record<Phase, string[]> = {
-  night: ['#05081a', '#0d1430', '#141433', colors.bg],
-  dawn: ['#1b2347', '#5b4470', '#c98466', colors.bg],
-  morning: ['#1d4f7c', '#3f7fb0', '#7fa9c6', colors.bg],
-  noon: ['#215784', '#5a8fb8', '#b9a888', colors.bg],
-  golden: ['#1d1631', '#5a3346', '#c06a3c', colors.bg],
-  dusk: ['#0f1430', '#2e2550', '#6a3a55', colors.bg],
+/** Sky colours, top to bottom; the app background is added as the last stop so the sky melts into the page. */
+const SKY: Record<Phase, [string, string, string]> = {
+  night: ['#05081a', '#0d1430', '#141433'],
+  dawn: ['#1b2347', '#5b4470', '#c98466'],
+  morning: ['#1d4f7c', '#3f7fb0', '#7fa9c6'],
+  noon: ['#215784', '#5a8fb8', '#b9a888'],
+  golden: ['#1d1631', '#5a3346', '#c06a3c'],
+  dusk: ['#0f1430', '#2e2550', '#6a3a55'],
 };
 
 /**
@@ -118,7 +118,7 @@ export const SkyBackdrop = ({ phase, title, subtitle, actions, children }: {
   const top = useSafeAreaInsets().top;
   return (
     <View style={{ width: W }}>
-      <LinearGradient colors={SKY[phase] as [string, string, ...string[]]} locations={[0, 0.38, 0.68, 1]} style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={[...SKY[phase], colors.bg]} locations={[0, 0.38, 0.68, 1]} style={StyleSheet.absoluteFill} />
 
       {/* a full sky of twinkling stars at night, a few at dusk and dawn */}
       {(phase === 'night' || phase === 'dusk' || phase === 'dawn') ? <Stars width={W} top={top} dim={phase !== 'night'} /> : null}

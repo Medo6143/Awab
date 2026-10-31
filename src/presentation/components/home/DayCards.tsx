@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { toAr } from '../../../shared/utils/format';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 
 export type DayStat = { key: string; label: string; value: number; total?: number; onPress: () => void };
 
@@ -23,15 +23,15 @@ export const DayStats = ({ items }: { items: DayStat[] }) => (
   </View>
 );
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   stats: { flexDirection: 'row', gap: space[2], marginTop: space[2] },
   stat: {
-    flex: 1, backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    flex: 1, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder,
     borderRadius: radius.card, padding: space[3],
   },
   statLabel: { ...type.caption, color: colors.textMuted },
   statValue: { fontFamily: 'Tajawal_800ExtraBold', fontSize: 22, color: colors.text, marginTop: 2 },
   statTotal: { fontFamily: 'Tajawal_500Medium', fontSize: 13, color: colors.textMuted },
-  bar: { height: 3, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.1)', marginTop: space[2], overflow: 'hidden' },
+  bar: { height: 3, borderRadius: 2, backgroundColor: colors.cardBorder, marginTop: space[2], overflow: 'hidden' },
   barFill: { height: 3, borderRadius: 2, backgroundColor: colors.gold },
-});
+}));

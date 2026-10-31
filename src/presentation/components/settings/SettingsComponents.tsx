@@ -3,18 +3,18 @@ import React from 'react';
 import { View, Text, Switch, TouchableOpacity } from 'react-native';
 import {
   LucideIcon, Minus, Plus, Check, Palette, UserRound, BookOpen, Layers, Type as TypeIcon,
-  BellRing, Clock3, Timer, Volume2, Maximize2, Square, RotateCcw, Hourglass, Moon, Sun, Star, Sparkles, HeartHandshake, Landmark,
+  BellRing, Clock3, Timer, Volume2, Maximize2, Square, RotateCcw, Hourglass, Moon, Sun, SunMoon, Star, Sparkles, HeartHandshake, Landmark,
 } from 'lucide-react-native';
 import { s } from './SettingsStyles';
 import { TAFSIR_LIST, STYLES_LIST, THEME_LIST } from './SettingsConstants';
 import { RECITER_MAP } from '../../../data/services/AudioService';
 import { Chip, IconTile, SectionTitle } from '../ui';
-import { colors, icon } from '../../../shared/theme/tokens';
+import { ACCENTS, colors, icon } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 import { toAr } from '../../../shared/utils/format';
 import { AccentKey } from '../../../shared/theme/tokens';
 import { AzanSettings, NotificationPrefs } from '../../../domain/entities/notifications';
-import { AsrMethod, TafsirStyle } from '../../store/slices/settingsSlice';
+import { AsrMethod, TafsirStyle, ThemeMode } from '../../store/slices/settingsSlice';
 import { AZAN_TYPES } from './AzanConstants';
 
 export const SettingSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -64,6 +64,22 @@ export const Stepper = ({ value, display, onDec, onInc }: { value: number; displ
   </View>
 );
 
+const THEME_MODES: { id: ThemeMode; name: string }[] = [
+  { id: 'light', name: 'فاتح' },
+  { id: 'dark', name: 'داكن' },
+  { id: 'system', name: 'حسب الموبايل' },
+];
+
+/** Light, dark, or whatever the phone is set to; the app changes at once. */
+export const ThemeModeSelector = ({ value, onSelect }: { value: ThemeMode; onSelect: (v: ThemeMode) => void }) => (
+  <View style={[s.subSection, { borderTopWidth: 0 }]}>
+    <SubLabel icon={SunMoon} text="الخلفية" />
+    <View style={s.row}>
+      {THEME_MODES.map((o) => <Chip key={o.id} label={o.name} size="sm" selected={value === o.id} onPress={() => onSelect(o.id)} style={{ flex: 1, justifyContent: 'center' }} />)}
+    </View>
+  </View>
+);
+
 export const ThemeSelector = ({ accentTheme, onSelect }: { accentTheme: AccentKey; onSelect: (id: AccentKey) => void }) => (
   <View style={[s.subSection, { borderTopWidth: 0 }]}>
     <SubLabel icon={Palette} text="لون التمييز" />
@@ -72,7 +88,7 @@ export const ThemeSelector = ({ accentTheme, onSelect }: { accentTheme: AccentKe
         const active = accentTheme === t.id;
         return (
           <TouchableOpacity key={t.id} style={[s.themeBtn, active && { backgroundColor: colors.goldSoft }]} onPress={() => onSelect(t.id)} accessibilityRole="radio" accessibilityState={{ selected: active }}>
-            <View style={[s.colorCircle, { backgroundColor: t.color }]}>{active ? <Check size={16} color="#fff" style={{ margin: 6 }} /> : null}</View>
+            <View style={[s.colorCircle, { backgroundColor: ACCENTS[t.id].accent }]}>{active ? <Check size={16} color="#fff" style={{ margin: 6 }} /> : null}</View>
             <Text style={[s.themeBtnText, active && { color: colors.text }]}>{t.name}</Text>
           </TouchableOpacity>
         );

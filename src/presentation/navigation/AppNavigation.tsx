@@ -2,10 +2,10 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList, TabParamList } from './types';
-import { NavigationContainer, DefaultTheme, createNavigationContainerRef } from '@react-navigation/native';
+import { NavigationContainer, NavigationState, DefaultTheme, createNavigationContainerRef } from '@react-navigation/native';
 import { View } from 'react-native';
 import { useAudio } from '../hooks/useAudio';
-import { colors } from '../../shared/theme/tokens';
+import { colors, isLightTheme } from '../../shared/theme/tokens';
 import { GlassTabBar } from './GlassTabBar';
 
 import HomeScreen from '../screens/HomeScreen';
@@ -29,6 +29,7 @@ import IbadaTodoScreen from '../screens/IbadaTodoScreen';
 import PrayerHubScreen from '../screens/PrayerHubScreen';
 import StatsScreen from '../screens/StatsScreen';
 import RemindersScreen from '../screens/RemindersScreen';
+import TasmeeScreen from '../screens/TasmeeScreen';
 
 /**
  * Route names:
@@ -57,18 +58,26 @@ const TabNavigator = () => (
 /** For screens shown outside the navigator, e.g. the reminder alarm opening the mushaf. */
 export const navigationRef = createNavigationContainerRef<RootStackParamList & TabParamList>();
 
-const navTheme = {
+const navTheme = () => ({
   ...DefaultTheme,
-  dark: true,
+  dark: !isLightTheme(),
   colors: { ...DefaultTheme.colors, background: colors.bg, card: colors.bg, text: colors.text, primary: colors.gold, border: 'transparent' },
-};
+});
+
+/** Where the user was, so switching the theme (which remounts the app) keeps them there. */
+let savedState: NavigationState | undefined;
 
 const AppNavigation = () => {
   // Keeps the global audio state in sync with TrackPlayer while any screen is mounted.
   useAudio();
 
   return (
-    <NavigationContainer ref={navigationRef} theme={navTheme}>
+    <NavigationContainer
+      ref={navigationRef}
+      theme={navTheme()}
+      initialState={savedState}
+      onStateChange={(state) => { savedState = state; }}
+    >
       <View style={{ flex: 1, backgroundColor: colors.bg }}>
         <Stack.Navigator screenOptions={{ headerShown: false, cardStyle: { backgroundColor: colors.bg } }}>
           <Stack.Screen name="MainTabs" component={TabNavigator} />
@@ -89,6 +98,7 @@ const AppNavigation = () => {
           <Stack.Screen name="الإعدادات" component={SettingsScreen} />
           <Stack.Screen name="الإحصائيات" component={StatsScreen} />
           <Stack.Screen name="التذكيرات" component={RemindersScreen} />
+          <Stack.Screen name="التسميع" component={TasmeeScreen} />
         </Stack.Navigator>
       </View>
     </NavigationContainer>

@@ -13,7 +13,7 @@ export const TasbeehCounter = ({ count, target, selectedDhikr, scaleAnim, onPres
   count: number; target: number; selectedDhikr: string; scaleAnim: Animated.Value; onPress: () => void; accentColor: string;
 }) => {
   const isBlack = accentColor === '#000000';
-  const textColor = isBlack ? '#FFFFFF' : (accentColor || '#fcd34d');
+  const textColor = isBlack ? '#FFFFFF' : (accentColor || colors.goldText);
   const size = Math.min(width * 0.86, 360);
 
   return (

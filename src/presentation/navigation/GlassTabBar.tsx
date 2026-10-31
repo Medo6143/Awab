@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   CrescentStarIcon, IconComponent, MihrabClockIcon, MosqueIcon, QuranStandIcon, TasbihIcon,
 } from '../components/icons/IslamicIcons';
-import { colors, elevation, icon, layout, radius, space, type } from '../../shared/theme/tokens';
+import { colors, isLightTheme, elevation, icon, layout, radius, space, type } from '../../shared/theme/tokens';
 import { useAccent } from '../../shared/theme/useAccent';
 
 const ICONS: Record<string, IconComponent> = {
@@ -36,7 +36,7 @@ export const GlassTabBar = ({ state, descriptors, navigation }: BottomTabBarProp
     <View pointerEvents="box-none" style={[styles.wrap, { bottom: layout.tabBarBottom + navBar }]}>
       <View style={[styles.bar, elevation.floating]}>
         {useBlur ? (
-          <BlurView intensity={40} tint="dark" experimentalBlurMethod="dimezisBlurView" style={StyleSheet.absoluteFill} />
+          <BlurView intensity={40} tint={isLightTheme() ? 'light' : 'dark'} experimentalBlurMethod="dimezisBlurView" style={StyleSheet.absoluteFill} />
         ) : null}
         <View style={[StyleSheet.absoluteFill, { backgroundColor: useBlur ? colors.glass : colors.glassOpaque }]} />
 

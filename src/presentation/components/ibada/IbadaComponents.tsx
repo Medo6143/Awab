@@ -4,7 +4,7 @@ import { Check, Plus } from 'lucide-react-native';
 import { IbadaTask } from '../../store/slices/ibadaSlice';
 import { ProgressRing } from '../ui';
 import { toAr } from '../../../shared/utils/format';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 
 const SHORT: Record<string, string> = { fajr: 'الفجر', dhuhr: 'الظهر', asr: 'العصر', maghrib: 'المغرب', isha: 'العشاء' };
 
@@ -77,29 +77,29 @@ export const DeedChips = ({ tasks, onToggle, onRemove, onAdd }: {
   </View>
 );
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   rings: { flexDirection: 'row', justifyContent: 'space-around', marginTop: space[2], marginBottom: space[4] },
   squares: { flexDirection: 'row', gap: space[2] },
   square: {
     flex: 1, alignItems: 'center', gap: space[1], paddingVertical: space[3], borderRadius: radius.card,
-    backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder,
   },
-  squareDone: { backgroundColor: 'rgba(76,175,125,0.14)', borderColor: 'rgba(76,175,125,0.3)' },
+  squareDone: { backgroundColor: colors.successSoft, borderColor: 'rgba(76,175,125,0.3)' },
   squareNext: { borderColor: colors.goldLine },
   squareText: { ...type.caption, color: colors.textSoft },
-  dot: { width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center' },
+  dot: { width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, borderColor: colors.ring, alignItems: 'center', justifyContent: 'center' },
   dotOn: { backgroundColor: colors.success, borderColor: colors.success },
   row: {
     flexDirection: 'row', alignItems: 'center', gap: space[3], marginBottom: space[2],
-    backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder,
     borderRadius: radius.card, paddingHorizontal: space[4], paddingVertical: space[3],
   },
   rowText: { ...type.bodyMedium, color: colors.text, flex: 1 },
-  check: { width: 26, height: 26, borderRadius: 13, borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center' },
+  check: { width: 26, height: 26, borderRadius: 13, borderWidth: 1.5, borderColor: colors.ring, alignItems: 'center', justifyContent: 'center' },
   checkOn: { backgroundColor: colors.success, borderColor: colors.success },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space[2] },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: space[4], paddingVertical: space[2], borderRadius: radius.pill, backgroundColor: 'rgba(255,255,255,0.06)' },
-  chipOn: { backgroundColor: 'rgba(76,175,125,0.15)' },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: space[4], paddingVertical: space[2], borderRadius: radius.pill, backgroundColor: colors.card },
+  chipOn: { backgroundColor: colors.successSoft },
   chipAdd: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: space[4], paddingVertical: space[2], borderRadius: radius.pill, borderWidth: 1, borderStyle: 'dashed', borderColor: colors.goldLine },
   chipText: { ...type.label, color: colors.textSoft },
-});
+}));

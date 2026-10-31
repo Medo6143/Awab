@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { colors, type } from '../../../shared/theme/tokens';
+import { colors, type, themed } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 import { toAr } from '../../../shared/utils/format';
 
@@ -30,6 +30,6 @@ export const StatNumber = ({ value, caption, size = 'h1', color, align = 'center
   );
 };
 
-const styles = StyleSheet.create({
+const styles = themed(() => ({
   caption: { ...type.caption, color: colors.textMuted, marginTop: 2 },
-});
+}));

@@ -10,6 +10,8 @@ import { RECITER_MAP } from '../../data/services/AudioService';
 
 /** The native alarm opens the app with "reminder:<id>" for the user's own reminders. */
 const REMINDER_PREFIX = 'reminder:';
+/** A tapped notification older than this no longer starts the adhan on launch. */
+const STALE_RESPONSE_MS = 5 * 60 * 1000;
 import { AudioService } from '../../data/services/AudioService';
 import { PRAYER_AR_NAMES, prayerFromNotification, prayerJustStarted } from '../../domain/entities/prayer';
 
@@ -45,11 +47,15 @@ export const useNotifications = () => {
       const lastResponse = await getNotifications().getLastNotificationResponseAsync();
       if (!isMounted || !azanSettings.visualAzanEnabled) return;
 
-      if (lastResponse) {
+      // the last response survives restarts: without these checks one tap on a prayer
+      // notification started the adhan again on every later launch
+      const fresh = lastResponse && Date.now() - (lastResponse.notification.date ?? 0) < STALE_RESPONSE_MS;
+      if (lastResponse) getNotifications().clearLastNotificationResponse?.();
+      if (lastResponse && fresh) {
         const { title, data } = lastResponse.notification.request.content;
         const prayer = prayerFromNotification(title, data);
         if (prayer) raiseAzan(prayer);
-      } else if (timings) {
+      } else if (!lastResponse && timings) {
         // a full-screen-intent launch often carries no response: fall back to the clock
         const justStarted = prayerJustStarted(timings, new Date());
         if (justStarted) raiseAzan(PRAYER_AR_NAMES[justStarted]);

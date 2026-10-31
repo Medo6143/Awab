@@ -5,7 +5,7 @@ import * as Sharing from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
 import { Download, Share2, X } from 'lucide-react-native';
 import { IconButton, PillButton } from '../ui';
-import { colors, icon, space, type } from '../../../shared/theme/tokens';
+import { colors, icon, space, type, themed } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 /** Story format (9:16), the size Instagram/WhatsApp stories use. */
 export const SHARE_PX_W = 1080;
@@ -112,11 +112,11 @@ export const ImageShareModal = ({ visible, title, onClose, children, toolbar }: 
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   backdrop: { flex: 1, backgroundColor: colors.glassOpaque, alignItems: 'center', justifyContent: 'center', paddingHorizontal: space[5] },
   top: { position: 'absolute', top: space[10], left: space[5], right: space[5], flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   title: { ...type.h2, color: colors.text },
   toolbar: { alignSelf: 'stretch', marginTop: space[4] },
   actions: { flexDirection: 'row', gap: space[3], marginTop: space[4] },
   hint: { ...type.caption, color: colors.textMuted, marginTop: space[3] },
-});
+}));

@@ -5,7 +5,7 @@ import { CheckCircle2 } from 'lucide-react-native';
 import { AthkarItem } from '../../../shared/constants/athkar';
 import { SkyBackdrop } from '../home/SkyHero';
 import { toAr } from '../../../shared/utils/format';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 
 export type AthkarTab = 'morning' | 'evening';
 
@@ -101,7 +101,7 @@ export const AthkarCard = ({ item, currentCount, isCurrent, onToggle }: {
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   count: { alignItems: 'center', marginTop: -space[2], paddingBottom: space[6] },
   countLabel: { fontFamily: 'Tajawal_500Medium', fontSize: 14, color: 'rgba(255,255,255,0.8)' },
   countValue: { fontFamily: 'Tajawal_800ExtraBold', fontSize: 48, lineHeight: 60, color: '#fff', textShadowColor: 'rgba(0,0,0,0.35)', textShadowRadius: 12 },
@@ -111,14 +111,14 @@ const st = StyleSheet.create({
 
   doneRow: {
     flexDirection: 'row', alignItems: 'center', gap: space[2], marginBottom: space[2],
-    backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: colors.card, borderWidth: 1, borderColor: colors.card,
     borderRadius: radius.card, paddingHorizontal: space[3], paddingVertical: space[3],
   },
   doneText: { ...type.caption, color: colors.textMuted, flex: 1 },
   doneCount: { ...type.caption, color: colors.textMuted },
 
   card: {
-    marginBottom: space[2], backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    marginBottom: space[2], backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder,
     borderRadius: radius.card, padding: space[4],
   },
   cardCurrent: { backgroundColor: colors.surfaceRaised, borderColor: colors.goldLine },
@@ -127,4 +127,4 @@ const st = StyleSheet.create({
   cardFoot: { flexDirection: 'row', alignItems: 'center', gap: space[3], marginTop: space[3] },
   reward: { ...type.caption, color: colors.textMuted, flex: 1, lineHeight: 18 },
   ringText: { fontFamily: 'Tajawal_700Bold', fontSize: 12, color: colors.goldText },
-});
+}));

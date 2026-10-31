@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Modal, TouchableOpacity, ScrollView, StyleSheet, Dimensions, Share } from 'react-native';
 import { CheckCircle2, XCircle, Share2, X, BookOpen, Sparkles } from 'lucide-react-native';
 import { IbadaTask } from '../../store/slices/ibadaSlice';
-import { colors, icon, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, icon, radius, space, type, themed } from '../../../shared/theme/tokens';
 import { toAr } from '../../../shared/utils/format';
 import { PillButton, ProgressRing, StatNumber } from '../ui';
 
@@ -126,7 +126,7 @@ export const DailyReportModal: React.FC<DailyReportModalProps> = ({ visible, onC
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   overlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: colors.overlay },
   sheet: { height: height * 0.85, backgroundColor: colors.surface, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, padding: space[6] },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: space[5] },
@@ -146,4 +146,4 @@ const st = StyleSheet.create({
   rowName: { ...type.bodyMedium, color: colors.text, flex: 1 },
   rowValue: { ...type.label, fontSize: 15 },
   footer: { paddingTop: space[3] },
-});
+}));

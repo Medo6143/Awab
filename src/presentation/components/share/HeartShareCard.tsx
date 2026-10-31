@@ -4,7 +4,7 @@ import { AnatomicalHeart } from '../heart/AnatomicalHeart';
 import { formatDate, khatmaTitle, MODE_NOUN } from '../heart/khatmaFormat';
 import type { HeartMode } from '../../store/slices/quranSlice';
 import { toAr } from '../../../shared/utils/format';
-import { colors } from '../../../shared/theme/tokens';
+import { night } from '../../../shared/theme/tokens';
 import { useShareCardSize } from './ImageShareModal';
 
 const LOGO = require('../../../../assets/icon.png');
@@ -65,14 +65,14 @@ const DateCell = ({ label, value, u }: { label: string; value: string; u: number
 
 const st = StyleSheet.create({
   // explicit: the share preview wraps cards in an LTR container for positioning
-  card: { backgroundColor: colors.bg, justifyContent: 'space-between', direction: 'rtl' },
-  frame: { position: 'absolute', borderWidth: 1.2, borderColor: colors.goldLine },
-  title: { fontFamily: 'Tajawal_800ExtraBold', color: colors.text },
-  sub: { fontFamily: 'Tajawal_700Bold', color: colors.gold },
-  muted: { fontFamily: 'Tajawal_500Medium', color: colors.textMuted },
-  dates: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface },
-  divider: { width: 1, alignSelf: 'stretch', backgroundColor: colors.goldLine },
-  dateValue: { fontFamily: 'Tajawal_700Bold', color: colors.text },
+  card: { backgroundColor: night.bg, justifyContent: 'space-between', direction: 'rtl' },
+  frame: { position: 'absolute', borderWidth: 1.2, borderColor: night.goldLine },
+  title: { fontFamily: 'Tajawal_800ExtraBold', color: night.text },
+  sub: { fontFamily: 'Tajawal_700Bold', color: night.gold },
+  muted: { fontFamily: 'Tajawal_500Medium', color: night.textMuted },
+  dates: { flexDirection: 'row', alignItems: 'center', backgroundColor: night.surface },
+  divider: { width: 1, alignSelf: 'stretch', backgroundColor: night.goldLine },
+  dateValue: { fontFamily: 'Tajawal_700Bold', color: night.text },
   brand: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-  brandName: { fontFamily: 'Tajawal_800ExtraBold', color: colors.gold },
+  brandName: { fontFamily: 'Tajawal_800ExtraBold', color: night.gold },
 });

@@ -96,7 +96,7 @@ export const StreakCard = ({ streak, longest, onPress }: { streak: number; longe
   </TouchableOpacity>
 );
 
-const HEAT = ['rgba(255,255,255,0.06)', 'rgba(212,175,55,0.3)', 'rgba(212,175,55,0.6)', colors.gold];
+const heat = () => [colors.hairline, colors.goldLineSoft, colors.goldLine, colors.gold];
 
 /** The last 12 weeks, a square per day, darker gold for a fuller day. */
 export const Heatmap = ({ levels }: { levels: number[][] }) => (
@@ -106,13 +106,13 @@ export const Heatmap = ({ levels }: { levels: number[][] }) => (
       <View style={s.heatGrid}>
         {levels.map((week, w) => (
           <View key={w} style={s.heatCol}>
-            {week.map((l, d) => <View key={d} style={[s.heatCell, { backgroundColor: l < 0 ? 'transparent' : HEAT[l] }]} />)}
+            {week.map((l, d) => <View key={d} style={[s.heatCell, { backgroundColor: l < 0 ? 'transparent' : heat()[l] }]} />)}
           </View>
         ))}
       </View>
       <View style={s.heatLegend}>
         <Text style={s.heatLegendText}>أقل</Text>
-        {HEAT.map((c) => <View key={c} style={[s.heatLegendCell, { backgroundColor: c }]} />)}
+        {heat().map((c) => <View key={c} style={[s.heatLegendCell, { backgroundColor: c }]} />)}
         <Text style={s.heatLegendText}>أكثر</Text>
       </View>
     </Card>

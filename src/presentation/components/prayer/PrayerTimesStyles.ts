@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 
-export const s = StyleSheet.create({
+export const s = themed(() => ({
   // ── Hero ──
   hero: { padding: space[5], alignItems: 'flex-start' },
   heroEyebrow: { ...type.label, color: colors.textMuted },
@@ -32,4 +32,4 @@ export const s = StyleSheet.create({
 
   // ── Hub ──
   hubTabs: { flexDirection: 'row', gap: space[2], paddingHorizontal: 20, paddingBottom: space[3] },
-});
+}));

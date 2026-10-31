@@ -1,10 +1,10 @@
 import { StyleSheet, Dimensions } from 'react-native';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 
 const { height: H } = Dimensions.get('window');
 
 // The mushaf keeps its paper look (paper tokens); all chrome around it is the dark system.
-export const s = StyleSheet.create({
+export const s = themed(() => ({
   root: { flex: 1, backgroundColor: colors.bg },
 
   topBar: {
@@ -76,6 +76,8 @@ export const s = StyleSheet.create({
   modernTitle: { ...type.h2, color: colors.paperInk },
   modernText: { fontFamily: 'Amiri_400Regular' },
 
+  tasmeeBtn: { flexDirection: 'row', alignSelf: 'center', alignItems: 'center', gap: space[2], marginTop: space[4], backgroundColor: colors.paperInk, borderRadius: radius.pill, paddingHorizontal: space[5], height: 42 },
+  tasmeeBtnText: { ...type.label, fontSize: 14, color: colors.paper },
   sheetToolBar: { flexDirection: 'row', paddingVertical: space[3], paddingHorizontal: space[5], justifyContent: 'space-around', backgroundColor: colors.paperDeep },
   sheetToolBtn: { alignItems: 'center', gap: 4 },
   sheetToolLab: { ...type.caption, color: colors.paperInk },
@@ -129,4 +131,4 @@ export const s = StyleSheet.create({
   bookmarkRow: { flexDirection: 'row', alignItems: 'center', padding: space[4], marginHorizontal: space[5], marginBottom: space[2], backgroundColor: colors.surface, borderRadius: radius.card, gap: space[3] },
   bookmarkRowLabel: { ...type.bodyMedium, color: colors.text },
   emptyBoxText: { ...type.body, color: colors.textMuted, textAlign: 'center', marginTop: 50 },
-});
+}));

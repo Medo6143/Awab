@@ -1,0 +1,23 @@
+diff --git a/node_modules/@fugood/react-native-audio-pcm-stream/android/src/main/java/com/imxiqi/rnliveaudiostream/RNLiveAudioStreamModule.java b/node_modules/@fugood/react-native-audio-pcm-stream/android/src/main/java/com/imxiqi/rnliveaudiostream/RNLiveAudioStreamModule.java
+index 6d7d17d..b1a6c7e 100644
+--- a/node_modules/@fugood/react-native-audio-pcm-stream/android/src/main/java/com/imxiqi/rnliveaudiostream/RNLiveAudioStreamModule.java
++++ b/node_modules/@fugood/react-native-audio-pcm-stream/android/src/main/java/com/imxiqi/rnliveaudiostream/RNLiveAudioStreamModule.java
+@@ -89,6 +89,9 @@ public class RNLiveAudioStreamModule extends ReactContextBaseJavaModule {
+     public void start() {
+         if (recorder == null || isRecording) return;
+         isRecording = true;
++        // owwab: the thread owns this recorder, so a late finish of an earlier thread
++        // cannot release (or null) a recorder created by init() after stop()
++        final AudioRecord recorder = this.recorder;
+         recorder.startRecording();
+ 
+         Thread recordingThread = new Thread(new Runnable() {
+@@ -113,7 +116,7 @@ public class RNLiveAudioStreamModule extends ReactContextBaseJavaModule {
+                     e.printStackTrace();
+                 } finally {
+                     recorder.release();
+-                    recorder = null;
++                    if (RNLiveAudioStreamModule.this.recorder == recorder) RNLiveAudioStreamModule.this.recorder = null;
+                 }
+             }
+         });

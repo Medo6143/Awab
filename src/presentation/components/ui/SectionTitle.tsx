@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { colors, space, type } from '../../../shared/theme/tokens';
+import { colors, space, type, themed } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 
 type Props = { title: string; action?: { label: string; onPress: () => void }; style?: object };
@@ -19,8 +19,8 @@ export const SectionTitle = ({ title, action, style }: Props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = themed(() => ({
   row: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginTop: space[6], marginBottom: space[3] },
   title: { ...type.h2, color: colors.text },
   action: { ...type.label },
-});
+}));

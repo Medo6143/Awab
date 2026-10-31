@@ -5,7 +5,7 @@ import type { IconComponent } from '../icons/IslamicIcons';
 import type { Hadith, Supplication, VerseRef } from '../../../domain/entities/guidance';
 import { SURAH_NAMES } from '../../../shared/constants/surahs';
 import { toAr } from '../../../shared/utils/format';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 import { useVerseTafsir, useVerseText } from '../../hooks/useGuidance';
 
 export const verseLabel = (r: VerseRef) =>
@@ -120,7 +120,7 @@ export const SupplicationCard = ({ dua, title = 'دعاء', onShare }: { dua: Su
   </View>
 );
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   banner: { flexDirection: 'row', alignItems: 'center', gap: space[3], backgroundColor: colors.goldSoft, borderRadius: radius.card, padding: space[4], marginBottom: space[3] },
   bannerIcon: { width: 44, height: 44, borderRadius: radius.tile, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
   bannerTitle: { ...type.bodyMedium, fontFamily: 'Tajawal_700Bold', color: colors.text },
@@ -152,4 +152,4 @@ const st = StyleSheet.create({
   duaCard: { backgroundColor: colors.goldSoft, borderRadius: radius.card, padding: space[4], marginBottom: space[3] },
   duaTitle: { ...type.label, color: colors.gold, marginBottom: space[1] },
   duaText: { fontFamily: 'Amiri_700Bold', fontSize: 19, lineHeight: 36, color: colors.text, textAlign: 'center' },
-});
+}));

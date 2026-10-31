@@ -17,6 +17,9 @@ interface AzanVideoModalProps {
 
 const MOSQUE = require('../../../../assets/images/mosque_bg.png');
 
+/** How long the post-adhan dua stays up before the screen closes itself. */
+const DUA_SCREEN_MS = 90 * 1000;
+
 /**
  * Follows the adhan being played: the native alarm service when it is the one playing,
  * otherwise the in-app player, otherwise the time since the screen opened. Returns the
@@ -86,6 +89,17 @@ const AzanContent = ({ onClose, prayerName }: { onClose: () => void; prayerName:
 
   // the app shows over the lock screen only while the adhan is on screen
   useEffect(() => () => azanAlarms.releaseLockScreen(), [azanAlarms]);
+
+  // once the adhan has finished the screen may sleep again (it was held on for the adhan),
+  // and the dua screen closes by itself: left open it kept the phone lit until closed by hand
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+  useEffect(() => {
+    if (!done) return;
+    azanAlarms.releaseLockScreen();
+    const t = setTimeout(() => closeRef.current(), DUA_SCREEN_MS);
+    return () => clearTimeout(t);
+  }, [done, azanAlarms]);
 
   const handleClose = async () => {
     azanAlarms.stop();
