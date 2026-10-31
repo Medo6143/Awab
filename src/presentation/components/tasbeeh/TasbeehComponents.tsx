@@ -4,16 +4,32 @@ import { Hash, Target, Plus } from 'lucide-react-native';
 import { s } from './TasbeehStyles';
 import { toAr } from './TasbeehConstants';
 import { SebhaSvg } from './SebhaSvg';
-import { colors } from '../../../shared/theme/tokens';
+import { colors, isLightTheme } from '../../../shared/theme/tokens';
 
 const { width } = Dimensions.get('window');
+
+/** Brightness 0..1 of a #rrggbb colour. */
+const lightness = (hex: string) => {
+  const n = parseInt(hex.slice(1, 7), 16);
+  return (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+};
+
+/**
+ * The count is drawn in the bubble colour the user picked, straight on the page. A colour
+ * too close to the page (white in light mode, black in dark) gives way to the theme's own.
+ */
+const readableOnPage = (accent?: string) => {
+  if (!accent || !/^#[0-9a-f]{6}$/i.test(accent)) return colors.goldText;
+  const l = lightness(accent);
+  if (isLightTheme() ? l > 0.8 : l < 0.2) return isLightTheme() ? colors.goldText : '#FFFFFF';
+  return accent;
+};
 
 // ── Tasbeeh Counter ────────────────────────────────────────────────────────
 export const TasbeehCounter = ({ count, target, selectedDhikr, scaleAnim, onPress, accentColor }: {
   count: number; target: number; selectedDhikr: string; scaleAnim: Animated.Value; onPress: () => void; accentColor: string;
 }) => {
-  const isBlack = accentColor === '#000000';
-  const textColor = isBlack ? '#FFFFFF' : (accentColor || colors.goldText);
+  const textColor = readableOnPage(accentColor);
   const size = Math.min(width * 0.86, 360);
 
   return (
