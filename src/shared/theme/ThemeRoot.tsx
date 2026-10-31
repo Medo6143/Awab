@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import { useSelector } from 'react-redux';
 import { StatusBar } from 'expo-status-bar';
-import { isLightTheme, setLightTheme } from './tokens';
+import * as SystemUI from 'expo-system-ui';
+import { colors, isLightTheme, setLightTheme } from './tokens';
 import type { ThemeMode } from '../../presentation/store/slices/settingsSlice';
 
 /**
@@ -15,6 +16,8 @@ export const ThemeRoot = ({ children }: { children: React.ReactNode }) => {
   const system = useColorScheme();
   const light = mode === 'light' || (mode === 'system' && system === 'light');
   if (isLightTheme() !== light) setLightTheme(light);
+  // the native root view shows through during keyboard resizes and modal transitions
+  useEffect(() => { SystemUI.setBackgroundColorAsync(colors.bg).catch(() => undefined); }, [light]);
   return (
     <React.Fragment key={light ? 'light' : 'dark'}>
       <StatusBar style={light ? 'dark' : 'light'} />
