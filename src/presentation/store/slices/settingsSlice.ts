@@ -6,13 +6,15 @@ export type TafsirStyle = 'simple' | 'book' | 'modern';
 export type AsrMethod = 'auto' | 'shafii' | 'hanafi';
 /** Look of the ayah/dua share image ('classic' is the original card). */
 export type ShareCardStyle = 'classic' | 'gold' | 'paper' | 'night' | 'mihrab';
+/** 'system' follows the phone's dark/light setting. */
+export type ThemeMode = 'light' | 'dark' | 'system';
 /** Largest size the ayah/dua text may take on the share image. */
 export type ShareTextSize = 'small' | 'medium' | 'large';
 
 interface SettingsState {
   notificationsEnabled: boolean;
   locationEnabled: boolean;
-  theme: 'light' | 'dark';
+  theme: ThemeMode;
   accentTheme: 'gold' | 'emerald' | 'midnight';
   selectedTafsirId: number;
   tafsirStyle: TafsirStyle;
@@ -62,7 +64,7 @@ export const settingsSlice = createSlice({
     toggleLocation: (state) => {
       state.locationEnabled = !state.locationEnabled;
     },
-    setTheme: (state, action: PayloadAction<'light' | 'dark'>) => {
+    setTheme: (state, action: PayloadAction<ThemeMode>) => {
       state.theme = action.payload;
     },
     setAccentTheme: (state, action: PayloadAction<'gold' | 'emerald' | 'midnight'>) => {

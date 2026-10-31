@@ -3,7 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { EyeOff, Mic, Minus, Plus } from 'lucide-react-native';
 import { Chip, PillButton, Sheet } from '../ui';
-import { colors, icon, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, icon, radius, space, type, themed } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 import { toAr } from '../../../shared/utils/format';
 import { MODEL_MB, downloadModel, modelPath } from '../../../data/services/RecitationListener';
@@ -176,7 +176,7 @@ export const TasmeeSetupSheet = ({ visible, title, fromPage, toPage, minPage = 1
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   meta: { ...type.caption, color: colors.textMuted },
   label: { ...type.label, color: colors.textMuted, marginTop: space[5], marginBottom: space[2] },
   bounds: { flexDirection: 'row', gap: space[2], marginBottom: space[2] },
@@ -195,4 +195,4 @@ const st = StyleSheet.create({
   fill: { height: 6, borderRadius: radius.pill },
   note: { ...type.caption, color: colors.textMuted, marginTop: space[2], lineHeight: 18 },
   start: { marginTop: space[6] },
-});
+}));

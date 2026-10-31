@@ -4,7 +4,7 @@ import Constants from 'expo-constants';
 import { ScreenProps } from '../navigation/types';
 import { Screen, ScreenHeader } from '../components/ui';
 import { toAr } from '../../shared/utils/format';
-import { colors, radius, space, type } from '../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../shared/theme/tokens';
 
 const LOGO = require('../../../assets/icon.png');
 
@@ -67,7 +67,7 @@ const AboutScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   hero: { alignItems: 'center', paddingVertical: space[4] },
   logo: { width: 96, height: 96, borderRadius: 24 },
   name: { fontFamily: 'Amiri_700Bold', fontSize: 40, lineHeight: 64, color: colors.gold, marginTop: space[2] },
@@ -84,6 +84,6 @@ const st = StyleSheet.create({
   sourceKey: { ...type.label, color: colors.gold },
   sourceVal: { ...type.body, color: colors.textSoft, marginTop: 2 },
   footer: { ...type.caption, color: colors.textFaint, textAlign: 'center', marginTop: space[6] },
-});
+}));
 
 export default AboutScreen;

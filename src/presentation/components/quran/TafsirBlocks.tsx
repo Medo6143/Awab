@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { colors, radius, space } from '../../../shared/theme/tokens';
+import { colors, radius, space, themed } from '../../../shared/theme/tokens';
 import { toAr } from '../../../shared/utils/format';
 import { TafsirBlock, TafsirRun } from './tafsirParser';
 
@@ -71,7 +71,7 @@ const Section = ({ block, index, count, fontSize, variant }: { block: TafsirBloc
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   header: { flexDirection: 'row', alignItems: 'center', gap: space[3], marginBottom: space[4] },
   headerBar: { width: 5, height: 24, borderRadius: 3, backgroundColor: colors.gold },
   headerTitle: { fontFamily: 'Tajawal_700Bold', fontSize: 18, color: colors.paperInk, flex: 1 },
@@ -91,4 +91,4 @@ const st = StyleSheet.create({
   ref: { fontFamily: 'Tajawal_500Medium', color: colors.paperMuted },
   text: { fontFamily: 'Tajawal_400Regular', color: colors.paperInk, textAlign: 'justify' },
   textBook: { fontFamily: 'Amiri_400Regular' },
-});
+}));

@@ -1,9 +1,9 @@
 import { StyleSheet, Dimensions } from 'react-native';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 
 const { height: H } = Dimensions.get('window');
 
-export const s = StyleSheet.create({
+export const s = themed(() => ({
   root: { flex: 1, backgroundColor: colors.bg },
 
   searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface, borderRadius: radius.field, paddingHorizontal: space[4], height: 48, gap: space[2], marginTop: space[4] },
@@ -40,4 +40,4 @@ export const s = StyleSheet.create({
   inputLabel: { ...type.label, color: colors.textMuted, marginBottom: space[2] },
   textInput: { backgroundColor: colors.surfaceRaised, borderRadius: radius.field, padding: space[4], color: colors.text, ...type.body, textAlign: 'right', marginBottom: space[4] },
   largeInput: { height: 140, textAlignVertical: 'top' },
-});
+}));

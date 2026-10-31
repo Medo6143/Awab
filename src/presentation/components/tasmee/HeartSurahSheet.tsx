@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { AlertCircle, Mic } from 'lucide-react-native';
 import { PillButton, ProgressBar, Sheet } from '../ui';
-import { colors, icon, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, icon, radius, space, type, themed } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 import { SURAH_AYAH_COUNTS, SURAH_NAMES } from '../../../shared/constants/surahs';
 import { toAr } from '../../../shared/utils/format';
@@ -68,7 +68,7 @@ export const HeartSurahSheet = ({ surah, marks, memorized, onClose, onRecite, on
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   meta: { ...type.caption, color: colors.textMuted },
   bar: { marginTop: space[4] },
   caption: { ...type.caption, color: colors.textMuted, marginTop: space[2] },
@@ -79,4 +79,4 @@ const st = StyleSheet.create({
   secondary: { marginTop: space[2] },
   link: { alignItems: 'center', paddingVertical: space[4] },
   linkText: { ...type.label, color: colors.textMuted },
-});
+}));

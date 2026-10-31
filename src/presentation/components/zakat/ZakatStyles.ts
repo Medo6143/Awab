@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 
-export const s = StyleSheet.create({
+export const s = themed(() => ({
   root: { flex: 1, backgroundColor: colors.bg },
   hero: { alignItems: 'center', paddingVertical: space[6] },
   nisabBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: space[4], backgroundColor: colors.surfaceRaised, paddingHorizontal: space[3], paddingVertical: 6, borderRadius: radius.pill },
@@ -17,4 +17,4 @@ export const s = StyleSheet.create({
 
   infoTitle: { ...type.h2, color: colors.text, marginBottom: space[2] },
   infoDesc: { ...type.body, color: colors.textMuted },
-});
+}));

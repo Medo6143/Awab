@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
-import { colors } from '../../../shared/theme/tokens';
+import { colors, themed } from '../../../shared/theme/tokens';
 import { useShareCardSize } from './ImageShareModal';
 import { layoutAyahCard } from './ayahCardLayout';
 import { useShareTextMax } from './storyThemes';
@@ -38,7 +38,7 @@ export const DuaShareCard = ({ text, source }: { text: string; source: string })
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   card: { backgroundColor: colors.bg, justifyContent: 'space-between', direction: 'rtl' },
   frame: { position: 'absolute', borderWidth: 1.2, borderColor: colors.goldLine },
   brand: { flexDirection: 'row', alignItems: 'center' },
@@ -49,4 +49,4 @@ const st = StyleSheet.create({
   body: { fontFamily: 'Amiri_700Bold', color: colors.text, textAlign: 'center' },
   source: { fontFamily: 'Tajawal_500Medium', color: colors.textMuted, textAlign: 'center' },
   footer: { fontFamily: 'Tajawal_500Medium', color: colors.textFaint, textAlign: 'center' },
-});
+}));

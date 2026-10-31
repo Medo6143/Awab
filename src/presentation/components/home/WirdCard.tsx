@@ -9,7 +9,7 @@ import { getLocalToday } from '../../store/slices/statsSlice';
 import { DEFAULT_WIRD, WIRD_PRESETS, WirdMode, pagesLabel, wirdGoal } from '../../../domain/entities/wird';
 import { Chip, PillButton, ProgressBar, Sheet } from '../ui';
 import { toAr } from '../../../shared/utils/format';
-import { colors, icon, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, icon, radius, space, type, themed } from '../../../shared/theme/tokens';
 
 const MINUTES_PER_PAGE = 2;
 
@@ -136,8 +136,8 @@ const GoalSheet = ({ visible, onClose }: { visible: boolean; onClose: () => void
   );
 };
 
-const st = StyleSheet.create({
-  card: { backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: radius.card, padding: space[4] },
+const st = themed(() => ({
+  card: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder, borderRadius: radius.card, padding: space[4] },
   cardDone: { borderColor: colors.goldLine },
   head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   title: { ...type.bodyMedium, fontFamily: 'Tajawal_700Bold', fontSize: 16, color: colors.text },
@@ -157,4 +157,4 @@ const st = StyleSheet.create({
   stepper: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: space[3], backgroundColor: colors.surfaceRaised, borderRadius: radius.field, padding: space[2] },
   stepBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.goldSoft, alignItems: 'center', justifyContent: 'center' },
   stepValue: { ...type.h2, color: colors.text },
-});
+}));

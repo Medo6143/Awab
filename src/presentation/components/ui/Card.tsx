@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
-import { colors, radius, space } from '../../../shared/theme/tokens';
+import { colors, radius, space, themed } from '../../../shared/theme/tokens';
 
 type Props = {
   children: React.ReactNode;
@@ -34,8 +34,8 @@ export const Card = ({ children, raised, onPress, padding = 4, style, accessibil
   return <View style={base}>{children}</View>;
 };
 
-const styles = StyleSheet.create({
+const styles = themed(() => ({
   card: { backgroundColor: colors.surface, borderRadius: radius.card },
   raised: { backgroundColor: colors.surfaceRaised },
   pressed: { opacity: 0.85 },
-});
+}));

@@ -13,7 +13,7 @@ import {
 } from '../../data/hadith/hadithLibrary';
 import type { HadithIndexEntry } from '../../domain/entities/hadith';
 import { toAr } from '../../shared/utils/format';
-import { colors, icon, radius, space, type } from '../../shared/theme/tokens';
+import { colors, icon, radius, space, type, themed } from '../../shared/theme/tokens';
 
 /**
  * The hadith library: search, hadith of the day and the category index on top; a
@@ -121,7 +121,7 @@ const HadithLibraryScreen = ({ navigation, route }: ScreenProps<'الأحادي�
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   root: { flex: 1, backgroundColor: colors.bg },
   list: { paddingHorizontal: 20 },
   search: { flexDirection: 'row', alignItems: 'center', gap: space[2], backgroundColor: colors.surface, borderRadius: radius.field, paddingHorizontal: space[4], height: 48, marginBottom: space[3] },
@@ -140,6 +140,6 @@ const st = StyleSheet.create({
   subText: { ...type.label, color: colors.textSoft },
   count: { ...type.caption, color: colors.textMuted, marginBottom: space[2] },
   note: { ...type.caption, color: colors.textFaint, textAlign: 'center', marginBottom: space[3] },
-});
+}));
 
 export default HadithLibraryScreen;

@@ -17,7 +17,7 @@ type Props = {
 export const PillButton = ({ label, onPress, variant = 'primary', icon, size = 'md', loading, disabled, style }: Props) => {
   const accent = useAccent();
   const bg = variant === 'primary' ? accent.accent : variant === 'danger' ? colors.dangerSoft : accent.accentSoft;
-  const fg = variant === 'primary' ? accent.onAccent : variant === 'danger' ? '#ff8a80' : accent.accentText;
+  const fg = variant === 'primary' ? accent.onAccent : variant === 'danger' ? colors.dangerText : accent.accentText;
   return (
     <TouchableOpacity
       onPress={onPress}

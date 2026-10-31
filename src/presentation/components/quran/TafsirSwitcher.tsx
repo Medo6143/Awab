@@ -5,7 +5,7 @@ import * as Haptics from 'expo-haptics';
 import { RootState } from '../../store';
 import { setTafsirFontSize, setTafsirId, setTafsirStyle, TafsirStyle } from '../../store/slices/settingsSlice';
 import { MUYASSAR_TAFSIR_ID, STYLES_LIST, TAFSIR_LIST } from '../settings/SettingsConstants';
-import { colors, radius, space } from '../../../shared/theme/tokens';
+import { colors, radius, space, themed } from '../../../shared/theme/tokens';
 import { toAr } from '../../../shared/utils/format';
 
 /**
@@ -52,7 +52,7 @@ const Chip = ({ label, on, onPress }: { label: string; on: boolean; onPress: () 
   </TouchableOpacity>
 );
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   wrap: { gap: space[2], marginBottom: space[4] },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: space[2] },
   row2: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: space[2] },
@@ -65,4 +65,4 @@ const st = StyleSheet.create({
   fontTxt: { fontFamily: 'Tajawal_700Bold', fontSize: 15, color: colors.paperInk },
   fontTxtSm: { fontFamily: 'Tajawal_700Bold', fontSize: 12, color: colors.paperInk },
   fontVal: { fontFamily: 'Tajawal_700Bold', fontSize: 12, color: colors.paperMuted, minWidth: 22, textAlign: 'center' },
-});
+}));

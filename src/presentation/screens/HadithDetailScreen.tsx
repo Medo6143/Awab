@@ -16,7 +16,7 @@ import { ShareStylePicker } from '../components/share/ShareStylePicker';
 import { useDependencies } from '../providers/DependencyProvider';
 import { hadithEntry } from '../../data/hadith/hadithLibrary';
 import type { HadithDetail } from '../../domain/entities/hadith';
-import { colors, icon, radius, space, type } from '../../shared/theme/tokens';
+import { colors, icon, radius, space, type, themed } from '../../shared/theme/tokens';
 
 /** One hadith: text with its narrator, grade, explanation, benefits and word meanings. */
 const HadithDetailScreen = ({ navigation, route }: ScreenProps<'الحديث'>) => {
@@ -118,7 +118,7 @@ const HadithDetailScreen = ({ navigation, route }: ScreenProps<'الحديث'>) 
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   loading: { paddingTop: space[4] },
   preview: { fontFamily: 'Amiri_700Bold', fontSize: 19, lineHeight: 36, color: colors.textSoft, textAlign: 'center' },
   card: { backgroundColor: colors.surface, borderRadius: radius.card, padding: space[4], borderWidth: 1, borderColor: colors.goldLineSoft },
@@ -133,6 +133,6 @@ const st = StyleSheet.create({
   wordMeaning: { ...type.body, color: colors.textSoft, marginTop: 2 },
   ref: { ...type.caption, color: colors.textMuted, lineHeight: 20 },
   source: { ...type.caption, color: colors.textFaint, textAlign: 'center', marginTop: space[6] },
-});
+}));
 
 export default HadithDetailScreen;

@@ -10,7 +10,7 @@ import { ReminderEditor, clock12 } from '../components/reminders/ReminderEditor'
 import { AzanReadinessCard } from '../components/settings/AzanReadinessCard';
 import { PRAYER_NAMES_AR, REMINDER_PRESETS, Reminder, WEEKDAYS_SHORT, newReminder, resolveReminderTime } from '../../domain/entities/reminders';
 import { toAr } from '../../shared/utils/format';
-import { colors, icon, radius, space, type } from '../../shared/theme/tokens';
+import { colors, icon, radius, space, type, themed } from '../../shared/theme/tokens';
 
 const daysLabel = (days: number[]) =>
   days.length === 0 || days.length === 7 ? 'كل يوم' : days.map((d) => WEEKDAYS_SHORT[d]).join('، ');
@@ -88,7 +88,7 @@ const RemindersScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   empty: { backgroundColor: colors.surface, borderRadius: radius.card, padding: space[5], marginTop: space[2] },
   emptyTitle: { ...type.h2, color: colors.text },
   emptyText: { ...type.body, color: colors.textMuted, marginTop: space[1] },
@@ -102,6 +102,6 @@ const st = StyleSheet.create({
   time: { fontFamily: 'Tajawal_800ExtraBold', fontSize: 20, color: colors.text, marginTop: 2 },
   meta: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: space[2] },
   metaText: { ...type.caption, color: colors.textMuted },
-});
+}));
 
 export default RemindersScreen;

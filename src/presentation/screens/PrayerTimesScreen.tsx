@@ -10,7 +10,7 @@ import { Screen, ErrorState, EmptyState, Skeleton } from '../components/ui';
 import { SkyButton, SkyHero } from '../components/home/SkyHero';
 import { AsrIcon, DhuhrIcon, FajrIcon, IconComponent, IshaIcon, KaabaIcon, MaghribIcon } from '../components/icons/IslamicIcons';
 import { toAr } from '../../shared/utils/format';
-import { colors, radius, space, type } from '../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../shared/theme/tokens';
 
 const PRAYERS: { key: string; task: string; ar: string; Icon: IconComponent }[] = [
   { key: 'Fajr', task: 'fajr', ar: 'الفجر', Icon: FajrIcon },
@@ -119,7 +119,7 @@ const PrayerTimesScreen = ({ navigation, tab, onOpenQibla }: EmbeddableScreenPro
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   locked: { opacity: 0.55 },
   body: { paddingHorizontal: 20, marginTop: -space[3] },
   listHead: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: space[2] },
@@ -127,20 +127,20 @@ const st = StyleSheet.create({
   listSub: { ...type.caption, color: colors.textMuted },
   row: {
     flexDirection: 'row', alignItems: 'center', gap: space[3], marginBottom: space[2],
-    backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder,
     borderRadius: radius.card, paddingHorizontal: space[3], paddingVertical: space[3],
   },
   rowNext: { backgroundColor: colors.surfaceRaised, borderColor: colors.goldLine },
-  icon: { width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center' },
+  icon: { width: 40, height: 40, borderRadius: 12, backgroundColor: colors.card, alignItems: 'center', justifyContent: 'center' },
   iconNext: { backgroundColor: colors.goldSoft },
   name: { ...type.bodyMedium, color: colors.textSoft, flex: 1 },
   nameNext: { fontFamily: 'Tajawal_700Bold', color: colors.text },
   nextTag: { ...type.caption, color: colors.gold },
   time: { fontFamily: 'Tajawal_700Bold', fontSize: 18, color: colors.text, fontVariant: ['tabular-nums'] },
   timeNext: { color: colors.goldText },
-  check: { width: 26, height: 26, borderRadius: 13, borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center' },
+  check: { width: 26, height: 26, borderRadius: 13, borderWidth: 1.5, borderColor: colors.ring, alignItems: 'center', justifyContent: 'center' },
   checkOn: { backgroundColor: colors.success, borderColor: colors.success },
   footnote: { ...type.caption, color: colors.textFaint, textAlign: 'center', marginTop: space[3], lineHeight: 18 },
-});
+}));
 
 export default PrayerTimesScreen;

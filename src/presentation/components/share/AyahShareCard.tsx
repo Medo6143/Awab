@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { toAr } from '../../../shared/utils/format';
-import { colors } from '../../../shared/theme/tokens';
+import { colors, themed } from '../../../shared/theme/tokens';
 import { useShareCardSize } from './ImageShareModal';
 import { layoutAyahCard } from './ayahCardLayout';
 import { useShareTextMax } from './storyThemes';
@@ -53,7 +53,7 @@ export const AyahShareCard = ({ ayahText, surahName, ayahNumber, tafsirName, taf
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   // explicit: the share preview wraps cards in an LTR container for positioning
   card: { backgroundColor: colors.bg, justifyContent: 'space-between', direction: 'rtl' },
   frame: { position: 'absolute', borderWidth: 1.2, borderColor: colors.goldLine },
@@ -67,4 +67,4 @@ const st = StyleSheet.create({
   tafsirLabel: { fontFamily: 'Tajawal_700Bold', color: colors.gold },
   tafsirText: { fontFamily: 'Tajawal_400Regular', color: colors.textSoft, textAlign: 'justify' },
   footer: { fontFamily: 'Tajawal_500Medium', color: colors.textFaint, textAlign: 'center' },
-});
+}));

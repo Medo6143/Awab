@@ -4,7 +4,7 @@ import { ScreenProps } from '../navigation/types';
 import { Screen, ScreenHeader } from '../components/ui';
 import { HadithCard, SectionHeading, SupplicationCard, VerseCard } from '../components/guidance/GuidanceBlocks';
 import { VIRTUES } from '../../domain/entities/virtues';
-import { colors, space, type } from '../../shared/theme/tokens';
+import { colors, space, type, themed } from '../../shared/theme/tokens';
 
 /** "فضل الدعاء" / "فضل الذكر": verses (from the Quran source) and verified hadiths. */
 const VirtuesScreen = ({ navigation, route }: ScreenProps<'الفضائل'>) => {
@@ -25,9 +25,9 @@ const VirtuesScreen = ({ navigation, route }: ScreenProps<'الفضائل'>) => 
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   intro: { ...type.body, color: colors.textSoft, lineHeight: 26, marginBottom: space[3] },
   note: { ...type.caption, color: colors.textFaint, textAlign: 'center', marginTop: space[6] },
-});
+}));
 
 export default VirtuesScreen;

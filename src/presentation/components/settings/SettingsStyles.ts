@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 
-export const s = StyleSheet.create({
+export const s = themed(() => ({
   root: { flex: 1, backgroundColor: colors.bg },
   content: { paddingBottom: space[10] },
 
@@ -53,4 +53,4 @@ export const s = StyleSheet.create({
   readinessHint: { ...type.caption, color: colors.textMuted, marginTop: 2 },
   readinessSummary: { ...type.body, color: colors.textMuted, marginBottom: space[2] },
 
-});
+}));

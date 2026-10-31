@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import Svg, { Defs, LinearGradient, Line, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
-import { colors } from '../../../shared/theme/tokens';
+import { colors, themed } from '../../../shared/theme/tokens';
 
 const SAJID = require('../../../../assets/images/sajid.png');
 const AnimatedPath = Animated.createAnimatedComponent(Path);
@@ -144,7 +144,7 @@ export const AnimatedSplash = ({ onDone }: Props) => {
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   root: { backgroundColor: '#0c0805', zIndex: 100 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   floor: { position: 'absolute' },
@@ -152,4 +152,4 @@ const st = StyleSheet.create({
   name: { fontFamily: 'Amiri_700Bold', fontSize: 50, lineHeight: 70, color: colors.gold, marginTop: 10 },
   verse: { fontFamily: 'Amiri_400Regular', fontSize: 17, color: '#cfc4b2' },
   rule: { width: 130, height: 1, backgroundColor: colors.gold, marginTop: 18 },
-});
+}));

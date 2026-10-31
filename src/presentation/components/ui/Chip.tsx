@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 
 type Props = {
@@ -33,7 +33,7 @@ export const Chip = ({ label, selected, onPress, icon, size = 'md', style }: Pro
   );
 };
 
-const styles = StyleSheet.create({
+const styles = themed(() => ({
   chip: {
     flexDirection: 'row', alignItems: 'center', gap: space[2],
     paddingHorizontal: space[4], paddingVertical: space[3],
@@ -42,4 +42,4 @@ const styles = StyleSheet.create({
   chipSm: { paddingHorizontal: space[3], paddingVertical: space[2] },
   label: { ...type.bodyMedium, color: colors.textMuted },
   labelSm: { ...type.label, color: colors.textMuted },
-});
+}));

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { colors } from '../../../shared/theme/tokens';
+import { colors, themed } from '../../../shared/theme/tokens';
 import { Ayah, mushafAyahText, toAr } from '../quran/QuranConstants';
 import { s as q } from '../quran/QuranStyles';
 import { TasmeeHelp, firstLetter, splitWords } from './tasmeeText';
@@ -100,7 +100,7 @@ const ayahWords = (
   });
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   // opacity does not apply to nested Text on Android: fade with the colour instead
   faded: { color: 'rgba(39,25,0,0.32)' },
   // Android ignores a transparent colour on nested Text, so the ink takes the strip's own
@@ -109,4 +109,4 @@ const st = StyleSheet.create({
   current: { color: CURRENT_STRIP, backgroundColor: CURRENT_STRIP },
   hint: { color: colors.paperInk },
   mistake: { color: colors.danger, backgroundColor: colors.dangerSoft, textDecorationLine: 'underline' },
-});
+}));

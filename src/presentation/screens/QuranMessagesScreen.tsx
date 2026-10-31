@@ -17,7 +17,7 @@ import { QURAN_MESSAGES, QuranMessage } from '../../domain/entities/quranMessage
 import type { VerseRef } from '../../domain/entities/guidance';
 import { SURAH_NAMES } from '../../shared/constants/surahs';
 import { toAr } from '../../shared/utils/format';
-import { colors, icon, radius, space, type } from '../../shared/theme/tokens';
+import { colors, icon, radius, space, type, themed } from '../../shared/theme/tokens';
 
 type Share =
   | { kind: 'ayah'; text: string; excerpt: string; surah: number; ayah: number }
@@ -168,7 +168,7 @@ const QuranMessagesScreen = ({ navigation, route }: ScreenProps<'رسائل_ال
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   lead: { ...type.body, color: colors.textSoft, lineHeight: 26, marginBottom: space[4] },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space[3] },
   surprise: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space[2], height: 48, borderRadius: radius.pill, backgroundColor: colors.gold, marginVertical: space[4] },
@@ -191,6 +191,6 @@ const st = StyleSheet.create({
 
   footer: { paddingHorizontal: 20, paddingTop: space[3], borderTopWidth: 1, borderTopColor: colors.hairline, backgroundColor: colors.bg },
   another: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space[2], height: 52, borderRadius: radius.pill, backgroundColor: colors.gold },
-});
+}));
 
 export default QuranMessagesScreen;

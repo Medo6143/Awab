@@ -10,19 +10,19 @@ import { DEFAULT_AZAN_SETTINGS, DEFAULT_NOTIFICATION_PREFS } from '../../domain/
 import { RootState } from '../store';
 import {
   toggleNotifications, toggleLocation, setTafsirId, setTafsirStyle, setTafsirFontSize,
-  setAccentTheme, setReciterId, toggleNotificationCategory, setAzanSettings,
+  setAccentTheme, setTheme, setReciterId, toggleNotificationCategory, setAzanSettings,
   setDailyWardTime, setEncouragementInterval, toggleTasbeehHaptics, setAsrMethod, toggleTasbeehTargetAlert, setPrayerMethod,
 } from '../store/slices/settingsSlice';
 import { setFloatingScale, setFloatingBubbleColor, toggleFloatingBorder, toggleFloatingReset, setFloatingReminderInterval } from '../store/slices/tasbeehSlice';
 import { RECITER_MAP } from '../../data/services/AudioService';
 import { methodName } from '../../domain/entities/prayerMethods';
 import { AZAN_TYPES } from '../components/settings/AzanConstants';
-import { colors, icon, radius, space, type } from '../../shared/theme/tokens';
+import { colors, icon, radius, space, type, themed } from '../../shared/theme/tokens';
 import { toAr } from '../../shared/utils/format';
 
 import { IconTile, Screen, ScreenHeader } from '../components/ui';
 import {
-  SettingSection, ItemRow, ThemeSelector, ReciterSelector, TafsirSettings,
+  SettingSection, ItemRow, ThemeModeSelector, ThemeSelector, ReciterSelector, TafsirSettings,
   NotificationSettings, AzanSelector, FloatingTasbeehSettings, AsrMethodSelector, PrayerMethodSelector,
 } from '../components/settings/SettingsComponents';
 import { AzanReadinessCard } from '../components/settings/AzanReadinessCard';
@@ -85,7 +85,7 @@ const useSectionHint = (id: Section) => {
     case 'alerts': return `${st8.notificationsEnabled ? 'الإشعارات شغالة' : 'الإشعارات متوقفة'} · ${toAr(reminders.filter((r) => r.enabled).length)} تذكير`;
     case 'quran': return `القارئ: ${RECITER_MAP[st8.selectedReciterId]?.name ?? ''}`;
     case 'tasbeeh': return tasbeeh.floatingReminderInterval ? `تذكير كل ${toAr(tasbeeh.floatingReminderInterval)} دقايق` : 'الاهتزاز والهدف والعائمة';
-    case 'look': return st8.accentTheme === 'emerald' ? 'زمردي' : st8.accentTheme === 'midnight' ? 'ليلي' : 'ذهبي';
+    case 'look': return `${st8.theme === 'light' ? 'فاتح' : st8.theme === 'system' ? 'حسب الموبايل' : 'داكن'} · ${st8.accentTheme === 'emerald' ? 'زمردي' : st8.accentTheme === 'midnight' ? 'ليلي' : 'ذهبي'}`;
   }
 };
 
@@ -115,7 +115,7 @@ const SectionBody = ({ section, navigation }: { section: Section; navigation: Sc
   const dispatch = useDispatch();
   const {
     notificationsEnabled, locationEnabled, selectedTafsirId, tafsirStyle, tafsirFontSize,
-    accentTheme, selectedReciterId, notificationPrefs, azanSettings: rawAzanSettings,
+    theme, accentTheme, selectedReciterId, notificationPrefs, azanSettings: rawAzanSettings,
     tasbeehHaptics = true, tasbeehTargetAlert = true, asrMethod = 'auto', prayerMethod = 'auto',
   } = useSelector((state: RootState) => state.settings);
   // the method today's times were actually fetched with
@@ -191,6 +191,7 @@ const SectionBody = ({ section, navigation }: { section: Section; navigation: Sc
     case 'look':
       return (
         <SettingSection title="لون التطبيق">
+          <ThemeModeSelector value={theme ?? 'dark'} onSelect={(m) => dispatch(setTheme(m))} />
           <ThemeSelector accentTheme={accentTheme} onSelect={(id) => dispatch(setAccentTheme(id))} />
         </SettingSection>
       );
@@ -214,11 +215,11 @@ const NavRow = ({ icon: Icon, label, sub, onPress, first }: { icon: typeof Info;
   </View>
 );
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   summary: { flexDirection: 'row', gap: space[2], marginTop: space[2] },
   summaryItem: { flex: 1, backgroundColor: colors.surface, borderRadius: radius.tile, paddingVertical: space[3], paddingHorizontal: space[2], alignItems: 'center' },
   summaryValue: { fontFamily: 'Tajawal_700Bold', fontSize: 15, color: colors.goldText },
   summaryLabel: { ...type.caption, color: colors.textMuted, marginTop: 2 },
-});
+}));
 
 export default SettingsScreen;

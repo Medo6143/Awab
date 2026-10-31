@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import type { HadithIndexEntry } from '../../../domain/entities/hadith';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 
 export const GradeChips = ({ grade, attribution }: { grade: string; attribution: string }) => (
   <View style={st.chips}>
@@ -18,11 +18,11 @@ export const HadithRow = ({ entry, onPress }: { entry: HadithIndexEntry; onPress
   </TouchableOpacity>
 );
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   row: { backgroundColor: colors.surface, borderRadius: radius.card, padding: space[4], marginBottom: space[2] },
   title: { fontFamily: 'Amiri_700Bold', fontSize: 17, lineHeight: 31, color: colors.text },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space[2], marginTop: space[2] },
   chip: { borderRadius: radius.pill, paddingHorizontal: space[3], paddingVertical: 3, backgroundColor: colors.goldSoft },
   gradeChip: { backgroundColor: colors.successSoft },
   chipText: { ...type.caption, color: colors.gold },
-});
+}));

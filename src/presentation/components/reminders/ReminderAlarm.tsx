@@ -15,7 +15,7 @@ import { Reminder, ReminderQuote, presetOf, resolveReminderTime } from '../../..
 import { REMINDER_ART } from './art';
 import { navigationRef } from '../../navigation/AppNavigation';
 import { toAr } from '../../../shared/utils/format';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 
 /** Ibada tasks a reminder's "done" button checks off. */
 const TASK_OF: Partial<Record<Reminder['kind'], string>> = { qiyam: 'qiyam_al_layl', duha: 'duha' };
@@ -174,7 +174,7 @@ const SlideToConfirm = ({ label, onConfirm }: { label: string; onConfirm: () => 
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   root: { flex: 1, backgroundColor: colors.bg },
   hero: { height: '58%', width: '100%', justifyContent: 'flex-end', overflow: 'hidden' },
   heroImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
@@ -197,4 +197,4 @@ const st = StyleSheet.create({
   row: { flexDirection: 'row', gap: space[3], alignSelf: 'stretch' },
   secondary: { flex: 1, alignItems: 'center', paddingVertical: space[3], borderRadius: radius.card, backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
   secondaryText: { ...type.bodyMedium, color: colors.text },
-});
+}));

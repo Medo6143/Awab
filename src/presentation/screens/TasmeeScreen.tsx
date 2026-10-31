@@ -11,7 +11,7 @@ import { recordTasmee } from '../store/slices/quranSlice';
 import { RootState } from '../store';
 import { SURAH_AYAH_COUNTS, SURAH_NAMES } from '../../shared/constants/surahs';
 import { toAr } from '../../shared/utils/format';
-import { colors, icon, radius, space, type } from '../../shared/theme/tokens';
+import { colors, icon, radius, space, type, themed } from '../../shared/theme/tokens';
 import { useAccent } from '../../shared/theme/useAccent';
 import { surahPageRange } from '../../data/quran/ayahSearch';
 import { useVoiceTasmee } from '../hooks/useVoiceTasmee';
@@ -322,7 +322,7 @@ const TasmeeScreen = ({ navigation, route }: ScreenProps<'التسميع'>) => {
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   flex: { flex: 1 },
   grow: { flex: 1.5 },
   pageWrap: { flex: 1, padding: space[2] },
@@ -337,6 +337,6 @@ const st = StyleSheet.create({
   summaryScore: { fontFamily: 'Tajawal_800ExtraBold', fontSize: 28, lineHeight: 34 },
   summaryOf: { fontFamily: 'Tajawal_700Bold', fontSize: 14, color: colors.textMuted },
   summarySub: { ...type.caption, color: colors.textMuted },
-});
+}));
 
 export default TasmeeScreen;

@@ -2,7 +2,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Heart, RotateCcw } from 'lucide-react-native';
 import { PillButton, ProgressRing } from '../ui';
-import { colors, icon, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, icon, radius, space, type, themed } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 import { toAr } from '../../../shared/utils/format';
 import { ayahsLabel, minutesLabel } from './tasmeeText';
@@ -81,7 +81,7 @@ export const TasmeeResult = ({ total, rangeLabel, mistakes, minutes, memorized, 
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   wrap: { paddingHorizontal: space[5], paddingBottom: space[10] },
   hero: { alignItems: 'center', paddingTop: space[6], paddingBottom: space[5] },
   ringInner: { alignItems: 'center' },
@@ -95,7 +95,7 @@ const st = StyleSheet.create({
   label: { ...type.label, color: colors.textMuted, marginBottom: space[2] },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space[3], backgroundColor: colors.surface, borderRadius: radius.tile, paddingHorizontal: space[4], paddingVertical: space[3], marginBottom: space[2] },
   rowTitle: { ...type.bodyMedium, color: colors.text },
-  rowTag: { ...type.caption, color: '#ff8a80', backgroundColor: colors.dangerSoft, borderRadius: radius.pill, paddingHorizontal: space[3], paddingVertical: space[1], flexShrink: 1, fontFamily: 'Amiri_400Regular', fontSize: 14 },
+  rowTag: { ...type.caption, color: colors.dangerText, backgroundColor: colors.dangerSoft, borderRadius: radius.pill, paddingHorizontal: space[3], paddingVertical: space[1], flexShrink: 1, fontFamily: 'Amiri_400Regular', fontSize: 14 },
   primary: { marginTop: space[4] },
   secondary: { marginTop: space[2] },
-});
+}));

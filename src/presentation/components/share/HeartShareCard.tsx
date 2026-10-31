@@ -4,7 +4,7 @@ import { AnatomicalHeart } from '../heart/AnatomicalHeart';
 import { formatDate, khatmaTitle, MODE_NOUN } from '../heart/khatmaFormat';
 import type { HeartMode } from '../../store/slices/quranSlice';
 import { toAr } from '../../../shared/utils/format';
-import { colors } from '../../../shared/theme/tokens';
+import { colors, themed } from '../../../shared/theme/tokens';
 import { useShareCardSize } from './ImageShareModal';
 
 const LOGO = require('../../../../assets/icon.png');
@@ -63,7 +63,7 @@ const DateCell = ({ label, value, u }: { label: string; value: string; u: number
   </View>
 );
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   // explicit: the share preview wraps cards in an LTR container for positioning
   card: { backgroundColor: colors.bg, justifyContent: 'space-between', direction: 'rtl' },
   frame: { position: 'absolute', borderWidth: 1.2, borderColor: colors.goldLine },
@@ -75,4 +75,4 @@ const st = StyleSheet.create({
   dateValue: { fontFamily: 'Tajawal_700Bold', color: colors.text },
   brand: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   brandName: { fontFamily: 'Tajawal_800ExtraBold', color: colors.gold },
-});
+}));

@@ -14,7 +14,7 @@ import { ALL_SURAHS, daysBetween, daysLabel, formatDate, khatmaTitle, MODE_NOUN 
 import { ImageShareModal } from '../components/share/ImageShareModal';
 import { HeartShareCard } from '../components/share/HeartShareCard';
 import { toAr } from '../../shared/utils/format';
-import { colors, icon, radius, space, type } from '../../shared/theme/tokens';
+import { colors, icon, radius, space, type, themed } from '../../shared/theme/tokens';
 
 const EMPTY: Khatma[] = [];
 
@@ -77,7 +77,7 @@ const KhatmatScreen = ({ navigation, route }: ScreenProps<'الختمات'>) => 
   );
 };
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   root: { flex: 1, backgroundColor: colors.bg },
   list: { paddingHorizontal: 20, paddingBottom: space[10], flexGrow: 1 },
   row: { flexDirection: 'row', alignItems: 'center', gap: space[4], backgroundColor: colors.surface, borderRadius: radius.card, padding: space[3], marginBottom: space[2] },
@@ -86,6 +86,6 @@ const st = StyleSheet.create({
   dates: { ...type.caption, color: colors.textMuted, marginTop: 2 },
   days: { ...type.caption, color: colors.gold, marginTop: 2 },
   note: { ...type.caption, color: colors.textMuted, textAlign: 'center', marginTop: space[3] },
-});
+}));
 
 export default KhatmatScreen;

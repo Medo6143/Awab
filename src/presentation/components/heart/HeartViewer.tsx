@@ -4,7 +4,7 @@ import { Download, Eraser, Maximize2, ZoomIn, ZoomOut } from 'lucide-react-nativ
 import * as Haptics from 'expo-haptics';
 import { stepZoom, ZoomableHeart } from './ZoomableHeart';
 import { HEART_VB_H, HEART_VB_W } from './heartCells';
-import { colors, icon, radius, space } from '../../../shared/theme/tokens';
+import { colors, icon, radius, space, themed } from '../../../shared/theme/tokens';
 import { toAr } from '../../../shared/utils/format';
 
 const ZOOMS = [1, 1.5, 2, 2.6];
@@ -87,10 +87,10 @@ const Tool = ({ label, onPress, disabled, children }: { label: string; onPress: 
   </TouchableOpacity>
 );
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   bar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', alignSelf: 'center', gap: space[1], backgroundColor: colors.surface, borderRadius: radius.pill, paddingHorizontal: space[3], paddingVertical: space[1], marginTop: space[3] },
   tool: { alignItems: 'center', justifyContent: 'center', minWidth: 50, paddingVertical: space[1] },
   toolLabel: { fontFamily: 'Tajawal_500Medium', fontSize: 10, color: colors.textMuted, marginTop: 2 },
   zoomText: { fontFamily: 'Tajawal_700Bold', fontSize: 12, color: colors.text, minWidth: 40, textAlign: 'center' },
   sep: { width: 1, height: 26, backgroundColor: colors.hairline, marginHorizontal: space[1] },
-});
+}));

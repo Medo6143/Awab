@@ -14,7 +14,7 @@ import {
 } from '../../../domain/entities/reminders';
 import { PRAYER_IDS } from '../../../domain/entities/notifications';
 import { toAr } from '../../../shared/utils/format';
-import { colors, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 
 const SOUNDS: { id: ReminderSound; label: string; hint: string }[] = [
   { id: 'recitation', label: 'تلاوة بصوت القارئ', hint: 'آيات مناسبة، بتتحمل مرة وتشتغل من غير نت' },
@@ -163,7 +163,7 @@ const StyleOption = ({ icon, label, hint, on, onPress }: { icon: React.ReactNode
   </TouchableOpacity>
 );
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   label: { ...type.label, color: colors.textMuted, marginTop: space[5], marginBottom: space[2] },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: space[2], marginBottom: space[2] },
   input: { ...type.body, color: colors.text, backgroundColor: colors.surfaceRaised, borderRadius: radius.field, paddingHorizontal: space[4], paddingVertical: space[3], textAlign: 'right' },
@@ -188,4 +188,4 @@ const st = StyleSheet.create({
   artOn: { borderColor: colors.gold },
   artImg: { width: '100%', height: 80 },
   artLabel: { ...type.caption, color: colors.textSoft, textAlign: 'center', paddingVertical: 4 },
-});
+}));

@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { BellRing, Database, Globe, MapPin, ShieldCheck, Trash2 } from 'lucide-react-native';
 import { ScreenProps } from '../navigation/types';
 import { Screen, ScreenHeader } from '../components/ui';
-import { colors, icon, radius, space, type } from '../../shared/theme/tokens';
+import { colors, icon, radius, space, type, themed } from '../../shared/theme/tokens';
 
 type Section = { icon: typeof ShieldCheck; title: string; body: string[] };
 
@@ -83,12 +83,12 @@ const PrivacyScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => (
   </Screen>
 );
 
-const st = StyleSheet.create({
+const st = themed(() => ({
   card: { backgroundColor: colors.surface, borderRadius: radius.card, padding: space[4], marginBottom: space[3] },
   head: { flexDirection: 'row', alignItems: 'center', gap: space[3], marginBottom: space[2] },
   iconWrap: { width: 38, height: 38, borderRadius: radius.tile, backgroundColor: colors.goldSoft, alignItems: 'center', justifyContent: 'center' },
   title: { ...type.bodyMedium, fontFamily: 'Tajawal_700Bold', color: colors.text, flex: 1 },
   body: { ...type.body, color: colors.textSoft, lineHeight: 25, marginTop: space[1] },
-});
+}));
 
 export default PrivacyScreen;
