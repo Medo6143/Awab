@@ -24,6 +24,9 @@ const SOURCES = [
   ['مراجعة الأحاديث', 'الدرر السنية (dorar.net)'],
   ['مواقيت الصلاة', 'aladhan.com'],
   ['التلاوات', 'mp3quran.net · everyayah.com'],
+  ['صوت الكلمة في التسميع', 'quran.com (word by word)'],
+  // CC BY 4.0 asks for this credit; the model file is adapted (front-end fused, position table cut)
+  ['التعرّف على التلاوة في التسميع بالصوت', 'mrmuminov/quran-fastconformer-ctc-ar، مبني على NVIDIA stt_ar_fastconformer_hybrid_large_pcd_v1.0 (CC BY 4.0، بتعديل)'],
 ];
 
 const AboutScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {

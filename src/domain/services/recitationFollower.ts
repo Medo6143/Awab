@@ -117,16 +117,19 @@ const dropPreambles = (heard: string[], due: string[]): string[] => {
       // the model also runs its words together («بسمالله»), so letters are compared, not words
       for (let o = 0; o + need <= p.length; o++) {
         if (o > 0 && k > 0) break;
-        // the span of heard words closest to the preamble (not the longest within tolerance, which
-        // swallowed the word after it: «بسم الله الرحمن الرحيم الم» is the basmala, then «الم»)
-        let best = Infinity;
+        // the span of heard words closest to the preamble, and on a tie the one covering more of
+        // it: not the longest within tolerance, which swallowed the word after it («بسم الله الرحمن
+        // الرحيم الم» is the basmala, then «الم»), nor the shortest exact one («بسم الله» alone left
+        // «الرحمن الرحيم» to be taken for the text)
+        let best = Infinity, bestWords = 0;
         for (let m = k + 1; m <= heard.length; m++) {
           const said = sound(heard.slice(k, m).join(''));
           for (let n = p.length - o; n >= need; n--) {
             const target = sound(p.slice(o, o + n).join(''));
             if (Math.abs(said.length - target.length) > 3) continue;
             const d = editDistance(said, target);
-            if (d <= Math.max(1, Math.round(target.length * 0.2)) && d < best) { best = d; run = m - k; }
+            if (d > Math.max(1, Math.round(target.length * 0.2))) continue;
+            if (d < best || (d === best && n > bestWords)) { best = d; bestWords = n; run = m - k; }
           }
         }
         if (run) break;

@@ -5,16 +5,14 @@ import { CtcEngine, CtcTiming } from './ctcEngine';
 
 /**
  * The offline speech model for voice tasmee: a FastConformer CTC model trained on the Quran
- * (see ctcEngine). It is not in the APK: the user downloads it once from the app's site,
- * the first time they choose «بصوتي».
+ * (see ctcEngine). It is not in the APK: the user downloads it once, from a release of the
+ * app's GitHub repo, the first time they choose «بصوتي».
  */
-export const MODEL_URL = 'https://owwab.vercel.app/models/quran-ctc-int8.onnx';
+// a GitHub release of the app's repo (credit and changes in its notes, and in «عن أوّاب»)
+export const MODEL_URL = 'https://github.com/Medo6143/Awab/releases/download/model-quran-ctc-v1/quran-ctc-int8.onnx';
 export const MODEL_MB = 157;
 
 const MODEL_FILE = `${FileSystem.documentDirectory}asr/quran-ctc-int8.onnx`;
-// TEMPORARY, until the model is on the site: a copy pushed over USB (adb can write the app's
-// external files dir) stands in for the download
-const DEV_MODEL = 'file:///storage/emulated/0/Android/data/com.mohamewael66sorganization.owwab/files/asr/quran-ctc-int8.onnx';
 
 const SAMPLE_RATE = 16000;
 
@@ -24,9 +22,7 @@ const exists = async (uri: string, minBytes = 1_000_000) => {
 
 /** The model on this phone, or null. */
 export const modelPath = async (): Promise<string | null> => {
-  if (await exists(MODEL_FILE)) return MODEL_FILE;
-  if (Platform.OS === 'android' && await exists(DEV_MODEL)) return DEV_MODEL;
-  return null;
+  return (await exists(MODEL_FILE)) ? MODEL_FILE : null;
 };
 
 /** Downloads the model; `onProgress` gets 0..1. Resolves when it is ready to use. */
