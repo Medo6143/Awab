@@ -155,9 +155,13 @@ function withNativePackages(config) {
       `add(${pkg}.widget.PrayerWidgetPackage())`,
       `add(${pkg}.AzanPackage())`,
       `add(${pkg}.OemBatteryPackage())`,
+      // Expo's autolinking leaves onnxruntime-react-native out of PackageList (its gradle
+      // project is still built), so the recitation model's native module is added here
+      'add(ai.onnxruntime.reactnative.OnnxruntimePackage())',
     ];
-    if (!src.includes('AzanPackage()')) {
-      src = src.replace(marker, `${marker}\n              ${lines.join('\n              ')}`);
+    const missing = lines.filter((l) => !src.includes(l));
+    if (missing.length) {
+      src = src.replace(marker, `${marker}\n              ${missing.join('\n              ')}`);
     }
     config.modResults.contents = src;
     return config;

@@ -90,7 +90,8 @@ const ayahWords = (
   const strip = state === 'current' ? st.current : st.hidden;
   return words.map((w, i) => {
     const key = `${n}-${i}`;
-    if (i < shown || (help === 'firstWord' && i === 0)) return <Text key={key} style={strip}><Text style={st.hint}>{w}</Text>{gap(i)}</Text>;
+    // words already said (voice) or given as a hint; a voice mistake shows before the ayah ends
+    if (i < shown || (help === 'firstWord' && i === 0)) return <Text key={key} style={strip}><Text style={marked?.includes(i) ? st.mistake : st.hint}>{w}</Text>{gap(i)}</Text>;
     if (help === 'firstLetter') {
       const head = firstLetter(w);
       return <Text key={key} style={strip}><Text style={st.hint}>{head}</Text>{w.slice(head.length)}{gap(i)}</Text>;

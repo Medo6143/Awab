@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Haptics from 'expo-haptics';
-import { ChevronLeft, Eye, Lightbulb, RotateCcw, Volume2, X } from 'lucide-react-native';
+import { ChevronLeft, Eye, Lightbulb, Mic, RotateCcw, Square, Volume2, X } from 'lucide-react-native';
 import { ScreenProps, TasmeeParams } from '../navigation/types';
 import { Screen, ScreenHeader, IconButton, PillButton, ErrorState } from '../components/ui';
 import { useAudio } from '../hooks/useAudio';
@@ -14,6 +14,7 @@ import { toAr } from '../../shared/utils/format';
 import { colors, icon, radius, space, type } from '../../shared/theme/tokens';
 import { useAccent } from '../../shared/theme/useAccent';
 import { surahPageRange } from '../../data/quran/ayahSearch';
+import { useVoiceTasmee } from '../hooks/useVoiceTasmee';
 import { GeometricFrame } from '../components/quran/MushafOrnaments';
 import { s as q } from '../components/quran/QuranStyles';
 import { Ayah, mushafAyahText } from '../components/quran/QuranConstants';
@@ -29,8 +30,9 @@ const pagesLabel = (from: number, to: number) => (from === to ? `صفحة ${toAr
 /**
  * Tasmee on the mushaf page itself. The ayahs being recited are covered by paper strips in
  * their exact place; «اكشف الآية» uncovers the next one, and tapping a word marks it wrong.
- * Ayahs left unmarked count as correct, so there is no grading step per ayah. The voice
- * mode will drive the same page: uncover words as they are heard and mark wrong ones itself.
+ * Ayahs left unmarked count as correct, so there is no grading step per ayah. In voice mode
+ * the reciter just recites: the offline speech model follows along and uncovers the words as
+ * they are said, ayah after ayah, and on a skipped or wrong word marks it and says it aloud.
  */
 const TasmeeScreen = ({ navigation, route }: ScreenProps<'التسميع'>) => {
   const dispatch = useDispatch();
@@ -52,6 +54,7 @@ const TasmeeScreen = ({ navigation, route }: ScreenProps<'التسميع'>) => {
   const startedAt = useRef(Date.now());
   const scroll = useRef<ScrollView>(null);
 
+
   const inSession = useCallback((a: Ayah) =>
     !!mushafAyahText(a)
     && (!cfg.surah || a.surah.number === cfg.surah)
@@ -66,6 +69,17 @@ const TasmeeScreen = ({ navigation, route }: ScreenProps<'التسميع'>) => {
   const stateOf = useCallback((a: Ayah): AyahState =>
     !inSession(a) ? 'outside' : revealed.has(a.number) ? 'revealed' : a.number === current?.number ? 'current' : 'hidden',
   [inSession, revealed, current]);
+
+  const voice = useVoiceTasmee(!!cfg.voice && !done, cfg.voiceMode ?? 'mark', session, revealed, {
+    onHeard: (a, count) => { if (a.number === current?.number) setShown(count); },
+    onAyahDone: (a) => { setRevealed((r) => new Set(r).add(a.number)); setShown(0); },
+    onMistake: (a, words) => {
+      setMarked((m) => ({ ...m, [a.number]: [...new Set([...(m[a.number] ?? []), ...words])].sort((x, y) => x - y) }));
+      // the wrong word shows (in red) while the rest of the ayah stays covered
+      if (a.number === current?.number) setShown((n) => Math.max(n, Math.max(...words, -1) + 1));
+    },
+  });
+  const listening = voice.state === 'listening' || voice.state === 'correcting' || voice.state === 'repeating';
 
   const finish = (all: Record<number, Result>) => {
     const list = Object.values(all);
@@ -256,6 +270,36 @@ const TasmeeScreen = ({ navigation, route }: ScreenProps<'التسميع'>) => {
               onPress={nextPage}
             />
           </View>
+        </View>
+      ) : cfg.voice ? (
+        <View style={st.bar}>
+          <Text style={st.guide}>
+            {voice.state === 'loading' ? 'بيجهّز التسميع بالصوت…'
+              : voice.state === 'error' ? 'ملف الصوت مش جاهز. نزّله تاني من «بصوتي» في إعداد التسميع.'
+              : voice.state === 'noMic' ? 'محتاج إذن المايك عشان يسمعك. اسمح له من إعدادات الموبايل.'
+              : voice.state === 'correcting' ? 'اسمع الكلمة الصح…'
+              : voice.state === 'repeating' ? `قول «${voice.repeat ?? 'الكلمة'}» تاني، وكمّل بعدها`
+              : voice.state === 'listening' ? 'بسمعك… كمّل قراءة'
+              : Object.values(marked).some((m) => m.length) ? 'لو كلمة اتعلّمت وانت قلتها صح، دوس عليها'
+              : 'دوس «سمّع» واقرأ من حفظك، والآيات هتنكشف وانت بتقرأ'}
+          </Text>
+          <View style={st.row}>
+            <PillButton variant="ghost" size="sm" label="تلميح" icon={<Lightbulb size={icon.size.sm} color={accent.accentText} strokeWidth={icon.stroke} />} style={st.flex} onPress={hint} disabled={!current || listening} />
+            <PillButton
+              size="sm"
+              label={listening ? 'وقّف' : 'سمّع'}
+              icon={listening
+                ? <Square size={icon.size.sm} color={accent.onAccent} strokeWidth={icon.stroke} fill={accent.onAccent} />
+                : <Mic size={icon.size.sm} color={accent.onAccent} strokeWidth={icon.stroke} />}
+              style={st.grow}
+              loading={voice.state === 'loading'}
+              onPress={listening ? voice.stop : voice.start}
+              disabled={!current || voice.state === 'error'}
+            />
+          </View>
+          <TouchableOpacity onPress={revealCurrent} disabled={!current} style={st.revealAll} accessibilityRole="button">
+            <Text style={st.revealAllText}>اكشف الآية من غير تسميع</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <View style={st.bar}>

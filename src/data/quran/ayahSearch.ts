@@ -42,6 +42,9 @@ const load = (): Entry[] => {
 export const plainAyahs = (surah: number, from: number, to: number): string[] =>
   load().filter((e) => e.surah === surah && e.ayah >= from && e.ayah <= to).map((e) => e.text);
 
+/** Plain text of one ayah by its global number (1..6236): what voice tasmee compares with. */
+export const plainAyah = (number: number): string => load()[number - 1]?.text ?? '';
+
 /** Builds the index ahead of the first query (call when the search UI opens). */
 export const warmAyahIndex = () => { load(); };
 

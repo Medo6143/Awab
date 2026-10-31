@@ -11,10 +11,12 @@ export type TasmeeHelp = 'none' | 'firstWord' | 'firstLetter';
 
 export const splitWords = (text: string): string[] => {
   const out: string[] = [];
+  let lead = '';                                     // a sign opening the ayah, e.g. «۞»
   for (const token of text.trim().split(/\s+/)) {
     if (!token) continue;
-    if (!LETTER.test(token) && out.length) out[out.length - 1] += ` ${token}`;
-    else out.push(token);
+    if (LETTER.test(token)) { out.push(lead + token); lead = ''; }
+    else if (out.length) out[out.length - 1] += ` ${token}`;
+    else lead += `${token} `;
   }
   return out;
 };
@@ -32,7 +34,7 @@ export const firstLetter = (word: string): string => {
     end++;
     while (end < chars.length && MARK.test(chars[end])) end++;
   }
-  return chars.slice(start, end).join('');
+  return chars.slice(0, end).join(''); // with any sign before the letter, so the rest is word.slice(length)
 };
 
 /** Letters only: drives the width of a word's hidden bar. */

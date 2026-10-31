@@ -15,6 +15,10 @@ export type TasmeeParams = {
   surah?: number;
   startAyah?: number;
   only?: number[];
+  /** recite aloud: the speech model uncovers each ayah and marks the wrong words */
+  voice?: boolean;
+  /** voice mode: stop and say the right word («correct»), or only mark mistakes («mark») */
+  voiceMode?: 'correct' | 'mark';
 };
 
 export type SettingsSection = 'prayer' | 'alerts' | 'quran' | 'tasbeeh' | 'look';

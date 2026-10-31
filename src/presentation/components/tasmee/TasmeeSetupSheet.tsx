@@ -6,11 +6,12 @@ import { Chip, PillButton, Sheet } from '../ui';
 import { colors, icon, radius, space, type } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 import { toAr } from '../../../shared/utils/format';
+import { MODEL_MB, downloadModel, modelPath } from '../../../data/services/RecitationListener';
 import { TasmeeHelp, minutesLabel } from './tasmeeText';
 
 const pagesLabel = (n: number) => (n === 1 ? 'صفحة واحدة' : n === 2 ? 'صفحتين' : `${toAr(n)} ${n <= 10 ? 'صفحات' : 'صفحة'}`);
 
-export type TasmeeStart = { fromPage: number; toPage: number; help: TasmeeHelp };
+export type TasmeeStart = { fromPage: number; toPage: number; help: TasmeeHelp; voice?: boolean; voiceMode?: 'correct' | 'mark' };
 
 type Props = {
   visible: boolean;
@@ -33,6 +34,11 @@ const HELP: { id: TasmeeHelp; label: string }[] = [
   { id: 'none', label: 'ولا حاجة' },
   { id: 'firstWord', label: 'أول كلمة' },
   { id: 'firstLetter', label: 'أول حرف' },
+];
+
+const VOICE_MODES: { id: 'mark' | 'correct'; label: string }[] = [
+  { id: 'mark', label: 'علّم الغلط بس' },
+  { id: 'correct', label: 'وقّفني وقولّي الكلمة' },
 ];
 
 const MINUTES_PER_PAGE = 3;
@@ -69,12 +75,24 @@ export const TasmeeSetupSheet = ({ visible, title, fromPage, toPage, minPage = 1
   const [from, setFrom] = useState(fromPage);
   const [to, setTo] = useState(toPage);
   const [help, setHelp] = useState<TasmeeHelp>('none');
-  const [voiceNote, setVoiceNote] = useState(false);
+  const [voice, setVoice] = useState(false);
+  const [voiceMode, setVoiceMode] = useState<'mark' | 'correct'>('mark');
+  // the speech model is downloaded once, the first time «بصوتي» is chosen
+  const [model, setModel] = useState<'checking' | 'missing' | 'downloading' | 'failed' | 'ready'>('checking');
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     if (!visible) return;
-    setFrom(fromPage); setTo(toPage); setVoiceNote(false);
+    setFrom(fromPage); setTo(toPage);
+    modelPath().then((p) => setModel((m) => (m === 'downloading' ? m : p ? 'ready' : 'missing')));
   }, [visible, fromPage, toPage]);
+
+  const download = () => {
+    Haptics.selectionAsync();
+    setModel('downloading');
+    setProgress(0);
+    downloadModel(setProgress).then(() => setModel('ready'), () => setModel('failed'));
+  };
 
   const count = to - from + 1;
   const preset = (f: number, t: number) => { Haptics.selectionAsync(); setFrom(Math.max(minPage, f)); setTo(Math.min(maxPage, t)); };
@@ -99,28 +117,61 @@ export const TasmeeSetupSheet = ({ visible, title, fromPage, toPage, minPage = 1
 
       <Text style={st.label}>هتسمّع إزاي</Text>
       <View style={st.seg}>
-        <TouchableOpacity style={st.segItem} onPress={() => { Haptics.selectionAsync(); setVoiceNote(true); }} accessibilityRole="button" accessibilityLabel="بصوتي، قريبًا">
-          <Mic size={icon.size.sm} color={colors.textMuted} strokeWidth={icon.stroke} />
-          <Text style={st.segText}>بصوتي</Text>
-          <Text style={st.soon}>قريبًا</Text>
+        <TouchableOpacity
+          style={[st.segItem, voice && { backgroundColor: accent.accentSoft }]}
+          onPress={() => { Haptics.selectionAsync(); setVoice(true); }}
+          accessibilityRole="button"
+          accessibilityState={{ selected: voice }}
+        >
+          <Mic size={icon.size.sm} color={voice ? accent.accentText : colors.textMuted} strokeWidth={icon.stroke} />
+          <Text style={[st.segText, voice && { color: accent.accentText }]}>بصوتي</Text>
         </TouchableOpacity>
-        <View style={[st.segItem, { backgroundColor: accent.accentSoft }]} accessibilityState={{ selected: true }}>
-          <EyeOff size={icon.size.sm} color={accent.accentText} strokeWidth={icon.stroke} />
-          <Text style={[st.segText, { color: accent.accentText }]}>بنفسي</Text>
-        </View>
+        <TouchableOpacity
+          style={[st.segItem, !voice && { backgroundColor: accent.accentSoft }]}
+          onPress={() => { Haptics.selectionAsync(); setVoice(false); }}
+          accessibilityRole="button"
+          accessibilityState={{ selected: !voice }}
+        >
+          <EyeOff size={icon.size.sm} color={!voice ? accent.accentText : colors.textMuted} strokeWidth={icon.stroke} />
+          <Text style={[st.segText, !voice && { color: accent.accentText }]}>بنفسي</Text>
+        </TouchableOpacity>
       </View>
       <Text style={st.note}>
-        {voiceNote
-          ? 'التسميع بالصوت والتصحيح التلقائي جايين في تحديث قريب، ومن غير إنترنت.'
-          : 'الآيات هتتغطّى في الصفحة. قولها من حفظك، واكشفها آية آية، ودوس على أي كلمة غلطت فيها.'}
+        {!voice
+          ? 'الآيات هتتغطّى في الصفحة. قولها من حفظك، واكشفها آية آية، ودوس على أي كلمة غلطت فيها.'
+          : model === 'ready'
+            ? voiceMode === 'mark'
+              ? 'اقرأ من حفظك، والكلمات هتنكشف وانت بتقرأ. أي كلمة نقصت أو غلطت فيها هتتعلّم بالأحمر من غير ما يوقّفك.'
+              : 'اقرأ من حفظك، ولو غلطت هيوقّفك ويقولّك الكلمة الصح بصوت قارئ، وتعيدها وتكمّل. صوت الكلمة محتاج إنترنت.'
+            : model === 'downloading'
+              ? `بينزّل ملف الصوت… ${toAr(Math.round(progress * 100))}٪`
+              : model === 'failed'
+                ? 'التنزيل ما كملش. اتأكد من الإنترنت وجرّب تاني.'
+                : `التسميع بالصوت محتاج ملف مرة واحدة (حوالي ${toAr(MODEL_MB)} ميجا)، والأفضل على واي فاي. بعد كده بيشتغل من غير إنترنت.`}
       </Text>
+      {voice && (model === 'missing' || model === 'failed') ? (
+        <PillButton variant="ghost" size="sm" label={model === 'failed' ? 'جرّب التنزيل تاني' : 'نزّل ملف الصوت'} style={st.download} onPress={download} />
+      ) : null}
+      {voice && model === 'ready' ? (
+        <View style={[st.chips, st.modes]}>
+          {VOICE_MODES.map((m) => <Chip key={m.id} size="sm" label={m.label} selected={voiceMode === m.id} onPress={() => { Haptics.selectionAsync(); setVoiceMode(m.id); }} />)}
+        </View>
+      ) : null}
+      {voice && model === 'downloading' ? (
+        <View style={st.track}><View style={[st.fill, { width: `${Math.round(progress * 100)}%`, backgroundColor: accent.accent }]} /></View>
+      ) : null}
 
       <Text style={st.label}>مساعدة</Text>
       <View style={st.chips}>
         {HELP.map((h) => <Chip key={h.id} size="sm" label={h.label} selected={help === h.id} onPress={() => { Haptics.selectionAsync(); setHelp(h.id); }} />)}
       </View>
 
-      <PillButton label="ابدأ التسميع" style={st.start} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); onStart({ fromPage: from, toPage: to, help }); }} />
+      <PillButton
+        label="ابدأ التسميع"
+        style={st.start}
+        disabled={voice && model !== 'ready'}
+        onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); onStart({ fromPage: from, toPage: to, help, voice, voiceMode }); }}
+      />
     </Sheet>
   );
 };
@@ -138,7 +189,10 @@ const st = StyleSheet.create({
   seg: { flexDirection: 'row', backgroundColor: colors.surfaceRaised, borderRadius: radius.pill, padding: space[1], gap: space[1] },
   segItem: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space[1], height: 40, borderRadius: radius.pill },
   segText: { ...type.label, color: colors.textMuted },
-  soon: { ...type.caption, fontSize: 10, color: colors.textFaint },
+  download: { marginTop: space[2], alignSelf: 'flex-start' },
+  modes: { marginTop: space[2] },
+  track: { height: 6, borderRadius: radius.pill, backgroundColor: colors.surfaceRaised, marginTop: space[2], overflow: 'hidden' },
+  fill: { height: 6, borderRadius: radius.pill },
   note: { ...type.caption, color: colors.textMuted, marginTop: space[2], lineHeight: 18 },
   start: { marginTop: space[6] },
 });
