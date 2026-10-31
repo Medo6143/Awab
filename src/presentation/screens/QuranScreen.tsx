@@ -19,7 +19,7 @@ import { GeometricFrame, StarBadge } from '../components/quran/MushafOrnaments';
 import { TafsirBottomSheet } from '../components/quran/TafsirBottomSheet';
 import { PickerTab, SurahPickerModal } from '../components/quran/SurahPickerModal';
 import { SURAH_START_PAGE } from '../../domain/entities/surahPages';
-import type { AyahHit } from '../../data/quran/ayahSearch';
+import { AyahHit, normalizeArabic } from '../../data/quran/ayahSearch';
 import { TasmeeSetupSheet, TasmeeStart } from '../components/tasmee/TasmeeSetupSheet';
 import { ReciterPickerModal } from '../components/quran/ReciterPickerModal';
 import { BookmarksModal } from '../components/quran/BookmarksModal';
@@ -48,6 +48,8 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const [showBookmarks, setShowBookmarks] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [highlightedAyah, setHighlightedAyah] = useState<number | null>(null);
+  /** The searched ayah, scrolled into view on its page. */
+  const [revealAyah, setRevealAyah] = useState<number | null>(null);
   const [pickerTab, setPickerTab] = useState<PickerTab>('surah');
   const [showReciterPicker, setShowReciterPicker] = useState(false);
   const [tasmee, setTasmee] = useState<{ fromPage: number; toPage: number; startAyah?: number; note?: string } | null>(null);
@@ -64,10 +66,13 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const { data: surahsData, isLoading: surahsLoading, isError: surahsError, refetch: refetchSurahs } = useSurahs();
   
   const surahsList = (surahsData as SurahMeta[] | undefined) ?? [];
+  // names come fully voweled («سُورَةُ ٱلْفَاتِحَةِ»), so both sides are compared without marks;
+  // Arabic-Indic digits work for the surah number too
+  const query = normalizeArabic(searchQuery).replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x0660));
   const filteredSurahs = surahsList.filter(s =>
-    (s.name ?? '').includes(searchQuery) ||
-    (s.englishName ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    String(s.number).includes(searchQuery)
+    normalizeArabic(s.name ?? '').includes(query) ||
+    (s.englishName ?? '').toLowerCase().includes(query.toLowerCase()) ||
+    String(s.number).includes(query)
   );
 
   const onPageSelected = useCallback((e: { nativeEvent: { position: number } }) => {
@@ -145,15 +150,23 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
     dispatch(setCurrentPage(SURAH_START_PAGE[surahNumber - 1] ?? 1));
   };
 
-  // open the page of a searched ayah and mark the ayah on it for a few seconds
-  const searchHighlight = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  // open the page of a searched ayah and mark the ayah on it, until the page is turned (it was
+  // marked for 4 s from the tap, often gone before the page had loaded and the index closed)
+  const searchedPage = useRef<number | null>(null);
   const handleAyahSelect = (hit: AyahHit) => {
     setShowSurahPicker(false);
+    searchedPage.current = hit.page;
     dispatch(setCurrentPage(hit.page));
     setHighlightedAyah(hit.number);
-    clearTimeout(searchHighlight.current);
-    searchHighlight.current = setTimeout(() => setHighlightedAyah((h) => (h === hit.number ? null : h)), 4000);
+    setRevealAyah(hit.number);
   };
+  useEffect(() => {
+    if (searchedPage.current !== null && searchedPage.current !== currentPage) {
+      searchedPage.current = null;
+      setHighlightedAyah(null);
+      setRevealAyah(null);
+    }
+  }, [currentPage]);
 
   const handleReciterChange = (id: string) => {
     changeReciter(id);
@@ -232,6 +245,7 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
                   isCurrentPage={pageNum === currentPage}
                   bookmarks={bookmarks}
                   highlightedAyah={highlightedAyah}
+                  revealAyah={revealAyah}
                   isBookmarked={bookmarkedPages.includes(pageNum)}
                   onToggleBookmark={() => dispatch(togglePageBookmark(pageNum))}
                   onAyahPress={getTafsir}
