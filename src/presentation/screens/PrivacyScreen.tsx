@@ -1,8 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { BellRing, Database, Globe, MapPin, ShieldCheck, Trash2 } from 'lucide-react-native';
+import { Linking, StyleSheet, Text, View } from 'react-native';
+import { BellRing, Database, ExternalLink, Globe, MapPin, Mic, ShieldCheck, Trash2 } from 'lucide-react-native';
 import { ScreenProps } from '../navigation/types';
-import { Screen, ScreenHeader } from '../components/ui';
+import { PillButton, Screen, ScreenHeader } from '../components/ui';
+
+/** The full policy, the same page the Play listing links to. */
+const POLICY_URL = 'https://owwab.vercel.app/privacy.html';
 import { colors, icon, radius, space, type, themed } from '../../shared/theme/tokens';
 
 type Section = { icon: typeof ShieldCheck; title: string; body: string[] };
@@ -33,9 +36,19 @@ const SECTIONS: Section[] = [
     icon: MapPin,
     title: 'الموقع',
     body: [
-      'يُستخدم موقعك لحساب مواقيت الصلاة واتجاه القبلة فقط.',
-      'تُرسل الإحداثيات إلى خدمة مواقيت الصلاة (aladhan.com) لحساب مواقيت مدينتك، ويحدد نظام الهاتف اسم الدولة لاختيار طريقة الحساب المناسبة.',
+      'يُستخدم موقعك أثناء استخدام التطبيق فقط، لمواقيت الصلاة واتجاه القبلة وأقرب مسجد.',
+      'تُرسل الإحداثيات إلى خدمة مواقيت الصلاة (aladhan.com)، ويحدد نظام الهاتف اسم الدولة لاختيار طريقة الحساب المناسبة.',
+      'لأقرب مسجد يُرسل موقعك بعد تقريبه إلى نحو ١٠٠ متر إلى خادم التطبيق (owwab.vercel.app) الذي يسأل OpenStreetMap ولا يحفظ شيئًا، أو إلى nominatim.openstreetmap.org مباشرة عند تعطّله.',
+      'زر «وديني» يفتح خرائط جوجل خارج التطبيق بموقع المسجد.',
       'يمكنك إيقاف «مواقيت الصلاة حسب الموقع» من الإعدادات في أي وقت.',
+    ],
+  },
+  {
+    icon: Mic,
+    title: 'الميكروفون',
+    body: [
+      'يُطلب فقط عند تشغيل التسميع بالصوت، ليسمع تلاوتك ويقارنها بالآيات.',
+      'يحدث ذلك كله على هاتفك؛ لا يُسجَّل صوتك ولا يُحفظ ولا يُرسل إلى أي جهة.',
     ],
   },
   {
@@ -45,7 +58,8 @@ const SECTIONS: Section[] = [
       'نص المصحف: alquran.cloud',
       'التفسير: quran.com',
       'الأحاديث وشرحها: hadeethenc.com',
-      'التلاوات الصوتية: mp3quran.net و everyayah.com',
+      'التلاوات الصوتية: mp3quran.net و everyayah.com و qurancdn.com',
+      'نموذج التسميع بالصوت (مرة واحدة): github.com',
       'هذه الطلبات تجلب المحتوى فقط ولا تتضمن أي بيانات شخصية، وكثير من المحتوى يُحفظ بعدها ليعمل دون إنترنت.',
     ],
   },
@@ -55,7 +69,8 @@ const SECTIONS: Section[] = [
     body: [
       'الإشعارات والمنبّهات الدقيقة: لرفع الأذان والتذكيرات في وقتها.',
       'الظهور على شاشة القفل وفوق التطبيقات: لتظهر شاشة الأذان كالمنبّه، وللمسبحة العائمة.',
-      'الاستثناء من توفير البطارية: حتى لا يوقف النظام الأذان أثناء النوم.',
+      'الاستثناء من توفير البطارية (اختياري): حتى لا يوقف النظام الأذان أثناء النوم.',
+      'الموقع والميكروفون: كما في الأقسام السابقة.',
       'حفظ الصور: لحفظ صور المشاركة في المعرض فقط، والتطبيق لا يقرأ صورك.',
     ],
   },
@@ -80,6 +95,13 @@ const PrivacyScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => (
         </View>
       );
     })}
+    <PillButton
+      label="سياسة الخصوصية كاملة"
+      variant="ghost"
+      icon={<ExternalLink size={icon.size.sm} color={colors.goldText} strokeWidth={icon.stroke} />}
+      onPress={() => Linking.openURL(POLICY_URL).catch(() => {})}
+      style={{ marginBottom: space[4] }}
+    />
   </Screen>
 );
 
