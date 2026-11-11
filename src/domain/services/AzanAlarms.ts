@@ -11,6 +11,11 @@ export interface AzanAlarms {
   playbackPosition(): Promise<number | null>;
   /** Stops the adhan the alarm is playing, if any. */
   stop(): void;
+  /**
+   * The adhan (or reminder) screen is now showing: the alarm's heads-up notification must not
+   * sit on top of it. The notification stays in the shade, with its stop button.
+   */
+  screenShown(): void;
   /** The azan screen closed: stop showing the app over the lock screen. */
   releaseLockScreen(): void;
 }

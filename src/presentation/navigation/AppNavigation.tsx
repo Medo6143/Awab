@@ -4,7 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList, TabParamList } from './types';
 import { NavigationContainer, NavigationState, DefaultTheme, createNavigationContainerRef } from '@react-navigation/native';
 import { View } from 'react-native';
-import { useAudio } from '../hooks/useAudio';
+import { useAudioSync } from '../hooks/useAudioSync';
 import { colors, isLightTheme } from '../../shared/theme/tokens';
 import { GlassTabBar } from './GlassTabBar';
 
@@ -69,8 +69,8 @@ const navTheme = () => ({
 let savedState: NavigationState | undefined;
 
 const AppNavigation = () => {
-  // Keeps the global audio state in sync with TrackPlayer while any screen is mounted.
-  useAudio();
+  // Keeps the global audio state in sync with the player while any screen is mounted.
+  useAudioSync();
 
   return (
     <NavigationContainer

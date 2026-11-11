@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { colors, type, themed } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
-import { toAr } from '../../../shared/utils/format';
+import { arDigits } from './ArDigits';
 
 type Props = {
   value: number | string;
@@ -23,7 +23,7 @@ export const StatNumber = ({ value, caption, size = 'h1', color, align = 'center
   return (
     <View style={[{ alignItems }, style]}>
       <Text style={[type[size], { color: color ?? accent.accentText, textAlign }]} numberOfLines={1} adjustsFontSizeToFit>
-        {typeof value === 'number' ? toAr(value) : toAr(value)}
+        {arDigits(value)}
       </Text>
       {caption ? <Text style={[styles.caption, { textAlign }]}>{caption}</Text> : null}
     </View>

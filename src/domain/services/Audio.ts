@@ -1,8 +1,24 @@
 /** One ayah to recite: surah number and ayah number within it. */
 export type AyahKey = { surahId: number; ayahNumber: number };
 
+/** What the recitation is doing right now, whichever engine is playing it. */
+export type PlaybackStatus = {
+  isPlaying: boolean;
+  /** Loading or stalled: sound was asked for and has not started yet. */
+  isBuffering: boolean;
+  positionMillis: number;
+  durationMillis: number;
+};
+
+export const IDLE_PLAYBACK: PlaybackStatus = { isPlaying: false, isBuffering: false, positionMillis: 0, durationMillis: 0 };
+
 /** Plays Quran recitation: whole surahs (with the media notification), single ayahs and runs of ayahs. */
 export interface QuranPlayer {
+  /**
+   * Reports every change of the recitation's state, including ones the app did not start
+   * (the notification's buttons, the end of the audio). Returns the unsubscribe function.
+   */
+  subscribe(listener: (status: PlaybackStatus) => void): () => void;
   /** Reciter id from RECITER_MAP; unknown ids are ignored. */
   setReciter(id: string): void;
   playSurah(surahId: number, surahName?: string): Promise<boolean>;

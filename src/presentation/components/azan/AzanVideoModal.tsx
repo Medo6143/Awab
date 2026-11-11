@@ -86,8 +86,12 @@ const AzanContent = ({ onClose, prayerName }: { onClose: () => void; prayerName:
     Animated.timing(phrase, { toValue: 1, duration: 450, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
   }, [line, done]);
 
-  // the app shows over the lock screen only while the adhan is on screen
-  useEffect(() => () => azanAlarms.releaseLockScreen(), [azanAlarms]);
+  // the app shows over the lock screen only while the adhan is on screen; and while it is,
+  // the alarm's heads-up notification must not cover the prayer name with a second stop button
+  useEffect(() => {
+    azanAlarms.screenShown();
+    return () => azanAlarms.releaseLockScreen();
+  }, [azanAlarms]);
 
   // once the adhan has finished the screen may sleep again (it was held on for the adhan),
   // and the dua screen closes by itself: left open it kept the phone lit until closed by hand

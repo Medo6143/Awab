@@ -37,9 +37,13 @@ export const useNotifications = () => {
     let isMounted = true;
 
     // shows the azan screen and plays the adhan unless the user chose silent
-    const raiseAzan = (prayerName: string) => {
+    const raiseAzan = async (prayerName: string) => {
       dispatch(showAzanModal(prayerName));
-      if (azanSettings.type !== 'none') azanSound.play(azanSettings.type);
+      if (azanSettings.type === 'none') return;
+      // the native alarm may be the one that opened the app, and is already calling the adhan:
+      // a second one from here would play over it
+      if ((await azanAlarms.playbackPosition()) != null) return;
+      azanSound.play(azanSettings.type);
     };
 
     const checkInitialNotification = async () => {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { toAr } from '../../../shared/utils/format';
+import { arDigits } from '../ui';
 import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 
 export type DayStat = { key: string; label: string; value: number; total?: number; onPress: () => void };
@@ -12,7 +13,7 @@ export const DayStats = ({ items }: { items: DayStat[] }) => (
       <TouchableOpacity key={s.key} activeOpacity={0.8} style={st.stat} onPress={s.onPress} accessibilityRole="button" accessibilityLabel={`${s.label} ${s.value}${s.total ? ` من ${s.total}` : ''}`}>
         <Text style={st.statLabel} numberOfLines={1}>{s.label}</Text>
         <Text style={st.statValue}>
-          {toAr(s.value)}
+          {arDigits(s.value)}
           {s.total ? <Text style={st.statTotal}>/{toAr(s.total)}</Text> : null}
         </Text>
         {s.total ? (

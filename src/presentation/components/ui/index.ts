@@ -5,6 +5,7 @@ export { SectionTitle } from './SectionTitle';
 export { Chip } from './Chip';
 export { PillButton } from './PillButton';
 export { StatNumber } from './StatNumber';
+export { arDigits } from './ArDigits';
 export { ProgressBar, ProgressRing } from './Progress';
 export { EmptyState, ErrorState, Skeleton } from './States';
 export { IconTile } from './IconTile';

@@ -7,6 +7,7 @@ import { parseClock } from '../../../domain/entities/notifications';
 import type { PrayerScheduleTimes } from '../../../domain/entities/prayer';
 import { toAr } from '../../../shared/utils/format';
 import { colors, space } from '../../../shared/theme/tokens';
+import { arDigits } from '../ui';
 
 export type Phase = 'night' | 'dawn' | 'morning' | 'noon' | 'golden' | 'dusk';
 
@@ -241,7 +242,7 @@ export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loadin
 
         <View style={st.count}>
           <Text style={st.countLabel}>{next ? `باقي على ${next.arName}` : loading ? 'جارٍ تحميل المواقيت…' : 'مواقيت الصلاة'}</Text>
-          <Text style={st.countValue}>{countdown}</Text>
+          <Text style={st.countValue}>{arDigits(countdown)}</Text>
           {next ? <Text style={st.countAt}>{toAr(next.time)}</Text> : null}
         </View>
       </Pressable>

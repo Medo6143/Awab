@@ -31,6 +31,10 @@ export class NativeAzanAlarms implements AzanAlarms {
     try { this.mod?.stopAzan?.(); } catch {}
   }
 
+  screenShown() {
+    try { this.mod?.quietNotification?.(); } catch {}
+  }
+
   releaseLockScreen() {
     try { this.mod?.releaseLockScreen?.(); } catch {}
   }

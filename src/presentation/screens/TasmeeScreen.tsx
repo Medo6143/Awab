@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as Haptics from 'expo-haptics';
 import { ChevronLeft, Eye, Lightbulb, Mic, RotateCcw, Square, Volume2, X } from 'lucide-react-native';
 import { ScreenProps, TasmeeParams } from '../navigation/types';
-import { Screen, ScreenHeader, IconButton, PillButton, ErrorState } from '../components/ui';
+import { Screen, ScreenHeader, IconButton, PillButton, ErrorState, arDigits } from '../components/ui';
 import { useAudio } from '../hooks/useAudio';
 import { useMushafPage } from '../hooks/useQuran';
 import { recordTasmee } from '../store/slices/quranSlice';
@@ -250,7 +250,7 @@ const TasmeeScreen = ({ navigation, route }: ScreenProps<'التسميع'>) => {
           <View style={st.summaryHead}>
             <Text style={st.summaryTitle}>خلّصت الصفحة</Text>
             <Text style={[st.summaryScore, { color: accent.accentText }]}>
-              {toAr(session.length - pageMistakes.length)}<Text style={st.summaryOf}>{`/${toAr(session.length)}`}</Text>
+              {arDigits(session.length - pageMistakes.length)}<Text style={st.summaryOf}>{`/${toAr(session.length)}`}</Text>
             </Text>
           </View>
           <Text style={st.summarySub}>

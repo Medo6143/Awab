@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Heart, RotateCcw } from 'lucide-react-native';
-import { PillButton, ProgressRing } from '../ui';
+import { PillButton, ProgressRing, arDigits } from '../ui';
 import { colors, icon, radius, space, type, themed } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 import { toAr } from '../../../shared/utils/format';
@@ -43,7 +43,7 @@ export const TasmeeResult = ({ total, rangeLabel, mistakes, minutes, memorized, 
           icon={
             <View style={st.ringInner}>
               <Text style={[st.score, { color: accent.accentText }]}>
-                {toAr(ok)}<Text style={st.scoreOf}>{`/${toAr(total)}`}</Text>
+                {arDigits(ok)}<Text style={st.scoreOf}>{`/${toAr(total)}`}</Text>
               </Text>
               <Text style={st.scoreCaption}>من غير غلط</Text>
             </View>

@@ -70,7 +70,7 @@ export const MushafPageContent = React.memo(({
       <View style={s.pageHeader}>
         <Text style={s.pageHeaderText}>{surahGroups[0]?.surahName ?? ''}</Text>
         <TouchableOpacity onPress={onToggleBookmark} hitSlop={10} accessibilityRole="button" accessibilityLabel={isBookmarked ? 'إزالة العلامة' : 'وضع علامة على الصفحة'}>
-          <Bookmark size={18} color={colors.goldDeep} fill={isBookmarked ? colors.goldDeep : 'none'} />
+          <Bookmark size={18} color={colors.paperQuote} fill={isBookmarked ? colors.paperQuote : 'none'} />
         </TouchableOpacity>
         <Text style={s.pageHeaderText}>{juz ? `الجزء ${toAr(juz)}` : ''}</Text>
       </View>
@@ -78,12 +78,12 @@ export const MushafPageContent = React.memo(({
       <ScrollView ref={scrollRef} contentContainerStyle={s.ayahList} showsVerticalScrollIndicator={false} onLayout={(e) => { viewport.current = e.nativeEvent.layout.height; }}>
         {loading ? (
           <View style={s.centerLoader}>
-            <ActivityIndicator size="large" color={colors.gold} />
+            <ActivityIndicator size="large" color={colors.paperRule} />
             <Text style={s.loaderSub}>يتم جلب الآيات...</Text>
           </View>
         ) : error ? (
           <View style={s.pageError}>
-            <AlertTriangle size={32} color={colors.goldDeep} style={{ alignSelf: 'center' }} />
+            <AlertTriangle size={32} color={colors.paperQuote} style={{ alignSelf: 'center' }} />
             <Text style={s.pageErrorText}>تعذّر تحميل الصفحة. تأكد من الاتصال بالإنترنت.</Text>
             <TouchableOpacity style={s.pageRetryBtn} onPress={retry} accessibilityRole="button">
               <Text style={s.pageRetryText}>إعادة المحاولة</Text>

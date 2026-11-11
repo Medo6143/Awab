@@ -5,6 +5,7 @@ import { s } from './TasbeehStyles';
 import { toAr } from './TasbeehConstants';
 import { SebhaSvg } from './SebhaSvg';
 import { colors, isLightTheme } from '../../../shared/theme/tokens';
+import { arDigits } from '../ui';
 
 const { width } = Dimensions.get('window');
 
@@ -37,7 +38,7 @@ export const TasbeehCounter = ({ count, target, selectedDhikr, scaleAnim, onPres
       <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
         <SebhaSvg size={size} count={count} accentColor={accentColor || '#B8860B'} onPress={onPress}>
           <Text style={s.dhikrHeader}>{selectedDhikr}</Text>
-          <Text style={[s.mainCount, { color: textColor }]}>{toAr(count)}</Text>
+          <Text style={[s.mainCount, { color: textColor }]}>{arDigits(count)}</Text>
           <View style={s.progressTextRow}>
             <Target size={14} color={textColor} />
             <Text style={[s.progressText, { color: textColor }]}>الهدف: {toAr(target)}</Text>
