@@ -1,0 +1,15 @@
+diff --git a/node_modules/onnxruntime-react-native/android/CMakeLists.txt b/node_modules/onnxruntime-react-native/android/CMakeLists.txt
+index 2f814e8..e421d63 100644
+--- a/node_modules/onnxruntime-react-native/android/CMakeLists.txt
++++ b/node_modules/onnxruntime-react-native/android/CMakeLists.txt
+@@ -87,6 +87,10 @@ set_target_properties(
+              CXX_EXTENSIONS OFF
+              POSITION_INDEPENDENT_CODE ON)
+ 
++# Google Play requires 16 KB-aligned native libraries for apps targeting Android 15+.
++# NDK 27 still links with 4 KB pages by default.
++target_link_options(onnxruntimejsi PRIVATE "-Wl,-z,max-page-size=16384")
++
+ find_library(log-lib log)
+ 
+ target_link_libraries(
