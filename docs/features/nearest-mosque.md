@@ -1,8 +1,8 @@
 # Nearest mosque (أقرب مسجد)
 
-> Status: In progress · Lists mosques within 3 km from OpenStreetMap with distance, walking time, a live direction arrow and a Google Maps hand-off; exists only on the branch feat/nearest-mosque, not on master, and its data source is still undecided.
+> Status: Shipped, data source open · Lists mosques within 3 km from OpenStreetMap with distance, walking time, a live direction arrow and a Google Maps hand-off. On `master` since #21; which data source to keep is still undecided (see Open issues).
 
-Branch state: the work is committed on feat/nearest-mosque as 88455e8 ("Nearest mosque: card on the prayer screen and a full list") and that branch exists on origin. It has not been merged to master. (The task brief described it as uncommitted; git shows it committed on the branch.)
+Merged to `master` in #21 (commit 88455e8, "Nearest mosque: card on the prayer screen and a full list").
 
 ## What it does
 
@@ -93,4 +93,5 @@ None.
 
 ## Open issues
 
-No GitHub issue is filed for this feature. Open decision, tracked only in conversation: the data source. Options on the table are Google Places (accurate, needs a key and billing) or dropping the in-app list and only opening Google Maps (what `mapSearchUrl` already does). Until that is decided the feature should not be merged to master.
+- #22: deploy `landing/` so `/api/mosques` exists. Until then every lookup uses the Nominatim fallback.
+- Open decision, not yet filed as an issue: the data source. If Overpass also refuses Vercel (see Edge cases), the proxy does not help. Options on the table are Google Places (accurate, needs a key and billing) or dropping the in-app list and only opening Google Maps (what `mapSearchUrl` already does). The feature is on `master` with the Nominatim fallback in the meantime.

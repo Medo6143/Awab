@@ -4,7 +4,7 @@
 |---|---|
 | Product | Owwab, an Arabic companion app for daily worship |
 | Platform | Android (APK from `owwab.vercel.app`; not on Google Play) |
-| Version described | 1.0.0, branch `feat/nearest-mosque` (= `master` + nearest mosque, not yet merged) |
+| Version described | 1.0.0, `master` (including nearest mosque, merged in #21) |
 | Last updated | November 2026 |
 | Related | [Architecture](ARCHITECTURE.md) · [Structure](STRUCTURE.md) · [Features](features/README.md) |
 
@@ -50,7 +50,7 @@ Primary user: an Arabic-speaking adult who prays and wants help being consistent
 | Prayer | Adhan over the lock screen | Shipped | [adhan](features/adhan.md) |
 | Prayer | Qibla | Shipped | [qibla](features/qibla.md) |
 | Prayer | Home-screen widget | Shipped | [widget](features/widget.md) |
-| Prayer | Nearest mosque | In progress | [nearest-mosque](features/nearest-mosque.md) |
+| Prayer | Nearest mosque | Shipped, data source open | [nearest-mosque](features/nearest-mosque.md) |
 | Quran | Mushaf: pages, index, search, bookmarks, tafsir | Shipped | [mushaf](features/mushaf.md) |
 | Quran | Recitation audio: ayah, page, full surah | Shipped, with known bugs | [quran-audio](features/quran-audio.md) |
 | Quran | Tasmee (voice memorisation check) | Shipped | [tasmee](features/tasmee.md) |
@@ -86,7 +86,7 @@ Each requirement has an id so issues and commits can refer to it. "Met" describe
 | PR-5 | The adhan screen shows the prayer name and one clear way to stop it. | Nothing covers the screen; one stop control. | **No** (#14) |
 | PR-6 | The app tells the user which permissions are missing for the adhan to work, and opens the right system screen. | Readiness card shows every missing permission. | Yes |
 | PR-7 | The user sees the qibla direction. | Arrow follows the phone's heading. | Yes |
-| PR-8 | The user can find the nearest mosque and get walking directions. | Lists real nearby mosques, including small ones. | **No** (in progress) |
+| PR-8 | The user can find the nearest mosque and get walking directions. | Lists real nearby mosques, including small ones. | **No**: on `master`, but the Nominatim fallback misses small and unnamed mosques until the data source is settled (#22) |
 
 ### Quran
 

@@ -12,7 +12,7 @@ Screens live in `src/presentation/screens/` and routes are registered in `src/pr
 | Prayer times | «الصلاة» | Shipped | [prayer-times.md](prayer-times.md) | `PrayerHubScreen.tsx` · tab `TabPrayer`; `PrayerTimesScreen.tsx` · route `الصلاة` | None |
 | Adhan | «الأذان» | Shipped | [adhan.md](adhan.md) | No route: global `AzanVideoModal` mounted in `App.tsx`; settings in `SettingsScreen.tsx` section `prayer` | #11, #14 |
 | Qibla | «القبلة» | Shipped | [qibla.md](qibla.md) | `QiblaScreen.tsx` · route `القبلة` | None |
-| Nearest mosque | «المساجد» | In progress (only on branch `feat/nearest-mosque`) | [nearest-mosque.md](nearest-mosque.md) | `MosquesScreen.tsx` · route `المساجد` | None |
+| Nearest mosque | «المساجد» | Shipped, data source open | [nearest-mosque.md](nearest-mosque.md) | `MosquesScreen.tsx` · route `المساجد` | None |
 | Mushaf | «القرآن» | Shipped | [mushaf.md](mushaf.md) | `QuranScreen.tsx` · tab `TabQuran` | #7, #8, #16 |
 | Quran audio | Not verified (inside the mushaf) | Shipped | [quran-audio.md](quran-audio.md) | `QuranScreen.tsx` · tab `TabQuran` (no screen of its own) | #5, #10, #15 |
 | Tasmee (recital check) | «التسميع» | Shipped | [tasmee.md](tasmee.md) | `TasmeeScreen.tsx` · route `التسميع` | None |
@@ -34,7 +34,7 @@ Screens live in `src/presentation/screens/` and routes are registered in `src/pr
 
 Notes:
 
-- Statuses other than nearest-mosque are "Shipped" because the screen and route exist in `AppNavigation.tsx` on this branch; individual docs may refine this.
+- "Shipped" means the screen and route exist in `AppNavigation.tsx` on `master`; individual docs may refine this.
 - #17 (bottom tabs change position depending on the active tab) is a navigation issue in `src/presentation/navigation/GlassTabBar.tsx`, not a Home bug. It is listed on the Home row because there is no navigation doc.
 - #13 (zero shown as ◆) is listed on both Tasbeeh and Home because both render the counter.
 - #6 (accent colour) is owned by Settings and theme; Home is one of the affected screens.

@@ -1,6 +1,6 @@
 # Owwab documentation
 
-Written in November 2026 from the code on branch `feat/nearest-mosque` (`master` plus three commits: nearest mosque, audio and location behind the container, `CLAUDE.md`). Nearest mosque is the only feature here that is not on `master`. When code and docs disagree, the code is right; fix the doc in the same change.
+Written in November 2026 from the code on `master` (after #21: nearest mosque, audio and location behind the container, `CLAUDE.md`; and #26: prayer times behind the container). When code and docs disagree, the code is right; fix the doc in the same change.
 
 | Document | What it answers |
 |---|---|
