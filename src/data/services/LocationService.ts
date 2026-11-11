@@ -1,16 +1,17 @@
 import * as Location from 'expo-location';
 import { Coordinates } from '../../domain/entities/types';
+import { HeadingReading, LocationProvider } from '../../domain/services/Location';
 
-export class LocationService {
-  static async requestPermissions(): Promise<boolean> {
+/** LocationProvider on top of expo-location. */
+export class ExpoLocationProvider implements LocationProvider {
+  async requestPermission(): Promise<boolean> {
     const { status } = await Location.requestForegroundPermissionsAsync();
     return status === 'granted';
   }
 
-  static async getCurrentLocation(): Promise<{ coords: Coordinates; countryCode: string | null } | null> {
+  async currentPosition(): Promise<{ coords: Coordinates; countryCode: string | null } | null> {
     try {
-      const hasPermission = await this.requestPermissions();
-      if (!hasPermission) return null;
+      if (!(await this.requestPermission())) return null;
 
       let location: Location.LocationObject | null = null;
       try {
@@ -41,11 +42,8 @@ export class LocationService {
       }
 
       return {
-        coords: {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        },
-        countryCode: countryCode,
+        coords: { latitude: location.coords.latitude, longitude: location.coords.longitude },
+        countryCode,
       };
     } catch (error) {
       console.error('Error fetching location:', error);
@@ -53,18 +51,10 @@ export class LocationService {
     }
   }
 
-  static calculateQiblaDirection(lat: number, lon: number): number {
-    const kaabaLat = 21.4225;
-    const kaabaLon = 39.8262;
-
-    const φ1 = (lat * Math.PI) / 180;
-    const φ2 = (kaabaLat * Math.PI) / 180;
-    const Δλ = ((kaabaLon - lon) * Math.PI) / 180;
-
-    const y = Math.sin(Δλ) * Math.cos(φ2);
-    const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
-    let qibla = (Math.atan2(y, x) * 180) / Math.PI;
-    
-    return (qibla + 360) % 360;
+  watchHeading(onReading: (r: HeadingReading) => void): Promise<{ remove(): void }> {
+    return Location.watchHeadingAsync((data) =>
+      // trueHeading is -1 until the phone knows where it is; magnetic north is close enough until then
+      onReading({ degrees: data.trueHeading === -1 ? data.magHeading : data.trueHeading, accuracy: data.accuracy }),
+    );
   }
 }

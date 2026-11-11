@@ -43,6 +43,8 @@ export type RootStackParamList = {
   'الإعدادات': { section?: SettingsSection } | undefined;
   'الإحصائيات': undefined;
   'التذكيرات': undefined;
+  /** Mosques within 3 km, nearest first (OpenStreetMap). */
+  'المساجد': undefined;
   /**
    * Recite mushaf pages `fromPage..toPage` from memory. Optional filters narrow which ayahs
    * are covered: one surah, from one ayah on (global number), or a list (retrying mistakes).
