@@ -115,7 +115,6 @@ Found while writing these docs. Listed here so nobody builds on them; none has b
 
 | Path | State |
 |---|---|
-| `src/data/api/prayerService.ts` | not imported anywhere; prayer times use `src/data/services/PrayerTimeService.ts` |
 | `src/presentation/store/slices/achievementsSlice.ts` | registered in the store, never read or written |
 | `src/domain/use-cases/`, `src/data/local/`, `src/data/static/`, `src/presentation/components/dhikr/` | empty folders |
 | `ios/` | stale project from an earlier name; the app is Android only |

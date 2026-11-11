@@ -26,9 +26,9 @@
 1. `usePrayerTimes` calls `useLocation({ watchHeading: false })`, which asks `ExpoLocationProvider.currentPosition()` once per hook instance.
 2. `ExpoLocationProvider` requests foreground permission, then tries `getCurrentPositionAsync` (Balanced accuracy). If that throws it falls back to the last known fix (max age 24 h), then to a Highest-accuracy request. It then reverse-geocodes the fix to get the ISO country code (failure is tolerated; the code stays `null`).
 3. Method: `settings.prayerMethod` (`'auto'` by default). Auto maps the country code through `methodForCountry` in `src/domain/entities/prayerMethods.ts`; unlisted or unknown countries use method 3 (Muslim World League).
-4. Asr school: `asrSchoolFor(settings.asrMethod, countryCode)`. Auto is Hanafi (1) for PK, IN, BD, AF and standard (0) everywhere else.
+4. Asr school: `asrSchoolFor(settings.asrMethod, countryCode)` in `src/domain/entities/prayerMethods.ts`. Auto is Hanafi (1) for PK, IN, BD, AF and standard (0) everywhere else.
 5. Cache check: if `prayer.cachedData` is for today (`DD-MM-YYYY`), has the same method id and the same school, it is reused and no request is made.
-6. Otherwise `PrayerTimeService.getPrayerTimes(lat, lon, method, school)` calls AlAdhan. When `|latitude| >= 48` it adds `latitudeAdjustmentMethod=3` (angle-based rule for high latitudes).
+6. Otherwise `prayerTimes.today(coords, method, school)` from the container (`AladhanPrayerTimes`) calls AlAdhan. When `|latitude| >= 48` it adds `latitudeAdjustmentMethod=3` (angle-based rule for high latitudes).
 7. The response is stored with `setPrayerData`; a failed request sets `status = 'failed'`.
 8. `findNextPrayer` (`src/domain/entities/prayer.ts`) picks the next entry of Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha after now, or tomorrow's Fajr. `usePrayerTimes` recomputes it every 60 s.
 9. Every time times are loaded (cache or network), and whenever the next prayer changes, the hook pushes data to the widget.
@@ -59,11 +59,12 @@ Checking off a prayer: `useToggleIbada` dispatches `toggleTask` (ibada slice) an
 | Hook | `src/presentation/hooks/usePrayerTimes.ts` | Location → method → cache → fetch → next prayer → widget |
 | Hook | `src/presentation/hooks/useLocation.ts` | Position once, country code, optional compass |
 | Hook | `src/presentation/hooks/useToggleIbada.ts` | Tick/untick with the "not yet" rule |
-| Data | `src/data/services/PrayerTimeService.ts` | AlAdhan request, Asr school rule |
+| Data | `src/data/services/PrayerTimeService.ts` | `AladhanPrayerTimes`: the AlAdhan request |
 | Data | `src/data/services/LocationService.ts` | `ExpoLocationProvider` on expo-location |
 | Data | `src/data/api/clients.ts` | `prayerApi` axios client (no timeout set) |
-| Data | `src/data/api/prayerService.ts` | `fetchPrayerTimes` by city: no importer found (dead code) |
-| Domain | `src/domain/entities/prayerMethods.ts` | Method list, country table, default |
+| Domain | `src/domain/services/PrayerTimes.ts` | `PrayerTimesSource` interface |
+| Domain | `src/domain/entities/prayer.ts` | `PrayerDay` shape, `findNextPrayer` |
+| Domain | `src/domain/entities/prayerMethods.ts` | Method list, country table, default, Asr school rule |
 | Domain | `src/domain/entities/prayer.ts` | `findNextPrayer`, `prayerJustStarted`, `prayerFromNotification` |
 | Domain | `src/domain/services/Location.ts` | `LocationProvider` interface |
 | Store | `src/presentation/store/slices/prayerSlice.ts` | Cached day of times |

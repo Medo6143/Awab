@@ -6,6 +6,47 @@ export type ScheduleName = (typeof PRAYER_ORDER)[number];
 /** Today's times as "HH:mm"; extra API fields (Imsak, Midnight...) are allowed and ignored. */
 export type PrayerScheduleTimes = Partial<Record<ScheduleName, string>>;
 
+/** One day's times as the timetable gives them, "HH:mm" (sometimes with a timezone suffix). */
+export interface PrayerDayTimings {
+  Fajr: string;
+  Sunrise: string;
+  Dhuhr: string;
+  Asr: string;
+  Sunset: string;
+  Maghrib: string;
+  Isha: string;
+  Imsak: string;
+  Midnight: string;
+}
+
+export interface PrayerDate {
+  readable: string;
+  timestamp: string;
+  gregorian: {
+    date: string;
+    format: string;
+    day: string;
+    weekday: { en: string; ar?: string };
+    month: { number: number; en: string; ar?: string };
+    year: string;
+  };
+  hijri: {
+    date: string;
+    format: string;
+    day: string;
+    weekday: { en: string; ar: string };
+    month: { number: number; en: string; ar: string };
+    year: string;
+  };
+}
+
+/** A day of prayer times: the times, the date in both calendars, and how they were calculated. */
+export interface PrayerDay {
+  timings: PrayerDayTimings;
+  date: PrayerDate;
+  meta: { method: { id: number; name?: string }; school?: string } & Record<string, unknown>;
+}
+
 export interface NextPrayer {
   name: ScheduleName;
   time: string;

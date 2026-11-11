@@ -43,7 +43,7 @@ flowchart LR
 | data | `src/data/` | classes that implement those interfaces (HTTP, AsyncStorage, expo modules, native modules) | `domain`, `shared` |
 | presentation | `src/presentation/` | screens, components, hooks, Redux store, navigation | `domain`, `shared`, and `data` only through `useDependencies()` |
 
-The rules are written in `CLAUDE.md` at the repo root. Older code still breaks them in places: some hooks and screens import `src/data/services/*` directly (for example `PrayerTimeService` and `AudioService`).
+The rules are written in `CLAUDE.md` at the repo root. Older code still breaks them in places: some hooks and screens import `src/data` directly (tasmee, reminders, `ayahSearch`, `hadithLibrary`). Issue #24 tracks moving them behind the container.
 
 ### Composition root
 
@@ -177,7 +177,7 @@ No analytics, crash reporting or ads SDK is in `package.json`.
 | `api.alquran.cloud` | Quran page and surah data | `src/data/api/clients.ts`, `QuranApiRepository` | page or surah numbers |
 | `api.quran.com` | tafsir text | `src/data/api/clients.ts`, `QuranComTafsirRepository` | tafsir id and ayah key |
 | `hadeethenc.com` | hadith details | `src/data/api/clients.ts`, `HadeethEncRepository` | hadith id, language |
-| `api.aladhan.com` | prayer times | `src/data/api/clients.ts`, `PrayerTimeService` | coordinates, date, calculation method |
+| `api.aladhan.com` | prayer times | `src/data/api/clients.ts`, `AladhanPrayerTimes` | coordinates, date, calculation method |
 | `everyayah.com`, `server*.mp3quran.net` | recitation audio | `AudioService`, `CustomReminderScheduler` | reciter, surah and ayah in the URL |
 | `audio.qurancdn.com` | word-by-word audio in tasmee | `src/data/services/wordAudio.ts` | word position in the URL |
 | GitHub releases | download of the speech model for tasmee (157 MB) | `src/data/services/RecitationListener.ts` | nothing beyond the request |
@@ -243,9 +243,9 @@ Declared in `app.json`. Storage and media-read permissions are explicitly blocke
 |---|---|---|
 | Two audio players with separate state | `useAudio.ts`, `AudioService.ts`, `TrackPlayerService.ts` | #5, #15 |
 | Fixed gold used instead of the accent | across `src/presentation` | #6 |
-| Presentation importing `data/services` directly | older hooks and screens | — |
+| Presentation importing `src/data` directly | older hooks and screens | #24 |
 | Qiyam al-layl exists as a notification toggle and as a reminder | notification settings, reminders | #18 |
-| Unused code | `src/data/api/prayerService.ts`, `achievementsSlice`, `src/presentation/components/prayer/PrayerTimesComponents.tsx`, `MUEZZINS` in `AzanConstants.ts` | — |
+| Unused code | `achievementsSlice`, `src/presentation/components/prayer/PrayerTimesComponents.tsx`, `MUEZZINS` in `AzanConstants.ts` | — |
 | Settings that nothing reads | `locationEnabled`, `notificationPrefs.dailyReminder`, `calculationMethod` | — |
 | `themed()` caches per light/dark only, so accent-dependent styles cannot live in it | `src/shared/theme/tokens.ts` | #6 |
 | Privacy screen behind the code | `src/presentation/screens/PrivacyScreen.tsx` | — |

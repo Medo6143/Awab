@@ -47,4 +47,14 @@ export const DEFAULT_METHOD = 3;
 export const methodForCountry = (countryCode: string | null | undefined) =>
   (countryCode && BY_COUNTRY[countryCode.toUpperCase()]) || DEFAULT_METHOD;
 
+/** Asr juristic method: 0 = Shafi'i/Maliki/Hanbali (shadow = 1x, used in Egypt and most countries), 1 = Hanafi (2x). */
+export type AsrSchool = 0 | 1;
+
+// Countries whose official timetables use the Hanafi Asr
+const HANAFI_COUNTRIES = ['PK', 'IN', 'BD', 'AF'];
+
+/** The user's Asr choice, or the country's when it is "auto". */
+export const asrSchoolFor = (pref: 'auto' | 'shafii' | 'hanafi' | undefined, countryCode: string | null): AsrSchool =>
+  pref === 'hanafi' ? 1 : pref === 'shafii' ? 0 : countryCode && HANAFI_COUNTRIES.includes(countryCode) ? 1 : 0;
+
 export const methodName = (id: number) => PRAYER_METHODS.find((m) => m.id === id)?.name ?? 'رابطة العالم الإسلامي';

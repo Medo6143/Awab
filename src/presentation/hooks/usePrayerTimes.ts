@@ -1,25 +1,26 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toAr } from '../../shared/utils/format';
-import { methodForCountry } from '../../domain/entities/prayerMethods';
+import { asrSchoolFor, methodForCountry } from '../../domain/entities/prayerMethods';
 import { useLocation } from './useLocation';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
-import { PrayerTimeService, asrSchoolFor } from '../../data/services/PrayerTimeService';
 import { useDependencies } from '../providers/DependencyProvider';
-import { NextPrayer } from '../../domain/entities/prayer';
+import { findNextPrayer, NextPrayer, PrayerScheduleTimes } from '../../domain/entities/prayer';
 
 export type NextPrayerView = NextPrayer & { arName: string };
+
+const nextPrayerIn = (timings: PrayerScheduleTimes) => findNextPrayer(timings, new Date());
 import { setPrayerData, setLoading as setPrayerLoading, setFailed as setPrayerFailed } from '../store/slices/prayerSlice';
 
 export const usePrayerTimes = () => {
   const dispatch = useDispatch();
-  const { prayerWidget } = useDependencies();
+  const { prayerWidget, prayerTimes } = useDependencies();
   // prayer times never use the compass: no heading watcher re-rendering every screen on each tick
   const { coords, countryCode, error: locationError } = useLocation({ watchHeading: false });
   const { prayerMethod = 'auto', asrMethod } = useSelector((state: RootState) => state.settings);
   const { cachedData, lastFetchedDate, status } = useSelector((state: RootState) => state.prayer);
   // stored times show at once; a slow GPS fix only refreshes them later
-  const [nextPrayer, setNextPrayer] = useState<NextPrayer | null>(() => (cachedData ? PrayerTimeService.getNextPrayer(cachedData.timings) : null));
+  const [nextPrayer, setNextPrayer] = useState<NextPrayer | null>(() => (cachedData ? nextPrayerIn(cachedData.timings) : null));
   const [retryTick, setRetryTick] = useState(0);
 
   const toArName = (name: string) => {
@@ -73,7 +74,7 @@ export const usePrayerTimes = () => {
 
         if (cachedData && cachedData.date.gregorian.date === todayStr && cachedData.meta.method.id === targetMethod && cachedSchool === school) {
           console.log('usePrayerTimes: Using persistent cached data for', todayStr, 'Method:', targetMethod);
-          const next = PrayerTimeService.getNextPrayer(cachedData.timings);
+          const next = nextPrayerIn(cachedData.timings);
           setNextPrayer(next);
           updateWidget(next, cachedData.timings as unknown as Record<string, string>, cachedData.date?.hijri);
           return;
@@ -81,11 +82,11 @@ export const usePrayerTimes = () => {
 
         console.log('usePrayerTimes: Fetching fresh prayer times for', todayStr, 'Country:', countryCode, 'Method:', targetMethod);
         dispatch(setPrayerLoading());
-        const times = await PrayerTimeService.getPrayerTimes(coords.latitude, coords.longitude, targetMethod, school);
+        const times = await prayerTimes.today(coords, targetMethod, school);
         
         if (times) {
           dispatch(setPrayerData(times));
-          const next = PrayerTimeService.getNextPrayer(times.timings);
+          const next = nextPrayerIn(times.timings);
           setNextPrayer(next);
           updateWidget(next, times.timings as unknown as Record<string, string>, times.date?.hijri);
         } else {
@@ -100,7 +101,7 @@ export const usePrayerTimes = () => {
     if (!cachedData) return;
     
     const interval = setInterval(() => {
-      const next = PrayerTimeService.getNextPrayer(cachedData.timings);
+      const next = nextPrayerIn(cachedData.timings);
       setNextPrayer((prev) => {
         // Only update the native widget if the prayer has actually changed
         if (!prev || prev.name !== next?.name) {

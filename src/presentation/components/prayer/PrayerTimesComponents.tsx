@@ -14,7 +14,7 @@ import { useAccent } from '../../../shared/theme/useAccent';
 import { formatCountdown } from '../../../shared/utils/format';
 
 import { NextPrayerView } from '../../hooks/usePrayerTimes';
-import { PrayerDate } from '../../store/slices/prayerSlice';
+import { PrayerDate } from '../../../domain/entities/prayer';
 
 type NextPrayer = NextPrayerView | null;
 
