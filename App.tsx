@@ -25,6 +25,8 @@ const queryClient = new QueryClient();
 
 import { syncDailyReset } from './src/presentation/store/slices/athkarSlice';
 import { useNotifications } from './src/presentation/hooks/useNotifications';
+import { useExactAlarmAccess } from './src/presentation/hooks/useExactAlarmAccess';
+import { ExactAlarmPrompt } from './src/presentation/components/azan/ExactAlarmPrompt';
 import { AzanVideoModal } from './src/presentation/components/azan/AzanVideoModal';
 import { ReminderAlarm } from './src/presentation/components/reminders/ReminderAlarm';
 import { hideAzanModal } from './src/presentation/store/slices/uiSlice';
@@ -83,7 +85,8 @@ const errorStyles = StyleSheet.create({
 const Bootstrapper = ({ children }: { children: React.ReactNode }) => {
   const dispatch = useDispatch();
   const { azanModal } = useSelector((state: RootState) => state.ui);
-  useNotifications();
+  const exactAlarm = useExactAlarmAccess();
+  useNotifications(exactAlarm.granted);
   
   useEffect(() => {
     dispatch(syncDailyReset());
@@ -98,6 +101,7 @@ const Bootstrapper = ({ children }: { children: React.ReactNode }) => {
         onClose={() => dispatch(hideAzanModal())} 
       />
       <ReminderAlarm />
+      <ExactAlarmPrompt granted={exactAlarm.granted} onAllow={exactAlarm.request} />
       <FloatingTasbeehController />
     </>
   );

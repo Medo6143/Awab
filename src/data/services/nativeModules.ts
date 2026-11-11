@@ -17,6 +17,10 @@ export interface AzanNativeModule {
   releaseLockScreen?(): void;
   didBootRescheduleFail?(): Promise<boolean>;
   clearBootRescheduleFailedFlag?(): void;
+  /** Android 12+: whether exact alarms are allowed; true below that. */
+  canScheduleExactAlarms?(): Promise<boolean>;
+  /** Opens the «المنبهات والتذكيرات» page for this app. */
+  openAlarmSettings?(): void;
   scheduleReminder?(json: string): Promise<void>;
   cancelAllReminders?(): Promise<void>;
   snoozeReminder?(json: string, minutes: number): Promise<void>;

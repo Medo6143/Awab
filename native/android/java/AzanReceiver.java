@@ -85,10 +85,16 @@ public class AzanReceiver extends BroadcastReceiver {
         long triggerTime = cal.getTimeInMillis();
 
         PendingIntent pendingIntent = AzanModule.buildAzanPendingIntent(context, prayerId, prayerName, type, hour, minute);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
-        } else {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
+            } else {
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
+            }
+        } catch (SecurityException e) {
+            // the permission was revoked between the check above and this call
+            Log.w(TAG, "Cannot re-arm " + prayerId + ": exact alarm permission revoked", e);
+            return;
         }
         AzanModule.saveToPrefs(context, prayerId, prayerName, type, triggerTime, hour, minute);
         Log.d(TAG, "Re-armed " + prayerId + " for tomorrow at " + hour + ":" + minute);

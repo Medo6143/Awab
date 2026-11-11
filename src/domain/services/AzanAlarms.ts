@@ -5,6 +5,13 @@ export interface AzanAlarms {
   /** True when re-arming after a reboot failed (e.g. exact-alarm permission revoked). */
   didBootRescheduleFail(): Promise<boolean>;
   clearBootRescheduleFailed(): void;
+  /**
+   * Whether the adhan can ring at the exact minute. On Android 14+ this is off for a new
+   * install until the user allows «المنبهات والتذكيرات»; true where it does not apply.
+   */
+  canScheduleExact(): Promise<boolean>;
+  /** Opens the system page where the user allows exact alarms for this app. */
+  openExactAlarmSettings(): void;
   /** An alarm fired while the app is running. */
   onTriggered(listener: (prayerName: string) => void): () => void;
   /** Seconds into the adhan the alarm is playing, or null when it is not. */

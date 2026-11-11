@@ -17,7 +17,12 @@ import { PRAYER_AR_NAMES, prayerFromNotification, prayerJustStarted } from '../.
 // We avoid top-level imports of expo-notifications to prevent early JSI binding attempts
 const getNotifications = () => require('expo-notifications');
 
-export const useNotifications = () => {
+/**
+ * `exactAlarmGranted` (from useExactAlarmAccess): the native adhan needs exact alarms. While it
+ * is unknown (null) nothing is scheduled yet; when it turns true the schedule is rebuilt, so
+ * prayers that fell back to plain notifications get the native adhan.
+ */
+export const useNotifications = (exactAlarmGranted: boolean | null) => {
   const dispatch = useDispatch();
   const { notifications, azanAlarms, azanSound } = useDependencies();
   const { timings } = usePrayerTimes();
@@ -66,12 +71,12 @@ export const useNotifications = () => {
     };
 
     const initNotifications = async () => {
-      if (!timings || isSchedulingRef.current) {
+      if (!timings || exactAlarmGranted === null || isSchedulingRef.current) {
         if (isSchedulingRef.current) console.log('useNotifications: Scheduling already in progress. Skipping.');
         return;
       }
 
-      const scheduleState = JSON.stringify({ timings, safePrefs, azanSettings, notificationsEnabled, reminders, reciterFolder });
+      const scheduleState = JSON.stringify({ timings, safePrefs, azanSettings, notificationsEnabled, reminders, reciterFolder, exactAlarmGranted });
       if (scheduleState === lastScheduledRef.current) {
         console.log('useNotifications: Scheduling state unchanged. Skipping.');
         return;
@@ -175,5 +180,5 @@ export const useNotifications = () => {
       responseSubscription.remove();
       offAzan();
     };
-  }, [timings, safePrefs, notificationsEnabled, azanSettings, reminders, reciterFolder, dispatch, notifications, azanAlarms]);
+  }, [timings, safePrefs, notificationsEnabled, azanSettings, reminders, reciterFolder, exactAlarmGranted, dispatch, notifications, azanAlarms]);
 };
