@@ -26,6 +26,8 @@ import { AzanSound, QuranPlayer } from '../domain/services/Audio';
 import { ExpoAudioPlayer } from './services/AudioService';
 import { PrayerTimesSource } from '../domain/services/PrayerTimes';
 import { AladhanPrayerTimes } from './services/PrayerTimeService';
+import { AyahVideoMaker } from '../domain/services/AyahVideo';
+import { NativeAyahVideo } from './services/NativeAyahVideo';
 
 export type AppDependencies = {
   quran: QuranRepository;
@@ -40,6 +42,7 @@ export type AppDependencies = {
   quranPlayer: QuranPlayer;
   azanSound: AzanSound;
   prayerTimes: PrayerTimesSource;
+  ayahVideo: AyahVideoMaker;
 };
 
 export const createDependencies = (): AppDependencies => {
@@ -57,6 +60,7 @@ export const createDependencies = (): AppDependencies => {
     quranPlayer: audio,
     azanSound: audio,
     prayerTimes: new AladhanPrayerTimes(),
+    ayahVideo: new NativeAyahVideo(),
     // a new reminder kind is one more scheduler here; the center itself does not change
     notifications: new ExpoNotificationCenter([
       new PrayerScheduler(),

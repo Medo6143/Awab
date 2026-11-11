@@ -8,6 +8,7 @@
  *   - AzanModule / AzanReceiver / AzanService / BootReceiver  (exact-alarm adhan)
  *   - OemBatteryModule                                           (battery-killer helpers)
  *   - PrayerWidgetProvider + layout/xml resources                (home-screen widget)
+ *   - AyahVideoModule / AyahVideoEncoder / FrameRenderer          (ayah share as MP4)
  *
  * It also registers the packages in MainApplication, adds the manifest entries and
  * wires the "isAzanTriggered" intent handling into MainActivity.
@@ -154,6 +155,7 @@ function withNativePackages(config) {
     const lines = [
       `add(${pkg}.widget.PrayerWidgetPackage())`,
       `add(${pkg}.AzanPackage())`,
+      `add(${pkg}.video.AyahVideoPackage())`,
       `add(${pkg}.OemBatteryPackage())`,
       // Expo's autolinking leaves onnxruntime-react-native out of PackageList (its gradle
       // project is still built), so the recitation model's native module is added here

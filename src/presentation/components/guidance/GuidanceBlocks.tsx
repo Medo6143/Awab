@@ -38,7 +38,7 @@ export const SectionHeading = ({ title, sub }: { title: string; sub?: string }) 
 );
 
 /** A verse from its reference, with al-Sa'di's tafsir underneath when asked. */
-export const VerseCard = ({ verse, withTafsir, onShare, onListen }: { verse: VerseRef; withTafsir?: boolean; onShare?: (p: { text: string; excerpt: string }) => void; onListen?: () => void }) => {
+export const VerseCard = ({ verse, withTafsir, onShare, onListen }: { verse: VerseRef; withTafsir?: boolean; onShare?: (p: { text: string; excerpt: string; texts: string[] }) => void; onListen?: () => void }) => {
   const { texts, offline, loading } = useVerseText(verse);
   const tafsir = useVerseTafsir(verse, !!withTafsir);
   const [more, setMore] = useState(false);
@@ -76,7 +76,7 @@ export const VerseCard = ({ verse, withTafsir, onShare, onListen }: { verse: Ver
       ) : null}
 
       {onShare && texts.length ? (
-        <TouchableOpacity style={st.shareBtn} onPress={() => onShare({ text: texts.join(' '), excerpt: tafsir.excerpt })} accessibilityRole="button">
+        <TouchableOpacity style={st.shareBtn} onPress={() => onShare({ text: texts.join(' '), excerpt: tafsir.excerpt, texts })} accessibilityRole="button">
           <Share2 size={16} color={colors.gold} />
           <Text style={st.more}>مشاركة كصورة</Text>
         </TouchableOpacity>

@@ -143,7 +143,16 @@ export const TafsirBottomSheet = ({
         </Animated.View>
       </View>
       {selectedAyah ? (
-        <ImageShareModal visible={shareOpen} title="مشاركة الآية كصورة" onClose={() => setShareOpen(false)} toolbar={<ShareStylePicker />}>
+        <ImageShareModal
+          visible={shareOpen}
+          title="مشاركة الآية"
+          onClose={() => setShareOpen(false)}
+          toolbar={<ShareStylePicker />}
+          video={{
+            surahName: selectedAyah.surah.name,
+            ayahs: [{ surahId: selectedAyah.surah.number, ayahNumber: selectedAyah.numberInSurah, text: selectedAyah.text }],
+          }}
+        >
           <AyahShare
             ayahText={selectedAyah.text}
             surahName={selectedAyah.surah.name}

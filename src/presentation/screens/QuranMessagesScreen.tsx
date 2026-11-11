@@ -20,7 +20,7 @@ import { toAr } from '../../shared/utils/format';
 import { colors, icon, radius, space, type, themed } from '../../shared/theme/tokens';
 
 type Share =
-  | { kind: 'ayah'; text: string; excerpt: string; surah: number; ayah: number }
+  | { kind: 'ayah'; text: string; excerpt: string; surah: number; ayah: number; texts: string[] }
   | { kind: 'text'; text: string; source: string };
 
 const shuffled = (n: number) => {
@@ -119,7 +119,7 @@ const QuranMessagesScreen = ({ navigation, route }: ScreenProps<'رسائل_ال
               verse={verse}
               withTafsir
               onListen={() => listen(verse)}
-              onShare={({ text, excerpt }) => setShared({ kind: 'ayah', text, excerpt, surah: verse.surah, ayah: verse.from })}
+              onShare={({ text, excerpt, texts }) => setShared({ kind: 'ayah', text, excerpt, surah: verse.surah, ayah: verse.from, texts })}
             />
           </View>
         ) : null}
@@ -157,7 +157,16 @@ const QuranMessagesScreen = ({ navigation, route }: ScreenProps<'رسائل_ال
         </TouchableOpacity>
       </View>
 
-      <ImageShareModal visible={!!shared} title="مشاركة كصورة" onClose={() => setShared(null)} toolbar={<ShareStylePicker />}>
+      <ImageShareModal
+        visible={!!shared}
+        title={shared?.kind === 'ayah' ? 'مشاركة الآية' : 'مشاركة كصورة'}
+        onClose={() => setShared(null)}
+        toolbar={<ShareStylePicker />}
+        // the recitation covers every ayah the card shows
+        video={shared?.kind === 'ayah'
+          ? { surahName: `سورة ${SURAH_NAMES[shared.surah - 1]}`, ayahs: shared.texts.map((text, i) => ({ surahId: shared.surah, ayahNumber: shared.ayah + i, text })) }
+          : undefined}
+      >
         {shared?.kind === 'ayah' ? (
           <AyahShare ayahText={shared.text} surahName={`سورة ${SURAH_NAMES[shared.surah - 1]}`} ayahNumber={shared.ayah} tafsirName="تفسير السعدي" tafsirExcerpt={shared.excerpt} />
         ) : shared ? (
