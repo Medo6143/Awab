@@ -6,7 +6,6 @@ import { useDependencies } from '../providers/DependencyProvider';
 import { RootState } from '../store';
 import { setReciterId } from '../store/slices/settingsSlice';
 import { setAudioState } from '../store/slices/audioSlice';
-import { usePlaybackState, useProgress, State } from 'react-native-track-player';
 
 export const useAudio = () => {
   const dispatch = useDispatch();
@@ -19,41 +18,27 @@ export const useAudio = () => {
     player.setReciter(selectedReciterId);
   }, [player, selectedReciterId]);
 
-  const { state: playbackState } = usePlaybackState();
-  const progress = useProgress();
-
-  // Sync TrackPlayer state to Redux
-  useEffect(() => {
-    const isPlaying = playbackState === State.Playing;
-    const isBuffering = playbackState === State.Buffering || playbackState === State.Loading;
-    
-    dispatch(setAudioState({
-      isPlaying,
-      isBuffering,
-      currentPosition: progress.position * 1000,
-      duration: progress.duration * 1000,
-    }));
-  }, [playbackState, progress.position, progress.duration, dispatch]);
+  // isPlaying / isBuffering / position come from the player itself, through useAudioSync
 
   const changeReciter = (id: string) => {
     dispatch(setReciterId(id));
   };
 
   const playSurah = async (surahId: number, surahName?: string) => {
-    dispatch(setAudioState({ currentSurahId: surahId, isBuffering: true, playMode: 'surah' }));
+    dispatch(setAudioState({ currentSurahId: surahId, playMode: 'surah' }));
     await player.playSurah(surahId, surahName);
   };
 
   const playAyah = async (surahId: number, ayahNumber: number, surahName?: string) => {
-    dispatch(setAudioState({ currentSurahId: surahId, isBuffering: true, playMode: 'ayah' }));
+    dispatch(setAudioState({ currentSurahId: surahId, playMode: 'ayah' }));
     await player.playAyah(surahId, ayahNumber, surahName);
   };
 
   const playSequence = async (items: AyahKey[], title?: string) => {
     if (items.length === 0) return;
-    dispatch(setAudioState({ currentSurahId: items[0].surahId, isBuffering: true, playMode: 'sequence' }));
+    dispatch(setAudioState({ currentSurahId: items[0].surahId, playMode: 'sequence' }));
     await player.playSequence(items, title, () => {
-      dispatch(setAudioState({ isPlaying: false, isBuffering: false, playMode: undefined }));
+      dispatch(setAudioState({ playMode: undefined }));
     });
   };
 
@@ -83,14 +68,7 @@ export const useAudio = () => {
 
   const stopPlayback = async () => {
     await player.stop();
-    dispatch(setAudioState({
-      isPlaying: false,
-      isBuffering: false,
-      currentSurahId: null,
-      currentPosition: 0,
-      duration: 0,
-      playMode: undefined,
-    }));
+    dispatch(setAudioState({ currentSurahId: null, playMode: undefined }));
   };
 
   return { 

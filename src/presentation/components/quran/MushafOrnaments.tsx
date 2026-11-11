@@ -17,7 +17,7 @@ export const EightPointStar = ({ size, color, filled = false, strokeWidth = 1.2 
 };
 
 /** A star with a number in it, e.g. the page number under the Mushaf page. */
-export const StarBadge = ({ label, size = 34, color = colors.goldDeep, textColor = colors.paperInk }: { label: string; size?: number; color?: string; textColor?: string }) => (
+export const StarBadge = ({ label, size = 34, color = colors.paperQuote, textColor = colors.paperInk }: { label: string; size?: number; color?: string; textColor?: string }) => (
   <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
     <View style={StyleSheet.absoluteFill}>
       <EightPointStar size={size} color={color} />

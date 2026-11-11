@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { ChevronLeft, Flame } from 'lucide-react-native';
 import { s } from './StatsStyles';
-import { Card, SectionTitle, ProgressBar, StatNumber } from '../ui';
+import { Card, SectionTitle, ProgressBar, StatNumber, arDigits } from '../ui';
 import { colors } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 import { toAr } from '../../../shared/utils/format';
@@ -88,7 +88,7 @@ export const StreakCard = ({ streak, longest, onPress }: { streak: number; longe
     <View style={s.streakIcon}><Flame size={26} color={colors.goldText} /></View>
     <View style={{ flex: 1 }}>
       <Text style={s.streakValue}>
-        {toAr(streak)}<Text style={s.streakUnit}> {streak === 1 ? 'يوم' : 'يوم متتالي'}</Text>
+        {arDigits(streak)}<Text style={s.streakUnit}> {streak === 1 ? 'يوم' : 'يوم متتالي'}</Text>
       </Text>
       <Text style={s.streakSub}>{longest > streak ? `أطول سلسلة: ${toAr(longest)} يوم` : streak > 1 ? 'أطول سلسلة لك حتى الآن' : 'بداية مباركة، استمر'}</Text>
     </View>

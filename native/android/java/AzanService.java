@@ -24,12 +24,17 @@ import java.io.IOException;
 public class AzanService extends Service {
     private static final String TAG              = "AzanService";
     private static final String CHANNEL_ID       = "azan_channel_v2";
+    /** Same alarms, shown in the shade only: used once the full-screen adhan is on screen. */
+    private static final String QUIET_CHANNEL_ID = "azan_ongoing";
     private static final int    NOTIFICATION_ID  = 2001;
+    private static final int    QUIET_NOTIFICATION_ID = 2002;
     public  static final String ACTION_STOP      = "STOP_AZAN";
     public  static final String ACTION_PREVIEW   = "PREVIEW_REMINDER_SOUND";
     private static final long   REMINDER_MAX_MS  = 5 * 60 * 1000L; // a reminder rings at most 5 minutes
     private static final long   PREVIEW_MS       = 8 * 1000L;
-    private static final long   RAMP_MS          = 30 * 1000L;     // volume rises from soft to full
+    private static final long   RAMP_MS          = 12 * 1000L;     // volume rises from soft to full
+    private static final float  RAMP_FROM        = 0.5f;           // of the phone's alarm volume
+    private static final long   AZAN_MAX_MS      = 10 * 60 * 1000L; // longer than any adhan recording
 
     /** The reminder ringing now (JSON), so JS can show its screen; null for the adhan. */
     private static volatile String ringingReminder;
@@ -38,6 +43,18 @@ public class AzanService extends Service {
     private int playIndex;
     private boolean loopPlaylist;
     private long playStartedAt;
+    /** Sounds in a row that failed to play; a full round of failures falls back to the bundled sound. */
+    private int failedInARow;
+    /** What the notification says, kept to post it again quietly. */
+    private String noticeTitle, noticeText, noticeStop;
+    private PendingIntent noticeOpen;
+    private boolean quiet;
+    /**
+     * Keeps the CPU awake while ringing. MediaPlayer's own wake lock only covers a sound while
+     * it plays: in the gap between two sounds a sleeping phone suspended, and the next one
+     * never started.
+     */
+    private PowerManager.WakeLock cpuLock;
 
     private MediaPlayer       mediaPlayer;
     private PowerManager.WakeLock screenLock;
@@ -97,7 +114,9 @@ public class AzanService extends Service {
         Log.d(TAG, "Starting Azan for: " + prayerName + " type=" + azanType);
 
         // ► MUST call startForeground within 5 seconds of startForegroundService
+        quiet = false;
         startForeground(NOTIFICATION_ID, buildNotification(prayerName));
+        holdCpu(AZAN_MAX_MS);
 
         // Light the screen like an alarm clock. Works on every phone, so even where the maker
         // blocks the adhan screen over the lock screen, the user sees the notification + stop.
@@ -117,6 +136,7 @@ public class AzanService extends Service {
         ringingReminder = null;
         handler.removeCallbacksAndMessages(null);
         releaseScreenLock();
+        releaseCpu();
         releaseMediaPlayer();
         abandonAudioFocus();
         super.onDestroy();
@@ -139,9 +159,12 @@ public class AzanService extends Service {
         org.json.JSONObject r;
         try { r = new org.json.JSONObject(json); } catch (org.json.JSONException e) { stopSelf(); return; }
         String id = r.optString("id");
+        quiet = false;
         startForeground(NOTIFICATION_ID, buildReminderNotification(r.optString("title", "تذكير"), r.optString("body"), id));
+        holdCpu(REMINDER_MAX_MS + 10 * 1000L);
         ringingReminder = json;
         current = this;
+        failedInARow = 0;
         wakeScreen();
         launchActivityIfAllowed(ReminderAlarms.PREFIX + id);
         playlist = resolveSound(r.optString("sound"), false);
@@ -158,6 +181,7 @@ public class AzanService extends Service {
         handler.removeCallbacksAndMessages(null);
         playlist = resolveSound(sound, true);
         loopPlaylist = false;
+        failedInARow = 0;
         playStartedAt = System.currentTimeMillis() - RAMP_MS; // full volume
         playAt(0);
         handler.postDelayed(() -> { releaseMediaPlayer(); stopSelf(); }, PREVIEW_MS);
@@ -206,24 +230,47 @@ public class AzanService extends Service {
             mediaPlayer.setVolume(currentVolume(), currentVolume());
             mediaPlayer.setOnPreparedListener(MediaPlayer::start);
             mediaPlayer.setOnCompletionListener(mp -> {
-                int next = playIndex + 1;
-                if (next < playlist.size()) playAt(next);
-                else if (loopPlaylist) handler.postDelayed(() -> playAt(0), 1500); // a breath between rounds
-                else releaseMediaPlayer();
+                failedInARow = 0;
+                playNext();
             });
             mediaPlayer.setOnErrorListener((mp, what, extra) -> {
                 Log.e(TAG, "Reminder sound error " + what + "/" + extra);
+                // returning true means no completion callback: without moving on here the
+                // reminder went silent at the first sound that failed
+                handler.post(this::skipFailed);
                 return true;
             });
             mediaPlayer.prepareAsync();
         } catch (IOException | IllegalStateException | IllegalArgumentException | SecurityException e) {
             Log.e(TAG, "Failed to play reminder sound", e);
+            handler.post(this::skipFailed);
         }
+    }
+
+    private void playNext() {
+        if (playlist == null) return;
+        int next = playIndex + 1;
+        if (next < playlist.size()) playAt(next);
+        else if (loopPlaylist) handler.postDelayed(() -> playAt(0), 1500); // a breath between rounds
+        else releaseMediaPlayer();
+    }
+
+    /** A sound could not be played (a broken download, a missing tone): go on to the next one. */
+    private void skipFailed() {
+        if (playlist == null) return;
+        failedInARow++;
+        if (failedInARow >= playlist.size()) {
+            if (failedInARow > playlist.size()) { releaseMediaPlayer(); return; } // the bundled sound failed too
+            playlist = resolveSound(null, false); // nothing in the list plays: the bundled salawat
+            playAt(0);
+            return;
+        }
+        playNext();
     }
 
     private float currentVolume() {
         long t = System.currentTimeMillis() - playStartedAt;
-        return Math.min(1f, 0.25f + 0.75f * t / (float) RAMP_MS);
+        return Math.min(1f, RAMP_FROM + (1f - RAMP_FROM) * t / (float) RAMP_MS);
     }
 
     private void rampVolume() {
@@ -244,24 +291,80 @@ public class AzanService extends Service {
         openIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         PendingIntent openPending = PendingIntent.getActivity(this, 2, openIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        noticeTitle = title;
+        noticeText = body == null || body.isEmpty() ? "حان موعد تذكيرك" : body;
+        noticeStop = "إيقاف";
+        noticeOpen = openPending;
+        return buildNotice(false);
+    }
+
+    /**
+     * The alarm's notification. Loud: heads-up, with the full-screen intent that opens the
+     * adhan screen. Quiet: the same lines and stop button in the shade only, for when that
+     * screen is already showing (the heads-up covered it, with a second stop button).
+     */
+    private Notification buildNotice(boolean quietly) {
         Intent stopIntent = new Intent(this, AzanService.class);
         stopIntent.setAction(ACTION_STOP);
         PendingIntent stopPending = PendingIntent.getService(this, 1, stopIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        return new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle(title)
-                .setContentText(body == null || body.isEmpty() ? "حان موعد تذكيرك" : body)
+        NotificationCompat.Builder b = new NotificationCompat.Builder(this, quietly ? QUIET_CHANNEL_ID : CHANNEL_ID)
+                .setContentTitle(noticeTitle)
+                .setContentText(noticeText)
                 .setSmallIcon(R.drawable.notification_icon)
                 .setLargeIcon(android.graphics.BitmapFactory.decodeResource(getResources(), R.drawable.owwab_logo)) // the app's coloured logo inside the notification
-                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setPriority(quietly ? NotificationCompat.PRIORITY_LOW : NotificationCompat.PRIORITY_MAX)
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setOngoing(true)
                 .setAutoCancel(false)
-                .setFullScreenIntent(openPending, true)
-                .setContentIntent(openPending)
-                .addAction(android.R.drawable.ic_menu_close_clear_cancel, "إيقاف", stopPending)
-                .build();
+                .setContentIntent(noticeOpen)
+                .addAction(android.R.drawable.ic_menu_close_clear_cancel, noticeStop, stopPending);
+        if (quietly) b.setOnlyAlertOnce(true).setSilent(true);
+        else b.setFullScreenIntent(noticeOpen, true);
+        return b.build();
+    }
+
+    /**
+     * The adhan / reminder screen is on screen (JS calls this when it shows): take the
+     * heads-up off it. The notification stays in the shade with its stop button.
+     */
+    public static void quietNotification() {
+        AzanService svc = current;
+        if (svc != null) svc.handler.post(svc::postQuietly);
+    }
+
+    private void postQuietly() {
+        if (quiet || noticeTitle == null || current != this) return;
+        try {
+            // a new id on the quiet channel becomes the service's notification, then the loud one goes
+            startForeground(QUIET_NOTIFICATION_ID, buildNotice(true));
+            NotificationManager nm = getSystemService(NotificationManager.class);
+            if (nm != null) nm.cancel(NOTIFICATION_ID);
+            quiet = true;
+        } catch (Exception e) {
+            Log.w(TAG, "Could not quiet the notification", e);
+        }
+    }
+
+    private void holdCpu(long maxMs) {
+        try {
+            releaseCpu();
+            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+            if (pm == null) return;
+            cpuLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "owwab:azan-cpu");
+            cpuLock.setReferenceCounted(false);
+            cpuLock.acquire(maxMs);
+        } catch (Exception e) {
+            Log.w(TAG, "holdCpu failed", e);
+        }
+    }
+
+    private void releaseCpu() {
+        try {
+            if (cpuLock != null && cpuLock.isHeld()) cpuLock.release();
+        } catch (Exception ignored) {}
+        cpuLock = null;
     }
 
     private void playAzan() {
@@ -352,8 +455,10 @@ public class AzanService extends Service {
         ringingReminder = null;
         handler.removeCallbacksAndMessages(null);
         releaseScreenLock();
+        releaseCpu();
         releaseMediaPlayer();
         abandonAudioFocus();
+        if (current == this) current = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             stopForeground(STOP_FOREGROUND_REMOVE);
         } else {
@@ -421,8 +526,21 @@ public class AzanService extends Service {
             channel.setSound(null, null); // MediaPlayer owns the sound, not the channel
             channel.enableVibration(false);
 
+            NotificationChannel ongoing = new NotificationChannel(
+                    QUIET_CHANNEL_ID,
+                    "الأذان أثناء عرضه على الشاشة",
+                    NotificationManager.IMPORTANCE_LOW
+            );
+            ongoing.setDescription("إشعار هادئ بزر الإيقاف وقت ظهور شاشة الأذان");
+            ongoing.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            ongoing.setSound(null, null);
+            ongoing.enableVibration(false);
+
             NotificationManager nm = getSystemService(NotificationManager.class);
-            if (nm != null) nm.createNotificationChannel(channel);
+            if (nm != null) {
+                nm.createNotificationChannel(channel);
+                nm.createNotificationChannel(ongoing);
+            }
         }
     }
 
@@ -438,27 +556,11 @@ public class AzanService extends Service {
                 this, 0, openIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        // Stop button
-        Intent stopIntent = new Intent(this, AzanService.class);
-        stopIntent.setAction(ACTION_STOP);
-        PendingIntent stopPending = PendingIntent.getService(
-                this, 1, stopIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-        return new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("حان موعد صلاة " + prayerName)
-                .setContentText("حيَّ على الصلاة • حيَّ على الفلاح")
-                .setSmallIcon(R.drawable.notification_icon)
-                .setLargeIcon(android.graphics.BitmapFactory.decodeResource(getResources(), R.drawable.owwab_logo)) // the app's coloured logo inside the notification
-                .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setCategory(NotificationCompat.CATEGORY_ALARM)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setOngoing(true)
-                .setAutoCancel(false)
-                .setFullScreenIntent(openPending, true)
-                .setContentIntent(openPending)
-                .addAction(android.R.drawable.ic_menu_close_clear_cancel, "إيقاف الأذان", stopPending)
-                .build();
+        noticeTitle = "حان موعد صلاة " + prayerName;
+        noticeText = "حيَّ على الصلاة • حيَّ على الفلاح";
+        noticeStop = "إيقاف الأذان";
+        noticeOpen = openPending;
+        return buildNotice(false);
     }
 
     // ──────────────────────────────────────────────────────────────

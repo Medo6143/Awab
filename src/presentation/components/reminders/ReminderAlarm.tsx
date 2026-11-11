@@ -8,6 +8,7 @@ import { BookOpen, ChevronsLeft, Volume2 } from 'lucide-react-native';
 import { RootState } from '../../store';
 import { hideReminderAlarm } from '../../store/slices/uiSlice';
 import { useToggleIbada } from '../../hooks/useToggleIbada';
+import { useDependencies } from '../../providers/DependencyProvider';
 import { useVerseText } from '../../hooks/useGuidance';
 import { azanNative } from '../../../data/services/nativeModules';
 import { reminderPayload } from '../../../data/notifications/CustomReminderScheduler';
@@ -16,6 +17,7 @@ import { REMINDER_ART } from './art';
 import { navigationRef } from '../../navigation/AppNavigation';
 import { toAr } from '../../../shared/utils/format';
 import { night, radius, space, type } from '../../../shared/theme/tokens';
+import { arDigits } from '../ui';
 
 /** Ibada tasks a reminder's "done" button checks off. */
 const TASK_OF: Partial<Record<Reminder['kind'], string>> = { qiyam: 'qiyam_al_layl', duha: 'duha' };
@@ -39,6 +41,9 @@ export const ReminderAlarm = () => {
   const tasks = useSelector((s: RootState) => s.ibada.tasks);
   const toggle = useToggleIbada();
   const insets = useSafeAreaInsets();
+  const { azanAlarms } = useDependencies();
+  // this screen has the stop and snooze: the alarm's heads-up notification must not cover it
+  useEffect(() => { if (id) azanAlarms.screenShown(); }, [id, azanAlarms]);
   if (!id) return null;
 
   const preset = presetOf(reminder?.kind ?? 'custom');
@@ -78,7 +83,7 @@ export const ReminderAlarm = () => {
           <LinearGradient style={StyleSheet.absoluteFill} colors={['rgba(14,10,7,0.45)', 'rgba(14,10,7,0)', 'rgba(14,10,7,0)', 'rgba(14,10,7,0.75)', night.bg]} locations={[0, 0.18, 0.58, 0.88, 1]} />
           <Text style={[st.when, { top: insets.top + space[4] }]}>{whenLabel(reminder)}</Text>
           <View style={st.over}>
-            <Text style={st.time}>{clock(now.getHours(), now.getMinutes())}</Text>
+            <Text style={st.time}>{arDigits(clock(now.getHours(), now.getMinutes()))}</Text>
             <Text style={st.title} numberOfLines={1}>{reminder?.title || preset.name}</Text>
           </View>
         </View>

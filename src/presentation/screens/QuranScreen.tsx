@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import PagerView from 'react-native-pager-view';
 import { colors } from '../../shared/theme/tokens';
 import { useDispatch, useSelector } from 'react-redux';
-import { Bookmark, BookOpen, ChevronLeft, ChevronRight, Play, Pause, Settings, Home, Mic } from 'lucide-react-native';
+import { Bookmark, BookOpen, ChevronLeft, ChevronRight, Play, Pause, Square, Settings, Home, Mic } from 'lucide-react-native';
 import { useAudio } from '../hooks/useAudio';
 import { RootState } from '../store';
 import { setCurrentPage, togglePageBookmark, toggleBookmark } from '../store/slices/quranSlice';
@@ -58,8 +58,8 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const isTransitioning = useRef(false);
 
   const { 
-    isPlaying, isBuffering, currentSurahId, activeReciter,
-    playSurah, playAyah, playSequence, togglePlayback, changeReciter 
+    isPlaying, isBuffering, currentSurahId, playMode, activeReciter,
+    playSurah, playAyah, playSequence, togglePlayback, stopPlayback, changeReciter
   } = useAudio();
 
   const bottomSheetAnim = useRef(new Animated.Value(H)).current;
@@ -192,8 +192,11 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
         <View style={s.topActions}>
           <TouchableOpacity 
             onPress={async () => {
-              if (isPlaying) {
-                await togglePlayback();
+              if (isPlaying || isBuffering) {
+                // a whole surah pauses (it resumes from the index or the notification);
+                // an ayah or the page stops, and a tap while it is still loading cancels it
+                if (playMode === 'surah' && isPlaying) await togglePlayback();
+                else await stopPlayback();
               } else {
                 const itemsToPlay = quran.peekPage(currentPage)?.map(a => ({
                   surahId: a.surah.number,
@@ -206,9 +209,13 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
               }
             }} 
             style={s.iconBtn}
+            accessibilityRole="button"
+            accessibilityLabel={isPlaying || isBuffering ? 'إيقاف التلاوة' : 'تشغيل الصفحة'}
           >
             {isBuffering ? (
               <ActivityIndicator size="small" color={colors.gold} />
+            ) : isPlaying && playMode !== 'surah' ? (
+              <Square size={19} color={colors.gold} fill={colors.gold} />
             ) : isPlaying ? (
               <Pause size={21} color={colors.gold} fill={colors.gold} />
             ) : (
@@ -332,7 +339,7 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
             setShowSurahPicker(false);
         }}
         activeReciter={activeReciter}
-        currentSurahId={currentSurahId}
+        currentSurahId={playMode === 'surah' ? currentSurahId : null}
         isPlaying={isPlaying}
         isBuffering={isBuffering}
         onPlaySurah={(id: number, name: string) => { playSurah(id, name); }}

@@ -6,6 +6,7 @@ import { AthkarItem } from '../../../shared/constants/athkar';
 import { SkyBackdrop } from '../home/SkyHero';
 import { toAr } from '../../../shared/utils/format';
 import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
+import { arDigits } from '../ui';
 
 export type AthkarTab = 'morning' | 'evening';
 
@@ -40,7 +41,7 @@ export const AthkarSky = ({ tab, subtitle, actions, doneItems, totalItems, progr
       <View style={st.count}>
         <Text style={st.countLabel}>أتممت</Text>
         <Text style={st.countValue}>
-          {toAr(doneItems)}<Text style={st.countOf}> من {toAr(totalItems)}</Text>
+          {arDigits(doneItems)}<Text style={st.countOf}> من {toAr(totalItems)}</Text>
         </Text>
         <View style={st.bar}><View style={[st.barFill, { width: `${Math.round(progress * 100)}%` }]} /></View>
       </View>

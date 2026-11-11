@@ -7,6 +7,8 @@ import type { StyleSheet } from 'react-native';
  * - Surfaces are separated by spacing, not borders. `hairline` only where unavoidable.
  * - `gold` is THE accent (icons, fills, progress, active states). `goldText` is for
  *   big emphasis numbers only. Never mix the two on one element.
+ *   The `gold*` / `onGold` keys follow the colour picked in settings (see ACCENT_OF);
+ *   what must stay gold whatever the accent (the mushaf paper) uses the `paper*` keys.
  * - Shadows: none on cards. `elevation.floating` only for the tab bar and the floating sebha.
  * - Icons: lucide-react-native only, stroke 1.75.
  */
@@ -104,25 +106,83 @@ let isLight = false;
 export const isLightTheme = () => isLight;
 export const setLightTheme = (on: boolean) => { isLight = on; };
 
+const DARK_ACCENTS = {
+  gold: {
+    accent: '#d4af37', accentText: '#fcd34d', accentSoft: 'rgba(212,175,55,0.14)', onAccent: '#1a140f',
+    deep: '#9a7a1f', line: 'rgba(212,175,55,0.45)', lineSoft: 'rgba(212,175,55,0.22)',
+  },
+  emerald: {
+    accent: '#2e8b6a', accentText: '#7fd3b5', accentSoft: 'rgba(46,139,106,0.16)', onAccent: '#0b1a14',
+    deep: '#1f6b50', line: 'rgba(46,139,106,0.5)', lineSoft: 'rgba(46,139,106,0.26)',
+  },
+  midnight: {
+    accent: '#4f5bd5', accentText: '#a5acff', accentSoft: 'rgba(79,91,213,0.16)', onAccent: '#0e1024',
+    deep: '#3a45b0', line: 'rgba(79,91,213,0.5)', lineSoft: 'rgba(79,91,213,0.26)',
+  },
+};
+const LIGHT_ACCENTS: typeof DARK_ACCENTS = {
+  gold: {
+    accent: '#b8901f', accentText: '#8a6a12', accentSoft: 'rgba(184,144,31,0.14)', onAccent: '#ffffff',
+    deep: '#8a6a12', line: 'rgba(184,144,31,0.5)', lineSoft: 'rgba(184,144,31,0.3)',
+  },
+  emerald: {
+    accent: '#2e8b6a', accentText: '#1f6b50', accentSoft: 'rgba(46,139,106,0.12)', onAccent: '#ffffff',
+    deep: '#1f6b50', line: 'rgba(46,139,106,0.5)', lineSoft: 'rgba(46,139,106,0.3)',
+  },
+  midnight: {
+    accent: '#4f5bd5', accentText: '#3a45b0', accentSoft: 'rgba(79,91,213,0.12)', onAccent: '#ffffff',
+    deep: '#3a45b0', line: 'rgba(79,91,213,0.5)', lineSoft: 'rgba(79,91,213,0.3)',
+  },
+};
+
+/** The accent of each theme, for the mode on screen. */
+export const ACCENTS = {} as typeof DARK_ACCENTS;
+for (const key of Object.keys(DARK_ACCENTS) as (keyof typeof DARK_ACCENTS)[]) {
+  Object.defineProperty(ACCENTS, key, { enumerable: true, get: () => (isLight ? LIGHT_ACCENTS : DARK_ACCENTS)[key] });
+}
+export type AccentKey = keyof typeof ACCENTS;
+export type Accent = (typeof ACCENTS)[AccentKey];
+
+let accentKey: AccentKey = 'gold';
+
+/** The accent now on screen; ThemeRoot sets it and remounts the app when it changes. */
+export const currentAccentKey = () => accentKey;
+export const setAccentKey = (key: AccentKey) => { accentKey = key; };
+
+/** The palette keys that are "the accent": they resolve to the selected accent, not to fixed gold. */
+const ACCENT_OF: Partial<Record<keyof Palette, keyof Accent>> = {
+  gold: 'accent',
+  goldText: 'accentText',
+  goldSoft: 'accentSoft',
+  onGold: 'onAccent',
+  goldDeep: 'deep',
+  goldLine: 'line',
+  goldLineSoft: 'lineSoft',
+};
+
 /**
  * The current palette. Each key is a getter, so code that reads `colors.text` while
- * rendering gets the colour of the theme on screen.
+ * rendering gets the colour of the theme and accent on screen.
  */
 export const colors = {} as Palette;
 for (const key of Object.keys(dark) as (keyof Palette)[]) {
-  Object.defineProperty(colors, key, { enumerable: true, get: () => (isLight ? light : dark)[key] });
+  const accentField = ACCENT_OF[key];
+  Object.defineProperty(colors, key, {
+    enumerable: true,
+    get: () => (accentField ? ACCENTS[accentKey][accentField] : (isLight ? light : dark)[key]),
+  });
 }
 
 /**
- * A stylesheet built once per theme. Write `themed(() => ({ ... }))` where a screen would
+ * A stylesheet built once per theme and accent. Write `themed(() => ({ ... }))` where a screen would
  * write `StyleSheet.create({ ... })`; `st.card` is then the current theme's style.
  */
 export const themed = <T extends StyleSheet.NamedStyles<T> | StyleSheet.NamedStyles<any>>(
   build: () => T & StyleSheet.NamedStyles<any>,
 ): T => {
-  const sheets: { dark?: T; light?: T } = {};
+  const sheets: Record<string, T> = {};
   const sheet = () => {
-    const mode = isLight ? 'light' : 'dark';
+    const mode = `${isLight ? 'light' : 'dark'}-${accentKey}`;
     return (sheets[mode] ??= build()) as T;
   };
   const out = {} as T;
@@ -131,25 +191,6 @@ export const themed = <T extends StyleSheet.NamedStyles<T> | StyleSheet.NamedSty
   }
   return out;
 };
-
-const DARK_ACCENTS = {
-  gold:     { accent: '#d4af37', accentText: '#fcd34d', accentSoft: 'rgba(212,175,55,0.14)', onAccent: '#1a140f' },
-  emerald:  { accent: '#2e8b6a', accentText: '#7fd3b5', accentSoft: 'rgba(46,139,106,0.16)', onAccent: '#0b1a14' },
-  midnight: { accent: '#4f5bd5', accentText: '#a5acff', accentSoft: 'rgba(79,91,213,0.16)',  onAccent: '#0e1024' },
-};
-const LIGHT_ACCENTS: typeof DARK_ACCENTS = {
-  gold:     { accent: '#b8901f', accentText: '#8a6a12', accentSoft: 'rgba(184,144,31,0.14)', onAccent: '#ffffff' },
-  emerald:  { accent: '#2e8b6a', accentText: '#1f6b50', accentSoft: 'rgba(46,139,106,0.12)', onAccent: '#ffffff' },
-  midnight: { accent: '#4f5bd5', accentText: '#3a45b0', accentSoft: 'rgba(79,91,213,0.12)',  onAccent: '#ffffff' },
-};
-
-/** Per-theme interactive accent. Static gold (mushaf frame etc.) does not change. */
-export const ACCENTS = {} as typeof DARK_ACCENTS;
-for (const key of Object.keys(DARK_ACCENTS) as (keyof typeof DARK_ACCENTS)[]) {
-  Object.defineProperty(ACCENTS, key, { enumerable: true, get: () => (isLight ? LIGHT_ACCENTS : DARK_ACCENTS)[key] });
-}
-export type AccentKey = keyof typeof ACCENTS;
-export type Accent = (typeof ACCENTS)[AccentKey];
 
 export const radius = { card: 20, field: 12, pill: 999, tile: 14, sheet: 28 } as const;
 

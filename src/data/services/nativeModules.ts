@@ -12,6 +12,8 @@ export interface AzanNativeModule {
   /** ms into the adhan the native service is playing, or -1. */
   getAzanPositionMs?(): Promise<number>;
   stopAzan?(): void;
+  /** Moves the ringing alarm's notification from heads-up to the shade. */
+  quietNotification?(): void;
   releaseLockScreen?(): void;
   didBootRescheduleFail?(): Promise<boolean>;
   clearBootRescheduleFailedFlag?(): void;

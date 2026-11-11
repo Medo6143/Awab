@@ -260,6 +260,12 @@ public class AzanModule extends ReactContextBaseJavaModule {
         });
     }
 
+    /** The in-app adhan / reminder screen is showing: no heads-up notification on top of it. */
+    @ReactMethod
+    public void quietNotification() {
+        AzanService.quietNotification();
+    }
+
     /** Stops the adhan the alarm service is playing, from the in-app azan screen. */
     @ReactMethod
     public void stopAzan() {
