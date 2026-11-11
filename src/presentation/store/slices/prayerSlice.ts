@@ -1,46 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-interface PrayerTimings {
-  Fajr: string;
-  Sunrise: string;
-  Dhuhr: string;
-  Asr: string;
-  Sunset: string;
-  Maghrib: string;
-  Isha: string;
-  Imsak: string;
-  Midnight: string;
-}
-
-export interface PrayerDate {
-  readable: string;
-  timestamp: string;
-  gregorian: {
-    date: string;
-    format: string;
-    day: string;
-    weekday: { en: string; ar?: string };
-    month: { number: number; en: string; ar?: string };
-    year: string;
-  };
-  hijri: {
-    date: string;
-    format: string;
-    day: string;
-    weekday: { en: string; ar: string };
-    month: { number: number; en: string; ar: string };
-    year: string;
-  };
-}
-
-interface PrayerData {
-  timings: PrayerTimings;
-  date: PrayerDate;
-  meta: { method: { id: number; name?: string }; school?: string } & Record<string, unknown>;
-}
+import { PrayerDay } from '../../../domain/entities/prayer';
 
 interface PrayerState {
-  cachedData: PrayerData | null;
+  cachedData: PrayerDay | null;
   lastFetchedDate: string | null; // Format: YYYY-MM-DD
   status: 'idle' | 'loading' | 'failed';
 }
@@ -55,7 +17,7 @@ const prayerSlice = createSlice({
   name: 'prayer',
   initialState,
   reducers: {
-    setPrayerData: (state, action: PayloadAction<PrayerData>) => {
+    setPrayerData: (state, action: PayloadAction<PrayerDay>) => {
       state.cachedData = action.payload;
       // Extract date from gregorian or use current date for fetch tracking
       state.lastFetchedDate = action.payload.date.gregorian.date;

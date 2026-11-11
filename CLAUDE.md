@@ -20,7 +20,7 @@ Three layers. Dependencies point inward only: `presentation → domain ← data`
 - **Extend, don't edit.** New reminder kinds are a new scheduler passed to `ExpoNotificationCenter` in the container, not a branch inside the center. Apply the same idea elsewhere: add an implementation rather than a special case.
 - **Reuse before writing.** Look in `src/domain/services/`, `src/shared/utils/format.ts` and `src/presentation/components/ui/` before adding a helper (e.g. bearings come from `geo.ts`, Arabic digits from `toAr`).
 
-Older code still breaks these rules (`PrayerTimeService`, `AudioService` and others are imported straight from `data/services`). Don't copy that; when you touch such code, move it behind the container if the change is small, or say it's left as is.
+Older code still breaks these rules (tasmee, reminders, `ayahSearch` and `hadithLibrary` are imported straight from `src/data`; see issue #24). Don't copy that; when you touch such code, move it behind the container if the change is small, or say it's left as is.
 
 ## UI
 

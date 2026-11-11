@@ -46,3 +46,6 @@ yarn-error.*
 landing/owwab.apk
 landing/.vercel
 videos/
+
+# ElevenLabs API key for the video voices
+videos/.el_key
