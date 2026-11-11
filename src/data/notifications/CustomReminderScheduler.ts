@@ -1,5 +1,6 @@
 import { ReminderScheduler, ScheduleContext } from '../../domain/services/Notifications';
 import { Reminder, presetOf, resolveReminderTime } from '../../domain/entities/reminders';
+import { ayahAudioUrl } from '../../domain/entities/reciters';
 import { azanNative } from '../services/nativeModules';
 import { expoNotifications, rtl } from './expo';
 
@@ -13,7 +14,7 @@ export const reminderSoundSpec = (r: Pick<Reminder, 'kind' | 'sound'>, reciterFo
   const rec = presetOf(r.kind).recitation ?? { surah: 73, from: 1, to: 4 };
   const urls = [];
   for (let a = rec.from; a <= rec.to; a++) {
-    urls.push(`https://everyayah.com/data/${reciterFolder}/${String(rec.surah).padStart(3, '0')}${String(a).padStart(3, '0')}.mp3`);
+    urls.push(ayahAudioUrl(reciterFolder, rec.surah, a));
   }
   return `urls:${urls.join('|')}`;
 };

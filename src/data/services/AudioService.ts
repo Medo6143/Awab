@@ -3,7 +3,7 @@ import type { Sound } from 'expo-av/build/Audio';
 import TrackPlayer, { Event, State } from 'react-native-track-player';
 import { initializeTrackPlayer } from './TrackPlayerService';
 import { AyahKey, AzanSound, IDLE_PLAYBACK, PlaybackStatus, QuranPlayer } from '../../domain/services/Audio';
-import { DEFAULT_RECITER_ID, RECITER_MAP } from '../../domain/entities/reciters';
+import { DEFAULT_RECITER_ID, RECITER_MAP, ayahAudioUrl } from '../../domain/entities/reciters';
 
 /**
  * Recitation and the in-app adhan on top of react-native-track-player (whole surahs, with the
@@ -132,10 +132,7 @@ export class ExpoAudioPlayer implements QuranPlayer, AzanSound {
     try { await TrackPlayer.reset(); } catch {}
 
     try {
-      const reciter = RECITER_MAP[this.activeReciterId];
-      const surahStr = surahId.toString().padStart(3, '0');
-      const ayahStr = ayahNumber.toString().padStart(3, '0');
-      const audioUrl = `https://everyayah.com/data/${reciter.folder}/${surahStr}${ayahStr}.mp3`;
+      const audioUrl = ayahAudioUrl(RECITER_MAP[this.activeReciterId].folder, surahId, ayahNumber);
 
       console.log(`AudioService: Playing ayah ${surahId}:${ayahNumber} (No Notification)`);
 

@@ -28,6 +28,15 @@ export interface AzanNativeModule {
   previewReminderSound?(sound: string): void;
 }
 
+/**
+ * AyahVideoModule (native/android/java/video): builds the ayah MP4. `spec` is JSON:
+ * { background, overlay, pages: [{ image, words: [{ x, y, w, h, ayah, weight }] }], audios: [], out },
+ * with plain file paths and boxes in pixels of the 1080×1920 frame.
+ */
+export interface AyahVideoNativeModule {
+  encode?(spec: string): Promise<{ durationMs: number }>;
+}
+
 export interface FloatingBubbleNativeModule {
   initialize?(): Promise<void>;
   checkPermission?(): Promise<boolean>;
@@ -46,4 +55,5 @@ const androidOnly = <T>(name: string): T | undefined =>
   Platform.OS === 'android' ? (NativeModules[name] as T | undefined) : undefined;
 
 export const azanNative = () => androidOnly<AzanNativeModule>('AzanModule');
+export const ayahVideoNative = () => androidOnly<AyahVideoNativeModule>('AyahVideo');
 export const floatingBubbleNative = () => androidOnly<FloatingBubbleNativeModule>('RNFloatingBubble');
