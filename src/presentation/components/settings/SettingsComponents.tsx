@@ -7,7 +7,7 @@ import {
 } from 'lucide-react-native';
 import { s } from './SettingsStyles';
 import { TAFSIR_LIST, STYLES_LIST, THEME_LIST } from './SettingsConstants';
-import { RECITER_MAP } from '../../../data/services/AudioService';
+import { RECITER_MAP } from '../../../domain/entities/reciters';
 import { Chip, IconTile, SectionTitle } from '../ui';
 import { ACCENTS, colors, icon } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';

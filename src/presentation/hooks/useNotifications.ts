@@ -6,13 +6,12 @@ import { useDependencies } from '../providers/DependencyProvider';
 import { AzanSettings, DEFAULT_AZAN_SETTINGS, DEFAULT_NOTIFICATION_PREFS } from '../../domain/entities/notifications';
 import { usePrayerTimes } from './usePrayerTimes';
 import { showAzanModal, showReminderAlarm } from '../store/slices/uiSlice';
-import { RECITER_MAP } from '../../data/services/AudioService';
+import { RECITER_MAP } from '../../domain/entities/reciters';
 
 /** The native alarm opens the app with "reminder:<id>" for the user's own reminders. */
 const REMINDER_PREFIX = 'reminder:';
 /** A tapped notification older than this no longer starts the adhan on launch. */
 const STALE_RESPONSE_MS = 5 * 60 * 1000;
-import { AudioService } from '../../data/services/AudioService';
 import { PRAYER_AR_NAMES, prayerFromNotification, prayerJustStarted } from '../../domain/entities/prayer';
 
 // We avoid top-level imports of expo-notifications to prevent early JSI binding attempts
@@ -20,7 +19,7 @@ const getNotifications = () => require('expo-notifications');
 
 export const useNotifications = () => {
   const dispatch = useDispatch();
-  const { notifications, azanAlarms } = useDependencies();
+  const { notifications, azanAlarms, azanSound } = useDependencies();
   const { timings } = usePrayerTimes();
   const { notificationPrefs, notificationsEnabled, azanSettings: rawAzanSettings, selectedReciterId } = useSelector((state: RootState) => state.settings);
   const reminders = useSelector((state: RootState) => state.reminders?.list ?? []);
@@ -40,7 +39,7 @@ export const useNotifications = () => {
     // shows the azan screen and plays the adhan unless the user chose silent
     const raiseAzan = (prayerName: string) => {
       dispatch(showAzanModal(prayerName));
-      if (azanSettings.type !== 'none') AudioService.playAzan(azanSettings.type);
+      if (azanSettings.type !== 'none') azanSound.play(azanSettings.type);
     };
 
     const checkInitialNotification = async () => {
@@ -137,7 +136,7 @@ export const useNotifications = () => {
       const { title, data } = notification.request.content;
       const prayer = prayerFromNotification(title, data);
       if (!prayer || azanSettings.type === 'none') return;
-      AudioService.playAzan(azanSettings.type);
+      azanSound.play(azanSettings.type);
       if (azanSettings.visualAzanEnabled) dispatch(showAzanModal(prayer));
     });
 

@@ -14,7 +14,8 @@ import { setPrayerData, setLoading as setPrayerLoading, setFailed as setPrayerFa
 export const usePrayerTimes = () => {
   const dispatch = useDispatch();
   const { prayerWidget } = useDependencies();
-  const { coords, countryCode, error: locationError } = useLocation();
+  // prayer times never use the compass: no heading watcher re-rendering every screen on each tick
+  const { coords, countryCode, error: locationError } = useLocation({ watchHeading: false });
   const { prayerMethod = 'auto', asrMethod } = useSelector((state: RootState) => state.settings);
   const { cachedData, lastFetchedDate, status } = useSelector((state: RootState) => state.prayer);
   // stored times show at once; a slow GPS fix only refreshes them later
@@ -126,6 +127,7 @@ export const usePrayerTimes = () => {
     loading: !cachedData && (status === 'loading' || (!coords && !locationError) || (!!coords && status !== 'failed')),
     error: status === 'failed',
     hasLocation: !!coords || !locationError,
+    coords,
     retry,
   };
 };

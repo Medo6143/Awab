@@ -18,6 +18,12 @@ import { FloatingSebha } from '../domain/services/FloatingSebha';
 import { NotificationCenter } from '../domain/services/Notifications';
 import { PrayerWidget } from '../domain/services/PrayerWidget';
 import { AzanAlarms } from '../domain/services/AzanAlarms';
+import { LocationProvider } from '../domain/services/Location';
+import { MosqueFinder } from '../domain/services/Mosques';
+import { ExpoLocationProvider } from './services/LocationService';
+import { OsmMosqueFinder } from './services/MosqueService';
+import { AzanSound, QuranPlayer } from '../domain/services/Audio';
+import { ExpoAudioPlayer } from './services/AudioService';
 
 export type AppDependencies = {
   quran: QuranRepository;
@@ -27,25 +33,37 @@ export type AppDependencies = {
   notifications: NotificationCenter;
   prayerWidget: PrayerWidget;
   azanAlarms: AzanAlarms;
+  location: LocationProvider;
+  mosques: MosqueFinder;
+  quranPlayer: QuranPlayer;
+  azanSound: AzanSound;
 };
 
-export const createDependencies = (): AppDependencies => ({
-  quran: new QuranApiRepository(quranApi),
-  tafsir: new QuranComTafsirRepository(tafsirApi),
-  hadith: new HadeethEncRepository(hadithApi),
-  floatingSebha: new NativeFloatingSebha(),
-  prayerWidget: new NativePrayerWidget(),
-  azanAlarms: new NativeAzanAlarms(),
-  // a new reminder kind is one more scheduler here; the center itself does not change
-  notifications: new ExpoNotificationCenter([
-    new PrayerScheduler(),
-    new AthkarScheduler(),
-    new SpiritualScheduler(),
-    new DailyWardScheduler(),
-    new EncouragementScheduler(),
-    new CustomReminderScheduler(),
-  ]),
-});
+export const createDependencies = (): AppDependencies => {
+  // one player for both: recitation and the in-app adhan share the same expo-av sound
+  const audio = new ExpoAudioPlayer();
+  return {
+    quran: new QuranApiRepository(quranApi),
+    tafsir: new QuranComTafsirRepository(tafsirApi),
+    hadith: new HadeethEncRepository(hadithApi),
+    floatingSebha: new NativeFloatingSebha(),
+    prayerWidget: new NativePrayerWidget(),
+    azanAlarms: new NativeAzanAlarms(),
+    location: new ExpoLocationProvider(),
+    mosques: new OsmMosqueFinder(),
+    quranPlayer: audio,
+    azanSound: audio,
+    // a new reminder kind is one more scheduler here; the center itself does not change
+    notifications: new ExpoNotificationCenter([
+      new PrayerScheduler(),
+      new AthkarScheduler(),
+      new SpiritualScheduler(),
+      new DailyWardScheduler(),
+      new EncouragementScheduler(),
+      new CustomReminderScheduler(),
+    ]),
+  };
+};
 
 /** The app's single set of dependencies (also used outside React, e.g. at startup). */
 export const appDependencies = createDependencies();

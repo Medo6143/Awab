@@ -30,6 +30,7 @@ import PrayerHubScreen from '../screens/PrayerHubScreen';
 import StatsScreen from '../screens/StatsScreen';
 import RemindersScreen from '../screens/RemindersScreen';
 import TasmeeScreen from '../screens/TasmeeScreen';
+import MosquesScreen from '../screens/MosquesScreen';
 
 /**
  * Route names:
@@ -99,6 +100,7 @@ const AppNavigation = () => {
           <Stack.Screen name="الإحصائيات" component={StatsScreen} />
           <Stack.Screen name="التذكيرات" component={RemindersScreen} />
           <Stack.Screen name="التسميع" component={TasmeeScreen} />
+          <Stack.Screen name="المساجد" component={MosquesScreen} />
         </Stack.Navigator>
       </View>
     </NavigationContainer>

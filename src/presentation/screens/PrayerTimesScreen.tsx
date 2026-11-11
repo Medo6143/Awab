@@ -10,6 +10,7 @@ import { Screen, ErrorState, EmptyState, Skeleton } from '../components/ui';
 import { SkyButton, SkyHero } from '../components/home/SkyHero';
 import { AsrIcon, DhuhrIcon, FajrIcon, IconComponent, IshaIcon, KaabaIcon, MaghribIcon } from '../components/icons/IslamicIcons';
 import { toAr } from '../../shared/utils/format';
+import { NearestMosqueCard } from '../components/prayer/MosqueParts';
 import { colors, radius, space, type, themed } from '../../shared/theme/tokens';
 
 const PRAYERS: { key: string; task: string; ar: string; Icon: IconComponent }[] = [
@@ -35,7 +36,7 @@ const WEEKDAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأر�
  */
 const PrayerTimesScreen = ({ navigation, tab, onOpenQibla }: EmbeddableScreenProps & { onOpenQibla?: () => void }) => {
   const toggleIbada = useToggleIbada();
-  const { timings, date, nextPrayer, loading, error, hasLocation, retry } = usePrayerTimes();
+  const { timings, date, nextPrayer, loading, error, hasLocation, retry, coords } = usePrayerTimes();
   const tasks = useSelector((s: RootState) => s.ibada.tasks);
   const meta = useSelector((s: RootState) => s.prayer.cachedData?.meta);
   const done = new Set(tasks.filter((t) => t.isCompleted).map((t) => t.id));
@@ -92,6 +93,7 @@ const PrayerTimesScreen = ({ navigation, tab, onOpenQibla }: EmbeddableScreenPro
           {method ? ` · الحساب: ${method}` : ''}
           {school ? ` · العصر: ${school}` : ''}
         </Text>
+        <NearestMosqueCard coords={coords ?? null} />
       </>
     );
   }
