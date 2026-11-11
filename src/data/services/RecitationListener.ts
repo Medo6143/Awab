@@ -40,6 +40,12 @@ export const downloadModel = async (onProgress: (p: number) => void): Promise<vo
   await FileSystem.moveAsync({ from: tmp, to: MODEL_FILE });
 };
 
+/** Whether the microphone is already allowed (no dialog). */
+export const hasMic = async (): Promise<boolean> => {
+  if (Platform.OS !== 'android') return true;
+  return PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+};
+
 export const requestMic = async (): Promise<boolean> => {
   if (Platform.OS !== 'android') return true;
   const r = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);

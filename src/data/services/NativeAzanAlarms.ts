@@ -20,6 +20,16 @@ export class NativeAzanAlarms implements AzanAlarms {
     try { this.mod?.clearBootRescheduleFailedFlag?.(); } catch {}
   }
 
+  async canScheduleExact() {
+    // no native module (iOS, old build): nothing to ask for
+    if (!this.mod?.canScheduleExactAlarms) return true;
+    try { return await this.mod.canScheduleExactAlarms(); } catch { return true; }
+  }
+
+  openExactAlarmSettings() {
+    try { this.mod?.openAlarmSettings?.(); } catch {}
+  }
+
   async playbackPosition() {
     try {
       const ms = await this.mod?.getAzanPositionMs?.();

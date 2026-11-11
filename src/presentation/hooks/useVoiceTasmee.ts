@@ -1,9 +1,26 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Alert } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { Ayah, mushafAyahText } from '../components/quran/QuranConstants';
 import { splitWords } from '../components/tasmee/tasmeeText';
 import { plainAyah } from '../../data/quran/ayahSearch';
-import { RecitationListener, requestMic } from '../../data/services/RecitationListener';
+import { RecitationListener, hasMic, requestMic } from '../../data/services/RecitationListener';
+
+/**
+ * Says why the microphone is needed before Android's own dialog asks (Play's prominent
+ * disclosure). Resolves true when the user chooses to continue.
+ */
+const explainMic = () => new Promise<boolean>((resolve) => {
+  Alert.alert(
+    'التسميع بالصوت',
+    'أوّاب هيطلب إذن المايك عشان يسمع تلاوتك ويتابع معاك الآيات. الصوت بيتعالج على موبايلك بس، ومش بيتسجّل ولا بيتبعت لأي حد.',
+    [
+      { text: 'مش دلوقتي', style: 'cancel', onPress: () => resolve(false) },
+      { text: 'كمّل', onPress: () => resolve(true) },
+    ],
+    { cancelable: true, onDismiss: () => resolve(false) },
+  );
+});
 import { playWord, prefetchWord } from '../../data/services/wordAudio';
 import { RecitationFollower, followWords } from '../../domain/services/recitationFollower';
 
@@ -186,7 +203,10 @@ export const useVoiceTasmee = (enabled: boolean, mode: VoiceMode, ayahs: Ayah[],
   const start = useCallback(async () => {
     const l = listener.current;
     if (!l || active.current) return;
-    if (!(await requestMic())) { setState('noMic'); return; }
+    if (!(await hasMic())) {
+      if (!(await explainMic())) return; // stays idle: the user can start again
+      if (!(await requestMic())) { setState('noMic'); return; }
+    }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     active.current = true;
     await l.start();
