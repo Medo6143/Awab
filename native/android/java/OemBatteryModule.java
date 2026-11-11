@@ -44,20 +44,34 @@ public class OemBatteryModule extends ReactContextBaseJavaModule {
         promise.resolve(true); // Pre-M or no PM available
     }
 
+    /**
+     * Opens this app's settings page, where «البطارية» → «غير مقيّد» lifts the battery limits.
+     * The direct "allow?" dialog (ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS) needs the
+     * REQUEST_IGNORE_BATTERY_OPTIMIZATIONS permission, which Google Play restricts to a few
+     * kinds of apps, so the app no longer declares it. Falls back to the system-wide list.
+     */
     @ReactMethod
     public void requestIgnoreBatteryOptimizations(Promise promise) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            try {
-                Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-                intent.setData(Uri.parse("package:" + getReactApplicationContext().getPackageName()));
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                getReactApplicationContext().startActivity(intent);
-                promise.resolve(true);
-            } catch (Exception e) {
-                promise.reject("BATTERY_INTENT_FAILED", e);
-            }
-        } else {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             promise.resolve(false);
+            return;
+        }
+        Context ctx = getReactApplicationContext();
+        try {
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.setData(Uri.parse("package:" + ctx.getPackageName()));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            ctx.startActivity(intent);
+            promise.resolve(true);
+        } catch (Exception e) {
+            try {
+                Intent list = new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+                list.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                ctx.startActivity(list);
+                promise.resolve(true);
+            } catch (Exception e2) {
+                promise.reject("BATTERY_INTENT_FAILED", e2);
+            }
         }
     }
 

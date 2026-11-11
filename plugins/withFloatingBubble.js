@@ -26,7 +26,7 @@ module.exports = function withFloatingBubble(config) {
         'property': [
           {
             $: {
-              'android:name': 'android.app.PROPERTY_SPECIAL_USE_FGS_REASON',
+              'android:name': 'android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE',
               'android:value': 'Floating Tasbeeh counter and dhikr reminders that must remain active over other apps.',
             },
           },

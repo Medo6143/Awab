@@ -75,7 +75,7 @@ export function useAzanPermissions() {
       { id: 'notifications', label: 'الإشعارات', hint: 'يظهر إشعار الأذان مع زر الإيقاف', status: notif ? 'ok' : 'missing', fix: () => notifications.request() },
       { id: 'exactAlarm', label: 'المنبهات الدقيقة', hint: 'يرن الأذان في الدقيقة نفسها', status: exact ? 'ok' : 'missing', fix: () => AzanModule.openAlarmSettings() },
       { id: 'fullScreen', label: 'شاشة الأذان فوق القفل', hint: 'أندرويد ١٤ وما بعده يطلب هذا الإذن', status: fsi ? 'ok' : 'missing', fix: () => AzanModule.openFullScreenIntentSettings?.() },
-      { id: 'battery', label: 'استثناء من توفير البطارية', hint: 'حتى لا يُقتل المنبه أثناء النوم', status: battery ? 'ok' : 'missing', fix: () => OemBatteryModule.requestIgnoreBatteryOptimizations() },
+      { id: 'battery', label: 'استثناء من توفير البطارية', hint: 'افتح «البطارية» واختار «غير مقيّد» عشان المنبه ما يتقتلش وأنت نايم', status: battery ? 'ok' : 'missing', fix: () => OemBatteryModule.requestIgnoreBatteryOptimizations() },
       // any phone: an app allowed to draw over others may open its screen from the background
       { id: 'overlay', label: 'الظهور فوق التطبيقات', hint: 'لتفتح شاشة الأذان تلقائيًا والتطبيق مغلق', status: overlay ? 'ok' : 'missing', fix: () => AzanModule.requestOverlayPermission?.() },
     ];

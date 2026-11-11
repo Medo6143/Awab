@@ -85,7 +85,7 @@ index 41a92ab..8a476d0 100644
 +
 +    <application>
 +        <service android:name=".FloatingBubbleService" android:foregroundServiceType="specialUse" android:stopWithTask="false">
-+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_REASON" android:value="Floating Tasbeeh counter and dhikr reminders that must remain active over other apps."/>
++            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Floating Tasbeeh counter and dhikr reminders that must remain active over other apps."/>
 +        </service>
 +    </application>
 +

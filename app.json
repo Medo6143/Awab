@@ -34,13 +34,14 @@
         "FOREGROUND_SERVICE",
         "FOREGROUND_SERVICE_MEDIA_PLAYBACK",
         "FOREGROUND_SERVICE_SPECIAL_USE",
-        "REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
         "SYSTEM_ALERT_WINDOW",
         "POST_NOTIFICATIONS",
         "RECORD_AUDIO"
       ],
       "blockedPermissions": [
         "android.permission.USE_EXACT_ALARM",
+        "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+        "android.permission.ACTIVITY_RECOGNITION",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.READ_MEDIA_IMAGES",
         "android.permission.READ_MEDIA_VIDEO",
@@ -81,6 +82,7 @@
       ],
       "./plugins/withFloatingBubble.js",
       "./plugins/withOwwabNative.js",
+      "./plugins/withPlayPolicy.js",
       "onnxruntime-react-native"
     ],
     "runtimeVersion": {
