@@ -14,7 +14,7 @@ import {
   setDailyWardTime, setEncouragementInterval, toggleTasbeehHaptics, setAsrMethod, toggleTasbeehTargetAlert, setPrayerMethod,
 } from '../store/slices/settingsSlice';
 import { setFloatingScale, setFloatingBubbleColor, toggleFloatingBorder, toggleFloatingReset, setFloatingReminderInterval } from '../store/slices/tasbeehSlice';
-import { RECITER_MAP } from '../../data/services/AudioService';
+import { RECITER_MAP } from '../../domain/entities/reciters';
 import { methodName } from '../../domain/entities/prayerMethods';
 import { AZAN_TYPES } from '../components/settings/AzanConstants';
 import { colors, icon, radius, space, type, themed } from '../../shared/theme/tokens';

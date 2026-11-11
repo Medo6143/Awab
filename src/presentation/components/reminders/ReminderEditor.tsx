@@ -8,7 +8,7 @@ import { Chip, PillButton, Sheet } from '../ui';
 import { REMINDER_ART } from './art';
 import { azanNative } from '../../../data/services/nativeModules';
 import { reminderSoundSpec } from '../../../data/notifications/CustomReminderScheduler';
-import { RECITER_MAP } from '../../../data/services/AudioService';
+import { RECITER_MAP } from '../../../domain/entities/reciters';
 import {
   PRAYER_NAMES_AR, REMINDER_PRESETS, Reminder, ReminderArt, ReminderKind, ReminderSound, WEEKDAYS_SHORT, newReminder, presetOf,
 } from '../../../domain/entities/reminders';

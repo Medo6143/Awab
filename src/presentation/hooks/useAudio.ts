@@ -1,22 +1,23 @@
-import type { AVPlaybackStatus } from 'expo-av';
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { AudioService, RECITER_MAP } from '../../data/services/AudioService';
-import { AudioState } from '../../domain/entities/types';
+import { RECITER_MAP } from '../../domain/entities/reciters';
+import { AyahKey } from '../../domain/services/Audio';
+import { useDependencies } from '../providers/DependencyProvider';
 import { RootState } from '../store';
 import { setReciterId } from '../store/slices/settingsSlice';
 import { setAudioState } from '../store/slices/audioSlice';
-import TrackPlayer, { usePlaybackState, useProgress, State } from 'react-native-track-player';
+import { usePlaybackState, useProgress, State } from 'react-native-track-player';
 
 export const useAudio = () => {
   const dispatch = useDispatch();
   const { selectedReciterId } = useSelector((state: RootState) => state.settings);
   const state = useSelector((state: RootState) => state.audio);
-  
-  // Sync AudioService with Redux setting
+  const { quranPlayer: player } = useDependencies();
+
+  // keep the player on the reciter chosen in settings
   useEffect(() => {
-    AudioService.setReciter(selectedReciterId);
-  }, [selectedReciterId]);
+    player.setReciter(selectedReciterId);
+  }, [player, selectedReciterId]);
 
   const { state: playbackState } = usePlaybackState();
   const progress = useProgress();
@@ -34,69 +35,54 @@ export const useAudio = () => {
     }));
   }, [playbackState, progress.position, progress.duration, dispatch]);
 
-  const onStatusUpdate = useCallback((status: AVPlaybackStatus) => {
-    // Only used for Azan (expo-av) now
-    if (status.isLoaded) {
-      dispatch(setAudioState({
-        isPlaying: status.isPlaying,
-        isBuffering: status.isBuffering,
-        currentPosition: status.positionMillis,
-        duration: status.durationMillis || 0,
-      }));
-    }
-  }, [dispatch]);
-
   const changeReciter = (id: string) => {
     dispatch(setReciterId(id));
   };
 
   const playSurah = async (surahId: number, surahName?: string) => {
     dispatch(setAudioState({ currentSurahId: surahId, isBuffering: true, playMode: 'surah' }));
-    await AudioService.playSurah(surahId, surahName);
+    await player.playSurah(surahId, surahName);
   };
 
   const playAyah = async (surahId: number, ayahNumber: number, surahName?: string) => {
     dispatch(setAudioState({ currentSurahId: surahId, isBuffering: true, playMode: 'ayah' }));
-    await AudioService.playAyah(surahId, ayahNumber, surahName);
+    await player.playAyah(surahId, ayahNumber, surahName);
   };
 
-  const playSequence = async (items: { surahId: number, ayahNumber: number }[], title?: string) => {
+  const playSequence = async (items: AyahKey[], title?: string) => {
     if (items.length === 0) return;
     dispatch(setAudioState({ currentSurahId: items[0].surahId, isBuffering: true, playMode: 'sequence' }));
-    await AudioService.playSequence(items, title, () => {
+    await player.playSequence(items, title, () => {
       dispatch(setAudioState({ isPlaying: false, isBuffering: false, playMode: undefined }));
     });
   };
 
   const togglePlayback = async () => {
     if (state.isPlaying) {
-      await AudioService.pause();
+      await player.pause();
       return;
     }
     // After an app restart the persisted "current surah" has no queue behind it,
     // so resume() would silently do nothing. Re-load the surah in that case.
     if (state.playMode === 'surah' && state.currentSurahId) {
-      try {
-        const queue = await TrackPlayer.getQueue();
-        if (queue.length === 0) {
-          await playSurah(state.currentSurahId);
-          return;
-        }
-      } catch {}
+      if (!(await player.hasQueue())) {
+        await playSurah(state.currentSurahId);
+        return;
+      }
     }
-    await AudioService.resume();
+    await player.resume();
   };
 
   const resumePlayback = async () => {
-    await AudioService.resume();
+    await player.resume();
   };
 
   const seekTo = async (positionMillis: number) => {
-    await AudioService.seek(positionMillis);
+    await player.seek(positionMillis);
   };
 
   const stopPlayback = async () => {
-    await AudioService.stop();
+    await player.stop();
     dispatch(setAudioState({
       isPlaying: false,
       isBuffering: false,

@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Modal, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { X } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { AudioService } from '../../../data/services/AudioService';
 import { verseForPrayer } from '../../../domain/entities/prayerVerses';
 import { ADHAN_END, ADHAN_LINES, POST_ADHAN_DUA, adhanLineAt } from '../../../domain/entities/adhan';
 import { useDependencies } from '../../providers/DependencyProvider';
@@ -27,7 +26,7 @@ const DUA_SCREEN_MS = 90 * 1000;
  * that was playing stopped, or the recording's length has passed.
  */
 const useAdhanLine = () => {
-  const { azanAlarms } = useDependencies();
+  const { azanAlarms, azanSound } = useDependencies();
   const openedAt = useRef(Date.now()).current;
   const [line, setLine] = useState(0);
   const [done, setDone] = useState(false);
@@ -35,7 +34,7 @@ const useAdhanLine = () => {
     let alive = true;
     let heardPlayer = false;
     const tick = async () => {
-      const played = (await azanAlarms.playbackPosition()) ?? (await AudioService.azanPosition());
+      const played = (await azanAlarms.playbackPosition()) ?? (await azanSound.position());
       if (played != null) heardPlayer = true;
       const pos = played ?? (Date.now() - openedAt) / 1000;
       if (!alive) return;
@@ -57,7 +56,7 @@ const formatTime = (d: Date) => {
 
 const AzanContent = ({ onClose, prayerName }: { onClose: () => void; prayerName: string }) => {
   const { width, height } = useWindowDimensions();
-  const { azanAlarms } = useDependencies();
+  const { azanAlarms, azanSound } = useDependencies();
   const navBar = useSafeAreaInsets().bottom;
   const verse = verseForPrayer(prayerName);
   const { line, done } = useAdhanLine();
@@ -103,7 +102,7 @@ const AzanContent = ({ onClose, prayerName }: { onClose: () => void; prayerName:
 
   const handleClose = async () => {
     azanAlarms.stop();
-    await AudioService.stop();
+    await azanSound.stop();
     onClose();
   };
 

@@ -1,10 +1,10 @@
-import type { Reciter } from '../../../data/services/AudioService';
+import type { Reciter } from '../../../domain/entities/reciters';
 import React from 'react';
 import { View, Text, Modal, ScrollView, TouchableOpacity } from 'react-native';
 import { X, Star } from 'lucide-react-native';
 import { s } from './QuranStyles';
 import { colors } from '../../../shared/theme/tokens';
-import { RECITER_MAP } from '../../../data/services/AudioService';
+import { RECITER_MAP } from '../../../domain/entities/reciters';
 
 interface Props {
   visible: boolean;

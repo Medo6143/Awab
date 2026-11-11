@@ -22,6 +22,8 @@ import { LocationProvider } from '../domain/services/Location';
 import { MosqueFinder } from '../domain/services/Mosques';
 import { ExpoLocationProvider } from './services/LocationService';
 import { OsmMosqueFinder } from './services/MosqueService';
+import { AzanSound, QuranPlayer } from '../domain/services/Audio';
+import { ExpoAudioPlayer } from './services/AudioService';
 
 export type AppDependencies = {
   quran: QuranRepository;
@@ -33,9 +35,13 @@ export type AppDependencies = {
   azanAlarms: AzanAlarms;
   location: LocationProvider;
   mosques: MosqueFinder;
+  quranPlayer: QuranPlayer;
+  azanSound: AzanSound;
 };
 
 export const createDependencies = (): AppDependencies => {
+  // one player for both: recitation and the in-app adhan share the same expo-av sound
+  const audio = new ExpoAudioPlayer();
   return {
     quran: new QuranApiRepository(quranApi),
     tafsir: new QuranComTafsirRepository(tafsirApi),
@@ -45,6 +51,8 @@ export const createDependencies = (): AppDependencies => {
     azanAlarms: new NativeAzanAlarms(),
     location: new ExpoLocationProvider(),
     mosques: new OsmMosqueFinder(),
+    quranPlayer: audio,
+    azanSound: audio,
     // a new reminder kind is one more scheduler here; the center itself does not change
     notifications: new ExpoNotificationCenter([
       new PrayerScheduler(),
