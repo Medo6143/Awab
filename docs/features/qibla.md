@@ -48,7 +48,7 @@ Inside the hub, `QiblaScreen` is rendered with `hideHeader` and `tab`, under the
 | Asset | `assets/images/qibla_compass_bg.png` | The disk image |
 | Hook | `src/presentation/hooks/useLocation.ts` | `useLocation` (position, country, qibla bearing) and `useHeading` (compass) |
 | Data | `src/data/services/LocationService.ts` | `ExpoLocationProvider`: permission, position, heading watcher |
-| Domain | `src/domain/services/geo.ts` | `bearingDeg`, `qiblaBearing`, also `distanceMeters` and `walkMinutes` used by the mosque feature |
+| Domain | `src/domain/services/geo.ts` | `bearingDeg`, `qiblaBearing` |
 | Domain | `src/domain/services/Location.ts` | `LocationProvider` and `HeadingReading` types |
 | DI | `src/data/container.ts` | Registers `location: new ExpoLocationProvider()` |
 

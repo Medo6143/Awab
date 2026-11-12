@@ -19,9 +19,7 @@ import { NotificationCenter } from '../domain/services/Notifications';
 import { PrayerWidget } from '../domain/services/PrayerWidget';
 import { AzanAlarms } from '../domain/services/AzanAlarms';
 import { LocationProvider } from '../domain/services/Location';
-import { MosqueFinder } from '../domain/services/Mosques';
 import { ExpoLocationProvider } from './services/LocationService';
-import { OsmMosqueFinder } from './services/MosqueService';
 import { AzanSound, QuranPlayer } from '../domain/services/Audio';
 import { ExpoAudioPlayer } from './services/AudioService';
 import { PrayerTimesSource } from '../domain/services/PrayerTimes';
@@ -41,7 +39,6 @@ export type AppDependencies = {
   prayerWidget: PrayerWidget;
   azanAlarms: AzanAlarms;
   location: LocationProvider;
-  mosques: MosqueFinder;
   quranPlayer: QuranPlayer;
   azanSound: AzanSound;
   prayerTimes: PrayerTimesSource;
@@ -61,7 +58,6 @@ export const createDependencies = (): AppDependencies => {
     prayerWidget: new NativePrayerWidget(),
     azanAlarms: new NativeAzanAlarms(),
     location: new ExpoLocationProvider(),
-    mosques: new OsmMosqueFinder(),
     quranPlayer: audio,
     azanSound: audio,
     prayerTimes: new AladhanPrayerTimes(),

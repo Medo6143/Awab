@@ -1,16 +1,15 @@
 import { Coordinates } from '../entities/types';
 
-export type Mosque = { id: string; name: string; coords: Coordinates; meters: number };
-
-/** How far around the user mosques are looked for. */
-export const MOSQUE_RADIUS_M = 3000;
-
-/** Mosques around a point, and the map links to reach them. */
-export interface MosqueFinder {
-  /** Within MOSQUE_RADIUS_M, nearest first. `fresh` skips any saved answer. */
-  findNearby(at: Coordinates, fresh?: boolean): Promise<Mosque[]>;
-  /** A link that opens walking directions to `m`. */
-  walkingDirectionsUrl(m: Mosque): string;
-  /** A link that searches a full map for mosques around `at`, for ones this finder does not know. */
-  mapSearchUrl(at: Coordinates): string;
-}
+/**
+ * Google Maps searching for «مسجد» around `at`. Without a position, Google Maps searches
+ * around wherever the phone is, with its own location permission.
+ *
+ * Mosques are not listed in the app: no open dataset covers Egyptian villages (OSM, Overture
+ * and Foursquare had none within 5 km of Abu Ghalib, Giza), and Google Maps has them (#22).
+ */
+export const mosqueSearchUrl = (at?: Coordinates | null) => {
+  const q = encodeURIComponent('مسجد');
+  return at
+    ? `https://www.google.com/maps/search/${q}/@${at.latitude.toFixed(5)},${at.longitude.toFixed(5)},15z`
+    : `https://www.google.com/maps/search/?api=1&query=${q}`;
+};

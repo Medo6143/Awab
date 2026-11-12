@@ -60,7 +60,6 @@ The rules are written in `CLAUDE.md` at the repo root. Older code still breaks t
 | `location` | `LocationProvider` | `ExpoLocationProvider` |
 | `quranPlayer`, `azanSound` | `QuranPlayer`, `AzanSound` | one shared `ExpoAudioPlayer` |
 | `notifications` | `NotificationCenter` | `ExpoNotificationCenter` with six schedulers |
-| `mosques` | `MosqueFinder` | `OsmMosqueFinder` |
 
 Adding a reminder kind means adding one scheduler to the list passed to `ExpoNotificationCenter`; the center itself does not change.
 
@@ -83,14 +82,14 @@ Redux Toolkit with redux-persist on AsyncStorage (`src/presentation/store/index.
 - `achievements` is registered but nothing reads or writes it.
 - `@tanstack/react-query` is installed and its provider is mounted; only `src/presentation/hooks/useQuran.ts` uses it.
 
-Some services keep their own AsyncStorage caches outside Redux (hadith details, mosque results). Each feature doc lists its keys.
+Some services keep their own AsyncStorage caches outside Redux (hadith details). Each feature doc lists its keys.
 
 ## 4. Navigation
 
 `src/presentation/navigation/AppNavigation.tsx`: one stack navigator whose first screen is a bottom-tab navigator.
 
 - **Tabs** (stable ids, Arabic titles): `TabHome` الرئيسية, `TabPrayer` الصلاة, `TabQuran` القرآن, `TabTasbeeh` المسبحة, `TabAthkar` الأذكار. The Quran tab hides the tab bar. The bar itself is `GlassTabBar.tsx`.
-- **Stack routes** keep Arabic names, used directly in `navigate()` calls: الأدعية, نور_القلب, الختمات, الفضائل, رسائل_القرآن, الأحاديث, الحديث, الخصوصية, عن_التطبيق, القبلة, الزكاة, العبادات, الإعدادات, الإحصائيات, التذكيرات, التسميع, المساجد.
+- **Stack routes** keep Arabic names, used directly in `navigate()` calls: الأدعية, نور_القلب, الختمات, الفضائل, رسائل_القرآن, الأحاديث, الحديث, الخصوصية, عن_التطبيق, القبلة, الزكاة, العبادات, الإعدادات, الإحصائيات, التذكيرات, التلاوات, التسميع.
 - Two stack routes, الأذكار and الصلاة, are declared but no `navigate()` call reaches them; those screens are only shown as tabs.
 - Param types live in `src/presentation/navigation/types.ts`.
 - The navigation state is kept in a module variable so that switching the theme, which remounts the tree, leaves the user where they were.
@@ -181,7 +180,7 @@ No analytics, crash reporting or ads SDK is in `package.json`.
 | `everyayah.com`, `server*.mp3quran.net` | recitation audio | `AudioService`, `CustomReminderScheduler` | reciter, surah and ayah in the URL |
 | `audio.qurancdn.com` | word-by-word audio in tasmee | `src/data/services/wordAudio.ts` | word position in the URL |
 | GitHub releases | download of the speech model for tasmee (157 MB) | `src/data/services/RecitationListener.ts` | nothing beyond the request |
-| `owwab.vercel.app/api/mosques`, `nominatim.openstreetmap.org` | nearby mosques | `src/data/services/MosqueService.ts`, `landing/api/mosques.js` | position rounded to about 100 m |
+| `www.google.com/maps` (opened outside the app, on tap) | «أقرب مسجد» search | `src/domain/services/Mosques.ts` | the user's position, in the link from the prayer screen |
 | `owwab.vercel.app` | landing site and APK download; link from the about screen | `landing/` | — |
 
 Per-feature details, including what the privacy screen promises, are in the feature docs. Microphone audio in tasmee is processed on the device.

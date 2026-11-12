@@ -31,7 +31,6 @@ import StatsScreen from '../screens/StatsScreen';
 import RemindersScreen from '../screens/RemindersScreen';
 import RecitationsScreen from '../screens/RecitationsScreen';
 import TasmeeScreen from '../screens/TasmeeScreen';
-import MosquesScreen from '../screens/MosquesScreen';
 
 /**
  * Route names:
@@ -102,7 +101,6 @@ const AppNavigation = () => {
           <Stack.Screen name="التذكيرات" component={RemindersScreen} />
           <Stack.Screen name="التلاوات" component={RecitationsScreen} />
           <Stack.Screen name="التسميع" component={TasmeeScreen} />
-          <Stack.Screen name="المساجد" component={MosquesScreen} />
         </Stack.Navigator>
       </View>
     </NavigationContainer>

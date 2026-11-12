@@ -85,14 +85,12 @@ About and Privacy make no requests. The table checks the Privacy screen's list a
 | `everyayah.com` | Ayah audio, reminder recitation | Reciter folder, surah, ayah | Yes | Yes |
 | `audio.qurancdn.com` | Word audio in tasmee | Surah, ayah, word position | **No** (only "quran.com" for tafsir) | Yes, as quran.com word by word |
 | `github.com` (release asset) | One-time 157 MB speech model download | Nothing beyond the request | **No** | Credit only, no mention of a download |
-| `owwab.vercel.app` | Nearest mosques | Position rounded to 3 decimals (about 100 m) | **No** | **No** |
-| `nominatim.openstreetmap.org` | Nearest mosques fallback | Bounding box around the rounded position, `User-Agent: Owwab/1.0` | **No** | **No** |
-| `www.google.com/maps` | Directions and map search links, opened in an external app | Mosque coordinates; the search link carries the user's exact position | **No** | **No** |
+| `www.google.com/maps` | «أقرب مسجد» search, opened in an external app on tap | The user's position in the link (prayer-screen card only) | Yes | Yes |
 | `www.islamcan.com` | Nothing: `MUEZZINS` in `AzanConstants.ts` is never imported | — | — | — |
 
 Mismatches between the Privacy text and the code:
 
-1. **Location.** The screen says location is used for prayer times and qibla only, and that coordinates go to aladhan.com. Since nearest mosque (#21) the rounded position also goes to `owwab.vercel.app` (and to Nominatim as a fallback), and exact coordinates are placed in Google Maps links.
+1. **Location.** The screen says location is used for prayer times and qibla only, and that coordinates go to aladhan.com. Since #22 the only other place location goes is the Google Maps link the «أقرب مسجد» card opens on tap, and both privacy texts say so.
 2. **Location switch.** The screen says «مواقيت الصلاة حسب الموقع» can be turned off in Settings. The switch only flips `settings.locationEnabled`, which nothing reads, so location is still requested and sent.
 3. **Service list is incomplete.** `audio.qurancdn.com` and the GitHub model download are missing.
 4. **Microphone.** Voice tasmee requests `RECORD_AUDIO`; the permissions card does not mention it. Recognition runs on the device (ONNX model), and no audio upload was found under `src/`.
