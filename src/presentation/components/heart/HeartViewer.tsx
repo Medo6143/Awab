@@ -14,6 +14,7 @@ type Props = {
   completedSurahs: number[];
   progress: number;
   onToggleSurah: (id: number) => void;
+  onLongPressSurah: (id: number) => void;
   onOpenFullscreen: () => void;
   onDownload: () => void;
   onReset: () => void;
@@ -24,7 +25,7 @@ type Props = {
  * heart grows inside it, so a zoomed heart pans in place (both axes) instead of pushing
  * the page around. Controls: zoom out/in, fullscreen, save as image, reset.
  */
-export const HeartViewer = ({ pulseAnim, completedSurahs, progress, onToggleSurah, onOpenFullscreen, onDownload, onReset }: Props) => {
+export const HeartViewer = ({ pulseAnim, completedSurahs, progress, onToggleSurah, onLongPressSurah, onOpenFullscreen, onDownload, onReset }: Props) => {
   const { width: screenW } = useWindowDimensions();
   const base = screenW * 0.9;
   const frameH = (base * HEART_VB_H) / HEART_VB_W;
@@ -54,7 +55,7 @@ export const HeartViewer = ({ pulseAnim, completedSurahs, progress, onToggleSura
         completedSurahs={completedSurahs}
         progress={progress}
         onToggleSurah={onToggleSurah}
-        onZoomRequest={onOpenFullscreen}
+        onLongPressSurah={onLongPressSurah}
       />
 
       <View style={st.bar}>

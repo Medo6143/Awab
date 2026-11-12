@@ -4,7 +4,7 @@ import { Alert, Animated } from 'react-native';
 import { Screen } from '../components/ui';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
-import { toggleSurahCompleted, setCompletedSurahs, finishKhatma, finishedCount, HeartMode } from '../store/slices/quranSlice';
+import { setCurrentPage, toggleSurahCompleted, setCompletedSurahs, finishKhatma, finishedCount, HeartMode } from '../store/slices/quranSlice';
 import * as Haptics from 'expo-haptics';
 
 // Heart Components & Constants
@@ -68,6 +68,14 @@ const HeartJourneyScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => 
     if (showZoom) { setShowZoom(false); setTimeout(() => setHifzSurah(id), 300); }
     else setHifzSurah(id);
   }, [mode, handleToggle, showZoom]);
+
+  // hold a surah: open it in the mushaf at its first page
+  const openInMushaf = useCallback((id: number) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setShowZoom(false);
+    dispatch(setCurrentPage(surahPageRange(id).from));
+    navigation.navigate('TabQuran');
+  }, [dispatch, navigation]);
 
   const startTasmee = (t: TasmeeParams) => {
     setHifzSurah(null);
@@ -136,6 +144,7 @@ const HeartJourneyScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => 
           completedSurahs={completedSurahs}
           progress={heartProgress}
           onToggleSurah={handleSurahPress}
+          onLongPressSurah={openInMushaf}
           onOpenFullscreen={openZoom}
           onDownload={() => setShowShare(true)}
           onReset={confirmReset}
@@ -162,6 +171,7 @@ const HeartJourneyScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => 
         completedSurahs={completedSurahs}
         progress={heartProgress}
         onToggleSurah={handleSurahPress}
+        onLongPressSurah={openInMushaf}
       />
       <HeartSurahSheet
         surah={hifzSurah}

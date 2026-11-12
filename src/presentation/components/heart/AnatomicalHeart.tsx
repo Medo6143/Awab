@@ -45,14 +45,14 @@ const MOVE_SLOP = 10; // px a finger may wander before the touch counts as a dra
  * react-native-svg routes those through the legacy Touchable mixin, which measures the
  * element to build its press rect; under the new architecture that measurement fails,
  * so the first finger move "leaves" the cell and the long press is cancelled.
- * Here: hold → zoom, short tap → toggle, drag → let the ScrollView take over.
+ * Here: hold → open the surah in the mushaf, short tap → toggle, drag → let the ScrollView take over.
  */
 const HeartCell = React.memo(
-  ({ id, d, done, onToggle, onZoom }: { id: number; d: string; done: boolean; onToggle?: (id: number) => void; onZoom?: () => void }) => {
+  ({ id, d, done, onToggle, onLongPress }: { id: number; d: string; done: boolean; onToggle?: (id: number) => void; onLongPress?: (id: number) => void }) => {
     const touch = React.useRef<{ x: number; y: number; timer: ReturnType<typeof setTimeout> | null; long: boolean; moved: boolean } | null>(null);
     const clear = () => { if (touch.current?.timer) clearTimeout(touch.current.timer); touch.current = null; };
     React.useEffect(() => clear, []);
-    const interactive = !!(onToggle || onZoom);
+    const interactive = !!(onToggle || onLongPress);
     return (
       <Path
         d={d}
@@ -62,7 +62,7 @@ const HeartCell = React.memo(
         onResponderGrant={(e) => {
           clear();
           const t = { x: e.nativeEvent.pageX, y: e.nativeEvent.pageY, timer: null as ReturnType<typeof setTimeout> | null, long: false, moved: false };
-          if (onZoom) t.timer = setTimeout(() => { t.long = true; onZoom(); }, LONG_PRESS_MS);
+          if (onLongPress) t.timer = setTimeout(() => { t.long = true; onLongPress(id); }, LONG_PRESS_MS);
           touch.current = t;
         }}
         onResponderMove={(e) => {
@@ -118,11 +118,11 @@ type Props = {
   progress: number;                     // 0..1
   size?: number;                        // rendered width
   onToggleSurah?: (id: number) => void; // tap a cell to mark/unmark that surah
-  onZoomRequest?: () => void;           // long-press on a cell
+  onLongPressSurah?: (id: number) => void; // long-press on a cell: open that surah in the mushaf
   labels?: boolean;                     // surah names; off for thumbnails
 };
 
-export const AnatomicalHeart = ({ pulseAnim, completedSurahs, progress, size, onToggleSurah, onZoomRequest, labels = true }: Props) => {
+export const AnatomicalHeart = ({ pulseAnim, completedSurahs, progress, size, onToggleSurah, onLongPressSurah, labels = true }: Props) => {
   const width = size ?? Dimensions.get('window').width * 0.9;
   const height = (width * HEART_VB_H) / HEART_VB_W;
   const scale = width / HEART_VB_W; // viewBox units → px, for the RN label overlay
@@ -176,7 +176,7 @@ export const AnatomicalHeart = ({ pulseAnim, completedSurahs, progress, size, on
 
           {/* the only hittable layer */}
           {CELL_LAYOUT.map((cell) => (
-            <HeartCell key={cell.id} id={cell.id} d={cell.d} done={doneSet.has(cell.id)} onToggle={onToggleSurah} onZoom={onZoomRequest} />
+            <HeartCell key={cell.id} id={cell.id} d={cell.d} done={doneSet.has(cell.id)} onToggle={onToggleSurah} onLongPress={onLongPressSurah} />
           ))}
 
           <G clipPath="url(#heartClip)" pointerEvents="none">

@@ -11,6 +11,7 @@
 - Reading mode: tapping a cell or a row in the surah checklist toggles the surah.
 - Memorization mode: tapping a surah opens `HeartSurahSheet` with its tasmee progress (ayahs passed, last recital, ayahs needing review) and buttons to recite, choose a range, or mark it memorized without reciting.
 - Bulk marking: «ختم جزء» (marks every surah a juz touches) and «تحديد سريع» (marks surah 1 up to the chosen one).
+- Long-pressing a cell (400 ms) opens the mushaf at the surah's first page, also inside the full-screen heart (#29). The header says so.
 - Heart tools: zoom out/in, full screen, save/share as image, reset («تصفير», with confirmation).
 - When all 114 are marked, «إنهاء الختمة» appears: it logs the khatma, empties the heart and opens the log.
 

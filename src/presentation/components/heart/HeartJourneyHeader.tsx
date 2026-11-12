@@ -26,6 +26,7 @@ export const HeartNarrative = ({ mode, khatmaCount, completedCount, startedAt, o
         <Text style={s.narrativeTitle}>{mode === 'reading' ? 'جدول ختم السور' : 'جدول حفظ السور'}</Text>
         <Text style={s.narrativeSub}>
           {mode === 'reading' ? 'حدد السورة التي أتممتها لتمتلئ بها عروق قلبك' : 'حدد السورة التي حفظتها لتمتلئ بها عروق قلبك'}
+          {'\nدوس مطوّلًا على أي سورة في القلب عشان تفتحها في المصحف'}
         </Text>
         <Text style={s.khatmaInfo}>
           {khatmaTitle(khatmaCount + 1)}{startedAt ? ` · بدأت ${formatDate(startedAt)}` : ''}
