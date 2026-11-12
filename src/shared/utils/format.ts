@@ -10,6 +10,16 @@ export const toArGrouped = (n: number, fractionDigits = 0): string =>
     n.toLocaleString('en-US', { minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }),
   ).replace(/,/g, '٬');
 
+/**
+ * A counted noun as Egyptian Arabic says it: 1 → «ساعة», 2 → «ساعتين», 3–10 → «٣ ساعات»,
+ * 11+ → «١٢ ساعة». Never «١ ساعة».
+ */
+export const countLabel = (n: number, forms: { one: string; two: string; few: string; many: string }): string =>
+  n === 1 ? forms.one : n === 2 ? forms.two : `${toAr(n)} ${n <= 10 ? forms.few : forms.many}`;
+
+export const HOURS = { one: 'ساعة', two: 'ساعتين', few: 'ساعات', many: 'ساعة' };
+export const MINUTES = { one: 'دقيقة', two: 'دقيقتين', few: 'دقايق', many: 'دقيقة' };
+
 /** "٤٥ دقيقة" / "١س و ١٤د" style countdown from minutes. */
 export const formatCountdown = (totalMinutes: number): string => {
   const m = Math.max(0, Math.round(totalMinutes));

@@ -121,7 +121,7 @@ Each requirement has an id so issues and commits can refer to it. "Met" describe
 | HB-2 | An alarm-style reminder cannot be dismissed with one tap: the user slides to confirm, and can snooze. | Slide to stop; snooze 5, 10 or 15 minutes. | Yes |
 | HB-3 | Reminder sounds are loud and play in full. | Not cut off; alarm-level volume. | **No** (#11, #12) |
 | HB-4 | Reminders are easy to find. | Reachable in at most two taps from launch. | **No** (#9) |
-| HB-5 | Each kind of reminder is configured in one place. | No duplicate settings. | **No** (#18) |
+| HB-5 | Each kind of reminder is configured in one place. | No duplicate settings. | Qiyam: yes (#18). Duha is still both a switch and a reminder preset. |
 | HB-6 | The user ticks off daily acts of worship and sees their history. | Checklist and stats agree. | Yes |
 
 ### App

@@ -18,13 +18,10 @@ export class AthkarScheduler implements ReminderScheduler {
 }
 
 export class SpiritualScheduler implements ReminderScheduler {
+  // 'spiritual-qiyam' is no longer scheduled (qiyam is a reminder in «تذكيراتي» now, #18);
+  // it stays listed so a reschedule cancels the copy older versions left armed
   readonly ids = ['spiritual-qiyam', 'spiritual-duha'];
   async schedule({ prefs }: ScheduleContext) {
-    if (prefs.qiyam) {
-      await scheduleDaily({ id: 'spiritual-qiyam', at: { hours: 2, minutes: 0 }, channel: 'spiritual', sound: SPIRITUAL_SOUND,
-        title: rtl('رسالة من أوّاب: قيام الليل'), body: rtl('🌌 قيام الليل شرف المؤمن.. لا تنسَ نصيبك من صلاة الليل') })
-        .catch((e) => console.error('notifications: qiyam failed', e));
-    }
     if (prefs.duha) {
       await scheduleDaily({ id: 'spiritual-duha', at: { hours: 9, minutes: 0 }, channel: 'spiritual', sound: SPIRITUAL_SOUND,
         title: rtl('صلاة الضحى'), body: rtl('☀️ صلاة الأوابين.. ركعتي الضحى تجزئ عن صدقة كل سلامى من عظامك') })

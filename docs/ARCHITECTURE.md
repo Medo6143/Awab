@@ -244,7 +244,6 @@ Declared in `app.json`. Storage and media-read permissions are explicitly blocke
 | Two audio players with separate state | `useAudio.ts`, `AudioService.ts`, `TrackPlayerService.ts` | #5, #15 |
 | Fixed gold used instead of the accent | across `src/presentation` | #6 |
 | Presentation importing `src/data` directly | older hooks and screens | #24 |
-| Qiyam al-layl exists as a notification toggle and as a reminder | notification settings, reminders | #18 |
 | Unused code | `achievementsSlice`, `src/presentation/components/prayer/PrayerTimesComponents.tsx`, `MUEZZINS` in `AzanConstants.ts` | — |
 | Settings that nothing reads | `locationEnabled`, `notificationPrefs.dailyReminder`, `calculationMethod` | — |
 | `themed()` caches per light/dark only, so accent-dependent styles cannot live in it | `src/shared/theme/tokens.ts` | #6 |

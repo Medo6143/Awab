@@ -97,7 +97,7 @@ No reminder content leaves the phone.
 - The notifications master toggle («التنبيهات العامة»): when off, every reminder, including native alarms, is cancelled.
 - The selected reciter (Settings → «المصحف والتفسير») chooses the recitation voice.
 - Prayer calculation method and Asr school move prayer-relative reminders.
-- The built-in category toggles («تنبيه قيام الليل», «تنبيه صلاة الضحى») are a separate, older mechanism and do not affect «تذكيراتي» (see #18).
+- Qiyam al-layl lives only here (#18). The older «تنبيه قيام الليل» switch was removed; store migration 7 (`src/presentation/store/migrations.ts`) gave whoever had it on a «قيام الليل» reminder at 02:00 (notification, salawat sound), id `qiyam-from-settings`. «تنبيه صلاة الضحى» is still a separate switch in the notification settings.
 
 ## Edge cases and limitations
 
@@ -115,4 +115,4 @@ No reminder content leaves the phone.
 - #9 — UX: reminders are buried inside Settings.
 - #11 — Adhan and reminder sounds are too quiet. Relevant code: the ramp starts at 25 % and playback follows the alarm-stream volume.
 - #12 — Qiyam al-layl sound is cut off before it finishes. Cause Not verified; candidates in code are the 5-minute cap, the swallowed player error, and the older fixed 02:00 qiyam notification whose sound is a short channel sound.
-- #18 — Qiyam al-layl is configured in two different places: the «تنبيه قيام الليل» toggle (fixed 02:00 notification from `SpiritualScheduler`) and the `qiyam` preset here.
+- #18 (closed) — Qiyam al-layl was configured in two places: the «تنبيه قيام الليل» toggle (fixed 02:00 notification from `SpiritualScheduler`) and the `qiyam` preset here.

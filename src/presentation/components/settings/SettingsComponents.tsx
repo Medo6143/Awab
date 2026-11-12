@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, Switch, TouchableOpacity } from 'react-native';
 import {
   LucideIcon, Minus, Plus, Check, Palette, UserRound, BookOpen, Layers, Type as TypeIcon,
-  BellRing, Clock3, Timer, Volume2, Maximize2, Square, RotateCcw, Hourglass, Moon, Sun, SunMoon, Star, Sparkles, HeartHandshake, Landmark,
+  BellRing, Clock3, Timer, Volume2, Maximize2, Square, RotateCcw, Hourglass, Moon, Sun, SunMoon, Sparkles, HeartHandshake, Landmark,
 } from 'lucide-react-native';
 import { s } from './SettingsStyles';
 import { TAFSIR_LIST, STYLES_LIST, THEME_LIST } from './SettingsConstants';
@@ -11,7 +11,7 @@ import { RECITER_MAP } from '../../../domain/entities/reciters';
 import { Chip, IconTile, SectionTitle } from '../ui';
 import { ACCENTS, colors, icon } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
-import { toAr } from '../../../shared/utils/format';
+import { HOURS, MINUTES, countLabel, toAr } from '../../../shared/utils/format';
 import { AccentKey } from '../../../shared/theme/tokens';
 import { AzanSettings, NotificationPrefs } from '../../../domain/entities/notifications';
 import { AsrMethod, TafsirStyle, ThemeMode } from '../../store/slices/settingsSlice';
@@ -184,7 +184,7 @@ export const TafsirSettings = ({ selectedTafsirId, onSelectTafsir, tafsirStyle, 
 type ToggleKey = { [K in keyof NotificationPrefs]: NotificationPrefs[K] extends boolean ? K : never }[keyof NotificationPrefs];
 
 const CATEGORY_ICONS: Partial<Record<ToggleKey, LucideIcon>> = {
-  prayers: Landmark, athkar: Moon, qiyam: Star, duha: Sun, dailyWardEnabled: BookOpen,
+  prayers: Landmark, athkar: Moon, duha: Sun, dailyWardEnabled: BookOpen,
   encouragementEnabled: HeartHandshake, prePrayerReminderEnabled: Timer, dailyReminder: Sparkles,
 };
 
@@ -199,7 +199,6 @@ export const NotificationSettings = ({ notificationPrefs, onToggle, onWardTime, 
   const categories: { id: ToggleKey; label: string; sub?: string }[] = [
     { id: 'prayers', label: 'مواقيت الصلاة' },
     { id: 'athkar', label: 'أذكار الصباح والمساء' },
-    { id: 'qiyam', label: 'تنبيه قيام الليل' },
     { id: 'duha', label: 'تنبيه صلاة الضحى' },
     { id: 'dailyWardEnabled', label: 'موعد الورد اليومي' },
     { id: 'encouragementEnabled', label: 'رسائل تشجيعية', sub: 'بصوت الصلاة على النبي ﷺ' },
@@ -230,7 +229,7 @@ export const NotificationSettings = ({ notificationPrefs, onToggle, onWardTime, 
           <SubLabel icon={Hourglass} text="تكرار رسائل التشجيع" />
           <View style={s.chipsWrap}>
             {[1, 2, 3, 4, 6, 8].map((h) => (
-              <Chip key={h} label={`كل ${toAr(h)} ${h === 1 ? 'ساعة' : h === 2 ? 'ساعتين' : 'ساعات'}`} size="sm" selected={notificationPrefs.encouragementInterval === h} onPress={() => onEncouragementInterval(h)} />
+              <Chip key={h} label={`كل ${countLabel(h, HOURS)}`} size="sm" selected={notificationPrefs.encouragementInterval === h} onPress={() => onEncouragementInterval(h)} />
             ))}
           </View>
         </View>
@@ -280,7 +279,7 @@ export const FloatingTasbeehSettings = ({
 
       <View style={{ marginTop: 16 }}>
         <SubLabel icon={Hourglass} text="تذكير تلقائي بالذكر" />
-        <Stepper value={floatingReminderInterval} display={`كل ${toAr(floatingReminderInterval)} دقيقة`} onDec={() => onUpdateInterval(Math.max(1, floatingReminderInterval - 1))} onInc={() => onUpdateInterval(Math.min(60, floatingReminderInterval + 1))} />
+        <Stepper value={floatingReminderInterval} display={`كل ${countLabel(floatingReminderInterval, MINUTES)}`} onDec={() => onUpdateInterval(Math.max(1, floatingReminderInterval - 1))} onInc={() => onUpdateInterval(Math.min(60, floatingReminderInterval + 1))} />
       </View>
 
       <View style={{ marginTop: 16 }}>

@@ -2,12 +2,12 @@ import type { Reciter } from '../../../domain/entities/reciters';
 import React from 'react';
 import { View, Text, Modal, TouchableOpacity, TextInput, FlatList, ActivityIndicator, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { X, Search, Play, Pause, User, BookOpen, Star } from 'lucide-react-native';
+import { X, Search, BookOpen } from 'lucide-react-native';
 import { Chip, ErrorState, EmptyState, ScreenHeader } from '../ui';
 import { colors } from '../../../shared/theme/tokens';
 import { s } from './QuranStyles';
 import { toAr, SurahMeta, JUZ_PAGES } from './QuranConstants';
-import { RECITER_MAP } from '../../../domain/entities/reciters';
+import { RecitationList } from './RecitationList';
 import { SURAH_START_JUZ, SURAH_START_PAGE } from '../../../domain/entities/surahPages';
 import type { AyahHit } from '../../../data/quran/ayahSearch';
 import { AyahSearchPanel } from './AyahSearchPanel';
@@ -127,50 +127,14 @@ export const SurahPickerModal = ({
             )}
           />
         ) : (
-          <>
-            <View style={s.reciterHeader}>
-              <View style={s.reciterInfo}>
-                <Text style={s.reciterLabel}>القارئ الحالي:</Text>
-                <Text style={s.reciterActiveName}>{activeReciter?.name}</Text>
-              </View>
-              <TouchableOpacity onPress={onShowReciterPicker} style={s.changeReciterBtn}>
-                <User size={18} color={colors.goldText} />
-                <Text style={s.changeReciterText}>تغيير القارئ</Text>
-              </TouchableOpacity>
-            </View>
-            <FlatList
-              key="audio-list"
-              data={surahsList}
-              keyExtractor={(item) => String(item.number)}
-              renderItem={({ item }) => (
-                <TouchableOpacity 
-                   onPress={() => {
-                     if (currentSurahId === item.number) {
-                       togglePlayback();
-                     } else {
-                       onPlaySurah(item.number, item.name || '');
-                     }
-                   }} 
-                   style={[s.surahEntry, currentSurahId === item.number && s.surahEntryActive]}
-                >
-                  <View style={s.surahNumHex}>
-                    {currentSurahId === item.number && isPlaying ? (
-                      <Pause size={18} color={colors.goldText} fill={colors.goldText} />
-                    ) : (
-                      <Play size={18} color={colors.goldText} fill={colors.goldText} />
-                    )}
-                  </View>
-                  <View style={s.surahTextSection}>
-                    <Text style={s.surahEntryName}>{item.name}</Text>
-                    <Text style={s.surahEntrySub}>تلاوة كاملة لـ {item.englishName}</Text>
-                  </View>
-                  {currentSurahId === item.number && isBuffering && (
-                    <ActivityIndicator size="small" color={colors.goldText} />
-                  )}
-                </TouchableOpacity>
-              )}
-            />
-          </>
+          <RecitationList
+            reciterName={activeReciter?.name}
+            onChangeReciter={onShowReciterPicker}
+            currentSurahId={currentSurahId}
+            isPlaying={isPlaying}
+            isBuffering={isBuffering}
+            onPressSurah={(n, name) => (currentSurahId === n ? togglePlayback() : onPlaySurah(n, name))}
+          />
         )}
       </SafeAreaView>
     </Modal>

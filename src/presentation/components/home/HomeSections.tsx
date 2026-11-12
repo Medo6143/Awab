@@ -1,8 +1,9 @@
 import { PlainRoute } from '../../navigation/types';
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
+import { AlarmClock, BookCheck, Headphones } from 'lucide-react-native';
 import {
-  DuaHandsIcon, HadithScrollIcon, HeartLightIcon, IconComponent, KaabaIcon, PrayerMatIcon, QuranMessageIcon, QuranStandIcon, ZakatCoinIcon,
+  DuaHandsIcon, HadithScrollIcon, HeartLightIcon, IconComponent, KaabaIcon, MosqueIcon, PrayerMatIcon, QuranMessageIcon, QuranStandIcon, ZakatCoinIcon,
 } from '../icons/IslamicIcons';
 import { styles } from './HomeStyles';
 import { IconTile, SectionTitle } from '../ui';
@@ -11,13 +12,17 @@ type GridItem = { label: string; route: PlainRoute; icon: IconComponent };
 
 const GRID: GridItem[] = [
   { label: 'القرآن', route: 'TabQuran', icon: QuranStandIcon },
+  { label: 'التلاوات', route: 'التلاوات', icon: Headphones },
   { label: 'القبلة', route: 'القبلة', icon: KaabaIcon },
   { label: 'الأدعية', route: 'الأدعية', icon: DuaHandsIcon },
   { label: 'نور القلب', route: 'نور_القلب', icon: HeartLightIcon },
   { label: 'العبادات', route: 'العبادات', icon: PrayerMatIcon },
+  { label: 'تذكيراتي', route: 'التذكيرات', icon: AlarmClock },
   { label: 'الزكاة', route: 'الزكاة', icon: ZakatCoinIcon },
   { label: 'رسائل القرآن', route: 'رسائل_القرآن', icon: QuranMessageIcon },
   { label: 'الأحاديث', route: 'الأحاديث', icon: HadithScrollIcon },
+  { label: 'الختمات', route: 'الختمات', icon: BookCheck },
+  { label: 'المساجد', route: 'المساجد', icon: MosqueIcon },
 ];
 
 /** 4-column mono-icon grid. All icons share the accent; identity comes from the glyph. */

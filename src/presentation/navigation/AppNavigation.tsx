@@ -29,6 +29,7 @@ import IbadaTodoScreen from '../screens/IbadaTodoScreen';
 import PrayerHubScreen from '../screens/PrayerHubScreen';
 import StatsScreen from '../screens/StatsScreen';
 import RemindersScreen from '../screens/RemindersScreen';
+import RecitationsScreen from '../screens/RecitationsScreen';
 import TasmeeScreen from '../screens/TasmeeScreen';
 import MosquesScreen from '../screens/MosquesScreen';
 
@@ -99,6 +100,7 @@ const AppNavigation = () => {
           <Stack.Screen name="الإعدادات" component={SettingsScreen} />
           <Stack.Screen name="الإحصائيات" component={StatsScreen} />
           <Stack.Screen name="التذكيرات" component={RemindersScreen} />
+          <Stack.Screen name="التلاوات" component={RecitationsScreen} />
           <Stack.Screen name="التسميع" component={TasmeeScreen} />
           <Stack.Screen name="المساجد" component={MosquesScreen} />
         </Stack.Navigator>

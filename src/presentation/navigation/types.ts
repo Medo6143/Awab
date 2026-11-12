@@ -43,6 +43,7 @@ export type RootStackParamList = {
   'الإعدادات': { section?: SettingsSection } | undefined;
   'الإحصائيات': undefined;
   'التذكيرات': undefined;
+  'التلاوات': undefined;
   /** Mosques within 3 km, nearest first (OpenStreetMap). */
   'المساجد': undefined;
   /**

@@ -8,7 +8,6 @@ export interface AzanSettings {
 export interface NotificationPrefs {
   prayers: boolean;
   athkar: boolean;
-  qiyam: boolean;
   duha: boolean;
   ramadan: boolean;
   dailyReminder: boolean;
@@ -21,7 +20,7 @@ export interface NotificationPrefs {
 }
 
 export const DEFAULT_NOTIFICATION_PREFS: NotificationPrefs = {
-  prayers: true, athkar: true, qiyam: true, duha: true, ramadan: true, dailyReminder: true,
+  prayers: true, athkar: true, duha: true, ramadan: true, dailyReminder: true,
   prePrayerReminderEnabled: true, prePrayerReminderOffset: 10,
   dailyWardEnabled: true, dailyWardTime: '05:00',
   encouragementEnabled: true, encouragementInterval: 3,
