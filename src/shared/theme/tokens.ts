@@ -192,6 +192,36 @@ export const themed = <T extends StyleSheet.NamedStyles<T> | StyleSheet.NamedSty
   return out;
 };
 
+/**
+ * Mushaf page designs. Each keeps its own colours whatever the app theme (a page is a page);
+ * «night» is the dark one. `frame`/`frameDeep` draw the border and the surah header, `marker`
+ * the ayah numbers, `divine` (Madani only) the name of Allah.
+ */
+export const MUSHAF_PALETTES = {
+  classic: {
+    paper: '#fdf6e3', ink: '#271900', muted: '#8b6b3e', frame: '#c9a24a', frameDeep: '#b8902f',
+    band: '#fdf6e3', marker: '#b8902f', highlight: 'rgba(212,175,55,0.4)', divine: '#271900',
+  },
+  madani: {
+    paper: '#fffaeb', ink: '#1f1a14', muted: '#7a5c2e', frame: '#b08a4a', frameDeep: '#7a5a24',
+    band: '#efe0b6', marker: '#6b4f1d', highlight: 'rgba(176,138,74,0.32)', divine: '#b3261e',
+  },
+  night: {
+    paper: '#11151f', ink: '#ece4d2', muted: '#8f97ab', frame: '#c9a24a', frameDeep: '#e7c873',
+    band: '#1a2030', marker: '#e7c873', highlight: 'rgba(231,200,115,0.25)', divine: '#ece4d2',
+  },
+  green: {
+    paper: '#eef3ea', ink: '#1e2a1f', muted: '#4d6b50', frame: '#5f8a63', frameDeep: '#3f6e44',
+    band: '#5f8a63', marker: '#3f6e44', highlight: 'rgba(95,138,99,0.3)', divine: '#1e2a1f',
+  },
+  simple: {
+    paper: '#ffffff', ink: '#1a1a1a', muted: '#888780', frame: '#d3d1c7', frameDeep: '#888780',
+    band: '#ffffff', marker: '#888780', highlight: 'rgba(0,0,0,0.08)', divine: '#1a1a1a',
+  },
+} as const;
+export type MushafPaletteId = keyof typeof MUSHAF_PALETTES;
+export type MushafPalette = { readonly [K in keyof (typeof MUSHAF_PALETTES)['classic']]: string };
+
 export const radius = { card: 20, field: 12, pill: 999, tile: 14, sheet: 28 } as const;
 
 export const space = { 1: 4, 2: 8, 3: 12, 4: 16, 5: 20, 6: 24, 8: 32, 10: 40 } as const;

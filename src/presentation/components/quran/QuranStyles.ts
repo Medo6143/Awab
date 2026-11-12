@@ -18,6 +18,8 @@ export const s = themed(() => ({
   mushafOuter: { flex: 1 },
   // paper card holding the geometric frame (MushafOrnaments.GeometricFrame)
   paperCard: { flex: 1, backgroundColor: colors.paper, borderRadius: 16, padding: 12 },
+  // the «simple» design has no frame: less margin around the text
+  paperCardPlain: { padding: 4 },
   pageHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space[4], paddingTop: space[3], paddingBottom: space[1] },
   pageHeaderText: { fontFamily: 'Tajawal_500Medium', fontSize: 12, color: colors.paperMuted, minWidth: 70 },
 
