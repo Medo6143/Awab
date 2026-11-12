@@ -30,6 +30,7 @@ import { useExactAlarmAccess } from './src/presentation/hooks/useExactAlarmAcces
 import { ExactAlarmPrompt } from './src/presentation/components/azan/ExactAlarmPrompt';
 import { PrayerCheckOptIn } from './src/presentation/components/azan/PrayerCheckOptIn';
 import { usePrayerCheckSync } from './src/presentation/hooks/usePrayerCheckSync';
+import { usePrayerWidgetSync } from './src/presentation/hooks/usePrayerWidgetSync';
 import { AzanVideoModal } from './src/presentation/components/azan/AzanVideoModal';
 import { ReminderAlarm } from './src/presentation/components/reminders/ReminderAlarm';
 import { hideAzanModal } from './src/presentation/store/slices/uiSlice';
@@ -91,6 +92,7 @@ const Bootstrapper = ({ children }: { children: React.ReactNode }) => {
   const exactAlarm = useExactAlarmAccess();
   useNotifications(exactAlarm.granted);
   usePrayerCheckSync();
+  usePrayerWidgetSync();
   
   useEffect(() => {
     dispatch(syncDailyReset());

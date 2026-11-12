@@ -17,6 +17,8 @@ import { NativeReminderAlarms } from './services/NativeReminderAlarms';
 import { AndroidMicrophone, CtcRecitationRecognizer, OnnxSpeechModel, QuranCdnWordAudio } from './services/TasmeeServices';
 import { Microphone, RecitationRecognizer, SpeechModel, WordAudio } from '../domain/services/Tasmee';
 import { ExpoNotificationCenter } from './notifications/ExpoNotificationCenter';
+import { ExpoIncomingNotifications } from './notifications/ExpoIncomingNotifications';
+import { IncomingNotifications } from '../domain/services/IncomingNotifications';
 import { PrayerScheduler } from './notifications/PrayerScheduler';
 import { CustomReminderScheduler } from './notifications/CustomReminderScheduler';
 import { AthkarScheduler, DailyWardScheduler, EncouragementScheduler, SpiritualScheduler } from './notifications/ReminderSchedulers';
@@ -46,6 +48,7 @@ export type AppDependencies = {
   quranIndex: QuranIndex;
   floatingSebha: FloatingSebha;
   notifications: NotificationCenter;
+  incomingNotifications: IncomingNotifications;
   prayerWidget: PrayerWidget;
   azanAlarms: AzanAlarms;
   reminderAlarms: ReminderAlarms;
@@ -75,6 +78,7 @@ export const createDependencies = (): AppDependencies => {
     prayerWidget: new NativePrayerWidget(),
     azanAlarms: new NativeAzanAlarms(),
     reminderAlarms: new NativeReminderAlarms(),
+    incomingNotifications: new ExpoIncomingNotifications(),
     speechModel: new OnnxSpeechModel(),
     microphone: new AndroidMicrophone(),
     recitation: new CtcRecitationRecognizer(),

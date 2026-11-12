@@ -64,7 +64,7 @@ The route is declared in `src/presentation/navigation/AppNavigation.tsx`; the ti
 | Domain | `src/domain/entities/quranMessages.ts` | States and base content |
 | Domain | `src/domain/entities/quranMessageVerses.ts` | Extra verse references |
 | Domain | `src/domain/entities/guidance.ts` | `VerseRef`, `Hadith`, `Supplication` |
-| Data | `src/data/quran/ayahSearch.ts` | `plainAyahs` offline fallback |
+| Data | `QuranIndex` (`useDependencies().quranIndex`) | `plainAyahs` offline fallback |
 | Data | `src/data/quran/quranPlainText.ts` | Bundled plain Quran text |
 | Store | `src/presentation/store/slices/favoritesSlice.ts` | `messageCards` |
 | Script | `scripts/check-message-verses.js` | Verifies every extra verse reference |

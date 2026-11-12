@@ -57,7 +57,7 @@ Until it is dismissed, a hint under the bar (`MushafHint`, `settings.mushafHintS
 | Hook | `src/presentation/hooks/useQuran.ts` | `useSurahs`, `useMushafPage`, `useTafsir` |
 | Domain | `src/domain/repositories/QuranRepository.ts`, `src/domain/entities/quran.ts`, `src/domain/entities/surahPages.ts` | Contracts, types, surah start pages |
 | Data | `src/data/repositories/QuranApiRepository.ts`, `src/data/api/clients.ts` | alquran.cloud and quran.com clients (15 s timeout) |
-| Data | `src/data/quran/ayahSearch.ts`, `src/data/quran/quranPlainText.ts` | Offline search index; bundled plain text (about 0.8 MB) |
+| Data | `QuranIndex` (`useDependencies().quranIndex`) on `src/data/quran/ayahSearch.ts` and `src/data/quran/quranPlainText.ts` | Offline search index; bundled plain text (about 0.8 MB) |
 | DI | `src/data/container.ts` | Registers `quran` and `tafsir` repositories |
 
 ## State and storage

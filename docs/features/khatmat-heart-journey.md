@@ -62,7 +62,7 @@ Routes in `src/presentation/navigation/AppNavigation.tsx`: stack screens `نور
 | Component | `src/presentation/components/tasmee/TasmeeSetupSheet.tsx` | Range picker bounded to the surah's pages |
 | Share | `src/presentation/components/share/HeartShareCard.tsx`, `src/presentation/components/share/ImageShareModal.tsx` | Share card and capture/share modal |
 | Store | `src/presentation/store/slices/quranSlice.ts` | All state and reducers; `finishedCount` |
-| Data | `src/data/quran/ayahSearch.ts` | `ayahRef`, `surahPageRange` (ayah ↔ page) |
+| Data | `QuranIndex` (`useDependencies().quranIndex`, on `src/data/quran/ayahSearch.ts`) | `ayahRef`, `surahPageRange` (ayah ↔ page) |
 
 ## State and storage
 
