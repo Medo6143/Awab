@@ -13,7 +13,7 @@ Three layers. Dependencies point inward only: `presentation → domain ← data`
 | data | `src/data/` | the classes that implement those interfaces (APIs, AsyncStorage, expo, native modules) | `domain`, `shared` |
 | presentation | `src/presentation/` | screens, components, hooks, Redux store | `domain`, `shared`, and `data/container` through `useDependencies()` only |
 
-- **New service = interface first.** Declare the contract in `src/domain/services/` (or `domain/repositories/` for data sources), implement it as a class in `src/data/`, and register it in `src/data/container.ts`. `LocationProvider` / `ExpoLocationProvider` and `MosqueFinder` / `OsmMosqueFinder` are the pattern to copy.
+- **New service = interface first.** Declare the contract in `src/domain/services/` (or `domain/repositories/` for data sources), implement it as a class in `src/data/`, and register it in `src/data/container.ts`. `LocationProvider` / `ExpoLocationProvider` and `PrayerTimesSource` / `AladhanPrayerTimes` are the pattern to copy.
 - **Presentation never imports `src/data/**` directly** (except `DependencyProvider`'s import of the container) and never imports `expo-location`, `expo-notifications`, AsyncStorage or native modules. Take dependencies from `useDependencies()`, so tests can pass fakes to `DependencyProvider`.
 - **No UI in the data layer:** no `Alert`, `Linking`, `ToastAndroid`, navigation or Arabic UI strings in `src/data/`. Return data (a URL, a result, an error), and let presentation show it.
 - **One job per unit.** A hook does one thing (fetch X, watch Y); a screen composes hooks. If a hook needs a second responsibility, split it (as `useHeading` was split out of `useLocation`). Logic that is not React belongs in `domain`, not in a hook.

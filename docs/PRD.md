@@ -50,7 +50,7 @@ Primary user: an Arabic-speaking adult who prays and wants help being consistent
 | Prayer | Adhan over the lock screen | Shipped | [adhan](features/adhan.md) |
 | Prayer | Qibla | Shipped | [qibla](features/qibla.md) |
 | Prayer | Home-screen widget | Shipped | [widget](features/widget.md) |
-| Prayer | Nearest mosque | Shipped, data source open | [nearest-mosque](features/nearest-mosque.md) |
+| Prayer | Nearest mosque | Shipped (opens Google Maps) | [nearest-mosque](features/nearest-mosque.md) |
 | Quran | Mushaf: pages, index, search, bookmarks, tafsir | Shipped | [mushaf](features/mushaf.md) |
 | Quran | Recitation audio: ayah, page, full surah | Shipped, with known bugs | [quran-audio](features/quran-audio.md) |
 | Quran | Tasmee (voice memorisation check) | Shipped | [tasmee](features/tasmee.md) |
@@ -86,7 +86,7 @@ Each requirement has an id so issues and commits can refer to it. "Met" describe
 | PR-5 | The adhan screen shows the prayer name and one clear way to stop it. | Nothing covers the screen; one stop control. | **No** (#14) |
 | PR-6 | The app tells the user which permissions are missing for the adhan to work, and opens the right system screen. | Readiness card shows every missing permission. | Yes |
 | PR-7 | The user sees the qibla direction. | Arrow follows the phone's heading. | Yes |
-| PR-8 | The user can find the nearest mosque and get walking directions. | Lists real nearby mosques, including small ones. | **No**: on `master`, but the Nominatim fallback misses small and unnamed mosques until the data source is settled (#22) |
+| PR-8 | The user can find the nearest mosque and get walking directions. | One tap from the prayer screen reaches real nearby mosques, including small ones. | Yes, through Google Maps (#22) |
 
 ### Quran
 
@@ -140,7 +140,7 @@ Each requirement has an id so issues and commits can refer to it. "Met" describe
 |---|---|
 | Reliability | Adhan and alarm-style reminders fire in Doze, with the app killed, and after reboot, on phones with aggressive battery savers. |
 | Offline | Mushaf text search, athkar, duas, tasbeeh, hadith index, Quran messages and tasmee (after the model download) work without a network. Prayer times, tafsir, hadith details and recitation audio need one. |
-| Privacy | No account, no analytics, no ads SDK. Microphone audio is processed on the device. Location is used for prayer times, qibla and mosques. |
+| Privacy | No account, no analytics, no ads SDK. Microphone audio is processed on the device. Location is used for prayer times and qibla, and placed in the Google Maps link when the user taps «أقرب مسجد». |
 | Language and layout | Arabic, forced right-to-left, Arabic-Indic digits. |
 | Appearance | Light and dark modes; text stays readable in both. |
 | Size | The APK is about 76 MB (arm64). Growth should be justified. |
@@ -162,7 +162,6 @@ Order of work, most harmful first.
 | 7 | #13, #16, #20 | Zero shown as a diamond; unlabeled mushaf bar; small polish | Low risk |
 | 8 | #7 | Mushaf font size | New feature |
 | 9 | #8 | Mushaf page designs | New feature, builds on #7 |
-| — | — | Nearest mosque | Waiting for a data-source decision (see below) |
 
 ## 9. Findings without an issue yet
 
@@ -189,7 +188,7 @@ Found while reading the code for these docs. Each is described in the linked fea
 
 ## 10. Open questions
 
-1. **Nearest mosque data source.** OpenStreetMap (Overpass) is refused from the user's network and from Vercel, and Nominatim only returns named mosques. Options: Google Places (needs an API key and a billing card), or just open Google Maps with a "mosque" search.
+1. **Nearest mosque data source.** Decided in #22: open Google Maps. No open dataset (OSM, Overture, Foursquare) had a mosque within 5 km of a Giza village; Google Places needs a billing card. Revisit if a card becomes available.
 2. **Adhan recording rights.** The bundled adhan comes from islamcan.com and its licence is unknown. TikTok removed the sound of a video that used it.
 3. **Google Play.** The app is distributed as an APK only. Play would require a privacy policy URL, a declaration for exact alarms and full-screen intents, and review of the overlay and microphone permissions.
 4. **iOS.** Out of scope; the adhan and alarm design depends on Android features.

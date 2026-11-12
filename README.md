@@ -28,7 +28,7 @@ React Native 0.81 (New Architecture, bridgeless), Expo SDK 54, TypeScript, Redux
 
 ## Architecture in one paragraph
 
-Three layers, dependencies pointing inward: `presentation → domain ← data`. `src/domain` holds entities, pure logic and the interfaces for anything with side effects (`QuranPlayer`, `AzanSound`, `LocationProvider`, `MosqueFinder`, `PrayerTimesSource`, `NotificationCenter`, …). `src/data` implements them on expo, native modules and HTTP, and `src/data/container.ts` is the one place that picks the concrete classes. Screens and hooks get them through `useDependencies()`, so a test can swap any of them for a fake with `DependencyProvider`. Some older code still imports `src/data` directly; [#24](https://github.com/Medo6143/Awab/issues/24) tracks moving it. Details in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Three layers, dependencies pointing inward: `presentation → domain ← data`. `src/domain` holds entities, pure logic and the interfaces for anything with side effects (`QuranPlayer`, `AzanSound`, `LocationProvider`, `PrayerTimesSource`, `NotificationCenter`, …). `src/data` implements them on expo, native modules and HTTP, and `src/data/container.ts` is the one place that picks the concrete classes. Screens and hooks get them through `useDependencies()`, so a test can swap any of them for a fake with `DependencyProvider`. Some older code still imports `src/data` directly; [#24](https://github.com/Medo6143/Awab/issues/24) tracks moving it. Details in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Run it
 
@@ -59,7 +59,7 @@ Type check, which is the only automated check:
 npx tsc --noEmit -p .
 ```
 
-The landing page, the APK download and the `/api/mosques` function the nearest-mosque feature calls are all in `landing/`, deployed to Vercel at `owwab.vercel.app`:
+The landing page, the APK download and the privacy policy are all in `landing/`, deployed to Vercel at `owwab.vercel.app`:
 
 ```bash
 cd landing && npx vercel --prod --yes
@@ -174,12 +174,12 @@ const ensurePermission = async () => {
 **The Problem:**
 Mosques come from OpenStreetMap through the Overpass API: free, no key, nothing tied to the user. But from many Egyptian networks every public Overpass server is unreachable or answers 406, even on its status page. The app's main audience could not get a single result.
 
-**What is in place (⚠️ partly solved):**
+**What we tried first:**
 A small Vercel function, `landing/api/mosques.js`, asks Overpass from outside the user's network: the app calls `owwab.vercel.app/api/mosques?lat=…&lon=…`. It tries two Overpass servers (9 s each), trims the answer to id, position and names, and lets the edge cache it for a day per point. If the function fails, the app falls back to Nominatim, the other OpenStreetMap service. That answer is thinner (a name search, at most 40 results, ranked by importance), so the app keeps it for an hour instead of a day.
 
-**Still open:** Overpass has also answered 406 to requests from Vercel, so in practice the app often lands on the Nominatim fallback, which misses unnamed and small mosques. The data source (Google Places, or only opening Google Maps) is undecided; see [docs/features/nearest-mosque.md](docs/features/nearest-mosque.md) and #22.
+**Why it was dropped (✅ decided):** Overpass refuses Vercel too (406 by IP). We then measured every open source around a village in Giza (أبو غالب, Imbaba): OSM, Overture Places and Foursquare OS Places had **no mosque within 5 km**, while Google Maps has them. Google Places needs a billing card. So «أقرب مسجد» now opens Google Maps on the mosques around the user, and the proxy, the list and the cache were removed. The numbers are in [docs/features/nearest-mosque.md](docs/features/nearest-mosque.md) (#22).
 
-Privacy holds: the position is rounded to about 100 m before it leaves the phone, nothing is stored or logged on the server, and distances are computed on the phone from the exact position.
+The lesson: measure the data where your users are before building on it. The city numbers looked fine; the village had nothing.
 
 ---
 

@@ -6,9 +6,11 @@ import {
   DuaHandsIcon, HadithScrollIcon, HeartLightIcon, IconComponent, KaabaIcon, MosqueIcon, PrayerMatIcon, QuranMessageIcon, QuranStandIcon, ZakatCoinIcon,
 } from '../icons/IslamicIcons';
 import { styles } from './HomeStyles';
+import { openMosquesNearby } from '../prayer/MosqueParts';
 import { IconTile, SectionTitle } from '../ui';
 
-type GridItem = { label: string; route: PlainRoute; icon: IconComponent };
+/** A tile opens a screen (`route`) or, for «المساجد», Google Maps (`maps`). */
+type GridItem = { label: string; icon: IconComponent } & ({ route: PlainRoute } | { maps: 'mosques' });
 
 const GRID: GridItem[] = [
   { label: 'القرآن', route: 'TabQuran', icon: QuranStandIcon },
@@ -22,7 +24,7 @@ const GRID: GridItem[] = [
   { label: 'رسائل القرآن', route: 'رسائل_القرآن', icon: QuranMessageIcon },
   { label: 'الأحاديث', route: 'الأحاديث', icon: HadithScrollIcon },
   { label: 'الختمات', route: 'الختمات', icon: BookCheck },
-  { label: 'المساجد', route: 'المساجد', icon: MosqueIcon },
+  { label: 'المساجد', maps: 'mosques', icon: MosqueIcon },
 ];
 
 /** 4-column mono-icon grid. All icons share the accent; identity comes from the glyph. */
@@ -32,9 +34,9 @@ export const HomeGrid = ({ onNavigate, onReport }: { onNavigate: (route: PlainRo
     <View style={styles.grid}>
       {GRID.map((item) => (
         <TouchableOpacity
-          key={item.route}
+          key={item.label}
           style={styles.gridItem}
-          onPress={() => onNavigate(item.route)}
+          onPress={() => ('route' in item ? onNavigate(item.route) : openMosquesNearby())}
           accessibilityRole="button"
           accessibilityLabel={item.label}
           activeOpacity={0.8}

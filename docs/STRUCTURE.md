@@ -44,7 +44,7 @@ src/
     quran/                bundled plain text and ayah search
     hadith/               bundled hadith index and library helpers
   presentation/
-    screens/              one file per screen (23, including MosquesScreen)
+    screens/              one file per screen (23, including RecitationsScreen)
     components/           one folder per feature, plus ui/ (design-system primitives),
                           share/ (share cards), icons/, splash/
     hooks/                useAudio, useFloatingSebha, useGuidance, useLocation, useNotifications,
