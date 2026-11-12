@@ -42,6 +42,8 @@ export interface PrayerCheckNativeModule {
   schedule?(json: string): Promise<void>;
   cancelAll?(): Promise<void>;
   setDoneToday?(prayerIds: string[]): void;
+  /** Shows the «صليت؟» card once (JSON: title, body, prayedLabel, laterLabel); false if not allowed. */
+  preview?(json: string): Promise<boolean>;
   takeAnswers?(): Promise<{ prayerId: string; day: string }[]>;
 }
 
