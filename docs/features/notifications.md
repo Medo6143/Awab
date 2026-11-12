@@ -35,7 +35,6 @@ Categories:
 | Before prayer | `PrayerScheduler` → `pre-prayer-<Id>` | `prePrayerReminderOffset` minutes before each prayer (10) | Default sound, channel `default` | `prePrayerReminderEnabled` (and `prayers`, since the scheduler returns early without it) |
 | Morning athkar | `AthkarScheduler` → `athkar-morning` | 07:00 daily | Channel `default` | `athkar` |
 | Evening athkar | `AthkarScheduler` → `athkar-evening` | 17:00 daily | Channel `default` | `athkar` |
-| Qiyam al-layl | `SpiritualScheduler` → `spiritual-qiyam` | 02:00 daily | the bundled salawat file, channel `spiritual` | `qiyam` |
 | Duha | `SpiritualScheduler` → `spiritual-duha` | 09:00 daily | the bundled salawat file, channel `spiritual` | `duha` |
 | Daily wird | `DailyWardScheduler` → `spiritual-ward` | `dailyWardTime` daily (05:00) | the bundled salawat file, channel `spiritual` | `dailyWardEnabled`, `dailyWardTime` |
 | Encouragement | `EncouragementScheduler` → `encouragement-0..9` | 10 slots from 08:00, `encouragementInterval` hours apart (3), wrapping past midnight | the bundled salawat file, channel `spiritual` | `encouragementEnabled`, `encouragementInterval` |
@@ -118,4 +117,4 @@ Master switch, the category switches, wird time, encouragement interval, adhan s
 - #11 — Adhan and reminder sounds are too quiet.
 - #12 — Qiyam al-layl sound is cut off before it finishes.
 - #14 — Adhan notification covers the full-screen adhan.
-- #18 — Qiyam al-layl is configured in two different places (the `qiyam` switch here and the qiyam preset in «تذكيراتي»).
+- Qiyam al-layl is no longer a switch here (#18, closed): it is only the «قيام الليل» reminder in «تذكيراتي». Store migration 7 turned an existing switch into that reminder (02:00, notification, salawat); `spiritual-qiyam` stays in `SpiritualScheduler.ids` only so a reschedule cancels the copy older versions armed.

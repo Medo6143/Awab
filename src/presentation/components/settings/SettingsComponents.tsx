@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, Switch, TouchableOpacity } from 'react-native';
 import {
   LucideIcon, Minus, Plus, Check, Palette, UserRound, BookOpen, Layers, Type as TypeIcon,
-  BellRing, Clock3, Timer, Volume2, Maximize2, Square, RotateCcw, Hourglass, Moon, Sun, SunMoon, Star, Sparkles, HeartHandshake, Landmark,
+  BellRing, Clock3, Timer, Volume2, Maximize2, Square, RotateCcw, Hourglass, Moon, Sun, SunMoon, Sparkles, HeartHandshake, Landmark,
 } from 'lucide-react-native';
 import { s } from './SettingsStyles';
 import { TAFSIR_LIST, STYLES_LIST, THEME_LIST } from './SettingsConstants';
@@ -184,7 +184,7 @@ export const TafsirSettings = ({ selectedTafsirId, onSelectTafsir, tafsirStyle, 
 type ToggleKey = { [K in keyof NotificationPrefs]: NotificationPrefs[K] extends boolean ? K : never }[keyof NotificationPrefs];
 
 const CATEGORY_ICONS: Partial<Record<ToggleKey, LucideIcon>> = {
-  prayers: Landmark, athkar: Moon, qiyam: Star, duha: Sun, dailyWardEnabled: BookOpen,
+  prayers: Landmark, athkar: Moon, duha: Sun, dailyWardEnabled: BookOpen,
   encouragementEnabled: HeartHandshake, prePrayerReminderEnabled: Timer, dailyReminder: Sparkles,
 };
 
@@ -199,7 +199,6 @@ export const NotificationSettings = ({ notificationPrefs, onToggle, onWardTime, 
   const categories: { id: ToggleKey; label: string; sub?: string }[] = [
     { id: 'prayers', label: 'مواقيت الصلاة' },
     { id: 'athkar', label: 'أذكار الصباح والمساء' },
-    { id: 'qiyam', label: 'تنبيه قيام الليل' },
     { id: 'duha', label: 'تنبيه صلاة الضحى' },
     { id: 'dailyWardEnabled', label: 'موعد الورد اليومي' },
     { id: 'encouragementEnabled', label: 'رسائل تشجيعية', sub: 'بصوت الصلاة على النبي ﷺ' },

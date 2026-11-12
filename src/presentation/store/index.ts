@@ -2,6 +2,7 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import {
   persistStore,
   persistReducer,
+  createMigrate,
   FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER
 } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,12 +19,14 @@ import prayerReducer from './slices/prayerSlice';
 import audioReducer from './slices/audioSlice';
 import favoritesReducer from './slices/favoritesSlice';
 import remindersReducer from './slices/remindersSlice';
+import { migrations } from './migrations';
 
-const STORE_VERSION = 6;
+const STORE_VERSION = 7; // 7: qiyam al-layl moved from a settings toggle to «تذكيراتي» (#18)
 
 const persistConfig = {
   key: 'root_v6',     // Incremented version for stats and tasbeeh
   version: STORE_VERSION,
+  migrate: createMigrate(migrations, { debug: false }),
   storage: AsyncStorage,
   // Session-only state: an open azan screen or a "playing" flag must not come back
   // after the app was killed (the azan screen reappeared on every launch).
