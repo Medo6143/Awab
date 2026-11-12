@@ -3,28 +3,13 @@
  * first search only, and normalized once into an in-memory index; each query is then a
  * linear scan of 6236 short strings with `includes`, a few milliseconds on a phone.
  */
-export type AyahHit = {
-  surah: number;
-  ayah: number;
-  page: number;
-  number: number; // global ayah number (1..6236), what the mushaf highlights
-  text: string;
-};
+import type { AyahHit } from '../../domain/repositories/QuranIndex';
+import { normalizeArabic } from '../../domain/services/arabicText';
+
+export type { AyahHit };
+export { normalizeArabic };
 
 type Entry = AyahHit & { norm: string };
-
-const DIACRITICS = /[ً-ٰٟـ]/g; // tashkeel, dagger alef, tatweel
-
-/** Spelling-insensitive form: no tashkeel, one alef, ya/alef maqsura and ta/ha merged. */
-export const normalizeArabic = (s: string) =>
-  s.replace(DIACRITICS, '')
-    .replace(/[أإآٱ]/g, 'ا')
-    .replace(/ى/g, 'ي')
-    .replace(/ة/g, 'ه')
-    .replace(/ؤ/g, 'و')
-    .replace(/ئ/g, 'ي')
-    .replace(/\s+/g, ' ')
-    .trim();
 
 let index: Entry[] | null = null;
 

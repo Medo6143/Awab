@@ -1,6 +1,7 @@
 import { AxiosInstance } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { HadithDetail, HadithRepository } from '../../domain/entities/hadith';
+import { HadithDetail } from '../../domain/entities/hadith';
+import { HadithRepository } from '../../domain/repositories/HadithRepository';
 
 type Raw = {
   id: string; hadeeth?: string; hadeeth_intro?: string; attribution?: string; grade?: string;

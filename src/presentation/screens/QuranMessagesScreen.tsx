@@ -18,6 +18,7 @@ import type { VerseRef } from '../../domain/entities/guidance';
 import { SURAH_NAMES } from '../../shared/constants/surahs';
 import { toAr } from '../../shared/utils/format';
 import { colors, icon, radius, space, type, themed } from '../../shared/theme/tokens';
+import { MESSAGE_ICONS } from '../components/guidance/messageIcons';
 
 type Share =
   | { kind: 'ayah'; text: string; excerpt: string; surah: number; ayah: number; texts: string[] }
@@ -75,7 +76,7 @@ const QuranMessagesScreen = ({ navigation, route }: ScreenProps<'رسائل_ال
         </TouchableOpacity>
         <View style={st.grid}>
           {QURAN_MESSAGES.map((m) => {
-            const Icon = m.icon;
+            const Icon = MESSAGE_ICONS[m.icon];
             return (
               <TouchableOpacity key={m.id} style={st.moodCard} onPress={() => open(m)} accessibilityRole="button" accessibilityLabel={m.name} activeOpacity={0.85}>
                 <View style={st.moodIcon}><Icon size={icon.size.lg} color={colors.gold} strokeWidth={icon.stroke} /></View>

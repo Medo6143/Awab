@@ -8,18 +8,17 @@ import { ScreenProps } from '../navigation/types';
 import { RootState } from '../store';
 import { EmptyState, ScreenHeader, useBottomInset } from '../components/ui';
 import { GradeChips, HadithRow } from '../components/hadith/HadithRow';
-import {
-  hadithCategories, hadithCategory, hadithCount, hadithEntry, hadithOfTheDay, hadithsIn, searchHadiths, warmHadithIndex,
-} from '../../data/hadith/hadithLibrary';
 import type { HadithIndexEntry } from '../../domain/entities/hadith';
 import { toAr } from '../../shared/utils/format';
 import { colors, icon, radius, space, type, themed } from '../../shared/theme/tokens';
+import { useDependencies } from '../providers/DependencyProvider';
 
 /**
  * The hadith library: search, hadith of the day and the category index on top; a
  * category shows its sub-categories and its hadiths; `favorites` lists saved ones.
  */
 const HadithLibraryScreen = ({ navigation, route }: ScreenProps<'الأحاديث'>) => {
+  const { hadithLibrary } = useDependencies();
   const categoryId = route.params?.categoryId;
   const showFavorites = !!route.params?.favorites;
   const favorites = useSelector((s: RootState) => s.favorites?.hadiths ?? []);
@@ -29,27 +28,27 @@ const HadithLibraryScreen = ({ navigation, route }: ScreenProps<'الأحادي�
   const [ready, setReady] = useState(false);
 
   // the index is built off the first frame so the screen opens instantly
-  useEffect(() => { const t = setTimeout(() => { warmHadithIndex(); setReady(true); }, 30); return () => clearTimeout(t); }, []);
+  useEffect(() => { const t = setTimeout(() => { hadithLibrary.warm(); setReady(true); }, 30); return () => clearTimeout(t); }, []);
   useEffect(() => {
     if (query.trim().length < 2) { setResult(null); return; }
-    const t = setTimeout(() => setResult(searchHadiths(query)), 200);
+    const t = setTimeout(() => setResult(hadithLibrary.search(query)), 200);
     return () => clearTimeout(t);
   }, [query]);
 
   const open = (id: number) => navigation.navigate('الحديث', { id });
   // a new screen per category level, so back walks up the index
   const go = (params: { categoryId?: number; favorites?: boolean }) => navigation.dispatch(StackActions.push('الأحاديث', params));
-  const category = ready && categoryId ? hadithCategory(categoryId) : undefined;
-  const children = useMemo(() => (ready ? hadithCategories(categoryId ?? null) : []), [ready, categoryId]);
+  const category = ready && categoryId ? hadithLibrary.category(categoryId) : undefined;
+  const children = useMemo(() => (ready ? hadithLibrary.categories(categoryId ?? null) : []), [ready, categoryId]);
   const list = useMemo<HadithIndexEntry[]>(() => {
     if (!ready) return [];
-    if (showFavorites) return favorites.map((id) => hadithEntry(id)).filter((e): e is HadithIndexEntry => !!e);
-    return categoryId ? hadithsIn(categoryId) : [];
+    if (showFavorites) return favorites.map((id) => hadithLibrary.entry(id)).filter((e): e is HadithIndexEntry => !!e);
+    return categoryId ? hadithLibrary.hadithsIn(categoryId) : [];
   }, [ready, categoryId, showFavorites, favorites]);
 
   const title = showFavorites ? 'الأحاديث المحفوظة' : category?.title ?? 'الأحاديث';
   const isHome = !categoryId && !showFavorites;
-  const today = ready && isHome ? hadithOfTheDay() : null;
+  const today = ready && isHome ? hadithLibrary.ofTheDay() : null;
 
   const header = (
     <View>
@@ -99,7 +98,7 @@ const HadithLibraryScreen = ({ navigation, route }: ScreenProps<'الأحادي�
       {result ? (
         <Text style={st.count}>{result.total > result.hits.length ? `${toAr(result.total)} نتيجة، تظهر أول ${toAr(result.hits.length)}` : `${toAr(result.total)} نتيجة`}</Text>
       ) : isHome && ready ? (
-        <Text style={st.note}>{toAr(hadithCount())} حديثًا صحيحًا أو حسنًا · المصدر: موسوعة الأحاديث النبوية</Text>
+        <Text style={st.note}>{toAr(hadithLibrary.count())} حديثًا صحيحًا أو حسنًا · المصدر: موسوعة الأحاديث النبوية</Text>
       ) : null}
     </View>
   );

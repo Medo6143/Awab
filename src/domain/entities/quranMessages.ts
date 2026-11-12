@@ -1,15 +1,15 @@
-import { CloudFog, CloudRain, HeartCrack, Scale, Shield, Stethoscope, Undo2, UserRound, Wallet, Waves } from 'lucide-react-native';
 import type { Hadith, Supplication, VerseRef } from './guidance';
 import { DUA, H } from './hadiths';
 import { MORE_MESSAGE_VERSES } from './quranMessageVerses';
 
-type Icon = typeof CloudRain;
+/** Which icon a message shows; presentation maps the name to a picture (MESSAGE_ICONS). */
+export type QuranMessageIcon = 'cloud-rain' | 'waves' | 'heart-crack' | 'wallet' | 'shield' | 'cloud-fog' | 'stethoscope' | 'user' | 'undo' | 'scale';
 
 export interface QuranMessage {
   id: string;
   name: string;
   hint: string;
-  icon: Icon;
+  icon: QuranMessageIcon;
   /** A gentle opening word (ours, not a quotation). */
   comfort: string;
   verses: VerseRef[];
@@ -26,7 +26,7 @@ const BASE_MESSAGES: QuranMessage[] = [
     id: 'sadness',
     name: 'الحزن',
     hint: 'قلبك مثقل ولا تعرف لماذا',
-    icon: CloudRain,
+    icon: 'cloud-rain',
     comfort: 'حزنك ليس ضعفًا في إيمانك، فقد حزن الأنبياء قبلك. الله يعلم ما في قلبك، وما من حزن يصيب المؤمن إلا كان له به أجر. خذ نفسًا عميقًا واقرأ هذه الكلمات على مهل.',
     verses: [
       { surah: 9, from: 40, key: 'لا تحزن ان الله معنا' },
@@ -48,7 +48,7 @@ const BASE_MESSAGES: QuranMessage[] = [
     id: 'distress',
     name: 'الهم والكرب',
     hint: 'أمر يضيق به صدرك',
-    icon: Waves,
+    icon: 'waves',
     comfort: 'كل ضيق مهما اشتد له عند الله مخرج. لست وحدك في هذا؛ فالله أقرب إليك من همّك، وقد علّمنا النبي ﷺ كلمات نقولها عند الكرب.',
     verses: [
       { surah: 65, from: 3, key: 'فهو حسبه' },
@@ -68,7 +68,7 @@ const BASE_MESSAGES: QuranMessage[] = [
     id: 'loss',
     name: 'فقد عزيز',
     hint: 'وفاة شخص تحبه',
-    icon: HeartCrack,
+    icon: 'heart-crack',
     comfort: 'الفراق موجع، ودموعك رحمة لا تعارض الصبر؛ فقد دمعت عينا النبي ﷺ عند فقد ابنه. من رحل في رحمة الله، والصبر على فقده عند الله أجره عظيم.',
     verses: [
       { surah: 2, from: 155, to: 157, key: 'راجعون' },
@@ -87,7 +87,7 @@ const BASE_MESSAGES: QuranMessage[] = [
     id: 'debt',
     name: 'الدَّين وضيق الرزق',
     hint: 'ديون أو ضائقة مالية',
-    icon: Wallet,
+    icon: 'wallet',
     comfort: 'رزقك مكتوب لن يأخذه غيرك، والله الذي يرزق الطير يرزقك. خذ بالأسباب واطمئن، فبعد العسر يسر، وعد من الله لا يُخلف.',
     verses: [
       { surah: 65, from: 3, key: 'يرزقه' },
@@ -108,7 +108,7 @@ const BASE_MESSAGES: QuranMessage[] = [
     id: 'anxiety',
     name: 'القلق والخوف',
     hint: 'خوف من المستقبل أو من أمر قادم',
-    icon: Shield,
+    icon: 'shield',
     comfort: 'ما كتبه الله لك سيأتيك، وما لم يُكتب لن يصيبك. القلق يحمّلك هم الغد قبل أن يأتي، والله تكفّل بغدك كما تكفّل بيومك.',
     verses: [
       { surah: 9, from: 51, key: 'ما كتب الله لنا' },
@@ -128,7 +128,7 @@ const BASE_MESSAGES: QuranMessage[] = [
     id: 'depression',
     name: 'الضيق والاكتئاب',
     hint: 'فتور وضيق مستمر',
-    icon: CloudFog,
+    icon: 'cloud-fog',
     comfort: 'ما تشعر به حقيقي، ولست ضعيفًا ولا بعيدًا عن الله بسببه. رحمة الله أوسع من كل ضيق، وطلب العلاج من الأخذ بالأسباب الذي أمرنا به.',
     verses: [
       { surah: 39, from: 53, key: 'لا تقنطوا' },
@@ -149,7 +149,7 @@ const BASE_MESSAGES: QuranMessage[] = [
     id: 'illness',
     name: 'المرض',
     hint: 'مرض أو ألم يتعبك',
-    icon: Stethoscope,
+    icon: 'stethoscope',
     comfort: 'مرضك ليس عقوبة، بل قد يكون رفعة وتكفيرًا. وأجر ما كنت تعمله وأنت صحيح يُكتب لك وأنت مريض، فارفق بنفسك.',
     verses: [
       { surah: 26, from: 80, key: 'يشفين' },
@@ -168,7 +168,7 @@ const BASE_MESSAGES: QuranMessage[] = [
     id: 'loneliness',
     name: 'الوحدة',
     hint: 'تشعر أنك وحيد',
-    icon: UserRound,
+    icon: 'user',
     comfort: 'قد يبعد عنك الناس، لكن الله لا يبعد. هو أقرب إليك من حبل الوريد، يسمعك في كل وقت، ومعك إذا ذكرته.',
     verses: [
       { surah: 2, from: 186, key: 'فاني قريب' },
@@ -188,7 +188,7 @@ const BASE_MESSAGES: QuranMessage[] = [
     id: 'guilt',
     name: 'الذنب والندم',
     hint: 'تشعر بثقل ذنب',
-    icon: Undo2,
+    icon: 'undo',
     comfort: 'ندمك علامة حياة قلبك. باب التوبة مفتوح، والله يفرح بعودتك أكثر مما تتخيل، ويبدّل السيئات حسنات لمن تاب وعمل صالحًا.',
     verses: [
       { surah: 39, from: 53, key: 'لا تقنطوا' },
@@ -208,7 +208,7 @@ const BASE_MESSAGES: QuranMessage[] = [
     id: 'injustice',
     name: 'الظلم',
     hint: 'وقع عليك ظلم',
-    icon: Scale,
+    icon: 'scale',
     comfort: 'الله لا يغفل عن ظلم وقع عليك، وحقك محفوظ عنده. اصبر واطلب حقك بالطريق المشروع، ودعوتك وأنت مظلوم ليس بينها وبين الله حجاب.',
     verses: [
       { surah: 14, from: 42, key: 'غافلا' },

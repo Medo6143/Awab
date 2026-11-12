@@ -43,7 +43,7 @@ flowchart LR
 | data | `src/data/` | classes that implement those interfaces (HTTP, AsyncStorage, expo modules, native modules) | `domain`, `shared` |
 | presentation | `src/presentation/` | screens, components, hooks, Redux store, navigation | `domain`, `shared`, and `data` only through `useDependencies()` |
 
-The rules are written in `CLAUDE.md` at the repo root. Older code still breaks them in places: some hooks and screens import `src/data` directly (tasmee, reminders, `ayahSearch`, `hadithLibrary`). Issue #24 tracks moving them behind the container.
+The rules are written in `CLAUDE.md` at the repo root. Presentation reaches `src/data` only through the container (#24 moved the last direct imports: reminders, tasmee, the offline Quran index and hadith library, incoming notifications). The one exception is redux-persist's storage (AsyncStorage) in `src/presentation/store/index.ts`.
 
 ### Composition root
 
@@ -240,11 +240,7 @@ Declared in `app.json`. Storage and media-read permissions are explicitly blocke
 
 | Item | Where | Issue |
 |---|---|---|
-| Two audio players with separate state | `useAudio.ts`, `AudioService.ts`, `TrackPlayerService.ts` | #5, #15 |
-| Fixed gold used instead of the accent | across `src/presentation` | #6 |
-| Presentation importing `src/data` directly | older hooks and screens | #24 |
 | Unused code | `achievementsSlice`, `src/presentation/components/prayer/PrayerTimesComponents.tsx`, `MUEZZINS` in `AzanConstants.ts` | — |
 | Settings that nothing reads | `locationEnabled`, `notificationPrefs.dailyReminder`, `calculationMethod` | — |
-| `themed()` caches per light/dark only, so accent-dependent styles cannot live in it | `src/shared/theme/tokens.ts` | #6 |
 | Privacy screen behind the code | `src/presentation/screens/PrivacyScreen.tsx` | — |
 | No automated tests | whole repo | — |

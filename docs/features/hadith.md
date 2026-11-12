@@ -59,8 +59,8 @@ Copy puts `intro + text` and `[grade · attribution]` on the clipboard.
 | Components | `src/presentation/components/home/DailyMessageCard.tsx` | Random hadith on Home |
 | Components | `src/presentation/components/share/StoryCard.tsx` | `HadithShare` image |
 | Data | `src/data/hadith/hadithIndex.ts` | Generated index (bundled) |
-| Data | `src/data/hadith/hadithLibrary.ts` | Load, categories, search, hadith of the day, random |
-| Data | `src/data/quran/ayahSearch.ts` | `normalizeArabic` |
+| Data | `src/data/hadith/hadithLibrary.ts`, behind `HadithLibrary` (`src/domain/repositories/HadithLibrary.ts`, `BundledHadithLibrary`, `useDependencies().hadithLibrary`) | Load, categories, search, hadith of the day, random |
+| Domain | `src/domain/services/arabicText.ts` | `normalizeArabic` |
 | Data | `src/data/repositories/HadeethEncRepository.ts` | API call and device cache |
 | Data | `src/data/api/clients.ts` | `hadithApi` axios client |
 | Domain | `src/domain/entities/hadith.ts` | `HadithCategory`, `HadithIndexEntry`, `HadithDetail`, `HadithRepository` |

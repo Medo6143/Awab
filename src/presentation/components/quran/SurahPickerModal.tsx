@@ -9,7 +9,7 @@ import { s } from './QuranStyles';
 import { toAr, SurahMeta, JUZ_PAGES } from './QuranConstants';
 import { RecitationList } from './RecitationList';
 import { SURAH_START_JUZ, SURAH_START_PAGE } from '../../../domain/entities/surahPages';
-import type { AyahHit } from '../../../data/quran/ayahSearch';
+import type { AyahHit } from '../../../domain/repositories/QuranIndex';
 import { AyahSearchPanel } from './AyahSearchPanel';
 
 export type PickerTab = 'surah' | 'ayah' | 'juz' | 'audio';

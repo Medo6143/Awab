@@ -44,24 +44,21 @@ const useCountSync = () => {
 };
 
 /**
- * Keeps the overlay and the store in step for the whole app session: restores the
- * overlay on launch and on return from background, mirrors count/label/config, and
- * turns overlay events into store actions. Rendered once at the app root.
+ * Brings the overlay back when it should be there: on launch, and on return from the
+ * background (the system may have killed it). Returns whether the launch restore is done.
  */
-export const useFloatingSebhaSync = () => {
+const useFloatingSebhaRestore = () => {
   const { floatingSebha, notifications } = useDependencies();
   const dispatch = useDispatch();
   const store = useStore<RootState>();
   const syncCount = useCountSync();
-  const t = useSelector((s: RootState) => s.tasbeeh);
   const [ready, setReady] = useState(false);
-  const lastReminder = useRef<string | null>(null);
   const available = floatingSebha.isAvailable;
 
-  // restore on launch
+  // on launch
   useEffect(() => {
     (async () => {
-      if (!t.isFloatingActive || !available) return;
+      if (!store.getState().tasbeeh.isFloatingActive || !available) return;
       if (!(await floatingSebha.hasPermission())) { dispatch(setFloatingActive(false)); return; }
       await notifications.request();
       await floatingSebha.initialize();
@@ -74,7 +71,7 @@ export const useFloatingSebhaSync = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // restore after the system killed it while the app was in the background
+  // after the system killed it while the app was in the background
   useEffect(() => {
     const sub = AppState.addEventListener('change', async (next) => {
       if (next !== 'active' || !ready || !available || !store.getState().tasbeeh.isFloatingActive) return;
@@ -84,8 +81,21 @@ export const useFloatingSebhaSync = () => {
     return () => sub.remove();
   }, [ready, available, floatingSebha, store, syncCount]);
 
-  // mirror config (only while active: configuring starts the foreground service)
+  return ready;
+};
+
+/**
+ * Mirrors the store onto the overlay while it is on: its look (configuring starts the
+ * foreground service, so only while active), the count once restored, and the dhikr, with a
+ * reminder card when the dhikr changes.
+ */
+const useFloatingSebhaMirror = (ready: boolean) => {
+  const { floatingSebha } = useDependencies();
+  const t = useSelector((s: RootState) => s.tasbeeh);
   const haptics = useSelector((s: RootState) => s.settings.tasbeehHaptics) ?? true;
+  const lastReminder = useRef<string | null>(null);
+  const available = floatingSebha.isAvailable;
+
   useEffect(() => {
     if (available && t.isFloatingActive) floatingSebha.configure(toSebhaConfig(t, haptics));
   }, [available, t.isFloatingActive, t.floatingScale, t.floatingBubbleColor, t.floatingShowBorder, t.floatingShowReset, t.floatingReminderInterval, haptics, floatingSebha]);
@@ -103,8 +113,16 @@ export const useFloatingSebhaSync = () => {
       lastReminder.current = label;
     }
   }, [available, t.isFloatingActive, t.selectedDhikr, floatingSebha]);
+};
 
-  // overlay events
+/** Turns what happens on the overlay (a count, a reset, dragged away) into store actions. */
+const useFloatingSebhaEvents = () => {
+  const { floatingSebha } = useDependencies();
+  const dispatch = useDispatch();
+  const store = useStore<RootState>();
+  const syncCount = useCountSync();
+  const available = floatingSebha.isAvailable;
+
   useEffect(() => {
     if (!available) return;
     const offs = [
@@ -121,6 +139,16 @@ export const useFloatingSebhaSync = () => {
     ];
     return () => offs.forEach((off) => off());
   }, [available, floatingSebha, dispatch, store, syncCount]);
+};
+
+/**
+ * Keeps the overlay and the store in step for the whole app session: restores it, mirrors the
+ * store onto it, and turns its events into store actions. Rendered once at the app root.
+ */
+export const useFloatingSebhaSync = () => {
+  const ready = useFloatingSebhaRestore();
+  useFloatingSebhaMirror(ready);
+  useFloatingSebhaEvents();
 };
 
 /** Waits until the user comes back from a system settings page (or 30 s pass). */

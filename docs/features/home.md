@@ -75,7 +75,7 @@ Zero taps: `TabHome` is the first tab of `MainTabs`, the first stack route, so i
 | Store | `src/presentation/store/slices/statsSlice.ts` | `dailyRecords`, `getLocalToday` |
 | Store | `src/presentation/store/slices/ibadaSlice.ts` | Task list and the daily reset |
 | Data | `src/data/notifications/ReminderSchedulers.ts` | `DailyWardScheduler` (wird notification) |
-| Data | `src/data/hadith/hadithLibrary.ts` | `randomHadith` |
+| Data | `HadithLibrary` (`useDependencies().hadithLibrary`) | `random()` |
 | Navigation | `src/presentation/navigation/AppNavigation.tsx` | `TabHome` registration |
 
 ## State and storage

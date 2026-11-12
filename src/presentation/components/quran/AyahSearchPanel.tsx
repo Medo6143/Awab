@@ -3,27 +3,29 @@ import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'r
 import { Search, X } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState } from '../ui';
-import { AyahHit, searchAyahs, warmAyahIndex } from '../../../data/quran/ayahSearch';
+import type { AyahHit } from '../../../domain/repositories/QuranIndex';
 import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 import { toAr } from '../../../shared/utils/format';
 import { s } from './QuranStyles';
 import { SurahMeta } from './QuranConstants';
+import { useDependencies } from '../../providers/DependencyProvider';
 
 /** Search box + results for the ayah tab of the Quran index. Searches 200 ms after typing stops. */
 export const AyahSearchPanel = ({ surahs, onSelect }: { surahs: SurahMeta[]; onSelect: (hit: AyahHit) => void }) => {
   const [query, setQuery] = useState('');
+  const { quranIndex } = useDependencies();
   const navBar = useSafeAreaInsets().bottom;
   const [result, setResult] = useState<{ hits: AyahHit[]; total: number } | null>(null);
 
   // build the index while the keyboard opens, so the first query is as fast as the rest
   useEffect(() => {
-    const t = setTimeout(warmAyahIndex, 350);
+    const t = setTimeout(() => quranIndex.warm(), 350);
     return () => clearTimeout(t);
   }, []);
 
   useEffect(() => {
     if (query.trim().length < 2) { setResult(null); return; }
-    const t = setTimeout(() => setResult(searchAyahs(query)), 200);
+    const t = setTimeout(() => setResult(quranIndex.search(query)), 200);
     return () => clearTimeout(t);
   }, [query]);
 

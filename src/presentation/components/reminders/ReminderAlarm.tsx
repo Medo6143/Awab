@@ -10,8 +10,6 @@ import { hideReminderAlarm } from '../../store/slices/uiSlice';
 import { useToggleIbada } from '../../hooks/useToggleIbada';
 import { useDependencies } from '../../providers/DependencyProvider';
 import { useVerseText } from '../../hooks/useGuidance';
-import { azanNative } from '../../../data/services/nativeModules';
-import { reminderPayload } from '../../../data/notifications/CustomReminderScheduler';
 import { Reminder, ReminderQuote, presetOf, resolveReminderTime } from '../../../domain/entities/reminders';
 import { REMINDER_ART } from './art';
 import { navigationRef } from '../../navigation/AppNavigation';
@@ -41,7 +39,7 @@ export const ReminderAlarm = () => {
   const tasks = useSelector((s: RootState) => s.ibada.tasks);
   const toggle = useToggleIbada();
   const insets = useSafeAreaInsets();
-  const { azanAlarms } = useDependencies();
+  const { azanAlarms, reminderAlarms } = useDependencies();
   // this screen has the stop and snooze: the alarm's heads-up notification must not cover it
   useEffect(() => { if (id) azanAlarms.screenShown(); }, [id, azanAlarms]);
   if (!id) return null;
@@ -50,7 +48,8 @@ export const ReminderAlarm = () => {
   const at = reminder ? resolveReminderTime(reminder.time, timings) : null;
   const now = new Date();
   const close = () => {
-    try { azanNative()?.stopAzan?.(); azanNative()?.releaseLockScreen?.(); } catch {}
+    azanAlarms.stop();
+    azanAlarms.releaseLockScreen();
     dispatch(hideReminderAlarm());
   };
   const done = () => {
@@ -65,11 +64,8 @@ export const ReminderAlarm = () => {
   };
   const snooze = async () => {
     const minutes = reminder?.snoozeMinutes ?? 10;
-    try {
-      const json = (await azanNative()?.getRingingReminder?.()) ?? (reminder && at ? reminderPayload(reminder, at) : null);
-      if (json) await azanNative()?.snoozeReminder?.(json, minutes);
-    } catch {}
-    azanNative()?.releaseLockScreen?.();
+    await reminderAlarms.snooze(minutes, reminder, at);
+    azanAlarms.releaseLockScreen();
     dispatch(hideReminderAlarm());
   };
   const opensMushaf = reminder?.kind === 'quran' || reminder?.kind === 'kahf';

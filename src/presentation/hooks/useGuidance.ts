@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useDependencies } from '../providers/DependencyProvider';
-import { plainAyahs } from '../../data/quran/ayahSearch';
 import { parseTafsir, tafsirExcerpt } from '../components/quran/tafsirParser';
 import type { VerseRef } from '../../domain/entities/guidance';
 
@@ -12,7 +11,7 @@ export const SAADI_TAFSIR_ID = 91;
  * when offline (`offline` tells the card to say so).
  */
 export const useVerseText = (ref: VerseRef) => {
-  const { quran } = useDependencies();
+  const { quran, quranIndex } = useDependencies();
   const to = ref.to ?? ref.from;
   const [state, setState] = useState<{ texts: string[]; offline: boolean; loading: boolean }>({ texts: [], offline: false, loading: true });
 
@@ -21,9 +20,9 @@ export const useVerseText = (ref: VerseRef) => {
     setState((s) => ({ ...s, loading: true }));
     quran.getAyahs(ref.surah, ref.from, to)
       .then((texts) => { if (alive) setState({ texts, offline: false, loading: false }); })
-      .catch(() => { if (alive) setState({ texts: plainAyahs(ref.surah, ref.from, to), offline: true, loading: false }); });
+      .catch(() => { if (alive) setState({ texts: quranIndex.plainAyahs(ref.surah, ref.from, to), offline: true, loading: false }); });
     return () => { alive = false; };
-  }, [quran, ref.surah, ref.from, to]);
+  }, [quran, quranIndex, ref.surah, ref.from, to]);
 
   return state;
 };

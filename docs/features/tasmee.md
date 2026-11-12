@@ -65,7 +65,8 @@ The Heart Journey shortcut («سمّع السورة», «كمّل من آية»,
 | Service | `src/data/services/ctcEngine.ts`, `src/data/services/ctcModelData.ts` | ONNX session, greedy CTC decode, vocabulary |
 | Service | `src/data/services/wordAudio.ts` | Word-by-word audio for corrections |
 | Domain | `src/domain/services/recitationFollower.ts`, `src/domain/services/recitationMatch.ts` | Alignment and plain ↔ Uthmani mapping (pure TypeScript) |
-| Data | `src/data/quran/ayahSearch.ts` | `plainAyah`, `ayahRef`, `surahPageRange` |
+| Data | `QuranIndex` (`useDependencies().quranIndex`) | `plainAyah`, `surahPageRange` |
+| Data | `SpeechModel`, `Microphone`, `RecitationRecognizer`, `WordAudio` (`src/domain/services/Tasmee.ts`, `src/data/services/TasmeeServices.ts`) | Model download, mic permission, listening sessions, the corrected word's audio |
 
 ## State and storage
 

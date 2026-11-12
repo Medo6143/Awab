@@ -13,7 +13,6 @@ import { SURAH_AYAH_COUNTS, SURAH_NAMES } from '../../shared/constants/surahs';
 import { toAr } from '../../shared/utils/format';
 import { colors, icon, radius, space, type, themed } from '../../shared/theme/tokens';
 import { useAccent } from '../../shared/theme/useAccent';
-import { surahPageRange } from '../../data/quran/ayahSearch';
 import { useVoiceTasmee } from '../hooks/useVoiceTasmee';
 import { GeometricFrame } from '../components/quran/MushafOrnaments';
 import { s as q } from '../components/quran/QuranStyles';
@@ -21,6 +20,7 @@ import { Ayah, mushafAyahText } from '../components/quran/QuranConstants';
 import { AyahState, TasmeePage } from '../components/tasmee/TasmeePage';
 import { TasmeeResult, Mistake } from '../components/tasmee/TasmeeResult';
 import { ayahsLabel, splitWords } from '../components/tasmee/tasmeeText';
+import { useDependencies } from '../providers/DependencyProvider';
 
 type Result = { surah: number; ayah: number; page: number; ok: boolean; words: string[] };
 
@@ -35,6 +35,7 @@ const pagesLabel = (from: number, to: number) => (from === to ? `صفحة ${toAr
  * they are said, ayah after ayah, and on a skipped or wrong word marks it and says it aloud.
  */
 const TasmeeScreen = ({ navigation, route }: ScreenProps<'التسميع'>) => {
+  const { quranIndex } = useDependencies();
   const dispatch = useDispatch();
   const accent = useAccent();
   const { playAyah } = useAudio();
@@ -191,7 +192,7 @@ const TasmeeScreen = ({ navigation, route }: ScreenProps<'التسميع'>) => {
     const wrong = list.filter((r) => !r.ok).sort((x, y) => x.n - y.n);
     const mistakes: Mistake[] = wrong.map((r) => ({ key: r.n, label: `${SURAH_NAMES[r.surah - 1]} ${toAr(r.ayah)}`, words: r.words }));
     // continuing stays inside the chosen surah when there is one
-    const lastPage = cfg.surah ? surahPageRange(cfg.surah).to : LAST_PAGE;
+    const lastPage = cfg.surah ? quranIndex.surahPageRange(cfg.surah).to : LAST_PAGE;
     const next = cfg.only || cfg.toPage >= lastPage ? undefined : { from: cfg.toPage + 1, to: Math.min(lastPage, cfg.toPage + pageCount) };
     return (
       <Screen header={<ScreenHeader title="خلّصت التسميع" right={close} />} padded={false}>

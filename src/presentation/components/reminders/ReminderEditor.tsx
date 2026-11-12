@@ -6,8 +6,7 @@ import { Bell, AlarmClock, Minus, Plus, Play, Check } from 'lucide-react-native'
 import { RootState } from '../../store';
 import { Chip, PillButton, Sheet } from '../ui';
 import { REMINDER_ART } from './art';
-import { azanNative } from '../../../data/services/nativeModules';
-import { reminderSoundSpec } from '../../../data/notifications/CustomReminderScheduler';
+import { useDependencies } from '../../providers/DependencyProvider';
 import { RECITER_MAP } from '../../../domain/entities/reciters';
 import {
   PRAYER_NAMES_AR, REMINDER_PRESETS, Reminder, ReminderArt, ReminderKind, ReminderSound, WEEKDAYS_SHORT, newReminder, presetOf,
@@ -37,6 +36,7 @@ export const ReminderEditor = ({ visible, initial, onSave, onDelete, onClose }: 
 }) => {
   const reciterId = useSelector((s: RootState) => s.settings.selectedReciterId);
   const [r, setR] = useState<Reminder>(() => initial ?? newReminder('qiyam'));
+  const { reminderAlarms } = useDependencies();
   const isNew = !initial;
   useEffect(() => { if (visible) setR(initial ?? newReminder('qiyam')); }, [visible, initial]);
   const set = (patch: Partial<Reminder>) => setR((x) => ({ ...x, ...patch }));
@@ -48,7 +48,7 @@ export const ReminderEditor = ({ visible, initial, onSave, onDelete, onClose }: 
   const toggleDay = (d: number) => set({ days: r.days.includes(d) ? r.days.filter((x) => x !== d) : [...r.days, d].sort() });
   const preview = (sound: ReminderSound) => {
     Haptics.selectionAsync();
-    azanNative()?.previewReminderSound?.(reminderSoundSpec({ kind: r.kind, sound }, RECITER_MAP[reciterId]?.folder));
+    reminderAlarms.previewSound({ kind: r.kind, sound }, RECITER_MAP[reciterId]?.folder);
   };
   const step = (field: 'hour' | 'minute', d: number) => {
     if (r.time.type !== 'clock') return;
