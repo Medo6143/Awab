@@ -17,16 +17,18 @@
 - The tab is registered with `tabBarStyle: { display: 'none' }` and `GlassTabBar` returns `null` for it, so the bottom tab bar is hidden while the mushaf is open. The Home icon in the top bar (`navigate('TabHome')`) is the way back.
 - A reminder alarm can also open it (`ReminderAlarm` navigates to `MainTabs` → `TabQuran`).
 
-Top bar (six icon-only buttons, no text labels; only the mic has an `accessibilityLabel`):
+Top bar (`MushafToolbar`): six buttons, each with its label under the icon, in reading order:
 
-| Group | Icon | Action |
-|---|---|---|
-| Start side | Home | Go to `TabHome` |
-| Start side | Bookmark | Open the bookmarked pages list |
-| Start side | Settings | Navigate to «الإعدادات» |
-| End side | Play / Pause / spinner | Play the current page |
-| End side | Mic | Open the tasmee setup sheet for this page |
-| End side | BookOpen | Open the index modal |
+| Label | Action |
+|---|---|
+| الرئيسية | Go to `TabHome` |
+| الفهرس | Open the index modal |
+| استمع / إيقاف / إيقاف مؤقت / بيحمّل | Play the current page; stop an ayah or page, pause a surah |
+| سمّع | Open the tasmee setup sheet for this page |
+| المحفوظات | Saved pages and ayahs |
+| المزيد | `MushafMoreSheet`: text size (−/+ with a sample), «الختمات», «إعدادات المصحف» (Settings → المصحف والتفسير) |
+
+Until it is dismissed, a hint under the bar (`MushafHint`, `settings.mushafHintSeen`) says that tapping an ayah opens tafsir, listening, saving and sharing, and that a long press plays it.
 
 ## How it works
 
@@ -107,7 +109,7 @@ Not persisted: page text and tafsir (memory only; lost when the app is killed), 
 
 The red colouring covers the forms of «الله» (لله، بالله، والله، تالله، اللهم، ءآلله) and «الرحمن» only; «رب» and pronouns are left alone because they do not always refer to Allah. The Madinah print's own font (King Fahd Complex) was not available to download, so Amiri Quran (Google Fonts, OFL) stands in.
 
-The mushaf text size is not a setting: each design fixes it (`fontSize: 23`, `lineHeight` 60–64).
+**Text size** (`settings.mushafFontScale`, from «المزيد»): 85%, 100% (default), 115%, 130% or 145% of the design's own size (`fontSize: 23`, `lineHeight` 60–64), applied to the ayahs and the basmala.
 
 ## Edge cases and limitations
 
@@ -122,6 +124,4 @@ The mushaf text size is not a setting: each design fixes it (`fontSize: 23`, `li
 
 ## Open issues
 
-- #6 — Theme: selected accent color is not applied across the whole app
-- #7 — Mushaf: font size control
-- #16 — Mushaf top bar: six unlabeled icons, and ayah playback is not discoverable
+None.

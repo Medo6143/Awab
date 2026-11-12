@@ -51,3 +51,12 @@ export const useMushafTheme = (): MushafTheme => {
   const id = useSelector((s: RootState) => s.settings.mushafTheme);
   return MUSHAF_THEMES[id && id in MUSHAF_THEMES ? id : 'classic'];
 };
+
+/** The text sizes the mushaf offers, as multiples of each design's own size. */
+export const MUSHAF_FONT_SCALES = [0.85, 1, 1.15, 1.3, 1.45] as const;
+
+/** The mushaf text size chosen in the mushaf (1 for state saved before the setting existed). */
+export const useMushafFontScale = (): number => {
+  const scale = useSelector((s: RootState) => s.settings.mushafFontScale);
+  return typeof scale === 'number' && scale > 0 ? scale : 1;
+};
