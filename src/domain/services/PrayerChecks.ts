@@ -32,6 +32,11 @@ export interface PrayerChecks {
   setDoneToday(prayerIds: PrayerId[]): void;
   /** «صليت» answers given on the notification since the last call (each returned once). */
   takeAnswers(): Promise<PrayerCheckAnswer[]>;
+  /**
+   * Shows the question once now, as it will look after an adhan, without recording anything.
+   * Resolves false when it cannot be shown over other apps (no permission).
+   */
+  preview(item: Pick<PrayerCheckItem, 'title' | 'body' | 'prayedLabel' | 'laterLabel'>): Promise<boolean>;
   /** Called when the user answers on a notification while the app is running. */
   onAnswered(listener: () => void): () => void;
 }

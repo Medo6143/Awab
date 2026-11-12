@@ -66,6 +66,17 @@ public class PrayerCheckModule extends ReactContextBaseJavaModule {
         promise.resolve(out);
     }
 
+    /** The «صليت؟» card once, now, from settings: answering it records nothing. */
+    @ReactMethod
+    public void preview(String json, Promise promise) {
+        try {
+            JSONObject item = new JSONObject(json).put("prayerId", PrayerCheckCard.PREVIEW);
+            promise.resolve(PrayerCheckCard.show(getReactApplicationContext(), item, false));
+        } catch (Exception e) {
+            promise.resolve(false);
+        }
+    }
+
     // required by NativeEventEmitter on the JS side
     @ReactMethod
     public void addListener(String eventName) {}

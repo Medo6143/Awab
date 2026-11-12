@@ -1,15 +1,17 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Alert, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { CirclePause, ListChecks } from 'lucide-react-native';
+import { CirclePause, Eye, ListChecks } from 'lucide-react-native';
 import { RootState } from '../../store';
 import { setPrayerCheck } from '../../store/slices/settingsSlice';
-import { Chip } from '../ui';
+import { Chip, PillButton } from '../ui';
 import { ItemRow, SettingSection } from './SettingsComponents';
 import { s } from './SettingsStyles';
-import { space, type, colors, themed } from '../../../shared/theme/tokens';
+import { space, type, colors, icon, themed } from '../../../shared/theme/tokens';
 import { toAr } from '../../../shared/utils/format';
-import { DEFAULT_PRAYER_CHECK, EXCUSED_DAYS, PRAYER_CHECK_DELAYS, isExcused } from '../../../domain/entities/prayerCheck';
+import { DEFAULT_PRAYER_CHECK, EXCUSED_DAYS, PRAYER_CHECK_DELAYS, isExcused, prayerCheckCopy } from '../../../domain/entities/prayerCheck';
+import { useDependencies } from '../../providers/DependencyProvider';
+import { useAccent } from '../../../shared/theme/useAccent';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -19,6 +21,12 @@ export const PrayerCheckSettings = () => {
   const settings = { ...DEFAULT_PRAYER_CHECK, ...useSelector((st: RootState) => st.settings.prayerCheck) };
   const excused = isExcused(settings, Date.now());
   const until = settings.excusedUntil ? new Date(settings.excusedUntil) : null;
+  const { prayerChecks } = useDependencies();
+  const accent = useAccent();
+  const tryIt = async () => {
+    const shown = await prayerChecks.preview(prayerCheckCopy('الظهر', settings.delayMinutes));
+    if (!shown) Alert.alert('محتاج إذن الظهور فوق التطبيقات', 'عشان السؤال يظهر فوق الشاشة، اسمح لأوّاب «بالظهور فوق التطبيقات» من إعدادات الموبايل. من غيره هيجيلك كإشعار.');
+  };
 
   return (
     <SettingSection title="«صليت؟» بعد الأذان">
@@ -58,6 +66,11 @@ export const PrayerCheckSettings = () => {
             value={excused}
             onValueChange={() => dispatch(setPrayerCheck({ excusedUntil: excused ? null : Date.now() + EXCUSED_DAYS * DAY_MS }))}
           />
+          <View style={s.itemDivider} />
+          <View style={st.delayBlock}>
+            <Text style={st.delayLabel}>السؤال بيظهر فوق الشاشة وإنت شغال على الموبايل، ولو الشاشة مقفولة بيجيلك كإشعار</Text>
+            <PillButton label="جرّب السؤال" variant="ghost" size="sm" icon={<Eye size={icon.size.sm} color={accent.accentText} strokeWidth={icon.stroke} />} onPress={tryIt} style={st.tryBtn} />
+          </View>
         </>
       ) : null}
     </SettingSection>
@@ -69,4 +82,5 @@ const st = themed(() => ({
   delayLabel: { ...type.caption, color: colors.textMuted, marginBottom: space[2] },
   chips: { flexDirection: 'row', flexWrap: 'wrap' },
   chip: { marginEnd: space[2], marginBottom: space[1] },
+  tryBtn: { alignSelf: 'flex-start' },
 }));

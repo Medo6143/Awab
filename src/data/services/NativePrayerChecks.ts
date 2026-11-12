@@ -37,6 +37,10 @@ export class NativePrayerChecks implements PrayerChecks {
     }
   }
 
+  async preview(item: Pick<PrayerCheckItem, 'title' | 'body' | 'prayedLabel' | 'laterLabel'>) {
+    try { return !!(await this.mod?.preview?.(JSON.stringify(item))); } catch { return false; }
+  }
+
   onAnswered(listener: () => void) {
     const sub = DeviceEventEmitter.addListener('prayerCheckAnswered', listener);
     return () => sub.remove();

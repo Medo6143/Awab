@@ -204,7 +204,13 @@ public final class PrayerChecks {
         return BASE_NOTIFICATION + PRAYERS.indexOf(prayerId);
     }
 
+    /**
+     * Asks «صليت؟»: as a card at the top of the screen when the phone is in use and the app may
+     * draw over other apps (PrayerCheckCard), else as a notification so the question still
+     * reaches a locked phone.
+     */
     static void post(Context c, JSONObject item, boolean followUp) {
+        if (PrayerCheckCard.show(c, item, followUp)) return;
         NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
         if (nm == null) return;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && nm.getNotificationChannel(CHANNEL) == null) {
@@ -238,6 +244,7 @@ public final class PrayerChecks {
     }
 
     static void dismiss(Context c, String prayerId) {
+        PrayerCheckCard.hide(prayerId);
         NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
         if (nm != null) nm.cancel(notificationId(prayerId));
     }
