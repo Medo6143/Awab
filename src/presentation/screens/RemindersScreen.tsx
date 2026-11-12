@@ -73,7 +73,7 @@ const RemindersScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
       {hasAlarm ? (
         <>
           <SectionTitle title="عشان المنبّه يشتغل" />
-          <AzanReadinessCard />
+          <AzanReadinessCard subject="المنبّه" />
         </>
       ) : null}
 

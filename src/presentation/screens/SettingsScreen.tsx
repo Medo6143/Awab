@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  Bell, MapPin, Info, ChevronLeft, Vibrate, Target, ShieldCheck, Megaphone, BookOpen, CircleDot, Palette, AlarmClock,
+  Bell, MapPin, Info, ChevronLeft, Vibrate, Target, ShieldCheck, Megaphone, BookOpen, CircleDot, Palette,
 } from 'lucide-react-native';
 import { StackActions } from '@react-navigation/native';
 import { ScreenProps } from '../navigation/types';
@@ -37,7 +37,7 @@ import type { SettingsSection as Section } from '../navigation/types';
 
 const SECTIONS: { id: Section; title: string; icon: typeof Info }[] = [
   { id: 'prayer', title: 'الصلاة والأذان', icon: Megaphone },
-  { id: 'alerts', title: 'التنبيهات والتذكيرات', icon: Bell },
+  { id: 'alerts', title: 'التنبيهات', icon: Bell },
   { id: 'quran', title: 'المصحف والتفسير', icon: BookOpen },
   { id: 'tasbeeh', title: 'المسبحة والعائمة', icon: CircleDot },
   { id: 'look', title: 'المظهر', icon: Palette },
@@ -60,7 +60,10 @@ const SettingsScreen = ({ navigation, route }: Pick<ScreenProps<'الإعداد�
   }
   return (
     <Screen scroll contentStyle={s.content} header={<ScreenHeader title="الإعدادات" subtitle="تخصيص تجربة أوّاب" large onBack={back} />}>
-      <Summary />
+      <Summary
+        onOpenSection={(id) => navigation.dispatch(StackActions.push('الإعدادات', { section: id }))}
+        onOpenReminders={() => navigation.navigate('التذكيرات')}
+      />
       <View style={[s.sectionContent, { marginTop: space[5] }]}>
         {SECTIONS.map((x, i) => (
           <SectionRow key={x.id} first={i === 0} section={x} onPress={() => navigation.dispatch(StackActions.push('الإعدادات', { section: x.id }))} />
@@ -82,34 +85,33 @@ const SectionRow = ({ section, first, onPress }: { section: (typeof SECTIONS)[nu
 const useSectionHint = (id: Section) => {
   const st8 = useSelector((st: RootState) => st.settings);
   const tasbeeh = useSelector((st: RootState) => st.tasbeeh);
-  const reminders = useSelector((st: RootState) => st.reminders?.list ?? []);
   const azan = { ...DEFAULT_AZAN_SETTINGS, ...st8.azanSettings };
   switch (id) {
     case 'prayer': return `${AZAN_TYPES.find((t) => t.id === azan.type)?.name ?? ''} · «صليت؟» ${st8.prayerCheck?.enabled ? 'شغال' : 'مقفول'}`;
-    case 'alerts': return `${st8.notificationsEnabled ? 'الإشعارات شغالة' : 'الإشعارات متوقفة'} · ${toAr(reminders.filter((r) => r.enabled).length)} تذكير`;
+    case 'alerts': return st8.notificationsEnabled ? 'الإشعارات شغالة · الأذكار والورد والتشجيع' : 'الإشعارات متوقفة';
     case 'quran': return `المصحف ${MUSHAF_THEMES[st8.mushafTheme ?? 'classic']?.name ?? ''} · القارئ: ${RECITER_MAP[st8.selectedReciterId]?.name ?? ''}`;
     case 'tasbeeh': return tasbeeh.floatingReminderInterval ? `تذكير كل ${toAr(tasbeeh.floatingReminderInterval)} دقايق` : 'الاهتزاز والهدف والعائمة';
     case 'look': return `${st8.theme === 'light' ? 'فاتح' : st8.theme === 'system' ? 'حسب الموبايل' : 'داكن'} · ${st8.accentTheme === 'emerald' ? 'زمردي' : st8.accentTheme === 'midnight' ? 'ليلي' : 'ذهبي'}`;
   }
 };
 
-/** The few things worth seeing at a glance: azan, alerts, reminders. */
-const Summary = () => {
+/** The few things worth seeing at a glance: azan, alerts, reminders; each opens its place. */
+const Summary = ({ onOpenSection, onOpenReminders }: { onOpenSection: (id: Section) => void; onOpenReminders: () => void }) => {
   const { azanSettings, notificationsEnabled } = useSelector((st: RootState) => st.settings);
   const azan = { ...DEFAULT_AZAN_SETTINGS, ...azanSettings };
   const reminders = useSelector((st: RootState) => st.reminders?.list ?? []);
   const items = [
-    { label: 'الأذان', value: AZAN_TYPES.find((t) => t.id === azan.type)?.name ?? '' },
-    { label: 'الإشعارات', value: notificationsEnabled ? 'شغالة' : 'متوقفة' },
-    { label: 'تذكيراتي', value: toAr(reminders.filter((r) => r.enabled).length) },
+    { label: 'الأذان', value: AZAN_TYPES.find((t) => t.id === azan.type)?.name ?? '', onPress: () => onOpenSection('prayer') },
+    { label: 'الإشعارات', value: notificationsEnabled ? 'شغالة' : 'متوقفة', onPress: () => onOpenSection('alerts') },
+    { label: 'تذكيراتي', value: toAr(reminders.filter((r) => r.enabled).length), onPress: onOpenReminders },
   ];
   return (
     <View style={st.summary}>
       {items.map((x) => (
-        <View key={x.label} style={st.summaryItem}>
+        <TouchableOpacity key={x.label} style={st.summaryItem} onPress={x.onPress} activeOpacity={0.8} accessibilityRole="button" accessibilityLabel={`${x.label}: ${x.value}`}>
           <Text style={st.summaryValue} numberOfLines={1}>{x.value}</Text>
           <Text style={st.summaryLabel}>{x.label}</Text>
-        </View>
+        </TouchableOpacity>
       ))}
     </View>
   );
@@ -125,7 +127,6 @@ const SectionBody = ({ section, navigation }: { section: Section; navigation: Sc
   // the method today's times were actually fetched with
   const usedMethod = useSelector((state: RootState) => state.prayer.cachedData?.meta?.method?.id);
   const { floatingScale, floatingBubbleColor, floatingShowBorder, floatingShowReset, floatingReminderInterval } = useSelector((state: RootState) => state.tasbeeh);
-  const reminders = useSelector((state: RootState) => state.reminders?.list ?? []);
   // persisted state from older versions may lack newer keys
   const azanSettings = { ...DEFAULT_AZAN_SETTINGS, ...rawAzanSettings };
   const prefs = { ...DEFAULT_NOTIFICATION_PREFS, ...notificationPrefs };
@@ -148,9 +149,6 @@ const SectionBody = ({ section, navigation }: { section: Section; navigation: Sc
     case 'alerts':
       return (
         <>
-          <View style={[s.sectionContent, { marginTop: space[4] }]}>
-            <NavRow first icon={AlarmClock} label="تذكيراتي" sub={`${toAr(reminders.length)} تذكير · قيام، قرآن، أو أي عبادة`} onPress={() => navigation.navigate('التذكيرات')} />
-          </View>
           <SettingSection title="التنبيهات">
             <ItemRow first icon={Bell} label="التنبيهات العامة" value={notificationsEnabled} onValueChange={() => dispatch(toggleNotifications())} />
             {notificationsEnabled && (

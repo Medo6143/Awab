@@ -12,7 +12,8 @@ import { toAr } from '../../../shared/utils/format';
  * button that opens the exact system page. Re-checks whenever the app comes back
  * to the foreground (the user returns from system settings).
  */
-export const AzanReadinessCard = () => {
+/** `subject`: what the permissions are for, in the title and summary (the reminders screen uses «المنبّه»). */
+export const AzanReadinessCard = ({ subject = 'الأذان' }: { subject?: string }) => {
   const { getReadiness } = useAzanPermissions();
   const [items, setItems] = useState<ReadinessItem[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -30,13 +31,13 @@ export const AzanReadinessCard = () => {
   if (Platform.OS !== 'android' || !loaded) return null;
 
   const missing = items.filter((i) => i.status === 'missing').length;
-  const summary = missing === 0 ? 'كل الأذونات المطلوبة متاحة، الأذان جاهز.' : `${toAr(missing)} ${missing === 1 ? 'إذن ناقص' : 'أذونات ناقصة'}، أصلحها ليعمل الأذان في وقته.`;
+  const summary = missing === 0 ? `كل الأذونات المطلوبة متاحة، ${subject} جاهز.` : `${toAr(missing)} ${missing === 1 ? 'إذن ناقص' : 'أذونات ناقصة'}، أصلحها ليعمل ${subject} في وقته.`;
 
   return (
     <Card padding={4}>
       <View style={s.labelRow}>
         <ShieldCheck size={icon.size.md} color={missing === 0 ? colors.success : colors.goldText} strokeWidth={icon.stroke} />
-        <Text style={[s.subLabel, { color: colors.text }]}>جاهزية الأذان</Text>
+        <Text style={[s.subLabel, { color: colors.text }]}>{`جاهزية ${subject}`}</Text>
       </View>
       <Text style={s.readinessSummary}>{summary}</Text>
 
