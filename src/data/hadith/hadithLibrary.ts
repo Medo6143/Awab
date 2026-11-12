@@ -1,5 +1,5 @@
 import type { HadithCategory, HadithIndexEntry } from '../../domain/entities/hadith';
-import { normalizeArabic } from '../quran/ayahSearch';
+import { normalizeArabic } from '../../domain/services/arabicText';
 
 /**
  * Offline index of the hadith library: categories, and one line per hadith

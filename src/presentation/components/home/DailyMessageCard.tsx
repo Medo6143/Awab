@@ -5,10 +5,10 @@ import { ChevronLeft, RefreshCw, Shuffle } from 'lucide-react-native';
 import { Card, SectionTitle } from '../ui';
 import { QURAN_MESSAGES } from '../../../domain/entities/quranMessages';
 import type { HadithIndexEntry } from '../../../domain/entities/hadith';
-import { randomHadith } from '../../../data/hadith/hadithLibrary';
 import { useVerseText } from '../../hooks/useGuidance';
 import { verseLabel } from '../guidance/GuidanceBlocks';
 import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
+import { useDependencies } from '../../providers/DependencyProvider';
 
 /** Every (state, verse) pair across the Quran messages, as [moodIndex, verseIndex]. */
 const ALL_VERSES = QURAN_MESSAGES.flatMap((m, i) => m.verses.map((_, j) => [i, j] as const));
@@ -19,6 +19,7 @@ const ALL_VERSES = QURAN_MESSAGES.flatMap((m, i) => m.verses.map((_, j) => [i, j
  * new ones at random, as many times as the reader likes.
  */
 export const DailyMessageCard = ({ onOpenMessage, onOpenHadith }: { onOpenMessage: (mood: string) => void; onOpenHadith: (id: number) => void }) => {
+  const { hadithLibrary } = useDependencies();
   // a fresh verse every time the app opens, not the same one all day
   const [pick, setPick] = useState<readonly [number, number]>(() => ALL_VERSES[Math.floor(Math.random() * ALL_VERSES.length)]);
   const mood = QURAN_MESSAGES[pick[0]];
@@ -28,7 +29,7 @@ export const DailyMessageCard = ({ onOpenMessage, onOpenHadith }: { onOpenMessag
 
   // the hadith index is ~2 MB: build it after the home screen has painted
   useEffect(() => {
-    const t = setTimeout(() => setHadith(randomHadith()), 600);
+    const t = setTimeout(() => setHadith(hadithLibrary.random()), 600);
     return () => clearTimeout(t);
   }, []);
 
@@ -37,7 +38,7 @@ export const DailyMessageCard = ({ onOpenMessage, onOpenHadith }: { onOpenMessag
     while (ALL_VERSES.length > 1 && next[0] === pick[0] && next[1] === pick[1]) next = ALL_VERSES[Math.floor(Math.random() * ALL_VERSES.length)];
     setPick(next);
   };
-  const otherHadith = () => setHadith(randomHadith(hadith?.id));
+  const otherHadith = () => setHadith(hadithLibrary.random(hadith?.id));
   const shuffle = () => { Haptics.selectionAsync(); otherVerse(); otherHadith(); };
 
   return (

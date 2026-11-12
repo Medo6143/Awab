@@ -4,7 +4,11 @@
  */
 import { hadithApi, quranApi, tafsirApi } from './api/clients';
 import { HadeethEncRepository } from './repositories/HadeethEncRepository';
-import { HadithRepository } from '../domain/entities/hadith';
+import { HadithRepository } from '../domain/repositories/HadithRepository';
+import { HadithLibrary } from '../domain/repositories/HadithLibrary';
+import { QuranIndex } from '../domain/repositories/QuranIndex';
+import { BundledHadithLibrary } from './repositories/BundledHadithLibrary';
+import { BundledQuranIndex } from './repositories/BundledQuranIndex';
 import { QuranApiRepository, QuranComTafsirRepository } from './repositories/QuranApiRepository';
 import { NativeFloatingSebha } from './services/NativeFloatingSebha';
 import { NativePrayerWidget } from './services/NativePrayerWidget';
@@ -38,6 +42,8 @@ export type AppDependencies = {
   quran: QuranRepository;
   tafsir: TafsirRepository;
   hadith: HadithRepository;
+  hadithLibrary: HadithLibrary;
+  quranIndex: QuranIndex;
   floatingSebha: FloatingSebha;
   notifications: NotificationCenter;
   prayerWidget: PrayerWidget;
@@ -63,6 +69,8 @@ export const createDependencies = (): AppDependencies => {
     quran: new QuranApiRepository(quranApi),
     tafsir: new QuranComTafsirRepository(tafsirApi),
     hadith: new HadeethEncRepository(hadithApi),
+    hadithLibrary: new BundledHadithLibrary(),
+    quranIndex: new BundledQuranIndex(),
     floatingSebha: new NativeFloatingSebha(),
     prayerWidget: new NativePrayerWidget(),
     azanAlarms: new NativeAzanAlarms(),

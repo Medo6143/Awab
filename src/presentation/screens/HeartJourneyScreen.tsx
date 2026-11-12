@@ -19,13 +19,14 @@ import { JUZ_SURAH_RANGES, toAr } from '../components/heart/HeartJourneyConstant
 import { ModeSwitch } from '../components/heart/ModeSwitch';
 import { HeartSurahSheet } from '../components/tasmee/HeartSurahSheet';
 import { TasmeeSetupSheet, TasmeeStart } from '../components/tasmee/TasmeeSetupSheet';
-import { ayahRef, surahPageRange } from '../../data/quran/ayahSearch';
 import { SURAH_NAMES } from '../../shared/constants/surahs';
 import { TasmeeParams } from '../navigation/types';
+import { useDependencies } from '../providers/DependencyProvider';
 
 const EMPTY: number[] = [];
 
 const HeartJourneyScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
+  const { quranIndex } = useDependencies();
   const dispatch = useDispatch();
   const [mode, setMode] = useState<HeartMode>('reading');
   const completedSurahs = useSelector((state: RootState) =>
@@ -73,7 +74,7 @@ const HeartJourneyScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => 
   const openInMushaf = useCallback((id: number) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setShowZoom(false);
-    dispatch(setCurrentPage(surahPageRange(id).from));
+    dispatch(setCurrentPage(quranIndex.surahPageRange(id).from));
     navigation.navigate('TabQuran');
   }, [dispatch, navigation]);
 
@@ -85,13 +86,13 @@ const HeartJourneyScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => 
 
   /** Ayahs from..to of a surah as the mushaf pages they sit on; only that surah is recited. */
   const reciteAyahs = (surah: number, from: number, to: number, only?: number[]) => {
-    const a = ayahRef(surah, from);
-    const b = ayahRef(surah, to);
+    const a = quranIndex.ayahRef(surah, from);
+    const b = quranIndex.ayahRef(surah, to);
     if (!a || !b) return;
     startTasmee({
       fromPage: a.page, toPage: b.page, surah, help: 'none',
       startAyah: only ? undefined : a.number,
-      only: only?.map((n) => ayahRef(surah, n)?.number ?? 0).filter(Boolean),
+      only: only?.map((n) => quranIndex.ayahRef(surah, n)?.number ?? 0).filter(Boolean),
     });
   };
 
@@ -182,7 +183,7 @@ const HeartJourneyScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => 
         onChooseRange={(from) => {
           const surah = hifzSurah;
           setHifzSurah(null);
-          const page = surah ? ayahRef(surah, from)?.page : undefined;
+          const page = surah ? quranIndex.ayahRef(surah, from)?.page : undefined;
           if (surah && page) setTimeout(() => setRangeFor({ surah, fromPage: page, toPage: page }), 300);
         }}
         onToggleMemorized={() => { if (hifzSurah) handleToggle(hifzSurah); setHifzSurah(null); }}
@@ -193,8 +194,8 @@ const HeartJourneyScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => 
           title={`تسميع سورة ${SURAH_NAMES[rangeFor.surah - 1]}`}
           fromPage={rangeFor.fromPage}
           toPage={rangeFor.toPage}
-          minPage={surahPageRange(rangeFor.surah).from}
-          maxPage={surahPageRange(rangeFor.surah).to}
+          minPage={quranIndex.surahPageRange(rangeFor.surah).from}
+          maxPage={quranIndex.surahPageRange(rangeFor.surah).to}
           onClose={() => setRangeFor(null)}
           onStart={(t: TasmeeStart) => startTasmee({ ...t, surah: rangeFor.surah })}
         />

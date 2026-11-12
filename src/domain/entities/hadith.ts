@@ -30,6 +30,3 @@ export interface HadithDetail {
   reference: string;
 }
 
-export interface HadithRepository {
-  getHadith(id: number): Promise<HadithDetail>;
-}

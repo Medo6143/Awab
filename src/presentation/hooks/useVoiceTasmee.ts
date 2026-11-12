@@ -3,7 +3,6 @@ import { Alert } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { Ayah, mushafAyahText } from '../components/quran/QuranConstants';
 import { splitWords } from '../components/tasmee/tasmeeText';
-import { plainAyah } from '../../data/quran/ayahSearch';
 import type { RecitationSession } from '../../domain/services/Tasmee';
 import { useDependencies } from '../providers/DependencyProvider';
 
@@ -59,7 +58,7 @@ export const useVoiceTasmee = (enabled: boolean, mode: VoiceMode, ayahs: Ayah[],
   const [state, setState] = useState<VoiceState>(enabled ? 'loading' : 'idle');
   /** The word to say again after a correction. */
   const [repeat, setRepeat] = useState<string | null>(null);
-  const { recitation, microphone, wordAudio } = useDependencies();
+  const { recitation, microphone, wordAudio, quranIndex } = useDependencies();
   const listener = useRef<RecitationSession | null>(null);
   const active = useRef(false);
   const on = useRef(handlers);
@@ -77,7 +76,7 @@ export const useVoiceTasmee = (enabled: boolean, mode: VoiceMode, ayahs: Ayah[],
 
   // the page's words, from the first ayah still covered
   const follower = useMemo(() => {
-    const list = ayahs.map((a) => ({ number: a.number, plain: plainAyah(a.number), mushaf: splitWords(mushafAyahText(a)), opensSurah: a.numberInSurah === 1 }));
+    const list = ayahs.map((a) => ({ number: a.number, plain: quranIndex.plainAyah(a.number), mushaf: splitWords(mushafAyahText(a)), opensSurah: a.numberInSurah === 1 }));
     return new RecitationFollower(followWords(list));
   }, [ayahs]);
   const byNumber = useMemo(() => new Map(ayahs.map((a) => [a.number, a])), [ayahs]);

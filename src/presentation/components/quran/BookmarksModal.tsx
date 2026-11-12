@@ -6,7 +6,8 @@ import { s } from './QuranStyles';
 import { colors, space, type, themed } from '../../../shared/theme/tokens';
 import { toAr } from './QuranConstants';
 import { SURAH_NAMES } from '../../../shared/constants/surahs';
-import { AyahHit, ayahByNumber } from '../../../data/quran/ayahSearch';
+import type { AyahHit } from '../../../domain/repositories/QuranIndex';
+import { useDependencies } from '../../providers/DependencyProvider';
 
 interface Props {
   visible: boolean;
@@ -22,10 +23,11 @@ type Row = { kind: 'ayah'; hit: AyahHit } | { kind: 'page'; page: number };
 
 /** Saved ayahs (from the tafsir sheet) and saved pages; a tap opens the place in the mushaf. */
 export const BookmarksModal = ({ visible, onClose, bookmarkedAyahs, bookmarkedPages, onAyahSelect, onPageSelect }: Props) => {
+  const { quranIndex } = useDependencies();
   const sections = useMemo(() => {
     if (!visible) return [];
     const ayahs = bookmarkedAyahs
-      .map(ayahByNumber)
+      .map((n) => quranIndex.ayahByNumber(n))
       .filter((h): h is AyahHit => !!h)
       .sort((a, b) => a.number - b.number)
       .map((hit): Row => ({ kind: 'ayah', hit }));

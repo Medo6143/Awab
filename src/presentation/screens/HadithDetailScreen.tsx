@@ -14,17 +14,16 @@ import { ImageShareModal } from '../components/share/ImageShareModal';
 import { HadithShare } from '../components/share/StoryCard';
 import { ShareStylePicker } from '../components/share/ShareStylePicker';
 import { useDependencies } from '../providers/DependencyProvider';
-import { hadithEntry } from '../../data/hadith/hadithLibrary';
 import type { HadithDetail } from '../../domain/entities/hadith';
 import { colors, icon, radius, space, type, themed } from '../../shared/theme/tokens';
 
 /** One hadith: text with its narrator, grade, explanation, benefits and word meanings. */
 const HadithDetailScreen = ({ navigation, route }: ScreenProps<'الحديث'>) => {
   const id = route.params.id;
-  const { hadith } = useDependencies();
+  const { hadith, hadithLibrary } = useDependencies();
   const dispatch = useDispatch();
   const saved = useSelector((s: RootState) => (s.favorites?.hadiths ?? []).includes(id));
-  const entry = hadithEntry(id);
+  const entry = hadithLibrary.entry(id);
   const [state, setState] = useState<{ data?: HadithDetail; error: boolean }>({ error: false });
   const [sharing, setSharing] = useState(false);
   const [copied, setCopied] = useState(false);
