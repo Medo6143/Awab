@@ -31,6 +31,10 @@ interface SettingsState {
   shareCardStyle: ShareCardStyle;
   shareTextSize: ShareTextSize;
   mushafTheme: MushafThemeId;
+  /** Mushaf text size, as a multiple of the design's own size (MUSHAF_FONT_SCALES). */
+  mushafFontScale: number;
+  /** The «دوس على أي آية» hint above the mushaf was dismissed. */
+  mushafHintSeen: boolean;
   tasbeehHaptics: boolean;     // a light buzz on every count
   asrMethod: AsrMethod;
   tasbeehTargetAlert: boolean; // a stronger buzz when the target is reached
@@ -56,6 +60,8 @@ const initialState: SettingsState = {
   shareCardStyle: 'gold',
   shareTextSize: 'medium',
   mushafTheme: 'classic',
+  mushafFontScale: 1,
+  mushafHintSeen: false,
   tasbeehHaptics: true,
   asrMethod: 'auto',
   tasbeehTargetAlert: true,
@@ -95,6 +101,12 @@ export const settingsSlice = createSlice({
     },
     setMushafTheme: (state, action: PayloadAction<MushafThemeId>) => {
       state.mushafTheme = action.payload;
+    },
+    setMushafFontScale: (state, action: PayloadAction<number>) => {
+      state.mushafFontScale = action.payload;
+    },
+    dismissMushafHint: (state) => {
+      state.mushafHintSeen = true;
     },
     // `?? true`: state persisted before these settings existed lacks the keys
     toggleTasbeehHaptics: (state) => {
@@ -161,6 +173,8 @@ export const {
   setAsrMethod,
   setShareTextSize,
   setMushafTheme,
+  setMushafFontScale,
+  dismissMushafHint,
   toggleTasbeehHaptics,
   toggleTasbeehTargetAlert, 
   setTafsirFontSize,

@@ -5,7 +5,7 @@ import { Bookmark } from 'lucide-react-native';
 import { toAr, Ayah, mushafAyahText } from './QuranConstants';
 import { useMushafPage } from '../../hooks/useQuran';
 import { s } from './QuranStyles';
-import { useMushafTheme } from './mushafThemes';
+import { useMushafFontScale, useMushafTheme } from './mushafThemes';
 import { SurahHeader } from './MushafOrnaments';
 import { divineRuns } from '../../../domain/services/mushafText';
 
@@ -28,6 +28,7 @@ export const MushafPageContent = React.memo(({
 }: Props) => {
   const { ayahs, loading, error, retry } = useMushafPage(pageNum);
   const theme = useMushafTheme();
+  const scale = useMushafFontScale();
   const p = theme.palette;
   // the name of Allah in the design's own colour (Madani); other designs keep one ink
   const ink = (text: string, key: string) => (theme.divineNames
@@ -110,11 +111,11 @@ export const MushafPageContent = React.memo(({
 
               {group.surahNum !== 9 && group.ayahs[0]?.numberInSurah === 1 && (
                 <View style={s.basmalaContainer}>
-                  <Text style={[s.mushafBasmala, { color: p.ink, fontFamily: theme.fontFamily }]}>{ink('بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ', 'b')}</Text>
+                  <Text style={[s.mushafBasmala, { color: p.ink, fontFamily: theme.fontFamily, fontSize: 32 * scale, lineHeight: 52 * scale }]}>{ink('بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ', 'b')}</Text>
                 </View>
               )}
 
-              <Text style={[s.textFlow, { color: p.ink, fontFamily: theme.fontFamily, fontSize: theme.fontSize, lineHeight: theme.lineHeight, textAlign: theme.textAlign }]}>
+              <Text style={[s.textFlow, { color: p.ink, fontFamily: theme.fontFamily, fontSize: theme.fontSize * scale, lineHeight: theme.lineHeight * scale, textAlign: theme.textAlign }]}>
                 {group.ayahs.map(a => {
                    const text = mushafAyahText(a);
 
