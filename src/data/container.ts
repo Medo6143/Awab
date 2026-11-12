@@ -9,6 +9,7 @@ import { QuranApiRepository, QuranComTafsirRepository } from './repositories/Qur
 import { NativeFloatingSebha } from './services/NativeFloatingSebha';
 import { NativePrayerWidget } from './services/NativePrayerWidget';
 import { NativeAzanAlarms } from './services/NativeAzanAlarms';
+import { NativeReminderAlarms } from './services/NativeReminderAlarms';
 import { ExpoNotificationCenter } from './notifications/ExpoNotificationCenter';
 import { PrayerScheduler } from './notifications/PrayerScheduler';
 import { CustomReminderScheduler } from './notifications/CustomReminderScheduler';
@@ -18,6 +19,7 @@ import { FloatingSebha } from '../domain/services/FloatingSebha';
 import { NotificationCenter } from '../domain/services/Notifications';
 import { PrayerWidget } from '../domain/services/PrayerWidget';
 import { AzanAlarms } from '../domain/services/AzanAlarms';
+import { ReminderAlarms } from '../domain/services/ReminderAlarms';
 import { LocationProvider } from '../domain/services/Location';
 import { ExpoLocationProvider } from './services/LocationService';
 import { AzanSound, QuranPlayer } from '../domain/services/Audio';
@@ -38,6 +40,7 @@ export type AppDependencies = {
   notifications: NotificationCenter;
   prayerWidget: PrayerWidget;
   azanAlarms: AzanAlarms;
+  reminderAlarms: ReminderAlarms;
   location: LocationProvider;
   quranPlayer: QuranPlayer;
   azanSound: AzanSound;
@@ -57,6 +60,7 @@ export const createDependencies = (): AppDependencies => {
     floatingSebha: new NativeFloatingSebha(),
     prayerWidget: new NativePrayerWidget(),
     azanAlarms: new NativeAzanAlarms(),
+    reminderAlarms: new NativeReminderAlarms(),
     location: new ExpoLocationProvider(),
     quranPlayer: audio,
     azanSound: audio,
