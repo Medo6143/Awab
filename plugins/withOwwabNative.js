@@ -9,6 +9,7 @@
  *   - OemBatteryModule                                           (battery-killer helpers)
  *   - PrayerWidgetProvider + layout/xml resources                (home-screen widget)
  *   - AyahVideoModule / AyahVideoEncoder / FrameRenderer          (ayah share as MP4)
+ *   - PrayerCheckModule / PrayerCheckReceiver                     («صليت؟» after the adhan)
  *
  * It also registers the packages in MainApplication, adds the manifest entries and
  * wires the "isAzanTriggered" intent handling into MainActivity.
@@ -99,6 +100,11 @@ function withNativeManifest(config) {
       app.receiver.push({ $: { 'android:name': '.AzanReceiver', 'android:exported': 'false' } });
     }
 
+    // «صليت؟» after each adhan: its alarms and the notification's two buttons
+    if (!has(app.receiver, '.prayercheck.PrayerCheckReceiver')) {
+      app.receiver.push({ $: { 'android:name': '.prayercheck.PrayerCheckReceiver', 'android:exported': 'false' } });
+    }
+
     if (!has(app.receiver, '.BootReceiver')) {
       app.receiver.push({
         $: { 'android:name': '.BootReceiver', 'android:exported': 'true' },
@@ -156,6 +162,7 @@ function withNativePackages(config) {
       `add(${pkg}.widget.PrayerWidgetPackage())`,
       `add(${pkg}.AzanPackage())`,
       `add(${pkg}.video.AyahVideoPackage())`,
+      `add(${pkg}.prayercheck.PrayerCheckPackage())`,
       `add(${pkg}.OemBatteryPackage())`,
       // Expo's autolinking leaves onnxruntime-react-native out of PackageList (its gradle
       // project is still built), so the recitation model's native module is added here

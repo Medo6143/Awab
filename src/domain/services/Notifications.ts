@@ -1,5 +1,6 @@
 import { AzanSettings, NotificationPrefs, PrayerTimings } from '../entities/notifications';
 import type { Reminder } from '../entities/reminders';
+import type { PrayerCheckSettings } from '../entities/prayerCheck';
 
 export interface ScheduleContext {
   prefs: NotificationPrefs;
@@ -9,6 +10,8 @@ export interface ScheduleContext {
   reminders?: Reminder[];
   /** everyayah folder of the chosen reciter, for recitation sounds. */
   reciterFolder?: string;
+  /** «صليت؟» after each adhan. */
+  prayerCheck?: PrayerCheckSettings;
 }
 
 /** One kind of reminder (prayers, athkar, ...). Add a kind by adding a scheduler. */

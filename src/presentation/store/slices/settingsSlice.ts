@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { DEFAULT_PRAYER_CHECK, PrayerCheckSettings } from '../../../domain/entities/prayerCheck';
 import { AzanSettings, DEFAULT_NOTIFICATION_PREFS, NotificationPrefs } from '../../../domain/entities/notifications';
 
 export type TafsirStyle = 'simple' | 'book' | 'modern';
@@ -33,6 +34,8 @@ interface SettingsState {
   tasbeehHaptics: boolean;     // a light buzz on every count
   asrMethod: AsrMethod;
   tasbeehTargetAlert: boolean; // a stronger buzz when the target is reached
+  /** «صليت؟» after each adhan; missing in state persisted before it existed. */
+  prayerCheck?: PrayerCheckSettings;
 }
 
 const initialState: SettingsState = {
@@ -56,6 +59,7 @@ const initialState: SettingsState = {
   tasbeehHaptics: true,
   asrMethod: 'auto',
   tasbeehTargetAlert: true,
+  prayerCheck: DEFAULT_PRAYER_CHECK,
 };
 
 export const settingsSlice = createSlice({
@@ -134,6 +138,9 @@ export const settingsSlice = createSlice({
         state.notificationPrefs.dailyWardTime = action.payload;
       }
     },
+    setPrayerCheck: (state, action: PayloadAction<Partial<PrayerCheckSettings>>) => {
+      state.prayerCheck = { ...DEFAULT_PRAYER_CHECK, ...state.prayerCheck, ...action.payload };
+    },
     setEncouragementInterval: (state, action: PayloadAction<number>) => {
       if (state.notificationPrefs) {
         state.notificationPrefs.encouragementInterval = action.payload;
@@ -143,6 +150,7 @@ export const settingsSlice = createSlice({
 });
 
 export const { 
+  setPrayerCheck,
   toggleNotifications, 
   toggleLocation, 
   setTheme, 
