@@ -37,6 +37,14 @@ export interface AyahVideoNativeModule {
   encode?(spec: string): Promise<{ durationMs: number }>;
 }
 
+/** PrayerCheckModule (native/android/java/prayercheck): «صليت؟» after each adhan. */
+export interface PrayerCheckNativeModule {
+  schedule?(json: string): Promise<void>;
+  cancelAll?(): Promise<void>;
+  setDoneToday?(prayerIds: string[]): void;
+  takeAnswers?(): Promise<{ prayerId: string; day: string }[]>;
+}
+
 export interface FloatingBubbleNativeModule {
   initialize?(): Promise<void>;
   checkPermission?(): Promise<boolean>;
@@ -56,4 +64,5 @@ const androidOnly = <T>(name: string): T | undefined =>
 
 export const azanNative = () => androidOnly<AzanNativeModule>('AzanModule');
 export const ayahVideoNative = () => androidOnly<AyahVideoNativeModule>('AyahVideo');
+export const prayerCheckNative = () => androidOnly<PrayerCheckNativeModule>('PrayerCheck');
 export const floatingBubbleNative = () => androidOnly<FloatingBubbleNativeModule>('RNFloatingBubble');

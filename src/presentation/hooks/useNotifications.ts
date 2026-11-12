@@ -28,6 +28,7 @@ export const useNotifications = (exactAlarmGranted: boolean | null) => {
   const { timings } = usePrayerTimes();
   const { notificationPrefs, notificationsEnabled, azanSettings: rawAzanSettings, selectedReciterId } = useSelector((state: RootState) => state.settings);
   const reminders = useSelector((state: RootState) => state.reminders?.list ?? []);
+  const prayerCheck = useSelector((state: RootState) => state.settings.prayerCheck);
   const reciterFolder = RECITER_MAP[selectedReciterId]?.folder;
   
   const azanSettings = useMemo<AzanSettings>(() => ({ ...DEFAULT_AZAN_SETTINGS, ...rawAzanSettings }), [rawAzanSettings]);
@@ -76,7 +77,7 @@ export const useNotifications = (exactAlarmGranted: boolean | null) => {
         return;
       }
 
-      const scheduleState = JSON.stringify({ timings, safePrefs, azanSettings, notificationsEnabled, reminders, reciterFolder, exactAlarmGranted });
+      const scheduleState = JSON.stringify({ timings, safePrefs, azanSettings, notificationsEnabled, reminders, reciterFolder, exactAlarmGranted, prayerCheck });
       if (scheduleState === lastScheduledRef.current) {
         console.log('useNotifications: Scheduling state unchanged. Skipping.');
         return;
@@ -117,7 +118,7 @@ export const useNotifications = (exactAlarmGranted: boolean | null) => {
         }
 
         console.log('useNotifications: Re-scheduling all...');
-        await notifications.rescheduleAll({ prefs: safePrefs, azan: azanSettings, timings, reminders, reciterFolder });
+        await notifications.rescheduleAll({ prefs: safePrefs, azan: azanSettings, timings, reminders, reciterFolder, prayerCheck });
         
         lastScheduledRef.current = scheduleState;
         
@@ -180,5 +181,5 @@ export const useNotifications = (exactAlarmGranted: boolean | null) => {
       responseSubscription.remove();
       offAzan();
     };
-  }, [timings, safePrefs, notificationsEnabled, azanSettings, reminders, reciterFolder, exactAlarmGranted, dispatch, notifications, azanAlarms]);
+  }, [timings, safePrefs, notificationsEnabled, azanSettings, reminders, reciterFolder, exactAlarmGranted, prayerCheck, dispatch, notifications, azanAlarms]);
 };

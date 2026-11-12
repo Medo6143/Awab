@@ -28,6 +28,9 @@ import { PrayerTimesSource } from '../domain/services/PrayerTimes';
 import { AladhanPrayerTimes } from './services/PrayerTimeService';
 import { AyahVideoMaker } from '../domain/services/AyahVideo';
 import { NativeAyahVideo } from './services/NativeAyahVideo';
+import { PrayerChecks } from '../domain/services/PrayerChecks';
+import { NativePrayerChecks } from './services/NativePrayerChecks';
+import { PrayerCheckScheduler } from './notifications/PrayerCheckScheduler';
 
 export type AppDependencies = {
   quran: QuranRepository;
@@ -43,11 +46,13 @@ export type AppDependencies = {
   azanSound: AzanSound;
   prayerTimes: PrayerTimesSource;
   ayahVideo: AyahVideoMaker;
+  prayerChecks: PrayerChecks;
 };
 
 export const createDependencies = (): AppDependencies => {
   // one player for both: recitation and the in-app adhan share the same expo-av sound
   const audio = new ExpoAudioPlayer();
+  const prayerChecks = new NativePrayerChecks();
   return {
     quran: new QuranApiRepository(quranApi),
     tafsir: new QuranComTafsirRepository(tafsirApi),
@@ -61,6 +66,7 @@ export const createDependencies = (): AppDependencies => {
     azanSound: audio,
     prayerTimes: new AladhanPrayerTimes(),
     ayahVideo: new NativeAyahVideo(),
+    prayerChecks,
     // a new reminder kind is one more scheduler here; the center itself does not change
     notifications: new ExpoNotificationCenter([
       new PrayerScheduler(),
@@ -69,6 +75,7 @@ export const createDependencies = (): AppDependencies => {
       new DailyWardScheduler(),
       new EncouragementScheduler(),
       new CustomReminderScheduler(),
+      new PrayerCheckScheduler(prayerChecks),
     ]),
   };
 };

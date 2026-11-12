@@ -27,6 +27,8 @@ import { syncDailyReset } from './src/presentation/store/slices/athkarSlice';
 import { useNotifications } from './src/presentation/hooks/useNotifications';
 import { useExactAlarmAccess } from './src/presentation/hooks/useExactAlarmAccess';
 import { ExactAlarmPrompt } from './src/presentation/components/azan/ExactAlarmPrompt';
+import { PrayerCheckOptIn } from './src/presentation/components/azan/PrayerCheckOptIn';
+import { usePrayerCheckSync } from './src/presentation/hooks/usePrayerCheckSync';
 import { AzanVideoModal } from './src/presentation/components/azan/AzanVideoModal';
 import { ReminderAlarm } from './src/presentation/components/reminders/ReminderAlarm';
 import { hideAzanModal } from './src/presentation/store/slices/uiSlice';
@@ -87,6 +89,7 @@ const Bootstrapper = ({ children }: { children: React.ReactNode }) => {
   const { azanModal } = useSelector((state: RootState) => state.ui);
   const exactAlarm = useExactAlarmAccess();
   useNotifications(exactAlarm.granted);
+  usePrayerCheckSync();
   
   useEffect(() => {
     dispatch(syncDailyReset());
@@ -102,6 +105,7 @@ const Bootstrapper = ({ children }: { children: React.ReactNode }) => {
       />
       <ReminderAlarm />
       <ExactAlarmPrompt granted={exactAlarm.granted} onAllow={exactAlarm.request} />
+      <PrayerCheckOptIn />
       <FloatingTasbeehController />
     </>
   );

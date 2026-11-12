@@ -26,6 +26,7 @@ import {
   NotificationSettings, AzanSelector, FloatingTasbeehSettings, AsrMethodSelector, PrayerMethodSelector,
 } from '../components/settings/SettingsComponents';
 import { AzanReadinessCard } from '../components/settings/AzanReadinessCard';
+import { PrayerCheckSettings } from '../components/settings/PrayerCheckSettings';
 import { s } from '../components/settings/SettingsStyles';
 import { FloatingTasbeehToggle } from '../components/tasbeeh/FloatingTasbeeh';
 
@@ -137,6 +138,7 @@ const SectionBody = ({ section, navigation }: { section: Section; navigation: Sc
             <AsrMethodSelector value={asrMethod} onSelect={(v) => dispatch(setAsrMethod(v))} />
           </SettingSection>
           <View style={{ marginTop: 12 }}><AzanReadinessCard /></View>
+          <PrayerCheckSettings />
         </>
       );
     case 'alerts':
