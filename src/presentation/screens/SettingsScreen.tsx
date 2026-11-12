@@ -82,7 +82,7 @@ const useSectionHint = (id: Section) => {
   const reminders = useSelector((st: RootState) => st.reminders?.list ?? []);
   const azan = { ...DEFAULT_AZAN_SETTINGS, ...st8.azanSettings };
   switch (id) {
-    case 'prayer': return AZAN_TYPES.find((t) => t.id === azan.type)?.name ?? '';
+    case 'prayer': return `${AZAN_TYPES.find((t) => t.id === azan.type)?.name ?? ''} · «صليت؟» ${st8.prayerCheck?.enabled ? 'شغال' : 'مقفول'}`;
     case 'alerts': return `${st8.notificationsEnabled ? 'الإشعارات شغالة' : 'الإشعارات متوقفة'} · ${toAr(reminders.filter((r) => r.enabled).length)} تذكير`;
     case 'quran': return `القارئ: ${RECITER_MAP[st8.selectedReciterId]?.name ?? ''}`;
     case 'tasbeeh': return tasbeeh.floatingReminderInterval ? `تذكير كل ${toAr(tasbeeh.floatingReminderInterval)} دقايق` : 'الاهتزاز والهدف والعائمة';
@@ -137,8 +137,9 @@ const SectionBody = ({ section, navigation }: { section: Section; navigation: Sc
             <PrayerMethodSelector value={prayerMethod} auto={usedMethod != null ? methodName(usedMethod) : 'هتظهر بعد تحديد موقعك'} onSelect={(v) => dispatch(setPrayerMethod(v))} />
             <AsrMethodSelector value={asrMethod} onSelect={(v) => dispatch(setAsrMethod(v))} />
           </SettingSection>
-          <View style={{ marginTop: 12 }}><AzanReadinessCard /></View>
+          {/* right under the adhan settings: at the bottom, under the readiness card, it went unnoticed */}
           <PrayerCheckSettings />
+          <View style={{ marginTop: 12 }}><AzanReadinessCard /></View>
         </>
       );
     case 'alerts':
