@@ -6,7 +6,7 @@ import { Chip, PillButton, Sheet } from '../ui';
 import { colors, icon, radius, space, type, themed } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 import { toAr } from '../../../shared/utils/format';
-import { MODEL_MB, downloadModel, modelPath } from '../../../data/services/RecitationListener';
+import { useDependencies } from '../../providers/DependencyProvider';
 import { TasmeeHelp, minutesLabel } from './tasmeeText';
 
 const pagesLabel = (n: number) => (n === 1 ? 'صفحة واحدة' : n === 2 ? 'صفحتين' : `${toAr(n)} ${n <= 10 ? 'صفحات' : 'صفحة'}`);
@@ -80,18 +80,19 @@ export const TasmeeSetupSheet = ({ visible, title, fromPage, toPage, minPage = 1
   // the speech model is downloaded once, the first time «بصوتي» is chosen
   const [model, setModel] = useState<'checking' | 'missing' | 'downloading' | 'failed' | 'ready'>('checking');
   const [progress, setProgress] = useState(0);
+  const { speechModel } = useDependencies();
 
   useEffect(() => {
     if (!visible) return;
     setFrom(fromPage); setTo(toPage);
-    modelPath().then((p) => setModel((m) => (m === 'downloading' ? m : p ? 'ready' : 'missing')));
+    speechModel.isReady().then((ready) => setModel((m) => (m === 'downloading' ? m : ready ? 'ready' : 'missing')));
   }, [visible, fromPage, toPage]);
 
   const download = () => {
     Haptics.selectionAsync();
     setModel('downloading');
     setProgress(0);
-    downloadModel(setProgress).then(() => setModel('ready'), () => setModel('failed'));
+    speechModel.download(setProgress).then(() => setModel('ready'), () => setModel('failed'));
   };
 
   const count = to - from + 1;
@@ -147,7 +148,7 @@ export const TasmeeSetupSheet = ({ visible, title, fromPage, toPage, minPage = 1
               ? `بينزّل ملف الصوت… ${toAr(Math.round(progress * 100))}٪`
               : model === 'failed'
                 ? 'التنزيل ما كملش. اتأكد من الإنترنت وجرّب تاني.'
-                : `التسميع بالصوت محتاج ملف مرة واحدة (حوالي ${toAr(MODEL_MB)} ميجا)، والأفضل على واي فاي. بعد كده بيشتغل من غير إنترنت.`}
+                : `التسميع بالصوت محتاج ملف مرة واحدة (حوالي ${toAr(speechModel.sizeMb)} ميجا)، والأفضل على واي فاي. بعد كده بيشتغل من غير إنترنت.`}
       </Text>
       {voice && (model === 'missing' || model === 'failed') ? (
         <PillButton variant="ghost" size="sm" label={model === 'failed' ? 'جرّب التنزيل تاني' : 'نزّل ملف الصوت'} style={st.download} onPress={download} />

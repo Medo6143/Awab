@@ -4,7 +4,8 @@ import * as Haptics from 'expo-haptics';
 import { Ayah, mushafAyahText } from '../components/quran/QuranConstants';
 import { splitWords } from '../components/tasmee/tasmeeText';
 import { plainAyah } from '../../data/quran/ayahSearch';
-import { RecitationListener, hasMic, requestMic } from '../../data/services/RecitationListener';
+import type { RecitationSession } from '../../domain/services/Tasmee';
+import { useDependencies } from '../providers/DependencyProvider';
 
 /**
  * Says why the microphone is needed before Android's own dialog asks (Play's prominent
@@ -21,7 +22,6 @@ const explainMic = () => new Promise<boolean>((resolve) => {
     { cancelable: true, onDismiss: () => resolve(false) },
   );
 });
-import { playWord, prefetchWord } from '../../data/services/wordAudio';
 import { RecitationFollower, followWords } from '../../domain/services/recitationFollower';
 
 export type VoiceState = 'loading' | 'idle' | 'listening' | 'correcting' | 'repeating' | 'error' | 'noMic';
@@ -59,7 +59,8 @@ export const useVoiceTasmee = (enabled: boolean, mode: VoiceMode, ayahs: Ayah[],
   const [state, setState] = useState<VoiceState>(enabled ? 'loading' : 'idle');
   /** The word to say again after a correction. */
   const [repeat, setRepeat] = useState<string | null>(null);
-  const listener = useRef<RecitationListener | null>(null);
+  const { recitation, microphone, wordAudio } = useDependencies();
+  const listener = useRef<RecitationSession | null>(null);
   const active = useRef(false);
   const on = useRef(handlers);
   on.current = handlers;
@@ -67,12 +68,12 @@ export const useVoiceTasmee = (enabled: boolean, mode: VoiceMode, ayahs: Ayah[],
   useEffect(() => {
     if (!enabled) return;
     let alive = true;
-    RecitationListener.open().then(
+    recitation.open().then(
       (l) => { if (alive) { listener.current = l; setState('idle'); } else l.close(); },
       () => alive && setState('error'),
     );
     return () => { alive = false; active.current = false; listener.current?.close(); listener.current = null; };
-  }, [enabled]);
+  }, [enabled, recitation]);
 
   // the page's words, from the first ayah still covered
   const follower = useMemo(() => {
@@ -97,8 +98,8 @@ export const useVoiceTasmee = (enabled: boolean, mode: VoiceMode, ayahs: Ayah[],
     if (mode !== 'correct') return;
     const w = follower.words[at];
     const a = w && byNumber.get(w.ayah);
-    if (a) prefetchWord(a.surah.number, a.numberInSurah, (w.mushaf[0] ?? 0) + 1);
-  }, [mode, follower, byNumber]);
+    if (a) wordAudio.prefetch(a.surah.number, a.numberInSurah, (w.mushaf[0] ?? 0) + 1);
+  }, [mode, follower, byNumber, wordAudio]);
 
   /** Tells the screen how far the cursor is: done ayahs, and the words heard of the next one. */
   const report = useCallback((from: number, to: number) => {
@@ -176,7 +177,7 @@ export const useVoiceTasmee = (enabled: boolean, mode: VoiceMode, ayahs: Ayah[],
       const tries: number = redo && redo.at === step.at ? redo.tries + 1 : 1;
       setState('correcting');
       await l.pause();
-      if (a) await playWord(a.surah.number, a.numberInSurah, (w.mushaf[0] ?? 0) + 1);
+      if (a) await wordAudio.play(a.surah.number, a.numberInSurah, (w.mushaf[0] ?? 0) + 1);
       if (!active.current) break;
       if (tries >= MAX_TRIES) {
         // said it wrong again and again: move on rather than hold the reciter here
@@ -203,16 +204,16 @@ export const useVoiceTasmee = (enabled: boolean, mode: VoiceMode, ayahs: Ayah[],
   const start = useCallback(async () => {
     const l = listener.current;
     if (!l || active.current) return;
-    if (!(await hasMic())) {
+    if (!(await microphone.has())) {
       if (!(await explainMic())) return; // stays idle: the user can start again
-      if (!(await requestMic())) { setState('noMic'); return; }
+      if (!(await microphone.request())) { setState('noMic'); return; }
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     active.current = true;
     await l.start();
     setState('listening');
     run();
-  }, [follower, run]);
+  }, [follower, run, microphone]);
 
   const stop = useCallback(() => {
     active.current = false;

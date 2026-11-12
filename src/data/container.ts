@@ -10,6 +10,8 @@ import { NativeFloatingSebha } from './services/NativeFloatingSebha';
 import { NativePrayerWidget } from './services/NativePrayerWidget';
 import { NativeAzanAlarms } from './services/NativeAzanAlarms';
 import { NativeReminderAlarms } from './services/NativeReminderAlarms';
+import { AndroidMicrophone, CtcRecitationRecognizer, OnnxSpeechModel, QuranCdnWordAudio } from './services/TasmeeServices';
+import { Microphone, RecitationRecognizer, SpeechModel, WordAudio } from '../domain/services/Tasmee';
 import { ExpoNotificationCenter } from './notifications/ExpoNotificationCenter';
 import { PrayerScheduler } from './notifications/PrayerScheduler';
 import { CustomReminderScheduler } from './notifications/CustomReminderScheduler';
@@ -41,6 +43,10 @@ export type AppDependencies = {
   prayerWidget: PrayerWidget;
   azanAlarms: AzanAlarms;
   reminderAlarms: ReminderAlarms;
+  speechModel: SpeechModel;
+  microphone: Microphone;
+  recitation: RecitationRecognizer;
+  wordAudio: WordAudio;
   location: LocationProvider;
   quranPlayer: QuranPlayer;
   azanSound: AzanSound;
@@ -61,6 +67,10 @@ export const createDependencies = (): AppDependencies => {
     prayerWidget: new NativePrayerWidget(),
     azanAlarms: new NativeAzanAlarms(),
     reminderAlarms: new NativeReminderAlarms(),
+    speechModel: new OnnxSpeechModel(),
+    microphone: new AndroidMicrophone(),
+    recitation: new CtcRecitationRecognizer(),
+    wordAudio: new QuranCdnWordAudio(),
     location: new ExpoLocationProvider(),
     quranPlayer: audio,
     azanSound: audio,
