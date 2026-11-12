@@ -183,8 +183,8 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
           <TouchableOpacity onPress={() => navigation.navigate('TabHome')} style={s.iconBtn}>
             <Home size={21} color={colors.gold} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setShowBookmarks(true)} style={s.iconBtn}>
-            <Bookmark size={21} color={colors.gold} fill={bookmarkedPages.length > 0 ? colors.gold : 'none'} />
+          <TouchableOpacity onPress={() => setShowBookmarks(true)} style={s.iconBtn} accessibilityLabel="المحفوظات">
+            <Bookmark size={21} color={colors.gold} fill={bookmarkedPages.length + bookmarks.length > 0 ? colors.gold : 'none'} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('الإعدادات')} style={s.iconBtn}>
             <Settings size={21} color={colors.gold} />
@@ -360,7 +360,12 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
       <BookmarksModal
         visible={showBookmarks}
         onClose={() => setShowBookmarks(false)}
+        bookmarkedAyahs={bookmarks}
         bookmarkedPages={bookmarkedPages}
+        onAyahSelect={(hit) => {
+            setShowBookmarks(false);
+            handleAyahSelect(hit);
+        }}
         onPageSelect={(p) => {
             dispatch(setCurrentPage(p));
             setShowBookmarks(false);

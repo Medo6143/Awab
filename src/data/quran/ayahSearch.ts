@@ -42,6 +42,12 @@ const load = (): Entry[] => {
 export const plainAyahs = (surah: number, from: number, to: number): string[] =>
   load().filter((e) => e.surah === surah && e.ayah >= from && e.ayah <= to).map((e) => e.text);
 
+/** One ayah by its global number (1..6236): surah, ayah, page and plain text. */
+export const ayahByNumber = (number: number): AyahHit | undefined => {
+  const e = load()[number - 1];
+  return e ? { surah: e.surah, ayah: e.ayah, page: e.page, number: e.number, text: e.text } : undefined;
+};
+
 /** Plain text of one ayah by its global number (1..6236): what voice tasmee compares with. */
 export const plainAyah = (number: number): string => load()[number - 1]?.text ?? '';
 

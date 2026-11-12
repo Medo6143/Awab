@@ -17,13 +17,14 @@ type Props = {
   completedSurahs: number[];
   progress: number;
   onToggleSurah: (id: number) => void;
+  onLongPressSurah: (id: number) => void;
 };
 
 /**
  * Full-screen, pannable 2.6× view of the heart so the 114 surah names are legible.
  * Taps still toggle the surah; a caption confirms what was tapped.
  */
-export const HeartZoomModal = ({ visible, onClose, completedSurahs, progress, onToggleSurah }: Props) => {
+export const HeartZoomModal = ({ visible, onClose, completedSurahs, progress, onToggleSurah, onLongPressSurah }: Props) => {
   const { width: W } = useWindowDimensions();
   const [frameH, setFrameH] = useState(0);
   // free zoom (× screen width): buttons step through LEVELS, a pinch lands anywhere between
@@ -80,6 +81,7 @@ export const HeartZoomModal = ({ visible, onClose, completedSurahs, progress, on
               completedSurahs={completedSurahs}
               progress={progress}
               onToggleSurah={toggle}
+              onLongPressSurah={onLongPressSurah}
             />
           ) : null}
         </View>

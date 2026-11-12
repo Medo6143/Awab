@@ -18,7 +18,7 @@ type Props = {
   completedSurahs: number[];
   progress: number;
   onToggleSurah?: (id: number) => void;
-  onZoomRequest?: () => void;
+  onLongPressSurah?: (id: number) => void;
   /** Breathing room around the heart when it is larger than the frame. */
   margin?: number;
 };
@@ -40,7 +40,7 @@ const distance = (t: NativeTouchEvent[]) => Math.hypot(t[0].pageX - t[1].pageX, 
  */
 export const ZoomableHeart = ({
   frameW, frameH, size, minSize, maxSize, onSizeChange,
-  pulseAnim, completedSurahs, progress, onToggleSurah, onZoomRequest, margin = 24,
+  pulseAnim, completedSurahs, progress, onToggleSurah, onLongPressSurah, margin = 24,
 }: Props) => {
   const heartH = (size * HEART_VB_H) / HEART_VB_W;
   const contentW = Math.max(frameW, size + margin);
@@ -156,7 +156,7 @@ export const ZoomableHeart = ({
               progress={progress}
               size={size}
               onToggleSurah={onToggleSurah}
-              onZoomRequest={onZoomRequest}
+              onLongPressSurah={onLongPressSurah}
             />
           </ScrollView>
         </ScrollView>
