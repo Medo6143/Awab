@@ -8,6 +8,8 @@ export type AsrMethod = 'auto' | 'shafii' | 'hanafi';
 export type ShareCardStyle = 'classic' | 'gold' | 'paper' | 'night' | 'mihrab';
 /** 'system' follows the phone's dark/light setting. */
 export type ThemeMode = 'light' | 'dark' | 'system';
+/** Look of the mushaf page (see components/quran/mushafThemes.ts). */
+export type MushafThemeId = 'classic' | 'madani' | 'night' | 'green' | 'simple';
 /** Largest size the ayah/dua text may take on the share image. */
 export type ShareTextSize = 'small' | 'medium' | 'large';
 
@@ -27,6 +29,7 @@ interface SettingsState {
   azanSettings: AzanSettings;
   shareCardStyle: ShareCardStyle;
   shareTextSize: ShareTextSize;
+  mushafTheme: MushafThemeId;
   tasbeehHaptics: boolean;     // a light buzz on every count
   asrMethod: AsrMethod;
   tasbeehTargetAlert: boolean; // a stronger buzz when the target is reached
@@ -49,6 +52,7 @@ const initialState: SettingsState = {
   },
   shareCardStyle: 'gold',
   shareTextSize: 'medium',
+  mushafTheme: 'classic',
   tasbeehHaptics: true,
   asrMethod: 'auto',
   tasbeehTargetAlert: true,
@@ -84,6 +88,9 @@ export const settingsSlice = createSlice({
     },
     setShareTextSize: (state, action: PayloadAction<ShareTextSize>) => {
       state.shareTextSize = action.payload;
+    },
+    setMushafTheme: (state, action: PayloadAction<MushafThemeId>) => {
+      state.mushafTheme = action.payload;
     },
     // `?? true`: state persisted before these settings existed lacks the keys
     toggleTasbeehHaptics: (state) => {
@@ -145,6 +152,7 @@ export const {
   setShareCardStyle,
   setAsrMethod,
   setShareTextSize,
+  setMushafTheme,
   toggleTasbeehHaptics,
   toggleTasbeehTargetAlert, 
   setTafsirFontSize,

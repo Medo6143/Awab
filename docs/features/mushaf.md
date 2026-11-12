@@ -43,7 +43,8 @@ Top bar (six icon-only buttons, no text labels; only the mic has an `accessibili
 |---|---|---|
 | Screen | `src/presentation/screens/QuranScreen.tsx` | Top bar, pager, footer, wiring of all modals |
 | Component | `src/presentation/components/quran/MushafPageContent.tsx` | One page: header, bookmark toggle, flowing ayah text |
-| Component | `src/presentation/components/quran/MushafOrnaments.tsx` | `GeometricFrame`, `StarBadge` (page number) |
+| Component | `src/presentation/components/quran/MushafOrnaments.tsx` | `GeometricFrame`, `MushafFrame` and `SurahHeader` (per design), `StarBadge` (page number) |
+| Designs | `src/presentation/components/quran/mushafThemes.ts`, `src/presentation/components/settings/MushafThemeSelector.tsx` | The five page designs and their picker |
 | Component | `src/presentation/components/quran/SurahPickerModal.tsx` | Index modal with the four tabs |
 | Component | `src/presentation/components/quran/AyahSearchPanel.tsx` | Ayah search box and results |
 | Component | `src/presentation/components/quran/BookmarksModal.tsx` | List of bookmarked pages |
@@ -91,9 +92,22 @@ Not persisted: page text and tafsir (memory only; lost when the app is killed), 
 | Tafsir source (`selectedTafsirId`) | Settings screen and the tafsir sheet | 91 السعدي, 14 ابن كثير, 15 الطبري, 90 القرطبي, 16 الميسر |
 | Tafsir style (`tafsirStyle`) | Same | `simple` always loads tafsir 16 (Muyassar) whatever the source; `book`; `modern` |
 | Tafsir font size (`tafsirFontSize`) | Same | Sheet buttons step by 2, clamped 12–32 |
-| Theme (light/dark) | Settings | Screen chrome follows the theme; the paper page keeps its fixed colours |
+| Page design (`mushafTheme`) | Settings → المصحف والتفسير → «شكل صفحة المصحف» | `classic` (default), `madani`, `night`, `green`, `simple`; see below |
+| Theme (light/dark) | Settings | Screen chrome follows the theme; the page keeps its design's colours (`night` is the dark page) |
 
-The mushaf text size is not a setting: `textFlow` in `QuranStyles.ts` is fixed at `fontSize: 23`, `lineHeight: 64`, font `Amiri_700Bold`.
+**Page designs** (`src/presentation/components/quran/mushafThemes.ts`, colours in `MUSHAF_PALETTES` in `tokens.ts`). Each sets the paper and ink, the frame (`MushafFrame`), the surah header (`SurahHeader`), the font and the alignment:
+
+| Design | Frame | Surah header | Font, alignment | Other |
+|---|---|---|---|---|
+| الكلاسيكي | Geometric (rules and eight-point stars) | Ruled band | Amiri Bold, centred | The original look |
+| المدني | Wide band between two rules, diamond corners | Cartouche: name, «ترتيبها» and «آياتها» | Amiri Quran, justified | The name of Allah and «الرحمن» in red (`isDivineName` in `src/domain/services/mushafText.ts`) |
+| الليلي | Geometric, gold | Ruled band | Amiri Bold, centred | Dark page, cream text |
+| الأخضر | Double rule | Filled green cartouche | Amiri Quran, centred | Green-tinted paper |
+| البسيط | None | Name only | Amiri Bold, centred | White page |
+
+The red colouring covers the forms of «الله» (لله، بالله، والله، تالله، اللهم، ءآلله) and «الرحمن» only; «رب» and pronouns are left alone because they do not always refer to Allah. The Madinah print's own font (King Fahd Complex) was not available to download, so Amiri Quran (Google Fonts, OFL) stands in.
+
+The mushaf text size is not a setting: each design fixes it (`fontSize: 23`, `lineHeight` 60–64).
 
 ## Edge cases and limitations
 
@@ -110,5 +124,4 @@ The mushaf text size is not a setting: `textFlow` in `QuranStyles.ts` is fixed a
 
 - #6 — Theme: selected accent color is not applied across the whole app
 - #7 — Mushaf: font size control
-- #8 — Mushaf: multiple page designs to choose from
 - #16 — Mushaf top bar: six unlabeled icons, and ayah playback is not discoverable

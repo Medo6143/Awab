@@ -13,6 +13,7 @@ import {
   Tajawal_800ExtraBold
 } from '@expo-google-fonts/tajawal';
 import { Amiri_400Regular, Amiri_700Bold } from '@expo-google-fonts/amiri';
+import { AmiriQuran_400Regular } from '@expo-google-fonts/amiri-quran';
 import * as SplashScreen from 'expo-splash-screen';
 import { AnimatedSplash } from './src/presentation/components/splash/AnimatedSplash';
 
@@ -117,6 +118,7 @@ export default function App() {
     Tajawal_800ExtraBold,
     Amiri_400Regular,
     Amiri_700Bold,
+    AmiriQuran_400Regular,
   });
 
   // Timeout safety: if fonts haven't loaded after 8 seconds, proceed anyway

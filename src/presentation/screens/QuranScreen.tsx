@@ -15,7 +15,8 @@ import { useDependencies } from '../providers/DependencyProvider';
 
 // Quran Components & Constants
 import { MushafPageContent } from '../components/quran/MushafPageContent';
-import { GeometricFrame, StarBadge } from '../components/quran/MushafOrnaments';
+import { MushafFrame, StarBadge } from '../components/quran/MushafOrnaments';
+import { useMushafTheme } from '../components/quran/mushafThemes';
 import { TafsirBottomSheet } from '../components/quran/TafsirBottomSheet';
 import { PickerTab, SurahPickerModal } from '../components/quran/SurahPickerModal';
 import { SURAH_START_PAGE } from '../../domain/entities/surahPages';
@@ -36,6 +37,7 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const currentPage = useSelector((state: RootState) => state.quran.currentPage ?? 1);
   const bookmarkedPages = useSelector((state: RootState) => state.quran.bookmarkedPages ?? []);
   const bookmarks = useSelector((state: RootState) => state.quran.bookmarks ?? []);
+  const mushafTheme = useMushafTheme();
   
   const { selectedTafsirId, tafsirStyle, tafsirFontSize } = useSelector((state: RootState) => state.settings);
 
@@ -245,8 +247,8 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
       >
         {[Math.max(1, currentPage - 1), currentPage, Math.min(TOTAL_PAGES, currentPage + 1)].map((pageNum, idx) => (
           <View key={`pager-index-${idx}`} style={{ flex: 1, padding: 8 }}>
-            <View style={s.paperCard}>
-              <GeometricFrame paper={colors.paper}>
+            <View style={[s.paperCard, { backgroundColor: mushafTheme.palette.paper }, mushafTheme.frame === 'none' && s.paperCardPlain]}>
+              <MushafFrame theme={mushafTheme}>
                 <MushafPageContent
                   pageNum={pageNum}
                   isCurrentPage={pageNum === currentPage}
@@ -258,7 +260,7 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
                   onAyahPress={getTafsir}
                   onAyahLongPress={(a: Ayah) => playAyah(a.surah.number, a.numberInSurah)}
                 />
-              </GeometricFrame>
+              </MushafFrame>
             </View>
           </View>
         ))}

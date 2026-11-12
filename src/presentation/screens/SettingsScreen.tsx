@@ -12,6 +12,7 @@ import {
   toggleNotifications, toggleLocation, setTafsirId, setTafsirStyle, setTafsirFontSize,
   setAccentTheme, setTheme, setReciterId, toggleNotificationCategory, setAzanSettings,
   setDailyWardTime, setEncouragementInterval, toggleTasbeehHaptics, setAsrMethod, toggleTasbeehTargetAlert, setPrayerMethod,
+  setMushafTheme,
 } from '../store/slices/settingsSlice';
 import { setFloatingScale, setFloatingBubbleColor, toggleFloatingBorder, toggleFloatingReset, setFloatingReminderInterval } from '../store/slices/tasbeehSlice';
 import { RECITER_MAP } from '../../domain/entities/reciters';
@@ -28,6 +29,8 @@ import {
 import { AzanReadinessCard } from '../components/settings/AzanReadinessCard';
 import { s } from '../components/settings/SettingsStyles';
 import { FloatingTasbeehToggle } from '../components/tasbeeh/FloatingTasbeeh';
+import { MushafThemeSelector } from '../components/settings/MushafThemeSelector';
+import { MUSHAF_THEMES } from '../components/quran/mushafThemes';
 
 import type { SettingsSection as Section } from '../navigation/types';
 
@@ -83,7 +86,7 @@ const useSectionHint = (id: Section) => {
   switch (id) {
     case 'prayer': return AZAN_TYPES.find((t) => t.id === azan.type)?.name ?? '';
     case 'alerts': return `${st8.notificationsEnabled ? 'الإشعارات شغالة' : 'الإشعارات متوقفة'} · ${toAr(reminders.filter((r) => r.enabled).length)} تذكير`;
-    case 'quran': return `القارئ: ${RECITER_MAP[st8.selectedReciterId]?.name ?? ''}`;
+    case 'quran': return `المصحف ${MUSHAF_THEMES[st8.mushafTheme ?? 'classic']?.name ?? ''} · القارئ: ${RECITER_MAP[st8.selectedReciterId]?.name ?? ''}`;
     case 'tasbeeh': return tasbeeh.floatingReminderInterval ? `تذكير كل ${toAr(tasbeeh.floatingReminderInterval)} دقايق` : 'الاهتزاز والهدف والعائمة';
     case 'look': return `${st8.theme === 'light' ? 'فاتح' : st8.theme === 'system' ? 'حسب الموبايل' : 'داكن'} · ${st8.accentTheme === 'emerald' ? 'زمردي' : st8.accentTheme === 'midnight' ? 'ليلي' : 'ذهبي'}`;
   }
@@ -116,7 +119,7 @@ const SectionBody = ({ section, navigation }: { section: Section; navigation: Sc
   const {
     notificationsEnabled, locationEnabled, selectedTafsirId, tafsirStyle, tafsirFontSize,
     theme, accentTheme, selectedReciterId, notificationPrefs, azanSettings: rawAzanSettings,
-    tasbeehHaptics = true, tasbeehTargetAlert = true, asrMethod = 'auto', prayerMethod = 'auto',
+    tasbeehHaptics = true, tasbeehTargetAlert = true, asrMethod = 'auto', prayerMethod = 'auto', mushafTheme = 'classic',
   } = useSelector((state: RootState) => state.settings);
   // the method today's times were actually fetched with
   const usedMethod = useSelector((state: RootState) => state.prayer.cachedData?.meta?.method?.id);
@@ -161,6 +164,7 @@ const SectionBody = ({ section, navigation }: { section: Section; navigation: Sc
     case 'quran':
       return (
         <SettingSection title="المصحف والتفسير">
+          <MushafThemeSelector value={mushafTheme} onSelect={(id) => dispatch(setMushafTheme(id))} />
           <TafsirSettings
             selectedTafsirId={selectedTafsirId} onSelectTafsir={(id: number) => dispatch(setTafsirId(id))}
             tafsirStyle={tafsirStyle} onSelectStyle={(style) => dispatch(setTafsirStyle(style))}
