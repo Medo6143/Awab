@@ -18,7 +18,8 @@ const ICONS: Record<string, IconComponent> = {
 };
 
 /**
- * Floating glass tab bar. Active tab = icon + label in an accent pill; inactive = icon only.
+ * Floating glass tab bar: five equal cells, each with its icon and label, so no tab moves
+ * when another is selected. The active one is tinted with the accent in place.
  * Real blur on Android needs `experimentalBlurMethod`; if blur is unavailable the overlay
  * alone is opaque enough (`glassOpaque`) so the bar still reads correctly.
  */
@@ -64,7 +65,13 @@ export const GlassTabBar = ({ state, descriptors, navigation }: BottomTabBarProp
                 style={[styles.item, focused && { backgroundColor: accent.accentSoft }]}
               >
                 <Icon color={focused ? accent.accentText : colors.textFaint} size={22} strokeWidth={icon.stroke} />
-                {focused ? <Text style={[styles.label, { color: accent.accentText }]} numberOfLines={1}>{label}</Text> : null}
+                <Text
+                  style={[styles.label, { color: focused ? accent.accentText : colors.textFaint }]}
+                  numberOfLines={1}
+                  maxFontSizeMultiplier={1.2}
+                >
+                  {label}
+                </Text>
               </TouchableOpacity>
             );
           })}
@@ -75,21 +82,18 @@ export const GlassTabBar = ({ state, descriptors, navigation }: BottomTabBarProp
 };
 
 const styles = StyleSheet.create({
-  wrap: { position: 'absolute', left: 0, right: 0, bottom: layout.tabBarBottom, alignItems: 'center' },
+  // the padding keeps the bar inside the screen (width 100% plus margins used to overflow it)
+  wrap: { position: 'absolute', left: 0, right: 0, bottom: layout.tabBarBottom, alignItems: 'center', paddingHorizontal: layout.screenPadding },
   bar: {
     width: '100%', maxWidth: 520,
-    marginHorizontal: layout.screenPadding,
     height: layout.tabBarHeight,
     borderRadius: radius.pill,
     overflow: 'hidden',
-    alignSelf: 'center',
-    left: 0, right: 0,
-    marginLeft: layout.screenPadding, marginRight: layout.screenPadding,
   },
-  row: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space[2] },
+  row: { flex: 1, flexDirection: 'row', alignItems: 'center', paddingHorizontal: space[2] },
   item: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space[2],
-    height: 48, paddingHorizontal: space[4], borderRadius: radius.pill,
+    flex: 1, alignItems: 'center', justifyContent: 'center',
+    height: layout.tabBarHeight - space[3], marginHorizontal: 2, borderRadius: radius.pill,
   },
-  label: { ...type.label },
+  label: { ...type.caption, marginTop: 2 },
 });
