@@ -1,11 +1,11 @@
 import { ScreenProps } from '../navigation/types';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { View, Text, ActivityIndicator, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PagerView from 'react-native-pager-view';
 import { colors } from '../../shared/theme/tokens';
 import { useDispatch, useSelector } from 'react-redux';
-import { Bookmark, BookOpen, ChevronLeft, ChevronRight, Play, Pause, Square, Settings, Home, Mic } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { useAudio } from '../hooks/useAudio';
 import { RootState } from '../store';
 import { setCurrentPage, togglePageBookmark, toggleBookmark } from '../store/slices/quranSlice';
@@ -16,6 +16,7 @@ import { useDependencies } from '../providers/DependencyProvider';
 // Quran Components & Constants
 import { MushafPageContent } from '../components/quran/MushafPageContent';
 import { MushafFrame, StarBadge } from '../components/quran/MushafOrnaments';
+import { MushafHint, MushafMoreSheet, MushafToolbar } from '../components/quran/MushafToolbar';
 import { useMushafTheme } from '../components/quran/mushafThemes';
 import { TafsirBottomSheet } from '../components/quran/TafsirBottomSheet';
 import { PickerTab, SurahPickerModal } from '../components/quran/SurahPickerModal';
@@ -48,6 +49,7 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
   const { quran } = useDependencies();
   const [showSurahPicker, setShowSurahPicker] = useState(false);
   const [showBookmarks, setShowBookmarks] = useState(false);
+  const [showMore, setShowMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [highlightedAyah, setHighlightedAyah] = useState<number | null>(null);
   /** The searched ayah, scrolled into view on its page. */
@@ -177,61 +179,39 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
-      {/* Top Navigation Bar */}
-      <View style={s.topBar}>
-        <View style={s.topActions}>
-          <TouchableOpacity onPress={() => navigation.navigate('TabHome')} style={s.iconBtn}>
-            <Home size={21} color={colors.gold} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setShowBookmarks(true)} style={s.iconBtn} accessibilityLabel="المحفوظات">
-            <Bookmark size={21} color={colors.gold} fill={bookmarkedPages.length + bookmarks.length > 0 ? colors.gold : 'none'} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('الإعدادات')} style={s.iconBtn}>
-            <Settings size={21} color={colors.gold} />
-          </TouchableOpacity>
-        </View>
-        <Text style={s.topTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>المصحف الشريف</Text>
-        <View style={s.topActions}>
-          <TouchableOpacity 
-            onPress={async () => {
-              if (isPlaying || isBuffering) {
-                // a whole surah pauses (it resumes from the index or the notification);
-                // an ayah or the page stops, and a tap while it is still loading cancels it
-                if (playMode === 'surah' && isPlaying) await togglePlayback();
-                else await stopPlayback();
-              } else {
-                const itemsToPlay = quran.peekPage(currentPage)?.map(a => ({
-                  surahId: a.surah.number,
-                  ayahNumber: a.numberInSurah
-                })) ?? [];
-                if (itemsToPlay.length > 0) {
-                  const sName = itemsToPlay[0].surahId ? surahsList.find(s => s.number === itemsToPlay[0].surahId)?.name : '';
-                  await playSequence(itemsToPlay, sName ? `صفحة ${currentPage} - ${sName}` : `صفحة ${currentPage}`);
-                }
-              }
-            }} 
-            style={s.iconBtn}
-            accessibilityRole="button"
-            accessibilityLabel={isPlaying || isBuffering ? 'إيقاف التلاوة' : 'تشغيل الصفحة'}
-          >
-            {isBuffering ? (
-              <ActivityIndicator size="small" color={colors.gold} />
-            ) : isPlaying && playMode !== 'surah' ? (
-              <Square size={19} color={colors.gold} fill={colors.gold} />
-            ) : isPlaying ? (
-              <Pause size={21} color={colors.gold} fill={colors.gold} />
-            ) : (
-              <Play size={21} color={colors.gold} fill={colors.gold} />
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity onPress={openTasmeeForPage} style={s.iconBtn} accessibilityRole="button" accessibilityLabel="تسميع الصفحة">
-            <Mic size={21} color={colors.gold} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setShowSurahPicker(true)} style={s.iconBtn}>
-            <BookOpen size={21} color={colors.gold} />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <MushafToolbar
+        play={isBuffering ? 'loading' : isPlaying ? (playMode === 'surah' ? 'playing-surah' : 'playing') : 'idle'}
+        hasSaved={bookmarkedPages.length + bookmarks.length > 0}
+        onHome={() => navigation.navigate('TabHome')}
+        onIndex={() => setShowSurahPicker(true)}
+        onPlay={async () => {
+          if (isPlaying || isBuffering) {
+            // a whole surah pauses (it resumes from the index or the notification);
+            // an ayah or the page stops, and a tap while it is still loading cancels it
+            if (playMode === 'surah' && isPlaying) await togglePlayback();
+            else await stopPlayback();
+          } else {
+            const itemsToPlay = quran.peekPage(currentPage)?.map(a => ({
+              surahId: a.surah.number,
+              ayahNumber: a.numberInSurah
+            })) ?? [];
+            if (itemsToPlay.length > 0) {
+              const sName = itemsToPlay[0].surahId ? surahsList.find(s => s.number === itemsToPlay[0].surahId)?.name : '';
+              await playSequence(itemsToPlay, sName ? `صفحة ${currentPage} - ${sName}` : `صفحة ${currentPage}`);
+            }
+          }
+        }}
+        onTasmee={openTasmeeForPage}
+        onSaved={() => setShowBookmarks(true)}
+        onMore={() => setShowMore(true)}
+      />
+      <MushafHint />
+      <MushafMoreSheet
+        visible={showMore}
+        onClose={() => setShowMore(false)}
+        onKhatmat={() => { setShowMore(false); navigation.navigate('الختمات'); }}
+        onSettings={() => { setShowMore(false); navigation.navigate('الإعدادات', { section: 'quran' }); }}
+      />
 
       {/* Mushaf Pager View */}
       <PagerView

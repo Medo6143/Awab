@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BookOpenText, Check } from 'lucide-react-native';
-import { colors, icon, radius, space, type } from '../../../shared/theme/tokens';
+import { colors, icon, radius, space, themed, type } from '../../../shared/theme/tokens';
 import { useAccent } from '../../../shared/theme/useAccent';
 import { toAr } from '../../../shared/utils/format';
 import { MUSHAF_THEME_LIST, MushafTheme, MushafThemeId } from '../quran/mushafThemes';
@@ -69,7 +69,8 @@ export const MushafThemeSelector = ({ value, onSelect }: { value: MushafThemeId;
   );
 };
 
-const st = StyleSheet.create({
+// themed: colours are read when the sheet is built, once per app theme
+const st = themed(() => ({
   label: { flexDirection: 'row', alignItems: 'center', gap: space[2], marginBottom: space[3] },
   labelText: { ...type.label, color: colors.textMuted },
   // per-item margins, not gap: a wrapped/scrolling RTL row
@@ -81,4 +82,4 @@ const st = StyleSheet.create({
   text: { fontSize: 10, lineHeight: 22, textAlign: 'center' },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: space[2] },
   name: { ...type.caption, color: colors.textMuted },
-});
+}));
