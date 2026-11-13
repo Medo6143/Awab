@@ -47,6 +47,8 @@ final class AyahVideoEncoder {
     }
 
     private static final int FPS = 24;
+    /** Camera move on the clip: the zoom swings 1 ↔ ZOOM_MAX and back every ZOOM_PERIOD_S, with a slow drift. */
+    private static final float ZOOM_MAX = 1.18f, ZOOM_PERIOD_S = 14f, PAN_X_PERIOD_S = 19f, PAN_Y_PERIOD_S = 23f;
     private static final float BG_FADE_S = 0.5f, OVERLAY_FADE_S = 0.8f, PAGE_FADE_S = 0.5f;
     /** The last words stay on screen this long after the recitation ends. */
     private static final long HOLD_US = 900_000L;
@@ -378,9 +380,14 @@ final class AyahVideoEncoder {
                 float t = ptsUs / 1e6f;
 
                 renderer.begin();
-                // the clip, looped, fading in from black; the shade darkens it so the text reads
+                // the clip, looped, fading in from black and zooming slowly in and out with a drift;
+                // the shade darkens it so the text reads
                 clip.advanceTo(ptsUs);
-                renderer.drawVideo(clip, clip.aspect, clamp01(t / BG_FADE_S));
+                float swing = 0.5f - 0.5f * (float) Math.cos(2 * Math.PI * t / ZOOM_PERIOD_S);
+                float zoom = 1f + (ZOOM_MAX - 1f) * swing;
+                float panX = 0.8f * (float) Math.sin(2 * Math.PI * t / PAN_X_PERIOD_S);
+                float panY = 0.8f * (float) Math.sin(2 * Math.PI * t / PAN_Y_PERIOD_S);
+                renderer.drawVideo(clip, clip.aspect, clamp01(t / BG_FADE_S), zoom, panX, panY);
                 renderer.drawFull(shadeTex, 1f);
                 renderer.drawFull(overlayTex, clamp01(t / OVERLAY_FADE_S));
 

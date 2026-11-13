@@ -160,15 +160,21 @@ final class FrameRenderer {
 
     /**
      * Draws the clip's current frame over the whole frame, cropped to fill it (cover), at
-     * `alpha`. `videoAspect` is the clip's width / height.
+     * `alpha`. `videoAspect` is the clip's width / height. `zoom` (≥ 1) shows a smaller part of
+     * it, moved by `panX`/`panY` (-1..1 of the room the zoom leaves), for a camera move.
      */
-    void drawVideo(BackgroundVideo video, float videoAspect, float alpha) {
+    void drawVideo(BackgroundVideo video, float videoAspect, float alpha, float zoom, float panX, float panY) {
         if (alpha <= 0f) return;
         // crop the clip's texture coordinates so it covers the 9:16 frame without stretching
         float frameAspect = FRAME_W / FRAME_H;
         float s0 = 0f, s1 = 1f, t0 = 0f, t1 = 1f;
         if (videoAspect > frameAspect) { float keep = frameAspect / videoAspect; s0 = (1 - keep) / 2; s1 = 1 - s0; }
         else if (videoAspect < frameAspect) { float keep = videoAspect / frameAspect; t0 = (1 - keep) / 2; t1 = 1 - t0; }
+        if (zoom > 1f) {
+            float sw = (s1 - s0) / zoom, tw = (t1 - t0) / zoom;
+            float sc = (s0 + s1) / 2 + panX * ((s1 - s0) - sw) / 2, tc = (t0 + t1) / 2 + panY * ((t1 - t0) - tw) / 2;
+            s0 = sc - sw / 2; s1 = sc + sw / 2; t0 = tc - tw / 2; t1 = tc + tw / 2;
+        }
         // video textures have t = 0 at the bottom (the transform handles the rest)
         float[] v = verts;
         v[0] = -1f; v[1] = -1f; v[2] = s0; v[3] = t0;

@@ -122,7 +122,8 @@ const st = StyleSheet.create({
   abs: { position: 'absolute' },
   hidden: { opacity: 0 },
   dim: { backgroundColor: 'rgba(0,0,0,0.32)' },
-  brand: { position: 'absolute', left: 0, right: 0, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
+  // explicit RTL: logo first (on the right), then the name; the preview wrapper is LTR
+  brand: { position: 'absolute', left: 0, right: 0, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', direction: 'rtl' },
   brandName: { fontFamily: 'Tajawal_800ExtraBold', color: '#ffffff', ...SHADOW },
   center: { position: 'absolute', left: 0, right: 0, alignItems: 'center' },
   chip: { borderRadius: 999, borderWidth: 1, borderColor: 'rgba(255,255,255,0.55)', backgroundColor: 'rgba(0,0,0,0.25)' },
