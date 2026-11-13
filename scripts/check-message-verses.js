@@ -1,12 +1,13 @@
 #!/usr/bin/env node
-// Checks every extra verse of "رسائل من القرآن" exists and holds its key words (plain mushaf text).
+// Checks every verse reference of "رسائل من القرآن" and «الابتلاءات» exists and holds its key words (plain mushaf text).
 const fs = require('fs');
 const path = require('path');
 const root = path.join(__dirname, '..');
 const plain = JSON.parse(/QURAN_PLAIN_TEXT = (".*?");/s.exec(fs.readFileSync(path.join(root, 'src/data/quran/quranPlainText.ts'), 'utf8'))[1]);
 const ayah = new Map(plain.split('\n').map((l) => { const [s, a, , t] = l.split('|'); return [`${s}:${a}`, t]; }));
 const norm = (t) => t.replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').replace(/\s+/g, ' ');
-const src = fs.readFileSync(path.join(root, 'src/domain/entities/quranMessageVerses.ts'), 'utf8');
+const src = ['src/domain/entities/quranMessageVerses.ts', 'src/domain/entities/trials.ts']
+  .map((f) => fs.readFileSync(path.join(root, f), 'utf8')).join('\n');
 let bad = 0, n = 0;
 for (const m of src.matchAll(/v\((\d+), (\d+), '([^']+)'(?:, (\d+))?\)/g)) {
   const [, s, from, key, to = from] = m;

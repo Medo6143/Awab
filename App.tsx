@@ -17,6 +17,7 @@ import { Amiri_700Bold } from '@expo-google-fonts/amiri/700Bold';
 import { AmiriQuran_400Regular } from '@expo-google-fonts/amiri-quran/400Regular';
 import * as SplashScreen from 'expo-splash-screen';
 import { AnimatedSplash } from './src/presentation/components/splash/AnimatedSplash';
+import { OnboardingGate } from './src/presentation/components/onboarding/OnboardingGate';
 
 
 // Keep the splash screen visible while we fetch resources
@@ -204,10 +205,13 @@ export default function App() {
             <Bootstrapper>
               <QueryClientProvider client={queryClient}>
                 <ThemeRoot>
-                  <AppNavigation />
+                  <OnboardingGate>
+                    <AppNavigation />
+                  </OnboardingGate>
+                  {/* inside ThemeRoot so it is drawn in the app's light or dark theme */}
+                  {showSplash ? <AnimatedSplash onDone={() => setShowSplash(false)} /> : null}
                 </ThemeRoot>
               </QueryClientProvider>
-              {showSplash ? <AnimatedSplash onDone={() => setShowSplash(false)} /> : null}
             </Bootstrapper>
           </PersistGate>
         </Provider>

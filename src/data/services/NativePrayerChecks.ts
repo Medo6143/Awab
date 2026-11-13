@@ -24,6 +24,10 @@ export class NativePrayerChecks implements PrayerChecks {
     try { await this.mod?.cancelAll?.(); } catch {}
   }
 
+  setLook(mode: 'light' | 'dark' | 'system') {
+    try { this.mod?.setLook?.(mode); } catch {}
+  }
+
   setDoneToday(prayerIds: PrayerId[]) {
     try { this.mod?.setDoneToday?.(prayerIds); } catch {}
   }
@@ -37,7 +41,7 @@ export class NativePrayerChecks implements PrayerChecks {
     }
   }
 
-  async preview(item: Pick<PrayerCheckItem, 'title' | 'body' | 'prayedLabel' | 'laterLabel'>) {
+  async preview(item: Pick<PrayerCheckItem, 'kicker' | 'title' | 'body' | 'prayedLabel' | 'laterLabel'>) {
     try { return !!(await this.mod?.preview?.(JSON.stringify(item))); } catch { return false; }
   }
 

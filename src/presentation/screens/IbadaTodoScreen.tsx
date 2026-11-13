@@ -8,6 +8,7 @@ import { syncIbadaDailyReset, addCustomTask, removeCustomTask, IbadaTask } from 
 import { Screen, ScreenHeader, SectionTitle, IconButton } from '../components/ui';
 import { DeedChips, IbadaRings, PrayerSquares, TaskRow } from '../components/ibada/IbadaComponents';
 import { InputModal } from '../components/tasbeeh/TasbeehModals';
+import { QadaCard } from '../components/qada/QadaCard';
 import { prayerNotYet, useToggleIbada } from '../hooks/useToggleIbada';
 import { usePrayerTimes } from '../hooks/usePrayerTimes';
 import { colors, icon } from '../../shared/theme/tokens';
@@ -75,6 +76,9 @@ const IbadaTodoScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
 
       <SectionTitle title="الفرائض" />
       <PrayerSquares tasks={obligatory} isLocked={(t) => !t.isCompleted && !!prayerNotYet(t.id, timings as unknown as Record<string, string>)} nextId={nextPrayer ? PRAYER_IDS[nextPrayer.name] : undefined} onToggle={onToggle} />
+
+      <SectionTitle title="القضاء" />
+      <QadaCard />
 
       <SectionTitle title="السنن والنوافل" action={{ label: 'ذكّرني بيها', onPress: () => navigation.navigate('التذكيرات') }} />
       {sunnah.map((t) => <TaskRow key={t.id} task={t} onToggle={() => onToggle(t)} />)}

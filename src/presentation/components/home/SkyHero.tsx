@@ -65,20 +65,26 @@ const Stars = ({ width, top, dim }: { width: number; top: number; dim: boolean }
   );
 };
 
-const ARC_PRAYERS = [
+type ArcKey = 'Fajr' | 'Dhuhr' | 'Asr' | 'Maghrib' | 'Isha';
+
+/** The sun's arc runs fajr → maghrib; the moon's, after the flip at sunset, maghrib → fajr. */
+const DAY_PRAYERS: { key: ArcKey; ar: string }[] = [
   { key: 'Fajr', ar: 'الفجر' },
   { key: 'Dhuhr', ar: 'الظهر' },
   { key: 'Asr', ar: 'العصر' },
   { key: 'Maghrib', ar: 'المغرب' },
+];
+const NIGHT_PRAYERS: { key: ArcKey; ar: string }[] = [
   { key: 'Isha', ar: 'العشاء' },
-] as const;
+  { key: 'Fajr', ar: 'الفجر' },
+];
 
 const minutesOf = (t?: string) => {
   const c = parseClock(t);
   return c ? c.hours * 60 + c.minutes : null;
 };
 
-/** Point on the quadratic arc for t in [0,1]; t=0 is Fajr on the right (east), t=1 Isha on the left. */
+/** Point on the quadratic arc for t in [0,1]; t=0 is the east end on the right, t=1 the west end on the left. */
 const arcPoint = (t: number, w: number, base: number, peak: number, pad: number) => {
   const p0 = { x: w - pad, y: base };
   const p1 = { x: w / 2, y: peak };
@@ -137,9 +143,10 @@ export const SkyBackdrop = ({ phase, title, subtitle, actions, children }: {
 };
 
 /**
- * Home hero: a sky whose colour follows the time of day, the five prayers on the sun's
- * arc (done ones filled, the next one lit), the sun (or moon at night) at the current
- * moment, and the countdown to the next prayer.
+ * Home hero: a sky whose colour follows the time of day and an arc with the prayers on it
+ * (done ones filled, the next one lit). By day the sun travels fajr → dhuhr → asr → maghrib;
+ * at sunset the arc turns over and the moon travels from maghrib past isha to fajr, where it
+ * turns back to day. Under it, the countdown to the next prayer.
  */
 export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loading, onPressPrayer, actions, showTimes }: Props) => {
   const { width } = useWindowDimensions();
@@ -152,6 +159,19 @@ export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loadin
   const phase: Phase = phaseAt(now, timings);
   const night = phase === 'night';
 
+  // at maghrib and at fajr the arc turns over like a page: half a turn out, the other sky in
+  const [shownNight, setShownNight] = useState(night);
+  const flip = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (night === shownNight) return;
+    Animated.timing(flip, { toValue: 1, duration: 260, useNativeDriver: true }).start(() => {
+      setShownNight(night);
+      flip.setValue(-1);
+      Animated.timing(flip, { toValue: 0, duration: 320, useNativeDriver: true }).start();
+    });
+  }, [night, shownNight, flip]);
+  const turn = flip.interpolate({ inputRange: [-1, 0, 1], outputRange: ['-90deg', '0deg', '90deg'] });
+
   const W = width;
   const H = 150;
   const base = 128;
@@ -160,23 +180,29 @@ export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loadin
 
   const arc = useMemo(() => {
     const fajr = minutesOf(timings?.Fajr);
-    const isha = minutesOf(timings?.Isha);
-    if (fajr == null || isha == null || isha <= fajr) return null;
-    const tOf = (m: number) => Math.max(0, Math.min(1, (m - fajr) / (isha - fajr)));
-    const points = ARC_PRAYERS.map((p) => {
-      const m = minutesOf(timings?.[p.key]);
-      return { ...p, ...(m == null ? arcPoint(0, W, base, peak, pad) : arcPoint(tOf(m), W, base, peak, pad)) };
-    });
+    const maghrib = minutesOf(timings?.Maghrib);
+    if (fajr == null || maghrib == null || maghrib <= fajr) return null;
     const nowM = now.getHours() * 60 + now.getMinutes();
-    // the sun travels fajr -> maghrib; at night the moon carries on from maghrib to isha and rests there until fajr
-    const maghrib = minutesOf(timings?.Maghrib) ?? isha;
-    const body = nowM >= fajr && nowM < maghrib
-      ? arcPoint(tOf(nowM), W, base, peak, pad)
-      : arcPoint(nowM >= maghrib ? tOf(nowM) : 1, W, base, peak, pad);
-    const sr = minutesOf(timings?.Sunrise);
-    const sunrise = sr == null ? null : arcPoint(tOf(sr), W, base, peak, pad);
-    return { points, body, sunrise };
-  }, [timings, now, W]);
+    const at = (t: number) => arcPoint(Math.max(0, Math.min(1, t)), W, base, peak, pad);
+    if (!shownNight) {
+      // day: the sun from fajr (east) to maghrib (west)
+      const tOf = (m: number) => (m - fajr) / (maghrib - fajr);
+      const points = DAY_PRAYERS.map((p) => {
+        const m = minutesOf(timings?.[p.key]);
+        return { ...p, ...at(m == null ? 0 : tOf(m)) };
+      });
+      const sr = minutesOf(timings?.Sunrise);
+      return { points, body: at(tOf(nowM)), sunrise: sr == null ? null : at(tOf(sr)) };
+    }
+    // night: the moon from maghrib (east) over midnight to fajr (west)
+    const span = fajr + 1440 - maghrib;
+    const tOf = (m: number) => ((m - maghrib + 1440) % 1440) / span;
+    const points = NIGHT_PRAYERS.map((p) => {
+      const m = minutesOf(timings?.[p.key]);
+      return { ...p, ...at(p.key === 'Fajr' ? 1 : m == null ? 0 : tOf(m)) };
+    });
+    return { points, body: at(tOf(nowM)), sunrise: null };
+  }, [timings, now, W, shownNight]);
 
   const hours = next ? Math.floor(next.remaining / 60) : 0;
   const mins = next ? next.remaining % 60 : 0;
@@ -187,12 +213,12 @@ export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loadin
 
       <Pressable onPress={onPressPrayer} disabled={!onPressPrayer} accessibilityRole="button" accessibilityLabel={next ? `الصلاة القادمة ${next.arName}` : 'مواقيت الصلاة'}>
         {/* direction ltr: the arc is drawn in absolute coordinates (Fajr east on the right) */}
-        <View style={{ direction: 'ltr' }}>
+        <Animated.View style={{ direction: 'ltr', transform: [{ perspective: 900 }, { rotateX: turn }] }}>
           <Svg width={W} height={H}>
             <Defs>
               <RadialGradient id="glow" cx="50%" cy="50%" r="50%">
-                <Stop offset="0" stopColor={night ? '#dfe6ff' : '#ffd27a'} stopOpacity={0.55} />
-                <Stop offset="1" stopColor={night ? '#dfe6ff' : '#ffd27a'} stopOpacity={0} />
+                <Stop offset="0" stopColor={shownNight ? '#dfe6ff' : '#ffd27a'} stopOpacity={0.55} />
+                <Stop offset="1" stopColor={shownNight ? '#dfe6ff' : '#ffd27a'} stopOpacity={0} />
               </RadialGradient>
             </Defs>
             <Path d={`M${W - pad} ${base} Q${W / 2} ${peak} ${pad} ${base}`} fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth={1.2} strokeDasharray="3 6" />
@@ -206,13 +232,13 @@ export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loadin
               );
             })}
             {showTimes && arc?.sunrise ? <Circle cx={arc.sunrise.x} cy={arc.sunrise.y} r={3} fill="#fff" opacity={0.5} /> : null}
-            {arc && !night ? (
+            {arc && !shownNight ? (
               <>
                 <Circle cx={arc.body.x} cy={arc.body.y} r={22} fill="url(#glow)" />
                 <Circle cx={arc.body.x} cy={arc.body.y} r={9} fill="#ffd27a" />
               </>
             ) : null}
-            {arc && night ? (
+            {arc && shownNight ? (
               <>
                 <Circle cx={arc.body.x} cy={arc.body.y} r={26} fill="url(#glow)" />
                 {/* crescent: a lit disc with a sky-coloured disc over its edge */}
@@ -220,7 +246,7 @@ export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loadin
                 <Circle cx={arc.body.x + 5} cy={arc.body.y - 3} r={9.5} fill={SKY.night[1]} />
               </>
             ) : null}
-            {!arc && night ? (
+            {!arc && shownNight ? (
               <Path d={`M${W * 0.25} 26 a14 14 0 1 0 11 22 a11 11 0 1 1 -11 -22z`} fill="#e8eeff" opacity={0.9} />
             ) : null}
           </Svg>
@@ -238,7 +264,7 @@ export const SkyHero = ({ greeting, dateLine, timings, next, donePrayers, loadin
               </Text>
             );
           })}
-        </View>
+        </Animated.View>
 
         <View style={st.count}>
           <Text style={st.countLabel}>{next ? `باقي على ${next.arName}` : loading ? 'جارٍ تحميل المواقيت…' : 'مواقيت الصلاة'}</Text>

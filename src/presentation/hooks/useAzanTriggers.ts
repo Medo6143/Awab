@@ -46,9 +46,13 @@ export const useAzanTriggers = () => {
         const prayer = prayerFromNotification(last.content.title, last.content.data);
         if (prayer) raiseAzan(prayer);
       } else if (!last && timings) {
-        // a full-screen-intent launch often carries no response: fall back to the clock
+        // a full-screen-intent launch often carries no response: fall back to the clock, but
+        // only while the adhan is still playing, so opening the app after it was stopped does not
+        // bring the screen back
         const justStarted = prayerJustStarted(timings, new Date());
-        if (justStarted) raiseAzan(PRAYER_AR_NAMES[justStarted]);
+        if (justStarted && (await azanAlarms.playbackPosition()) != null && isMounted) {
+          raiseAzan(PRAYER_AR_NAMES[justStarted]);
+        }
       }
     })();
 

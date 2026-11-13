@@ -1,4 +1,5 @@
 import { ClockTime, parseClock, PRAYER_IDS, PrayerId } from './notifications';
+import { clock12 } from '../../shared/utils/format';
 
 /**
  * «صليت؟»: a question some minutes after each adhan, answered from the notification.
@@ -48,20 +49,21 @@ export const prayerCheckTimes = (timings: Partial<Record<string, string>>, delay
     const end = endKey ? parseClock(timings[endKey]) : null;
     const limit = end ? toMinutes(end) : 24 * 60;
     if (at >= limit) return [];
-    return [{ prayerId: id, at: { hours: Math.floor(at / 60), minutes: at % 60 } as ClockTime }];
+    return [{ prayerId: id, adhan: start, at: { hours: Math.floor(at / 60), minutes: at % 60 } as ClockTime }];
   });
-
-/** How long ago the adhan was, in the words the notification uses. */
-const AGO: Record<number, string> = { 15: 'من ربع ساعة', 30: 'من نص ساعة', 45: 'من ساعة إلا ربع' };
-const agoText = (delay: number) => AGO[delay] ?? `من ${delay} دقيقة`;
 
 /** «ل» + «الظهر» is «للظهر». */
 const forPrayer = (name: string) => (name.startsWith('ال') ? `لل${name.slice(2)}` : `ل${name}`);
 
-/** The notification's words for one prayer (Egyptian Arabic, gentle, no guilt). */
-export const prayerCheckCopy = (prayerName: string, delayMinutes: number) => ({
+/**
+ * The question's words for one prayer (Egyptian Arabic, gentle, no guilt). `adhan` is the
+ * adhan's time; the card names it rather than «من نص ساعة», which goes stale when the phone
+ * was locked and the card waits for the user to come back.
+ */
+export const prayerCheckCopy = (prayerName: string, adhan?: ClockTime) => ({
+  kicker: adhan ? `صلاة ${prayerName} · الأذان ${clock12(adhan.hours, adhan.minutes)}` : `صلاة ${prayerName}`,
   title: `صليت ${prayerName}؟`,
-  body: `الأذان كان ${agoText(delayMinutes)}`,
+  body: '«أرِحنا بها يا بلال»',
   followUpTitle: `لسه فيه وقت ${forPrayer(prayerName)}`,
   followUpBody: 'ربنا يعينك، قوم صلّي وتعالى علّمها',
   prayedLabel: 'صليت',

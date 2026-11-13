@@ -16,10 +16,10 @@ export class PrayerCheckScheduler implements ReminderScheduler {
   async schedule({ timings, prayerCheck }: ScheduleContext) {
     const settings = { ...DEFAULT_PRAYER_CHECK, ...prayerCheck };
     if (!settings.enabled || isExcused(settings, Date.now())) return;
-    const items = prayerCheckTimes(timings as Partial<Record<string, string>>, settings.delayMinutes).map(({ prayerId, at }) => ({
+    const items = prayerCheckTimes(timings as Partial<Record<string, string>>, settings.delayMinutes).map(({ prayerId, at, adhan }) => ({
       prayerId,
       at,
-      ...prayerCheckCopy(PRAYER_AR_NAMES[prayerId], settings.delayMinutes),
+      ...prayerCheckCopy(PRAYER_AR_NAMES[prayerId], adhan),
     }));
     await this.checks.schedule(items);
   }

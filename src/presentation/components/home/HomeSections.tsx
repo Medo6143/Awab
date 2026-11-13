@@ -1,7 +1,7 @@
 import { PlainRoute } from '../../navigation/types';
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { AlarmClock, Headphones, Radio } from 'lucide-react-native';
+import { AlarmClock, Headphones, Radio, CloudSun } from 'lucide-react-native';
 import {
   DuaHandsIcon, HadithScrollIcon, HeartLightIcon, IconComponent, KaabaIcon, MosqueIcon, PrayerMatIcon, QuranMessageIcon, QuranStandIcon, ZakatCoinIcon,
 } from '../icons/IslamicIcons';
@@ -14,16 +14,17 @@ type GridItem = { label: string; icon: IconComponent } & ({ route: PlainRoute } 
 
 const GRID: GridItem[] = [
   { label: 'القرآن', route: 'TabQuran', icon: QuranStandIcon },
+  { label: 'العبادات', route: 'العبادات', icon: PrayerMatIcon },
   { label: 'التلاوات', route: 'التلاوات', icon: Headphones },
-  { label: 'الإذاعة', route: 'الإذاعة', icon: Radio },
   { label: 'القبلة', route: 'القبلة', icon: KaabaIcon },
   { label: 'الأدعية', route: 'الأدعية', icon: DuaHandsIcon },
-  { label: 'نور القلب', route: 'نور_القلب', icon: HeartLightIcon },
-  { label: 'العبادات', route: 'العبادات', icon: PrayerMatIcon },
   { label: 'تذكيراتي', route: 'التذكيرات', icon: AlarmClock },
-  { label: 'الزكاة', route: 'الزكاة', icon: ZakatCoinIcon },
-  { label: 'رسائل القرآن', route: 'رسائل_القرآن', icon: QuranMessageIcon },
+  { label: 'نور القلب', route: 'نور_القلب', icon: HeartLightIcon },
+  { label: 'الابتلاءات', route: 'الابتلاءات', icon: CloudSun },
+  { label: 'الإذاعة', route: 'الإذاعة', icon: Radio },
   { label: 'الأحاديث', route: 'الأحاديث', icon: HadithScrollIcon },
+  { label: 'رسائل القرآن', route: 'رسائل_القرآن', icon: QuranMessageIcon },
+  { label: 'الزكاة', route: 'الزكاة', icon: ZakatCoinIcon },
   { label: 'المساجد', maps: 'mosques', icon: MosqueIcon },
 ];
 

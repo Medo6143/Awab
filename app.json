@@ -2,14 +2,14 @@
   "expo": {
     "name": "أوّاب",
     "slug": "owwab",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash-blank.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0c0805"
+      "backgroundColor": "#faf6ef"
     },
     "notification": {
       "icon": "./assets/notification-icon.png",
@@ -20,6 +20,7 @@
       "bundleIdentifier": "com.mohamewael66sorganization.owwab"
     },
     "android": {
+      "versionCode": 2,
       "adaptiveIcon": {
         "backgroundColor": "#0c0805",
         "foregroundImage": "./assets/android-icon-foreground.png"
@@ -78,6 +79,18 @@
           "savePhotosPermission": "يحتاج أوّاب لحفظ صورة القلب وصور الآيات في معرض الصور.",
           "isAccessMediaLocationEnabled": false,
           "granularPermissions": []
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-blank.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#faf6ef",
+          "dark": {
+            "image": "./assets/splash-blank.png",
+            "backgroundColor": "#0c0805"
+          }
         }
       ],
       "./plugins/withFloatingBubble.js",

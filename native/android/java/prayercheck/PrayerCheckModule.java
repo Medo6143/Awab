@@ -1,6 +1,7 @@
 package com.mohamewael66sorganization.owwab.prayercheck;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -20,6 +21,12 @@ public class PrayerCheckModule extends ReactContextBaseJavaModule {
 
     PrayerCheckModule(ReactApplicationContext context) {
         super(context);
+        // a question that came while the phone was locked shows as the card when the app opens
+        context.addLifecycleEventListener(new LifecycleEventListener() {
+            @Override public void onHostResume() { PrayerChecks.showWaiting(context); }
+            @Override public void onHostPause() {}
+            @Override public void onHostDestroy() {}
+        });
     }
 
     @Override
@@ -42,6 +49,12 @@ public class PrayerCheckModule extends ReactContextBaseJavaModule {
     public void cancelAll(Promise promise) {
         PrayerChecks.cancelAll(getReactApplicationContext());
         promise.resolve(null);
+    }
+
+    /** 'light' | 'dark' | 'system': the card follows the app's theme setting. */
+    @ReactMethod
+    public void setLook(String mode) {
+        PrayerChecks.setLook(getReactApplicationContext(), mode);
     }
 
     @ReactMethod

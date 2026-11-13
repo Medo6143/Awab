@@ -5,6 +5,8 @@ export interface PrayerCheckItem {
   prayerId: PrayerId;
   /** Local time of day; repeats daily until rescheduled or cancelled. */
   at: ClockTime;
+  /** The small line over the title: the prayer and its adhan time. */
+  kicker: string;
   title: string;
   body: string;
   /** Shown once, after «لسه». */
@@ -28,6 +30,8 @@ export interface PrayerChecks {
   /** Arms these questions, replacing any armed before. */
   schedule(items: PrayerCheckItem[]): Promise<void>;
   cancelAll(): Promise<void>;
+  /** The card's colours: the app's own light/dark setting ('system' follows the phone). */
+  setLook(mode: 'light' | 'dark' | 'system'): void;
   /** Prayers already marked today in the app: their question stays quiet. */
   setDoneToday(prayerIds: PrayerId[]): void;
   /** «صليت» answers given on the notification since the last call (each returned once). */
@@ -36,7 +40,7 @@ export interface PrayerChecks {
    * Shows the question once now, as it will look after an adhan, without recording anything.
    * Resolves false when it cannot be shown over other apps (no permission).
    */
-  preview(item: Pick<PrayerCheckItem, 'title' | 'body' | 'prayedLabel' | 'laterLabel'>): Promise<boolean>;
+  preview(item: Pick<PrayerCheckItem, 'kicker' | 'title' | 'body' | 'prayedLabel' | 'laterLabel'>): Promise<boolean>;
   /** Called when the user answers on a notification while the app is running. */
   onAnswered(listener: () => void): () => void;
 }

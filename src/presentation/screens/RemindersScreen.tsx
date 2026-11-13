@@ -6,10 +6,10 @@ import { ScreenProps } from '../navigation/types';
 import { RootState } from '../store';
 import { removeReminder, saveReminder, toggleReminder } from '../store/slices/remindersSlice';
 import { IconButton, Screen, ScreenHeader, SectionTitle } from '../components/ui';
-import { ReminderEditor, clock12 } from '../components/reminders/ReminderEditor';
+import { ReminderEditor } from '../components/reminders/ReminderEditor';
 import { AzanReadinessCard } from '../components/settings/AzanReadinessCard';
 import { PRAYER_NAMES_AR, REMINDER_PRESETS, Reminder, WEEKDAYS_SHORT, newReminder, resolveReminderTime } from '../../domain/entities/reminders';
-import { toAr } from '../../shared/utils/format';
+import { clock12, toAr } from '../../shared/utils/format';
 import { colors, icon, radius, space, type, themed } from '../../shared/theme/tokens';
 
 const daysLabel = (days: number[]) =>

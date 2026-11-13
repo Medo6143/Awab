@@ -2,14 +2,17 @@
  * Composition root: the only place that picks concrete classes. Presentation receives
  * these through DependencyProvider and sees only the domain interfaces.
  */
-import { hadithApi, quranApi, tafsirApi } from './api/clients';
+import { hadithApi, tafsirApi } from './api/clients';
 import { HadeethEncRepository } from './repositories/HadeethEncRepository';
 import { HadithRepository } from '../domain/repositories/HadithRepository';
 import { HadithLibrary } from '../domain/repositories/HadithLibrary';
 import { QuranIndex } from '../domain/repositories/QuranIndex';
 import { BundledHadithLibrary } from './repositories/BundledHadithLibrary';
 import { BundledQuranIndex } from './repositories/BundledQuranIndex';
-import { QuranApiRepository, QuranComTafsirRepository } from './repositories/QuranApiRepository';
+import { QuranComTafsirRepository } from './repositories/QuranComTafsirRepository';
+import { BundledQuranRepository } from './repositories/BundledQuranRepository';
+import { ExpoBackupFiles } from './services/ExpoBackupFiles';
+import { BackupFiles } from '../domain/services/Backup';
 import { NativeFloatingSebha } from './services/NativeFloatingSebha';
 import { NativePrayerWidget } from './services/NativePrayerWidget';
 import { NativeAzanAlarms } from './services/NativeAzanAlarms';
@@ -68,6 +71,7 @@ export type AppDependencies = {
   radios: RadioDirectory;
   videoBackgrounds: VideoBackgrounds;
   prayerChecks: PrayerChecks;
+  backupFiles: BackupFiles;
 };
 
 export const createDependencies = (): AppDependencies => {
@@ -75,7 +79,7 @@ export const createDependencies = (): AppDependencies => {
   const audio = new ExpoAudioPlayer();
   const prayerChecks = new NativePrayerChecks();
   return {
-    quran: new QuranApiRepository(quranApi),
+    quran: new BundledQuranRepository(),
     tafsir: new QuranComTafsirRepository(tafsirApi),
     hadith: new HadeethEncRepository(hadithApi),
     hadithLibrary: new BundledHadithLibrary(),
@@ -97,6 +101,7 @@ export const createDependencies = (): AppDependencies => {
     radios: new Mp3QuranRadioDirectory(),
     videoBackgrounds: new ReleaseVideoBackgrounds(),
     prayerChecks,
+    backupFiles: new ExpoBackupFiles(),
     // a new reminder kind is one more scheduler here; the center itself does not change
     notifications: new ExpoNotificationCenter([
       new PrayerScheduler(),

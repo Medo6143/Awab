@@ -4,13 +4,19 @@ import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.service.notification.StatusBarNotification;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import com.mohamewael66sorganization.owwab.R;
 
@@ -40,6 +46,11 @@ public final class PrayerChecks {
     private static final String KEY_DONE_DAY = "done_day";
     private static final String KEY_DONE_IDS = "done_ids";
     private static final String KEY_ANSWERS = "answers";
+    private static final String KEY_LOOK = "look";
+    /** The question that went to the notification because the phone was locked: {prayerId, followUp, at}. */
+    private static final String KEY_WAITING = "waiting";
+    /** A waiting question older than this is dropped rather than shown on unlock. */
+    private static final long WAITING_MAX_MS = 3 * 60 * 60_000L;
 
     static final String ACTION_FIRE = "owwab.prayercheck.FIRE";
     static final String ACTION_FOLLOW_UP = "owwab.prayercheck.FOLLOW_UP";
@@ -55,6 +66,15 @@ public final class PrayerChecks {
 
     private static SharedPreferences prefs(Context c) {
         return c.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+    }
+
+    /** The app's theme setting for the card: "light", "dark" or "system". */
+    static void setLook(Context c, String mode) {
+        prefs(c).edit().putString(KEY_LOOK, mode).apply();
+    }
+
+    static String look(Context c) {
+        return prefs(c).getString(KEY_LOOK, "dark");
     }
 
     static String today() {
@@ -210,7 +230,19 @@ public final class PrayerChecks {
      * reaches a locked phone.
      */
     static void post(Context c, JSONObject item, boolean followUp) {
-        if (PrayerCheckCard.show(c, item, followUp)) return;
+        if (PrayerCheckCard.show(c, item, followUp)) {
+            clearWaiting(c, null);
+            return;
+        }
+        // the card waits for the phone to be unlocked (or the app opened); the notification is
+        // there meanwhile, and on the lock screen
+        try {
+            prefs(c).edit().putString(KEY_WAITING, new JSONObject()
+                    .put("prayerId", item.optString("prayerId"))
+                    .put("followUp", followUp)
+                    .put("at", System.currentTimeMillis()).toString()).apply();
+        } catch (JSONException ignored) {}
+        watchUnlock(c);
         NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
         if (nm == null) return;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && nm.getNotificationChannel(CHANNEL) == null) {
@@ -229,6 +261,7 @@ public final class PrayerChecks {
                 .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle(item.optString(followUp ? "followUpTitle" : "title"))
                 .setContentText(item.optString(followUp ? "followUpBody" : "body"))
+                .setSubText(item.optString("kicker", null))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_REMINDER)
                 .setAutoCancel(true)
@@ -245,6 +278,7 @@ public final class PrayerChecks {
 
     static void dismiss(Context c, String prayerId) {
         PrayerCheckCard.hide(prayerId);
+        clearWaiting(c, prayerId);
         NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
         if (nm != null) nm.cancel(notificationId(prayerId));
     }
@@ -252,5 +286,77 @@ public final class PrayerChecks {
     private static PendingIntent actionIntent(Context c, String action, int code, String prayerId) {
         Intent intent = new Intent(c, PrayerCheckReceiver.class).setAction(action).putExtra(EXTRA_PRAYER, prayerId);
         return PendingIntent.getBroadcast(c, code, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+    }
+
+    // ── the card after unlock ────────────────────────────────────────────────
+
+    private static boolean watchingUnlock;
+
+    /**
+     * Shows the card when the phone is next unlocked. USER_PRESENT cannot be declared in the
+     * manifest, so this lives as long as the app's process; opening the app covers the rest
+     * (PrayerCheckModule calls showWaiting on resume).
+     */
+    private static synchronized void watchUnlock(Context context) {
+        if (watchingUnlock) return;
+        final Context app = context.getApplicationContext();
+        try {
+            ContextCompat.registerReceiver(app, new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context c, Intent intent) {
+                    // let the lock screen finish going away before the card slides in
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> showWaiting(app), 700);
+                }
+            }, new IntentFilter(Intent.ACTION_USER_PRESENT), ContextCompat.RECEIVER_NOT_EXPORTED);
+            watchingUnlock = true;
+        } catch (Exception e) {
+            Log.w(TAG, "Could not watch for unlock", e);
+        }
+    }
+
+    /**
+     * The question that went to the notification while the phone was locked, as the card, now
+     * that the user is here: unless it was answered or swiped away since, or is hours old.
+     */
+    static void showWaiting(Context c) {
+        JSONObject waiting;
+        try {
+            String raw = prefs(c).getString(KEY_WAITING, null);
+            if (raw == null) return;
+            waiting = new JSONObject(raw);
+        } catch (JSONException e) {
+            clearWaiting(c, null);
+            return;
+        }
+        String prayerId = waiting.optString("prayerId");
+        boolean stale = System.currentTimeMillis() - waiting.optLong("at") > WAITING_MAX_MS;
+        JSONObject item = find(c, prayerId);
+        if (stale || item == null || isDoneToday(c, prayerId) || !notificationShowing(c, prayerId)) {
+            clearWaiting(c, null);
+            return;
+        }
+        if (PrayerCheckCard.show(c, item, waiting.optBoolean("followUp"))) clearWaiting(c, null);
+    }
+
+    private static boolean notificationShowing(Context c, String prayerId) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true;
+        NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (nm == null) return false;
+        int id = notificationId(prayerId);
+        for (StatusBarNotification n : nm.getActiveNotifications()) if (n.getId() == id) return true;
+        return false;
+    }
+
+    /** Forgets the waiting question (only if it is `prayerId`'s, when given). */
+    private static void clearWaiting(Context c, String prayerId) {
+        SharedPreferences p = prefs(c);
+        String raw = p.getString(KEY_WAITING, null);
+        if (raw == null) return;
+        if (prayerId != null) {
+            try {
+                if (!prayerId.equals(new JSONObject(raw).optString("prayerId"))) return;
+            } catch (JSONException ignored) {}
+        }
+        p.edit().remove(KEY_WAITING).apply();
     }
 }
