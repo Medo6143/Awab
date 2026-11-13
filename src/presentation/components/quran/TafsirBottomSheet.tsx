@@ -1,6 +1,8 @@
-import React, { useMemo, useState } from 'react';
-import { View, Text, Modal, Pressable, Animated, ScrollView, TouchableOpacity, Share, ActivityIndicator, StyleSheet } from 'react-native';
-import { Share2, Copy, Star, Play, X, Mic } from 'lucide-react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { View, Text, Modal, Pressable, Animated, ScrollView, TouchableOpacity, Share, ActivityIndicator, StyleSheet, Platform, ToastAndroid } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
+import { Share2, Copy, Check, Star, Play, X, Mic } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import { s } from './QuranStyles';
 import { colors } from '../../../shared/theme/tokens';
@@ -37,6 +39,14 @@ export const TafsirBottomSheet = ({
 }: Props) => {
 
   const [shareOpen, setShareOpen] = useState(false);
+  // the bar sits above the phone's own buttons (the sheet draws under them)
+  const bottomInset = useSafeAreaInsets().bottom;
+  const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    if (!copied) return;
+    const t = setTimeout(() => setCopied(false), 1800);
+    return () => clearTimeout(t);
+  }, [copied]);
   // parse once: the sections and the share-card excerpt come from the same blocks
   const blocks = useMemo(() => (tafsir ? parseTafsir(tafsir) : []), [tafsir]);
   const excerpt = useMemo(() => tafsirExcerpt(blocks), [blocks]);
@@ -51,9 +61,11 @@ export const TafsirBottomSheet = ({
   };
 
   const handleCopy = async () => {
-    if (selectedAyah) {
-      await Clipboard.setStringAsync(selectedAyah.text);
-    }
+    if (!selectedAyah) return;
+    await Clipboard.setStringAsync(selectedAyah.text);
+    Haptics.selectionAsync();
+    setCopied(true);
+    if (Platform.OS === 'android') ToastAndroid.show('تم نسخ الآية', ToastAndroid.SHORT);
   };
 
   const renderTafsirContent = () => {
@@ -119,7 +131,7 @@ export const TafsirBottomSheet = ({
               )}
             </ScrollView>
           </View>
-          <View style={s.sheetToolBar}>
+          <View style={[s.sheetToolBar, { paddingBottom: 12 + bottomInset }]}>
             <TouchableOpacity style={s.sheetToolBtn} onPress={onToggleBookmark}>
               <Star size={24} color={colors.paperInk} fill={selectedAyah && bookmarks.includes(selectedAyah.number) ? colors.paperInk : "transparent"} />
               <Text style={s.sheetToolLab}>حفظ</Text>
@@ -135,9 +147,9 @@ export const TafsirBottomSheet = ({
               <Share2 size={24} color={colors.paperInk} />
               <Text style={s.sheetToolLab}>صورة</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={s.sheetToolBtn} onPress={handleCopy}>
-              <Copy size={24} color={colors.paperInk} />
-              <Text style={s.sheetToolLab}>نسخ</Text>
+            <TouchableOpacity style={s.sheetToolBtn} onPress={handleCopy} accessibilityLabel={copied ? 'تم النسخ' : 'نسخ الآية'}>
+              {copied ? <Check size={24} color={colors.paperInk} /> : <Copy size={24} color={colors.paperInk} />}
+              <Text style={s.sheetToolLab}>{copied ? 'تم النسخ' : 'نسخ'}</Text>
             </TouchableOpacity>
           </View>
         </Animated.View>

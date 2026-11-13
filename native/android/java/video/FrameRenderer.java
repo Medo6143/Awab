@@ -8,6 +8,7 @@ import android.opengl.EGLContext;
 import android.opengl.EGLDisplay;
 import android.opengl.EGLExt;
 import android.opengl.EGLSurface;
+import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.view.Surface;
@@ -48,6 +49,29 @@ final class FrameRenderer {
             "  gl_FragColor = texture2D(uTex, vTex) * uAlpha;\n" +
             "}\n";
 
+    // the background clip: an external (video) texture, its coordinates through the
+    // SurfaceTexture's transform
+    private static final String VERTEX_OES =
+            "attribute vec2 aPos;\n" +
+            "attribute vec2 aTex;\n" +
+            "uniform mat4 uTexMatrix;\n" +
+            "varying vec2 vTex;\n" +
+            "void main() {\n" +
+            "  gl_Position = vec4(aPos, 0.0, 1.0);\n" +
+            "  vTex = (uTexMatrix * vec4(aTex, 0.0, 1.0)).xy;\n" +
+            "}\n";
+
+    private static final String FRAGMENT_OES =
+            "#extension GL_OES_EGL_image_external : require\n" +
+            "precision mediump float;\n" +
+            "uniform samplerExternalOES uTex;\n" +
+            "uniform float uAlpha;\n" +
+            "varying vec2 vTex;\n" +
+            "void main() {\n" +
+            "  vec4 c = texture2D(uTex, vTex);\n" +
+            "  gl_FragColor = vec4(c.rgb * uAlpha, uAlpha);\n" +
+            "}\n";
+
     static final class Texture {
         final int id, width, height;
         Texture(int id, int width, int height) { this.id = id; this.width = width; this.height = height; }
@@ -58,6 +82,8 @@ final class FrameRenderer {
     private EGLSurface surface = EGL14.EGL_NO_SURFACE;
     private int program;
     private int aPos, aTex, uAlpha, uTex;
+    private int oesProgram;
+    private int oesPos, oesTex, oesAlpha, oesSampler, oesMatrix;
     private final FloatBuffer quad = ByteBuffer.allocateDirect(16 * 4).order(ByteOrder.nativeOrder()).asFloatBuffer();
     private final float[] verts = new float[16];
     private final int width, height;
@@ -112,6 +138,66 @@ final class FrameRenderer {
         aTex = GLES20.glGetAttribLocation(program, "aTex");
         uAlpha = GLES20.glGetUniformLocation(program, "uAlpha");
         uTex = GLES20.glGetUniformLocation(program, "uTex");
+
+        oesProgram = link(compile(GLES20.GL_VERTEX_SHADER, VERTEX_OES), compile(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_OES));
+        oesPos = GLES20.glGetAttribLocation(oesProgram, "aPos");
+        oesTex = GLES20.glGetAttribLocation(oesProgram, "aTex");
+        oesAlpha = GLES20.glGetUniformLocation(oesProgram, "uAlpha");
+        oesSampler = GLES20.glGetUniformLocation(oesProgram, "uTex");
+        oesMatrix = GLES20.glGetUniformLocation(oesProgram, "uTexMatrix");
+    }
+
+    private static int link(int vs, int fs) {
+        int prog = GLES20.glCreateProgram();
+        GLES20.glAttachShader(prog, vs);
+        GLES20.glAttachShader(prog, fs);
+        GLES20.glLinkProgram(prog);
+        int[] linked = new int[1];
+        GLES20.glGetProgramiv(prog, GLES20.GL_LINK_STATUS, linked, 0);
+        if (linked[0] == 0) throw new IllegalStateException("link failed: " + GLES20.glGetProgramInfoLog(prog));
+        return prog;
+    }
+
+    /**
+     * Draws the clip's current frame over the whole frame, cropped to fill it (cover), at
+     * `alpha`. `videoAspect` is the clip's width / height. `zoom` (≥ 1) shows a smaller part of
+     * it, moved by `panX`/`panY` (-1..1 of the room the zoom leaves), for a camera move.
+     */
+    void drawVideo(BackgroundVideo video, float videoAspect, float alpha, float zoom, float panX, float panY) {
+        if (alpha <= 0f) return;
+        // crop the clip's texture coordinates so it covers the 9:16 frame without stretching
+        float frameAspect = FRAME_W / FRAME_H;
+        float s0 = 0f, s1 = 1f, t0 = 0f, t1 = 1f;
+        if (videoAspect > frameAspect) { float keep = frameAspect / videoAspect; s0 = (1 - keep) / 2; s1 = 1 - s0; }
+        else if (videoAspect < frameAspect) { float keep = videoAspect / frameAspect; t0 = (1 - keep) / 2; t1 = 1 - t0; }
+        if (zoom > 1f) {
+            float sw = (s1 - s0) / zoom, tw = (t1 - t0) / zoom;
+            float sc = (s0 + s1) / 2 + panX * ((s1 - s0) - sw) / 2, tc = (t0 + t1) / 2 + panY * ((t1 - t0) - tw) / 2;
+            s0 = sc - sw / 2; s1 = sc + sw / 2; t0 = tc - tw / 2; t1 = tc + tw / 2;
+        }
+        // video textures have t = 0 at the bottom (the transform handles the rest)
+        float[] v = verts;
+        v[0] = -1f; v[1] = -1f; v[2] = s0; v[3] = t0;
+        v[4] = 1f;  v[5] = -1f; v[6] = s1; v[7] = t0;
+        v[8] = -1f; v[9] = 1f;  v[10] = s0; v[11] = t1;
+        v[12] = 1f; v[13] = 1f; v[14] = s1; v[15] = t1;
+        quad.clear();
+        quad.put(v).position(0);
+        GLES20.glUseProgram(oesProgram);
+        GLES20.glVertexAttribPointer(oesPos, 2, GLES20.GL_FLOAT, false, 16, quad);
+        GLES20.glEnableVertexAttribArray(oesPos);
+        quad.position(2);
+        GLES20.glVertexAttribPointer(oesTex, 2, GLES20.GL_FLOAT, false, 16, quad);
+        GLES20.glEnableVertexAttribArray(oesTex);
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, video.texture);
+        GLES20.glUniform1i(oesSampler, 0);
+        GLES20.glUniformMatrix4fv(oesMatrix, 1, false, video.transform, 0);
+        GLES20.glUniform1f(oesAlpha, Math.min(1f, alpha));
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+        // back to the image program for whatever is drawn next
+        GLES20.glUseProgram(program);
+        GLES20.glUniform1i(uTex, 0);
     }
 
     private static int compile(int type, String src) {
@@ -196,6 +282,7 @@ final class FrameRenderer {
         if (display != EGL14.EGL_NO_DISPLAY) {
             for (Texture t : textures) if (t != null) GLES20.glDeleteTextures(1, new int[]{ t.id }, 0);
             if (program != 0) GLES20.glDeleteProgram(program);
+            if (oesProgram != 0) GLES20.glDeleteProgram(oesProgram);
             EGL14.eglMakeCurrent(display, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_CONTEXT);
             if (surface != EGL14.EGL_NO_SURFACE) EGL14.eglDestroySurface(display, surface);
             if (context != EGL14.EGL_NO_CONTEXT) EGL14.eglDestroyContext(display, context);

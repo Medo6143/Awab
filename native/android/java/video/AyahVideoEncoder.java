@@ -23,8 +23,8 @@ import java.util.List;
  *  1. the MP3s (one per ayah) are decoded one after another and re-encoded into one AAC track,
  *     kept in memory (about 1 MB a minute); each ayah's start and length are noted;
  *  2. the frames are drawn by FrameRenderer onto the H.264 encoder's input Surface: the nature
- *     picture fades in and keeps moving (a slow zoom in and out with a drifting pan, like a
- *     camera), while the overlay (logo, surah, reciter) and the text stay still; a long ayah's
+ *     clip (BackgroundVideo, looped) fades in under a darkening shade, while the overlay (logo,
+ *     surah, reciter) and the text stay still; a long ayah's
  *     text is in pages, and each page cross-fades to the next when its first word is recited
  *     (each word's time is its share of its ayah's recitation, by letters);
  *  3. MediaMuxer writes both tracks, the audio interleaved as the video goes.
@@ -47,9 +47,8 @@ final class AyahVideoEncoder {
     }
 
     private static final int FPS = 24;
-    /** Camera move: the zoom swings between ZOOM_MIN and ZOOM_MAX, the pan drifts within the margin that leaves. */
-    private static final float ZOOM_MIN = 1.04f, ZOOM_MAX = 1.26f;
-    private static final float ZOOM_PERIOD_S = 18f, PAN_X_PERIOD_S = 23f, PAN_Y_PERIOD_S = 29f;
+    /** Camera move on the clip: the zoom swings 1 ↔ ZOOM_MAX and back every ZOOM_PERIOD_S, with a slow drift. */
+    private static final float ZOOM_MAX = 1.18f, ZOOM_PERIOD_S = 14f, PAN_X_PERIOD_S = 19f, PAN_Y_PERIOD_S = 23f;
     private static final float BG_FADE_S = 0.5f, OVERLAY_FADE_S = 0.8f, PAGE_FADE_S = 0.5f;
     /** The last words stay on screen this long after the recitation ends. */
     private static final long HOLD_US = 900_000L;
@@ -89,12 +88,13 @@ final class AyahVideoEncoder {
 
     /** Encodes the video described by the JSON `spec` (see AyahVideoModule); returns its length in ms. */
     long encode(String spec, Progress progress) throws EncodeException {
-        String background, overlay, out;
+        String video, shade, overlay, out;
         List<String> mp3s = new ArrayList<>();
         List<Page> pages = new ArrayList<>();
         try {
             JSONObject o = new JSONObject(spec);
-            background = o.getString("background");
+            video = o.getString("video");
+            shade = o.getString("shade");
             overlay = o.getString("overlay");
             out = o.getString("out");
             JSONArray a = o.getJSONArray("audios");
@@ -135,7 +135,7 @@ final class AyahVideoEncoder {
         timeWords(pages);
 
         try {
-            encodeVideo(background, overlay, pages, out, progress, durationMs);
+            encodeVideo(video, shade, overlay, pages, out, progress, durationMs);
         } catch (EncodeException e) {
             new File(out).delete();
             throw e;
@@ -327,11 +327,12 @@ final class AyahVideoEncoder {
 
     private static float clamp01(float v) { return v < 0f ? 0f : (v > 1f ? 1f : v); }
 
-    private void encodeVideo(String background, String overlay, List<Page> pages, String out, Progress progress, long durationMs) throws Exception {
+    private void encodeVideo(String video, String shade, String overlay, List<Page> pages, String out, Progress progress, long durationMs) throws Exception {
         MediaCodec encoder = null;
         Surface input = null;
         FrameRenderer renderer = null;
-        FrameRenderer.Texture bgTex = null, overlayTex = null;
+        FrameRenderer.Texture shadeTex = null, overlayTex = null;
+        BackgroundVideo clip = null;
         int[][] sizes = { { 1080, 1920, 6_000_000 }, { 720, 1280, 3_500_000 } };
         int width = 0, height = 0;
         for (int[] s : sizes) {
@@ -340,18 +341,19 @@ final class AyahVideoEncoder {
             f.setInteger(MediaFormat.KEY_BIT_RATE, s[2]);
             f.setInteger(MediaFormat.KEY_FRAME_RATE, FPS);
             f.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 2);
+            // the capability check often says no to portrait 1080×1920 (it reads the limits as
+            // landscape) on encoders that take it fine: then the default encoder is simply tried
             String name = new MediaCodecList(MediaCodecList.REGULAR_CODECS).findEncoderForFormat(f);
-            if (name == null) continue;
             MediaCodec c = null;
             try {
-                c = MediaCodec.createByCodecName(name);
+                c = name != null ? MediaCodec.createByCodecName(name) : MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_VIDEO_AVC);
                 c.configure(f, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
                 encoder = c;
                 width = s[0];
                 height = s[1];
                 break;
             } catch (Exception e) {
-                Log.w(TAG, "encoder " + name + " refused " + s[0] + "x" + s[1], e);
+                Log.w(TAG, "encoder " + (name != null ? name : "default") + " refused " + s[0] + "x" + s[1], e);
                 if (c != null) c.release();
             }
         }
@@ -362,7 +364,8 @@ final class AyahVideoEncoder {
             input = encoder.createInputSurface();
             encoder.start();
             renderer = new FrameRenderer(input, width, height);
-            bgTex = renderer.load(background);
+            clip = new BackgroundVideo(video);
+            shadeTex = renderer.load(shade);
             overlayTex = renderer.load(overlay);
             for (Page p : pages) p.texture = renderer.load(p.image);
             muxer = new MediaMuxer(out, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
@@ -378,15 +381,15 @@ final class AyahVideoEncoder {
                 float t = ptsUs / 1e6f;
 
                 renderer.begin();
-                // the picture: fades in from black, then moves like a camera: it starts at the
-                // widest, zooms in and out again, and drifts sideways and up and down, never far
-                // enough to show an edge
+                // the clip, looped, fading in from black and zooming slowly in and out with a drift;
+                // the shade darkens it so the text reads
+                clip.advanceTo(ptsUs);
                 float swing = 0.5f - 0.5f * (float) Math.cos(2 * Math.PI * t / ZOOM_PERIOD_S);
-                float scale = ZOOM_MIN + (ZOOM_MAX - ZOOM_MIN) * swing;
-                float dw = W * scale, dh = H * scale;
-                float panX = (dw - W) / 2f * 0.85f * (float) Math.sin(2 * Math.PI * t / PAN_X_PERIOD_S);
-                float panY = (dh - H) / 2f * 0.85f * (float) Math.sin(2 * Math.PI * t / PAN_Y_PERIOD_S);
-                renderer.draw(bgTex, 0, 0, W, H, (W - dw) / 2f + panX, (H - dh) / 2f + panY, dw, dh, clamp01(t / BG_FADE_S));
+                float zoom = 1f + (ZOOM_MAX - 1f) * swing;
+                float panX = 0.8f * (float) Math.sin(2 * Math.PI * t / PAN_X_PERIOD_S);
+                float panY = 0.8f * (float) Math.sin(2 * Math.PI * t / PAN_Y_PERIOD_S);
+                renderer.drawVideo(clip, clip.aspect, clamp01(t / BG_FADE_S), zoom, panX, panY);
+                renderer.drawFull(shadeTex, 1f);
                 renderer.drawFull(overlayTex, clamp01(t / OVERLAY_FADE_S));
 
                 // the text stays still: the first page fades in with the overlay; on a long ayah
@@ -412,9 +415,10 @@ final class AyahVideoEncoder {
         } finally {
             if (renderer != null) {
                 List<FrameRenderer.Texture> all = new ArrayList<>();
-                all.add(bgTex);
+                all.add(shadeTex);
                 all.add(overlayTex);
                 for (Page p : pages) all.add(p.texture);
+                if (clip != null) clip.release();
                 renderer.release(all.toArray(new FrameRenderer.Texture[0]));
             }
             try { encoder.stop(); } catch (Exception ignored) {}

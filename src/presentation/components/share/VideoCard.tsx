@@ -9,11 +9,15 @@ import { VideoBackground } from './videoBackgrounds';
 const LOGO = require('../../../../assets/icon.png');
 
 /**
- * What the card draws. 'preview' is everything (with `page`'s words). The video captures it
- * in parts: 'background' (the picture, darkened), 'overlay' (logo, surah, reciter, footer on
- * transparent) and 'words' (one page of the ayah text on transparent).
+ * What the card draws. 'preview' is everything (the clip playing, with `page`'s words). The
+ * video captures the still parts on transparent, to lay over the clip: 'shade' (the darkening
+ * that keeps the text readable), 'overlay' (logo, surah, reciter, footer) and 'words' (one page
+ * of the ayah text).
  */
-export type VideoCardMode = 'preview' | 'background' | 'overlay' | 'words';
+export type VideoCardMode = 'preview' | 'shade' | 'overlay' | 'words';
+
+/** expo-av is loaded on first use (importing it early binds its native module too soon). */
+const av = () => require('expo-av') as typeof import('expo-av');
 
 /** Where the ayah text goes, in units of 1% of the card width. */
 export const TEXT_BOX = { side: 8, top: 36, bottom: 32 };
@@ -21,6 +25,8 @@ export const TEXT_BOX = { side: 8, top: 36, bottom: 32 };
 type Props = {
   mode: VideoCardMode;
   background: VideoBackground;
+  /** The clip on the phone once downloaded; until then the preview shows its still. */
+  clipUri: string | null;
   surahName: string;
   reciterName: string;
   words: LayoutWord[];
@@ -37,7 +43,7 @@ type Props = {
  * reciter's name at the bottom, and the ayah in the middle. The words are separate so a long
  * ayah can be split into pages.
  */
-export const VideoCard = ({ mode, background, surahName, reciterName, words, fontU, page, onWordsLaid }: Props) => {
+export const VideoCard = ({ mode, background, clipUri, surahName, reciterName, words, fontU, page, onWordsLaid }: Props) => {
   const { w, h } = useShareCardSize();
   const u = w / 100;
   const size = fontU * u;
@@ -50,14 +56,25 @@ export const VideoCard = ({ mode, background, surahName, reciterName, words, fon
     if (boxes.every(Boolean)) onWordsLaid([...boxes] as FrameBox[]);
   };
 
-  const showBg = mode === 'preview' || mode === 'background';
+  const showClip = mode === 'preview';
+  const showShade = mode === 'preview' || mode === 'shade';
   const showOverlay = mode === 'preview' || mode === 'overlay';
   const showWords = mode === 'preview' || mode === 'words';
 
   return (
     <View style={{ width: w, height: h, overflow: 'hidden' }}>
-      <View style={[StyleSheet.absoluteFill, !showBg && st.hidden]}>
-        <Image source={background.image} resizeMode="cover" style={StyleSheet.absoluteFill} />
+      {/* the clip itself is only in the preview: the encoder plays it from the file */}
+      {showClip ? (
+        clipUri ? (
+          React.createElement(av().Video, {
+            source: { uri: clipUri }, style: StyleSheet.absoluteFill, resizeMode: av().ResizeMode.COVER,
+            shouldPlay: true, isLooping: true, isMuted: true,
+          })
+        ) : (
+          <Image source={background.thumb} resizeMode="cover" style={StyleSheet.absoluteFill} />
+        )
+      ) : null}
+      <View style={[StyleSheet.absoluteFill, !showShade && st.hidden]}>
         <View style={[StyleSheet.absoluteFill, st.dim]} />
         <LinearGradient colors={['rgba(0,0,0,0.55)', 'rgba(0,0,0,0)']} style={[st.abs, { left: 0, right: 0, top: 0, height: 34 * u }]} />
         <LinearGradient colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.6)']} style={[st.abs, { left: 0, right: 0, bottom: 0, height: 36 * u }]} />
@@ -105,7 +122,8 @@ const st = StyleSheet.create({
   abs: { position: 'absolute' },
   hidden: { opacity: 0 },
   dim: { backgroundColor: 'rgba(0,0,0,0.32)' },
-  brand: { position: 'absolute', left: 0, right: 0, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
+  // explicit RTL: logo first (on the right), then the name; the preview wrapper is LTR
+  brand: { position: 'absolute', left: 0, right: 0, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', direction: 'rtl' },
   brandName: { fontFamily: 'Tajawal_800ExtraBold', color: '#ffffff', ...SHADOW },
   center: { position: 'absolute', left: 0, right: 0, alignItems: 'center' },
   chip: { borderRadius: 999, borderWidth: 1, borderColor: 'rgba(255,255,255,0.55)', backgroundColor: 'rgba(0,0,0,0.25)' },

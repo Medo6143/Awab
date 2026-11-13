@@ -28,7 +28,7 @@ public class AyahVideoModule extends ReactContextBaseJavaModule {
     }
 
     /**
-     * `spec` is JSON: { background, overlay, pages: [{ image, words: [{ x, y, w, h, ayah, weight }] }],
+     * `spec` is JSON: { video (MP4), shade, overlay, pages: [{ image, words: [{ x, y, w, h, ayah, weight }] }],
      * audios: [mp3 paths, one per ayah], out }. Images are 1080×1920; boxes are in their pixels.
      */
     @ReactMethod

@@ -9,6 +9,7 @@ import { colors, icon, radius, space, type, themed } from '../../../shared/theme
 import { useAccent } from '../../../shared/theme/useAccent';
 import { toAr } from '../../../shared/utils/format';
 import { useAyahVideo } from '../../hooks/useAyahVideo';
+import { useDependencies } from '../../providers/DependencyProvider';
 import { AyahVideoError, AyahVideoFailure, FrameBox, VideoPage } from '../../../domain/services/AyahVideo';
 import { ayahWords, paginate, videoFontU } from '../../../domain/services/videoLayout';
 import { TEXT_BOX, VideoCard, VideoCardMode } from './VideoCard';
@@ -56,7 +57,9 @@ const clock = (ms: number) => {
 export const ImageShareModal = ({ visible, title, onClose, children, toolbar, video }: Props) => {
   const accent = useAccent();
   const ref = useRef<View>(null);
-  const [busy, setBusy] = useState<'share' | 'save' | 'video' | null>(null);
+  const [busy, setBusy] = useState<'share' | 'save' | 'video' | 'video-save' | null>(null);
+  /** The last video made, so saving it after sharing it (or the other way) does not make it again. */
+  const lastVideo = useRef<{ key: string; uri: string } | null>(null);
   const [mode, setMode] = useState<'image' | 'video'>('image');
   const ayahVideo = useAyahVideo();
   const { width, height } = useWindowDimensions();
@@ -65,6 +68,26 @@ export const ImageShareModal = ({ visible, title, onClose, children, toolbar, vi
 
   // ── the video's frame ──
   const [bgIndex, setBgIndex] = useState(() => Math.floor(Math.random() * VIDEO_BACKGROUNDS.length));
+  const { videoBackgrounds } = useDependencies();
+  /** The chosen clip's file once on the phone; while it downloads, how far it got. */
+  const [clip, setClip] = useState<{ id: string; uri: string | null; progress: number; failed?: boolean }>({ id: '', uri: null, progress: 0 });
+  const bgId = VIDEO_BACKGROUNDS[bgIndex].id;
+  useEffect(() => {
+    if (mode !== 'video' || !visible) return;
+    let alive = true;
+    setClip({ id: bgId, uri: null, progress: 0 });
+    (async () => {
+      try {
+        const uri = (await videoBackgrounds.localUri(bgId))
+          ?? (await videoBackgrounds.download(bgId, (p) => { if (alive) setClip((c) => (c.id === bgId ? { ...c, progress: p } : c)); }));
+        if (alive) setClip({ id: bgId, uri, progress: 1 });
+      } catch {
+        if (alive) setClip({ id: bgId, uri: null, progress: 0, failed: true });
+      }
+    })();
+    return () => { alive = false; };
+  }, [bgId, mode, visible, videoBackgrounds]);
+  const clipReady = clip.id === bgId && !!clip.uri;
   const [cardMode, setCardMode] = useState<VideoCardMode>('preview');
   const [pageIndex, setPageIndex] = useState(0);
   const [boxes, setBoxes] = useState<FrameBox[] | null>(null);
@@ -100,7 +123,7 @@ export const ImageShareModal = ({ visible, title, onClose, children, toolbar, vi
     captures.current = [];
   };
   useEffect(() => {
-    if (!visible) { releaseAll(); ayahVideo.releaseAll(); setMode('image'); }
+    if (!visible) { releaseAll(); ayahVideo.releaseAll(); lastVideo.current = null; setMode('image'); }
   }, [visible]);
   useEffect(() => releaseAll, []);
 
@@ -137,12 +160,13 @@ export const ImageShareModal = ({ visible, title, onClose, children, toolbar, vi
     return capture();
   };
 
-  const onVideo = async () => {
-    if (!video || !boxes || pages.length === 0) return;
-    setBusy('video');
-    try {
-      if (!(await Sharing.isAvailableAsync())) { Alert.alert('المشاركة غير متاحة على هذا الجهاز'); return; }
-      const backgroundUri = await capturePart('background');
+  /** Makes the video (or reuses the one just made for the same ayah and background). */
+  const makeVideo = async (): Promise<string | null> => {
+    if (!video || !boxes || pages.length === 0 || !clip.uri) return null;
+    const key = `${bgId}|${videoKey}|${ayahVideo.reciterName}`;
+    if (lastVideo.current?.key === key) return lastVideo.current.uri;
+    {
+      const shadeUri = await capturePart('shade');
       const overlayUri = await capturePart('overlay');
       const r = PixelRatio.get();
       const pad = 0.6 * u;
@@ -167,10 +191,31 @@ export const ImageShareModal = ({ visible, title, onClose, children, toolbar, vi
       setPageIndex(0);
       setCardMode('preview');
       const { uri } = await ayahVideo.make(
-        { backgroundUri, overlayUri, pages: framePages },
+        { videoUri: clip.uri, shadeUri, overlayUri, pages: framePages },
         video.ayahs.map(({ surahId, ayahNumber }) => ({ surahId, ayahNumber })),
       );
-      await Sharing.shareAsync(uri, { mimeType: 'video/mp4', dialogTitle: title, UTI: 'public.mpeg-4' });
+      lastVideo.current = { key, uri };
+      return uri;
+    }
+  };
+
+  const onVideo = async (target: 'share' | 'save') => {
+    setBusy(target === 'share' ? 'video' : 'video-save');
+    try {
+      if (target === 'share' && !(await Sharing.isAvailableAsync())) { Alert.alert('المشاركة غير متاحة على هذا الجهاز'); return; }
+      if (target === 'save') {
+        // write-only: the app never reads the gallery
+        const perm = await MediaLibrary.requestPermissionsAsync(true);
+        if (!perm.granted) { Alert.alert('لا يوجد إذن', 'اسمح لأوّاب بحفظ الفيديو من إعدادات الموبايل.'); return; }
+      }
+      const uri = await makeVideo();
+      if (!uri) return;
+      if (target === 'share') {
+        await Sharing.shareAsync(uri, { mimeType: 'video/mp4', dialogTitle: title, UTI: 'public.mpeg-4' });
+      } else {
+        await MediaLibrary.saveToLibraryAsync(uri); // copies the file into the gallery
+        Alert.alert('اتحفظ الفيديو', 'هتلاقيه في معرض الصور.');
+      }
     } catch (e) {
       const [head, body] = VIDEO_ERRORS[e instanceof AyahVideoError ? e.reason : 'encode'];
       Alert.alert(head, body);
@@ -180,6 +225,7 @@ export const ImageShareModal = ({ visible, title, onClose, children, toolbar, vi
       setBusy(null);
     }
   };
+  const making = busy === 'video' || busy === 'video-save';
 
   const p = ayahVideo.progress;
   const progressLabel = !p ? 'تجهيز الفيديو…'
@@ -192,11 +238,11 @@ export const ImageShareModal = ({ visible, title, onClose, children, toolbar, vi
   const iconColor = accent.accentText;
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={busy === 'video' ? () => {} : onClose} statusBarTranslucent>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={making ? () => {} : onClose} statusBarTranslucent>
       <View style={st.backdrop}>
         <View style={st.top}>
           <Text style={st.title}>{inVideo ? 'فيديو الآية' : title}</Text>
-          <IconButton onPress={busy === 'video' ? undefined : onClose} label="إغلاق">
+          <IconButton onPress={making ? undefined : onClose} label="إغلاق">
             <X size={icon.size.md} color={colors.text} strokeWidth={icon.stroke} />
           </IconButton>
         </View>
@@ -210,6 +256,7 @@ export const ImageShareModal = ({ visible, title, onClose, children, toolbar, vi
                 <VideoCard
                   mode={cardMode}
                   background={VIDEO_BACKGROUNDS[bgIndex]}
+                  clipUri={clipReady ? clip.uri : null}
                   surahName={video.surahName}
                   reciterName={ayahVideo.reciterName}
                   words={words}
@@ -221,7 +268,7 @@ export const ImageShareModal = ({ visible, title, onClose, children, toolbar, vi
             </View>
           </View>
           {/* outside the captured view: covers the parts being captured and shows the progress */}
-          {busy === 'video' ? (
+          {making ? (
             <View style={[StyleSheet.absoluteFill, st.working]}>
               <ActivityIndicator color={accent.accentText} />
               <Text style={st.workingText}>{progressLabel}</Text>
@@ -244,7 +291,8 @@ export const ImageShareModal = ({ visible, title, onClose, children, toolbar, vi
         {inVideo ? (
           <View style={st.actions}>
             <PillButton label="رجوع" variant="ghost" icon={<ChevronRight size={icon.size.sm} color={iconColor} strokeWidth={icon.stroke} />} disabled={!!busy} onPress={() => setMode('image')} />
-            <PillButton label="شارك الفيديو" icon={<Share2 size={icon.size.sm} color={accent.onAccent} strokeWidth={icon.stroke} />} loading={busy === 'video' || !boxes} disabled={!!busy || !boxes} onPress={onVideo} />
+            <PillButton label="حفظ" variant="ghost" icon={<Download size={icon.size.sm} color={iconColor} strokeWidth={icon.stroke} />} loading={busy === 'video-save'} disabled={!!busy || !boxes || !clipReady} onPress={() => onVideo('save')} />
+            <PillButton label="شارك" icon={<Share2 size={icon.size.sm} color={accent.onAccent} strokeWidth={icon.stroke} />} loading={busy === 'video' || !boxes || (!clipReady && !clip.failed)} disabled={!!busy || !boxes || !clipReady} onPress={() => onVideo('share')} />
           </View>
         ) : video ? (
           <View style={st.actions}>
@@ -262,7 +310,9 @@ export const ImageShareModal = ({ visible, title, onClose, children, toolbar, vi
           {tooLong
             ? `الفيديو ${clock(ayahVideo.durationMs!)} دقيقة، أطول من حالة واتساب (٩٠ ثانية): واتساب هيطلب منك تقصّه`
             : inVideo
-              ? 'اختار الخلفية، وهتتحرك في الفيديو مع التلاوة'
+              ? clip.failed ? 'تعذّر تحميل الخلفية، اتأكد من النت أو اختار واحدة تانية'
+              : !clipReady ? `بيحمّل الخلفية ${toAr(Math.round(clip.progress * 100))}٪ (مرة واحدة بس)`
+              : 'اختار الخلفية، وهتتحرك في الفيديو مع التلاوة'
               : 'اختر واتساب ثم «حالتي» لنشرها كحالة'}
         </Text>
       </View>
