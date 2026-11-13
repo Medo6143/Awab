@@ -13,6 +13,7 @@ Screens live in `src/presentation/screens/` and routes are registered in `src/pr
 | Adhan | «الأذان» | Shipped | [adhan.md](adhan.md) | No route: global `AzanVideoModal` mounted in `App.tsx`; settings in `SettingsScreen.tsx` section `prayer` | #11, #14 |
 | Qibla | «القبلة» | Shipped | [qibla.md](qibla.md) | `QiblaScreen.tsx` · route `القبلة` | None |
 | Nearest mosque | «أقرب مسجد» (prayer screen), «المساجد» (home) | Shipped: opens Google Maps | [nearest-mosque.md](nearest-mosque.md) | `MosqueParts.tsx` | None |
+| Quran radio | «الإذاعة» | Shipped | [radio.md](radio.md) | `RadioScreen.tsx` · route `الإذاعة` | None |
 | Mushaf | «القرآن» | Shipped | [mushaf.md](mushaf.md) | `QuranScreen.tsx` · tab `TabQuran` | #7, #8, #16 |
 | Quran audio | Not verified (inside the mushaf) | Shipped | [quran-audio.md](quran-audio.md) | `QuranScreen.tsx` · tab `TabQuran` (no screen of its own) | #5, #10, #15 |
 | Tasmee (recital check) | «التسميع» | Shipped | [tasmee.md](tasmee.md) | `TasmeeScreen.tsx` · route `التسميع` | None |
