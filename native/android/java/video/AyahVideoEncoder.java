@@ -341,18 +341,19 @@ final class AyahVideoEncoder {
             f.setInteger(MediaFormat.KEY_BIT_RATE, s[2]);
             f.setInteger(MediaFormat.KEY_FRAME_RATE, FPS);
             f.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 2);
+            // the capability check often says no to portrait 1080×1920 (it reads the limits as
+            // landscape) on encoders that take it fine: then the default encoder is simply tried
             String name = new MediaCodecList(MediaCodecList.REGULAR_CODECS).findEncoderForFormat(f);
-            if (name == null) continue;
             MediaCodec c = null;
             try {
-                c = MediaCodec.createByCodecName(name);
+                c = name != null ? MediaCodec.createByCodecName(name) : MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_VIDEO_AVC);
                 c.configure(f, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
                 encoder = c;
                 width = s[0];
                 height = s[1];
                 break;
             } catch (Exception e) {
-                Log.w(TAG, "encoder " + name + " refused " + s[0] + "x" + s[1], e);
+                Log.w(TAG, "encoder " + (name != null ? name : "default") + " refused " + s[0] + "x" + s[1], e);
                 if (c != null) c.release();
             }
         }
