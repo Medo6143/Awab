@@ -19,7 +19,7 @@ export const useAyahVideo = () => {
   const [durationMs, setDurationMs] = useState<number | null>(null);
   const made = useRef<string[]>([]);
 
-  const make = useCallback(async (frames: Pick<AyahVideoInput, 'backgroundUri' | 'overlayUri' | 'pages'>, ayahs: AyahKey[]) => {
+  const make = useCallback(async (frames: Pick<AyahVideoInput, 'videoUri' | 'shadeUri' | 'overlayUri' | 'pages'>, ayahs: AyahKey[]) => {
     setDurationMs(null);
     setProgress({ stage: 'audio', fraction: 0 });
     try {

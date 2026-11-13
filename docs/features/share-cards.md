@@ -6,7 +6,7 @@
 
 - Opens a full-screen preview of a 9:16 card with the app's logo and name.
 - Two actions: «مشاركة» (system share sheet, e.g. WhatsApp status) and «حفظ في المعرض».
-- For an ayah (mushaf tafsir sheet, Quran messages) there are three: «حفظ», «صورة» and «فيديو». «فيديو» opens the ayah video: a nature picture to choose, the ayah appearing word by word with the chosen reciter's recitation (all ayahs of a Quran-messages verse), and «شارك الفيديو».
+- For an ayah (mushaf tafsir sheet, Quran messages) there are three: «حفظ», «صورة» and «فيديو». «فيديو» opens the ayah video: a nature clip to choose (it plays in the preview), the ayah over it with the chosen reciter's recitation (all ayahs of a Quran-messages verse), and «شارك الفيديو».
 - For text cards, a picker under the preview chooses one of five designs and one of three text sizes; the choice is remembered.
 
 ## How the user reaches it
@@ -82,17 +82,18 @@ There is no route for it; it is a modal opened from other screens.
 | Assets | `assets/icon.png`, `assets/images/mosque_bg.png` | Logo; background of the `night` design |
 | Video | `src/presentation/components/share/VideoCard.tsx`, `videoBackgrounds.ts`, `src/presentation/hooks/useAyahVideo.ts` | The video frame, its pictures, making the video |
 | Video | `src/domain/services/AyahVideo.ts`, `src/domain/services/videoLayout.ts`, `src/data/services/NativeAyahVideo.ts`, `native/android/java/video/` | Contract, word layout, download and native encoder |
-| Assets | `assets/video-backgrounds/` (+ `thumbs/`) | The video's nature pictures (Pexels; ids in `videoBackgrounds.ts`) |
+| Assets | `assets/video-backgrounds/` | A still of each nature clip, for the picker (Pexels ids in `videoBackgrounds.ts`) |
+| Clips | GitHub release `video-backgrounds-v1` of the repo, via `ReleaseVideoBackgrounds` (`VideoBackgrounds` in `src/domain/services/`) | The 12 clips (720×1280 H.264, 2–11 MB), downloaded when picked and kept in the app's documents |
 
 **Ayah video** (`ImageShareModal` prop `video`, issue #28)
 
-The video has its own look, not the image card's: a nature picture (14 bundled in `assets/video-backgrounds/`, from Pexels, free licence, picked under the preview), the app's mark and the surah on top, «بصوت <reciter>» at the bottom, and the ayah in the middle, still, while the picture moves like a camera.
+The video has its own look, not the image card's: a real nature clip playing on a loop (12 from Pexels, free licence: clouds, sea, sunsets, waterfalls, forest, desert, mountains), the app's mark and the surah on top, «بصوت <reciter>» at the bottom, and the ayah in the middle, still. The clips are not in the APK: picking one downloads it once from the repo's `video-backgrounds-v1` release (the hint shows the percentage) and «شارك الفيديو» waits for it.
 
 1. «فيديو» switches the modal to `VideoCard`. Its words are separate `<Text>`s (`ayahWords` in `src/domain/services/videoLayout.ts`, each ayah followed by «﴿n﴾»); each reports its box with `onLayout`, and `paginate` splits them into pages that fit the text box.
-2. «شارك الفيديو» captures the frame in parts: `background` (picture, darkened), `overlay` (logo, surah, reciter, footer on transparent) and one `words` image per page (only that page's words, moved up to be centred).
+2. «شارك الفيديو» captures the still parts on transparent: `shade` (the darkening and the top and bottom gradients), `overlay` (logo, surah, reciter, footer) and one `words` image per page (only that page's words, moved up to be centred).
 3. `useAyahVideo` calls `ayahVideo.make` (`AyahVideoMaker`, implemented by `NativeAyahVideo`) with those images, every word's box in 1080×1920 pixels, its ayah and its weight (letters without diacritics), and the reciter from `settings.selectedReciterId`.
 4. `NativeAyahVideo` downloads each ayah's MP3 from everyayah.com (`ayahAudioUrl`) into `cache/ayah-video/`, calls the native `AyahVideo.encode(specJson)`, then deletes the MP3s.
-5. Native (`native/android/java/video/`): `AyahVideoEncoder` decodes the MP3s into one AAC track and notes where each ayah starts and how long it lasts. A word's time is its weight's share of its ayah's recitation; it is used only to know when the next page starts. `FrameRenderer` draws 24 fps frames with OpenGL ES: the picture fades in and keeps moving (zoom swinging 1.04 ↔ 1.26 every 18 s, with a slow pan that never shows an edge); the overlay and the first page fade in over 0.8 s and then stay still; on a long ayah each next page cross-fades in (0.5 s) when its first word is recited. `MediaMuxer` writes the MP4. 1080×1920 at 6 Mbps, or 720×1280 when the phone has no encoder for the larger size. The video runs 0.9 s past the recitation.
+5. Native (`native/android/java/video/`): `AyahVideoEncoder` decodes the MP3s into one AAC track and notes where each ayah starts and how long it lasts. A word's time is its weight's share of its ayah's recitation; it is used only to know when the next page starts. `BackgroundVideo` decodes the clip with MediaCodec onto a SurfaceTexture and starts it again at its end; `FrameRenderer` draws 24 fps frames with OpenGL ES: the clip's frame (cropped to fill 9:16) fading in from black, the shade over it; the overlay and the first page fade in over 0.8 s and then stay still; on a long ayah each next page cross-fades in (0.5 s) when its first word is recited. `MediaMuxer` writes the MP4. 1080×1920 at 6 Mbps, or 720×1280 when the phone has no encoder for the larger size. The video runs 0.9 s past the recitation.
 6. The MP4 goes to `expo-sharing` as `video/mp4`, and is deleted when the modal closes, like the PNGs.
 7. A video longer than 90 s (a WhatsApp status) is still made whole; the hint under the buttons says WhatsApp will ask to trim it.
 

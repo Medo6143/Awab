@@ -14,6 +14,8 @@ import { NativeFloatingSebha } from './services/NativeFloatingSebha';
 import { NativePrayerWidget } from './services/NativePrayerWidget';
 import { NativeAzanAlarms } from './services/NativeAzanAlarms';
 import { NativeReminderAlarms } from './services/NativeReminderAlarms';
+import { ReleaseVideoBackgrounds } from './services/ReleaseVideoBackgrounds';
+import { VideoBackgrounds } from '../domain/services/VideoBackgrounds';
 import { AndroidMicrophone, CtcRecitationRecognizer, OnnxSpeechModel, QuranCdnWordAudio } from './services/TasmeeServices';
 import { Microphone, RecitationRecognizer, SpeechModel, WordAudio } from '../domain/services/Tasmee';
 import { ExpoNotificationCenter } from './notifications/ExpoNotificationCenter';
@@ -61,6 +63,7 @@ export type AppDependencies = {
   azanSound: AzanSound;
   prayerTimes: PrayerTimesSource;
   ayahVideo: AyahVideoMaker;
+  videoBackgrounds: VideoBackgrounds;
   prayerChecks: PrayerChecks;
 };
 
@@ -88,6 +91,7 @@ export const createDependencies = (): AppDependencies => {
     azanSound: audio,
     prayerTimes: new AladhanPrayerTimes(),
     ayahVideo: new NativeAyahVideo(),
+    videoBackgrounds: new ReleaseVideoBackgrounds(),
     prayerChecks,
     // a new reminder kind is one more scheduler here; the center itself does not change
     notifications: new ExpoNotificationCenter([

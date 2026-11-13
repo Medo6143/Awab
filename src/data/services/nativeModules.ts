@@ -30,7 +30,7 @@ export interface AzanNativeModule {
 
 /**
  * AyahVideoModule (native/android/java/video): builds the ayah MP4. `spec` is JSON:
- * { background, overlay, pages: [{ image, words: [{ x, y, w, h, ayah, weight }] }], audios: [], out },
+ * { video, shade, overlay, pages: [{ image, words: [{ x, y, w, h, ayah, weight }] }], audios: [], out },
  * with plain file paths and boxes in pixels of the 1080×1920 frame.
  */
 export interface AyahVideoNativeModule {

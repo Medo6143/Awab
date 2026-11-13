@@ -17,7 +17,7 @@ type NativeProgress = { fraction?: number; durationMs?: number };
  * the MP4.
  */
 export class NativeAyahVideo implements AyahVideoMaker {
-  async make({ backgroundUri, overlayUri, pages, ayahs, reciterId }: AyahVideoInput, onProgress?: (p: AyahVideoProgress) => void) {
+  async make({ videoUri, shadeUri, overlayUri, pages, ayahs, reciterId }: AyahVideoInput, onProgress?: (p: AyahVideoProgress) => void) {
     const native = ayahVideoNative();
     if (!native?.encode) throw new AyahVideoError('unsupported', 'AyahVideo native module missing');
     if (ayahs.length === 0 || pages.length === 0) throw new AyahVideoError('encode', 'nothing to show');
@@ -45,7 +45,8 @@ export class NativeAyahVideo implements AyahVideoMaker {
 
       const out = `${DIR}${id}.mp4`;
       const spec = JSON.stringify({
-        background: toPath(backgroundUri),
+        video: toPath(videoUri),
+        shade: toPath(shadeUri),
         overlay: toPath(overlayUri),
         pages: pages.map((p) => ({ image: toPath(p.uri), words: p.words })),
         audios: mp3s.map(toPath),

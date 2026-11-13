@@ -34,8 +34,10 @@ export type VideoWord = FrameBox & {
 export type VideoPage = { uri: string; words: VideoWord[] };
 
 export type AyahVideoInput = {
-  /** 1080×1920 PNG/JPG file URIs. `background` slowly zooms; `overlay` (logo, surah, reciter) stays put. */
-  backgroundUri: string;
+  /** The nature clip played (looped) behind everything: a local MP4 file URI. */
+  videoUri: string;
+  /** 1080×1920 PNG file URIs on transparent: `shade` darkens the clip so the text reads; `overlay` (logo, surah, reciter) stays put. */
+  shadeUri: string;
   overlayUri: string;
   /** The ayah text in pages; each word fades in as it is recited, and a page replaces the one before. */
   pages: VideoPage[];
@@ -45,8 +47,8 @@ export type AyahVideoInput = {
 };
 
 /**
- * Builds an ayah video on the phone: a nature picture slowly zooming, the ayah appearing word
- * by word with the reciter's recitation. Rejects with an AyahVideoError.
+ * Builds an ayah video on the phone: a nature clip playing behind the ayah, with the reciter's
+ * recitation; a long ayah's text turns its pages as it is recited. Rejects with an AyahVideoError.
  */
 export interface AyahVideoMaker {
   make(input: AyahVideoInput, onProgress?: (p: AyahVideoProgress) => void): Promise<{ uri: string; durationMs: number }>;
