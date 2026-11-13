@@ -8,8 +8,8 @@ import { AyahShareCard } from './AyahShareCard';
 import { DuaShareCard } from './DuaShareCard';
 import { toAr } from '../../../shared/utils/format';
 
-const LOGO = require('../../../../assets/icon.png');
-const MOSQUE = require('../../../../assets/images/mosque_bg.png');
+const LOGO = require('../../../../assets/images/logo.jpg');
+const MOSQUE = require('../../../../assets/images/mosque_bg.jpg');
 
 type ThemeId = keyof typeof STORY_THEMES;
 

@@ -6,7 +6,7 @@ import { Screen, ScreenHeader } from '../components/ui';
 import { toAr } from '../../shared/utils/format';
 import { colors, radius, space, type, themed } from '../../shared/theme/tokens';
 
-const LOGO = require('../../../assets/icon.png');
+const LOGO = require('../../../assets/images/logo.jpg');
 
 const FEATURES = [
   'مواقيت الصلاة والأذان كالمنبّه، مع اتجاه القبلة',

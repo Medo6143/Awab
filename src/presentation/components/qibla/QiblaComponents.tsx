@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Animated, Image } from 'react-native';
 import { s } from './QiblaStyles';
 
-const diskImage = require('../../../../assets/images/qibla_compass_bg.png');
+const diskImage = require('../../../../assets/images/qibla_compass_bg.jpg');
 
 export const CompassDisk = ({ rotateDisk }: { rotateDisk: Animated.AnimatedInterpolation<string> }) => (
   <Animated.View style={[s.disk, { transform: [{ rotate: rotateDisk }] }]}>

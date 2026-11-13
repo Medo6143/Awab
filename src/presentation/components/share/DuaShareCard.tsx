@@ -5,7 +5,7 @@ import { useShareCardSize } from './ImageShareModal';
 import { layoutAyahCard } from './ayahCardLayout';
 import { useShareTextMax } from './storyThemes';
 
-const LOGO = require('../../../../assets/icon.png');
+const LOGO = require('../../../../assets/images/logo.jpg');
 
 /** 9:16 story card for a dua: brand, the dua in Amiri, its source. */
 export const DuaShareCard = ({ text, source }: { text: string; source: string }) => {

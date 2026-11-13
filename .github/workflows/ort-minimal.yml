@@ -1,0 +1,113 @@
+# Builds a small ONNX Runtime for Android (arm64 only) that holds just the operators the
+# tasmee model uses, converts the model to the .ort format that build loads, checks the
+# converted model gives the same results, and publishes both to a release.
+name: ORT minimal build
+
+on:
+  workflow_dispatch:
+    inputs:
+      ort_version:
+        description: ONNX Runtime version (git tag without the v)
+        default: '1.32.0'
+      release_tag:
+        description: Release to publish to
+        default: ort-minimal-v1
+  push:
+    branches: [build/ort-minimal]
+    paths: [.github/workflows/ort-minimal.yml, tools/ort-minimal/**]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      ORT_VERSION: ${{ inputs.ort_version || '1.32.0' }}
+      MODEL_URL: https://github.com/${{ github.repository }}/releases/download/model-quran-ctc-v1/quran-ctc-int8.onnx
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Download the model
+        run: |
+          mkdir -p model
+          curl -fL --retry 5 -o model/quran-ctc-int8.onnx "$MODEL_URL"
+          ls -l model
+
+      - name: Convert to .ort
+        run: |
+          pip install "onnxruntime==${ORT_VERSION}" onnx numpy flatbuffers
+          python -m onnxruntime.tools.convert_onnx_models_to_ort model \
+            --optimization_style Fixed --target_platform arm --enable_type_reduction
+          ls -l model
+          cat model/*.config
+
+      - name: Check the .ort model gives the same results
+        run: python tools/ort-minimal/verify.py model/quran-ctc-int8.onnx "$(ls model/*.ort | head -1)"
+
+      - name: Get ONNX Runtime source
+        run: |
+          git clone --depth 1 --branch "v${ORT_VERSION}" --recursive --shallow-submodules \
+            https://github.com/microsoft/onnxruntime.git ort-src
+
+      - name: Build the AAR
+        working-directory: ort-src
+        run: |
+          pip install -r tools/ci_build/requirements/pybind/requirements.txt || true
+          NDK="${ANDROID_NDK_LATEST_HOME:-$ANDROID_NDK_HOME}"
+          echo "NDK: $NDK"; cat "$NDK/source.properties"
+          python tools/ci_build/github/android/build_aar_package.py \
+            --build_dir "$GITHUB_WORKSPACE/aar-build" \
+            --config MinSizeRel \
+            --android_sdk_path "$ANDROID_HOME" \
+            --android_ndk_path "$NDK" \
+            --include_ops_by_config "$(ls $GITHUB_WORKSPACE/model/*.config | head -1)" \
+            "$GITHUB_WORKSPACE/tools/ort-minimal/build_settings.json"
+
+      - name: Collect and check
+        run: |
+          mkdir -p out
+          AAR=$(find aar-build/aar_out -name '*.aar' | head -1)
+          cp "$AAR" "out/onnxruntime-android-${ORT_VERSION}-minimal.aar"
+          cp "$(ls model/*.ort | head -1)" out/quran-ctc-int8.ort
+          cp model/*.config out/quran-ctc-int8.required_operators_and_types.config
+          cd out
+          unzip -o -q "onnxruntime-android-${ORT_VERSION}-minimal.aar" -d aar
+          SO=aar/jni/arm64-v8a/libonnxruntime.so
+          {
+            echo "ONNX Runtime ${ORT_VERSION}, minimal (extended), arm64-v8a, XNNPACK"
+            ls -l *.aar *.ort
+            ls -l aar/jni/arm64-v8a/
+            echo "LOAD segment alignment of libonnxruntime.so:"
+            readelf -lW "$SO" | grep LOAD
+          } | tee build-info.txt
+          # Google Play needs 16 KB page alignment
+          if readelf -lW "$SO" | grep LOAD | awk '{print $NF}' | grep -qv '0x4000\|0x10000'; then
+            echo "::error::libonnxruntime.so is not 16 KB aligned"; exit 1
+          fi
+          rm -rf aar
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ort-minimal
+          path: out/
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.release_tag || 'ort-minimal-v1' }}
+        run: |
+          gh release view "$TAG" >/dev/null 2>&1 || \
+            gh release create "$TAG" --latest=false --title "ONNX Runtime minimal ${ORT_VERSION} (tasmee)" \
+              --notes "Small ONNX Runtime for Android arm64 holding only the tasmee model's operators, and the model in the .ort format it loads. Built by .github/workflows/ort-minimal.yml."
+          gh release upload "$TAG" out/* --clobber

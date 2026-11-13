@@ -5,19 +5,19 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { store, persistor } from './src/presentation/store';
 import AppNavigation from './src/presentation/navigation/AppNavigation';
-import { 
-  useFonts, 
-  Tajawal_400Regular,
-  Tajawal_500Medium,
-  Tajawal_700Bold,
-  Tajawal_800ExtraBold
-} from '@expo-google-fonts/tajawal';
-import { Amiri_400Regular, Amiri_700Bold } from '@expo-google-fonts/amiri';
-import { AmiriQuran_400Regular } from '@expo-google-fonts/amiri-quran';
+import { useFonts } from 'expo-font';
+// each weight from its own file: the packages' index files require every weight (italics,
+// 200–900), and Metro bundles all of them, about 1 MB of fonts the app never shows
+import { Tajawal_400Regular } from '@expo-google-fonts/tajawal/400Regular';
+import { Tajawal_500Medium } from '@expo-google-fonts/tajawal/500Medium';
+import { Tajawal_700Bold } from '@expo-google-fonts/tajawal/700Bold';
+import { Tajawal_800ExtraBold } from '@expo-google-fonts/tajawal/800ExtraBold';
+import { Amiri_400Regular } from '@expo-google-fonts/amiri/400Regular';
+import { Amiri_700Bold } from '@expo-google-fonts/amiri/700Bold';
+import { AmiriQuran_400Regular } from '@expo-google-fonts/amiri-quran/400Regular';
 import * as SplashScreen from 'expo-splash-screen';
 import { AnimatedSplash } from './src/presentation/components/splash/AnimatedSplash';
 
-import './global.css'; // NativeWind
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync().catch(() => {});
