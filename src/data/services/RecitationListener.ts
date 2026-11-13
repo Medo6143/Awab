@@ -9,10 +9,14 @@ import { CtcEngine, CtcTiming } from './ctcEngine';
  * app's GitHub repo, the first time they choose «بصوتي».
  */
 // a GitHub release of the app's repo (credit and changes in its notes, and in «عن أوّاب»)
-export const MODEL_URL = 'https://github.com/Medo6143/Awab/releases/download/model-quran-ctc-v1/quran-ctc-int8.onnx';
+// The .ort format: the app ships a minimal ONNX Runtime that loads only this format (built by
+// .github/workflows/ort-minimal.yml from the .onnx in model-quran-ctc-v1).
+export const MODEL_URL = 'https://github.com/Medo6143/Awab/releases/download/model-quran-ctc-v2/quran-ctc-int8.ort';
 export const MODEL_MB = 157;
 
-const MODEL_FILE = `${FileSystem.documentDirectory}asr/quran-ctc-int8.onnx`;
+const MODEL_FILE = `${FileSystem.documentDirectory}asr/quran-ctc-int8.ort`;
+/** The .onnx earlier versions downloaded; the runtime can't load it any more. */
+const OLD_MODEL_FILE = `${FileSystem.documentDirectory}asr/quran-ctc-int8.onnx`;
 
 const SAMPLE_RATE = 16000;
 
@@ -22,6 +26,7 @@ const exists = async (uri: string, minBytes = 1_000_000) => {
 
 /** The model on this phone, or null. */
 export const modelPath = async (): Promise<string | null> => {
+  FileSystem.deleteAsync(OLD_MODEL_FILE, { idempotent: true }).catch(() => {});
   return (await exists(MODEL_FILE)) ? MODEL_FILE : null;
 };
 
