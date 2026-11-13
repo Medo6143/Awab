@@ -17,5 +17,7 @@ export type AudioState = {
   currentSurahId: number | null;
   currentPosition: number;
   duration: number;
-  playMode?: 'surah' | 'ayah' | 'sequence';
+  playMode?: 'surah' | 'ayah' | 'sequence' | 'live';
+  /** The radio playing when playMode is 'live'. */
+  liveStation?: { id: string; name: string; url: string } | null;
 };

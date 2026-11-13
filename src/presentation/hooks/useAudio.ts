@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RECITER_MAP } from '../../domain/entities/reciters';
 import { AyahKey } from '../../domain/services/Audio';
+import { RadioStation } from '../../domain/entities/radio';
 import { useDependencies } from '../providers/DependencyProvider';
 import { RootState } from '../store';
 import { setReciterId } from '../store/slices/settingsSlice';
@@ -25,26 +26,38 @@ export const useAudio = () => {
   };
 
   const playSurah = async (surahId: number, surahName?: string) => {
-    dispatch(setAudioState({ currentSurahId: surahId, playMode: 'surah' }));
+    dispatch(setAudioState({ currentSurahId: surahId, playMode: 'surah', liveStation: null }));
     await player.playSurah(surahId, surahName);
   };
 
   const playAyah = async (surahId: number, ayahNumber: number, surahName?: string) => {
-    dispatch(setAudioState({ currentSurahId: surahId, playMode: 'ayah' }));
+    dispatch(setAudioState({ currentSurahId: surahId, playMode: 'ayah', liveStation: null }));
     await player.playAyah(surahId, ayahNumber, surahName);
   };
 
   const playSequence = async (items: AyahKey[], title?: string) => {
     if (items.length === 0) return;
-    dispatch(setAudioState({ currentSurahId: items[0].surahId, playMode: 'sequence' }));
+    dispatch(setAudioState({ currentSurahId: items[0].surahId, playMode: 'sequence', liveStation: null }));
     await player.playSequence(items, title, () => {
       dispatch(setAudioState({ playMode: undefined }));
     });
   };
 
+  const playLive = async (station: RadioStation) => {
+    const liveStation = { id: station.id, name: station.name, url: station.url };
+    dispatch(setAudioState({ currentSurahId: null, playMode: 'live', liveStation }));
+    await player.playLive({ url: station.url, title: station.name });
+  };
+
   const togglePlayback = async () => {
     if (state.isPlaying) {
       await player.pause();
+      return;
+    }
+    // a paused live stream resumes from where the buffer stopped, minutes behind the
+    // broadcast: start it again at the live point instead
+    if (state.playMode === 'live' && state.liveStation) {
+      await playLive(state.liveStation);
       return;
     }
     // After an app restart the persisted "current surah" has no queue behind it,
@@ -68,7 +81,7 @@ export const useAudio = () => {
 
   const stopPlayback = async () => {
     await player.stop();
-    dispatch(setAudioState({ currentSurahId: null, playMode: undefined }));
+    dispatch(setAudioState({ currentSurahId: null, playMode: undefined, liveStation: null }));
   };
 
   return { 
@@ -78,6 +91,7 @@ export const useAudio = () => {
     playSurah, 
     playAyah, 
     playSequence, 
+    playLive,
     togglePlayback, 
     stopPlayback,
     seekTo,

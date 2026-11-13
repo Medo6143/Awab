@@ -89,7 +89,7 @@ Some services keep their own AsyncStorage caches outside Redux (hadith details).
 `src/presentation/navigation/AppNavigation.tsx`: one stack navigator whose first screen is a bottom-tab navigator.
 
 - **Tabs** (stable ids, Arabic titles): `TabHome` الرئيسية, `TabPrayer` الصلاة, `TabQuran` القرآن, `TabTasbeeh` المسبحة, `TabAthkar` الأذكار. The Quran tab hides the tab bar. The bar itself is `GlassTabBar.tsx`.
-- **Stack routes** keep Arabic names, used directly in `navigate()` calls: الأدعية, نور_القلب, الختمات, الفضائل, رسائل_القرآن, الأحاديث, الحديث, الخصوصية, عن_التطبيق, القبلة, الزكاة, العبادات, الإعدادات, الإحصائيات, التذكيرات, التلاوات, التسميع.
+- **Stack routes** keep Arabic names, used directly in `navigate()` calls: الأدعية, نور_القلب, الختمات, الفضائل, رسائل_القرآن, الأحاديث, الحديث, الخصوصية, عن_التطبيق, القبلة, الزكاة, العبادات, الإعدادات, الإحصائيات, التذكيرات, التلاوات, الإذاعة, التسميع.
 - Two stack routes, الأذكار and الصلاة, are declared but no `navigate()` call reaches them; those screens are only shown as tabs.
 - Param types live in `src/presentation/navigation/types.ts`.
 - The navigation state is kept in a module variable so that switching the theme, which remounts the tree, leaves the user where they were.

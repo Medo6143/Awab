@@ -38,6 +38,8 @@ import { PrayerTimesSource } from '../domain/services/PrayerTimes';
 import { AladhanPrayerTimes } from './services/PrayerTimeService';
 import { AyahVideoMaker } from '../domain/services/AyahVideo';
 import { NativeAyahVideo } from './services/NativeAyahVideo';
+import { RadioDirectory } from '../domain/services/Radio';
+import { Mp3QuranRadioDirectory } from './services/Mp3QuranRadioDirectory';
 import { PrayerChecks } from '../domain/services/PrayerChecks';
 import { NativePrayerChecks } from './services/NativePrayerChecks';
 import { PrayerCheckScheduler } from './notifications/PrayerCheckScheduler';
@@ -63,6 +65,7 @@ export type AppDependencies = {
   azanSound: AzanSound;
   prayerTimes: PrayerTimesSource;
   ayahVideo: AyahVideoMaker;
+  radios: RadioDirectory;
   videoBackgrounds: VideoBackgrounds;
   prayerChecks: PrayerChecks;
 };
@@ -91,6 +94,7 @@ export const createDependencies = (): AppDependencies => {
     azanSound: audio,
     prayerTimes: new AladhanPrayerTimes(),
     ayahVideo: new NativeAyahVideo(),
+    radios: new Mp3QuranRadioDirectory(),
     videoBackgrounds: new ReleaseVideoBackgrounds(),
     prayerChecks,
     // a new reminder kind is one more scheduler here; the center itself does not change

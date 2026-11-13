@@ -6,6 +6,26 @@ import { AyahKey, AzanSound, IDLE_PLAYBACK, PlaybackStatus, QuranPlayer } from '
 import { DEFAULT_RECITER_ID, RECITER_MAP, ayahAudioUrl } from '../../domain/entities/reciters';
 
 /**
+ * Follows a stream's redirects and returns the final address, forced to https (radio relays
+ * redirect to http and serve the same stream on https). Only the headers are read: the
+ * request is aborted as soon as they arrive. Falls back to `url` when anything fails.
+ */
+const resolveStreamUrl = async (url: string): Promise<string> => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    const res = await fetch(url, { method: 'GET', signal: controller.signal, headers: { Range: 'bytes=0-0' } });
+    const final = res.url || url;
+    controller.abort();
+    return final.replace(/^http:\/\//i, 'https://');
+  } catch {
+    return url;
+  } finally {
+    clearTimeout(timer);
+  }
+};
+
+/**
  * Recitation and the in-app adhan on top of react-native-track-player (whole surahs, with the
  * media notification) and expo-av (single ayahs and the adhan). Both interfaces live in one
  * class because they share the one expo-av sound: starting the adhan replaces a playing ayah.
@@ -75,6 +95,44 @@ export class ExpoAudioPlayer implements QuranPlayer, AzanSound {
   private async ensureTrackPlayer() {
     if (!this.isTrackPlayerInitialized) {
       this.isTrackPlayerInitialized = await initializeTrackPlayer();
+    }
+  }
+
+  /**
+   * Live radio through track-player (notification, lock screen, background). Radio relays
+   * such as radiojar answer an https URL with a redirect to http, which Android's player
+   * refuses (cross-protocol redirect, and cleartext is off); so the redirect is followed here
+   * and the final address played over https, which those relays also serve.
+   */
+  async playLive({ url, title, subtitle }: { url: string; title: string; subtitle?: string }) {
+    const request = ++this.request;
+    this.stopSequence();
+    this.engine = 'track';
+    this.emit({ ...IDLE_PLAYBACK, isBuffering: true });
+    await this.dropSound();
+
+    try {
+      const streamUrl = await resolveStreamUrl(url);
+      await this.ensureTrackPlayer();
+      await TrackPlayer.reset();
+      if (request !== this.request) return false;
+      await TrackPlayer.add({
+        id: `live-${url}`,
+        url: streamUrl,
+        title,
+        artist: subtitle ?? 'بث مباشر',
+        artwork: require('../../../assets/images/mosque_bg.png'),
+        isLiveStream: true,
+      });
+      await TrackPlayer.play();
+      return true;
+    } catch (error) {
+      console.error('AudioService: Error playing live stream:', error);
+      if (request === this.request) {
+        this.engine = null;
+        this.emit(IDLE_PLAYBACK);
+      }
+      return false;
     }
   }
 

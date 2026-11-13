@@ -25,6 +25,8 @@ export interface QuranPlayer {
   playAyah(surahId: number, ayahNumber: number, surahName?: string): Promise<boolean>;
   /** Plays `items` one after another, then calls `onFinish`. */
   playSequence(items: AyahKey[], title?: string, onFinish?: () => void): Promise<void>;
+  /** A live stream (Quran radio), with the media notification. No seeking. */
+  playLive(stream: { url: string; title: string; subtitle?: string }): Promise<boolean>;
   pause(): Promise<void>;
   resume(): Promise<void>;
   seek(positionMillis: number): Promise<void>;

@@ -30,6 +30,7 @@ import PrayerHubScreen from '../screens/PrayerHubScreen';
 import StatsScreen from '../screens/StatsScreen';
 import RemindersScreen from '../screens/RemindersScreen';
 import RecitationsScreen from '../screens/RecitationsScreen';
+import RadioScreen from '../screens/RadioScreen';
 import TasmeeScreen from '../screens/TasmeeScreen';
 
 /**
@@ -100,6 +101,7 @@ const AppNavigation = () => {
           <Stack.Screen name="الإحصائيات" component={StatsScreen} />
           <Stack.Screen name="التذكيرات" component={RemindersScreen} />
           <Stack.Screen name="التلاوات" component={RecitationsScreen} />
+          <Stack.Screen name="الإذاعة" component={RadioScreen} />
           <Stack.Screen name="التسميع" component={TasmeeScreen} />
         </Stack.Navigator>
       </View>
