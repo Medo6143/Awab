@@ -24,7 +24,7 @@ export const PrayerCheckSettings = () => {
   const { prayerChecks } = useDependencies();
   const accent = useAccent();
   const tryIt = async () => {
-    const shown = await prayerChecks.preview(prayerCheckCopy('الظهر', settings.delayMinutes));
+    const shown = await prayerChecks.preview(prayerCheckCopy('الظهر'));
     if (!shown) Alert.alert('محتاج إذن الظهور فوق التطبيقات', 'عشان السؤال يظهر فوق الشاشة، اسمح لأوّاب «بالظهور فوق التطبيقات» من إعدادات الموبايل. من غيره هيجيلك كإشعار.');
   };
 

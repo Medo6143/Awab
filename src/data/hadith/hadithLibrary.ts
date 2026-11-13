@@ -1,5 +1,6 @@
 import type { HadithCategory, HadithIndexEntry } from '../../domain/entities/hadith';
 import { normalizeArabic } from '../../domain/services/arabicText';
+import { hasTerm, searchTerms } from '../../domain/services/arabicSearch';
 
 /**
  * Offline index of the hadith library: categories, and one line per hadith
@@ -16,7 +17,7 @@ const load = () => {
   const { HADITH_CATEGORIES, HADITH_INDEX_TEXT } = require('./hadithIndex') as { HADITH_CATEGORIES: HadithCategory[]; HADITH_INDEX_TEXT: string };
   const entries: Entry[] = HADITH_INDEX_TEXT.split('\n').map((line) => {
     const [id, grade, attribution, cats, title, text = ''] = line.split('|');
-    return { id: +id, grade, attribution, categories: cats ? cats.split(',').map(Number) : [], title, norm: normalizeArabic(`${title} ${text}`) };
+    return { id: +id, grade, attribution, categories: cats ? cats.split(',').map(Number) : [], title, norm: ` ${normalizeArabic(`${title} ${text}`)} ` };
   });
   cache = { categories: HADITH_CATEGORIES, entries, byId: new Map(entries.map((e) => [e.id, e])) };
   return cache;
@@ -47,18 +48,29 @@ export const hadithEntry = (id: number): HadithIndexEntry | undefined => {
   return e ? strip(e) : undefined;
 };
 
-/** Hadiths whose title or text contains every word of the query (diacritics/hamza-insensitive). */
+/**
+ * Hadiths for a query: first those holding the query as typed, then those where every word
+ * appears in some form (without «ال», another derivation, or a word the texts use for that
+ * topic, see searchTerms). Diacritics and hamza spelling do not matter.
+ */
 export const searchHadiths = (query: string, limit = 80): { hits: HadithIndexEntry[]; total: number } => {
   const q = normalizeArabic(query);
   if (q.length < 2) return { hits: [], total: 0 };
-  const words = q.split(' ');
+  const words = q.split(' ').map(searchTerms);
   const phrase: Entry[] = [];
-  const loose: Entry[] = [];
+  const loose: { e: Entry; score: number }[] = [];
   for (const e of load().entries) {
-    if (e.norm.includes(q)) phrase.push(e);
-    else if (words.length > 1 && words.every((w) => e.norm.includes(w))) loose.push(e);
+    if (q.length > 2 && e.norm.includes(q)) { phrase.push(e); continue; }
+    let score = 0;
+    for (const terms of words) {
+      const best = terms.reduce((m, t) => (t.weight > m && hasTerm(e.norm, t.text) ? t.weight : m), 0);
+      if (!best) { score = 0; break; }
+      score += best;
+    }
+    if (score) loose.push({ e, score });
   }
-  const all = phrase.concat(loose);
+  loose.sort((a, b) => b.score - a.score);
+  const all = phrase.concat(loose.map((x) => x.e));
   return { hits: all.slice(0, limit).map(strip), total: all.length };
 };
 

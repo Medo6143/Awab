@@ -13,6 +13,7 @@ import { SkyButton, SkyHero } from '../components/home/SkyHero';
 import { Activity, Settings } from 'lucide-react-native';
 import { DayStats } from '../components/home/DayCards';
 import { WirdCard } from '../components/home/WirdCard';
+import { WelcomeBackCard } from '../components/home/WelcomeBackCard';
 import { getLocalToday } from '../store/slices/statsSlice';
 import { HomeGrid } from '../components/home/HomeSections';
 import { MORNING_ATHKAR, EVENING_ATHKAR } from '../../shared/constants/athkar';
@@ -95,6 +96,7 @@ const HomeScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
       />
 
       <View style={{ paddingHorizontal: 20, marginTop: -space[4] }}>
+      <WelcomeBackCard onStart={() => navigateTo('العبادات')} />
       <WirdCard surahName={`سورة ${surahOfPage(currentPage)}`} page={currentPage} onRead={() => navigateTo('TabQuran')} />
       <DayStats
         items={[
@@ -107,7 +109,7 @@ const HomeScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
       <HomeGrid onNavigate={navigateTo} onReport={() => setReportVisible(true)} />
 
       <DailyMessageCard
-        onOpenMessage={(mood) => navigation.navigate('رسائل_القرآن', { mood })}
+        onOpenMessage={(mood, verse) => navigation.navigate('رسائل_القرآن', { mood, verse })}
         onOpenHadith={(id) => navigation.navigate('الحديث', { id })}
       />
       <View style={{ height: space[4] }} />

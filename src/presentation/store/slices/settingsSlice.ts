@@ -40,6 +40,8 @@ interface SettingsState {
   tasbeehTargetAlert: boolean; // a stronger buzz when the target is reached
   /** «صليت؟» after each adhan; missing in state persisted before it existed. */
   prayerCheck?: PrayerCheckSettings;
+  /** The welcome screens were seen (fresh installs only; migration 8 sets it for existing users). */
+  onboarded?: boolean;
 }
 
 const initialState: SettingsState = {
@@ -66,6 +68,7 @@ const initialState: SettingsState = {
   asrMethod: 'auto',
   tasbeehTargetAlert: true,
   prayerCheck: DEFAULT_PRAYER_CHECK,
+  onboarded: false,
 };
 
 export const settingsSlice = createSlice({
@@ -104,6 +107,9 @@ export const settingsSlice = createSlice({
     },
     setMushafFontScale: (state, action: PayloadAction<number>) => {
       state.mushafFontScale = action.payload;
+    },
+    finishOnboarding: (state) => {
+      state.onboarded = true;
     },
     dismissMushafHint: (state) => {
       state.mushafHintSeen = true;
@@ -161,7 +167,8 @@ export const settingsSlice = createSlice({
   },
 });
 
-export const { 
+export const {
+  finishOnboarding,
   setPrayerCheck,
   toggleNotifications, 
   toggleLocation, 

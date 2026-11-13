@@ -14,6 +14,7 @@ const todayKey = (d = new Date()) =>
 /**
  * Keeps «صليت؟» and «العبادات» in step, both ways:
  * - prayers ticked in the app are passed to the native side, so their question stays quiet;
+ * - the card is drawn in the app's light or dark theme, not the phone's;
  * - «صليت» tapped on a notification ticks the prayer (on launch, on return to the app, or
  *   right away when the app is running). Only today's answers count, like the ibada list.
  * Rendered once at the app root.
@@ -31,6 +32,9 @@ export const usePrayerCheckSync = () => {
     [tasks, resetDay],
   );
   useEffect(() => { prayerChecks.setDoneToday(doneIds); }, [prayerChecks, doneIds]);
+
+  const theme = useSelector((s: RootState) => s.settings.theme) ?? 'dark';
+  useEffect(() => { prayerChecks.setLook(theme); }, [prayerChecks, theme]);
 
   const applyAnswers = useCallback(async () => {
     const answers = await prayerChecks.takeAnswers();

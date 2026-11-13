@@ -12,7 +12,7 @@ import {
   PRAYER_NAMES_AR, REMINDER_PRESETS, Reminder, ReminderArt, ReminderKind, ReminderSound, WEEKDAYS_SHORT, newReminder, presetOf,
 } from '../../../domain/entities/reminders';
 import { PRAYER_IDS } from '../../../domain/entities/notifications';
-import { toAr } from '../../../shared/utils/format';
+import { toAr, clock12 } from '../../../shared/utils/format';
 import { colors, radius, space, type, themed } from '../../../shared/theme/tokens';
 
 const SOUNDS: { id: ReminderSound; label: string; hint: string }[] = [
@@ -27,7 +27,6 @@ const ARTS: { id: ReminderArt; label: string }[] = [
 const OFFSETS = [-60, -30, 0, 15, 30, 60];
 
 const offsetLabel = (m: number) => (m === 0 ? 'وقتها' : `${m < 0 ? 'قبل' : 'بعد'} ${m % 60 === 0 ? (Math.abs(m) === 60 ? 'بساعة' : `${toAr(Math.abs(m) / 60)} س`) : `${toAr(Math.abs(m))} د`}`);
-export const clock12 = (h: number, m: number) => `${toAr(((h + 11) % 12) + 1)}:${toAr(String(m).padStart(2, '0'))} ${h < 12 ? 'ص' : 'م'}`;
 
 /** Add or edit one reminder. `initial` null with `kind` starts a new one from that preset. */
 export const ReminderEditor = ({ visible, initial, onSave, onDelete, onClose }: {

@@ -2,7 +2,7 @@ import type { MigrationManifest, PersistedState } from 'redux-persist';
 import { Reminder, newReminder } from '../../domain/entities/reminders';
 
 type Persisted = PersistedState & {
-  settings?: { notificationPrefs?: Record<string, unknown> };
+  settings?: { notificationPrefs?: Record<string, unknown>; onboarded?: boolean };
   reminders?: { list?: Reminder[] };
 };
 
@@ -37,5 +37,10 @@ export const migrations: MigrationManifest = {
       settings: { ...s.settings, notificationPrefs: rest },
       reminders: { ...s.reminders, list: add ? [...list, reminder] : list },
     } as PersistedState;
+  },
+  /** The welcome screens are for new installs: whoever already had the app skips them. */
+  8: (state) => {
+    const s = state as Persisted;
+    return { ...s, settings: { ...s.settings, onboarded: true } } as PersistedState;
   },
 };

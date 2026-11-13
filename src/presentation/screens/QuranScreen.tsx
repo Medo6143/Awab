@@ -329,6 +329,7 @@ const QuranScreen = ({ navigation }: Pick<ScreenProps, 'navigation'>) => {
         togglePlayback={togglePlayback}
         onShowReciterPicker={() => setShowReciterPicker(true)}
         surahsList={surahsList}
+        currentPage={currentPage}
       />
 
       <ReciterPickerModal

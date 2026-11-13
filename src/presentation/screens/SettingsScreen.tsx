@@ -2,8 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  Bell, MapPin, Info, ChevronLeft, Vibrate, Target, ShieldCheck, Megaphone, BookOpen, CircleDot, Palette,
-} from 'lucide-react-native';
+  Bell, MapPin, Info, ChevronLeft, Vibrate, Target, ShieldCheck, Megaphone, BookOpen, CircleDot, Palette, ArchiveRestore } from 'lucide-react-native';
 import { StackActions } from '@react-navigation/native';
 import { ScreenProps } from '../navigation/types';
 import { DEFAULT_AZAN_SETTINGS, DEFAULT_NOTIFICATION_PREFS } from '../../domain/entities/notifications';
@@ -34,6 +33,7 @@ import { MushafThemeSelector } from '../components/settings/MushafThemeSelector'
 import { MUSHAF_THEMES } from '../components/quran/mushafThemes';
 
 import type { SettingsSection as Section } from '../navigation/types';
+import { BackupSettings } from '../components/settings/BackupSettings';
 
 const SECTIONS: { id: Section; title: string; icon: typeof Info }[] = [
   { id: 'prayer', title: 'الصلاة والأذان', icon: Megaphone },
@@ -41,6 +41,7 @@ const SECTIONS: { id: Section; title: string; icon: typeof Info }[] = [
   { id: 'quran', title: 'المصحف والتفسير', icon: BookOpen },
   { id: 'tasbeeh', title: 'المسبحة والعائمة', icon: CircleDot },
   { id: 'look', title: 'المظهر', icon: Palette },
+  { id: 'backup', title: 'النسخة الاحتياطية', icon: ArchiveRestore },
 ];
 
 /**
@@ -91,6 +92,7 @@ const useSectionHint = (id: Section) => {
     case 'alerts': return st8.notificationsEnabled ? 'الإشعارات شغالة · الأذكار والورد والتشجيع' : 'الإشعارات متوقفة';
     case 'quran': return `المصحف ${MUSHAF_THEMES[st8.mushafTheme ?? 'classic']?.name ?? ''} · القارئ: ${RECITER_MAP[st8.selectedReciterId]?.name ?? ''}`;
     case 'tasbeeh': return tasbeeh.floatingReminderInterval ? `تذكير كل ${toAr(tasbeeh.floatingReminderInterval)} دقايق` : 'الاهتزاز والهدف والعائمة';
+    case 'backup': return 'احفظ كل حاجة في ملف، ورجّعها على أي موبايل';
     case 'look': return `${st8.theme === 'light' ? 'فاتح' : st8.theme === 'system' ? 'حسب الموبايل' : 'داكن'} · ${st8.accentTheme === 'emerald' ? 'زمردي' : st8.accentTheme === 'midnight' ? 'ليلي' : 'ذهبي'}`;
   }
 };
@@ -193,6 +195,8 @@ const SectionBody = ({ section, navigation }: { section: Section; navigation: Sc
           </SettingSection>
         </>
       );
+    case 'backup':
+      return <BackupSettings />;
     case 'look':
       return (
         <SettingSection title="لون التطبيق">

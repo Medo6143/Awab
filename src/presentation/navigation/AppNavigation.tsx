@@ -18,6 +18,7 @@ import HeartJourneyScreen from '../screens/HeartJourneyScreen';
 import KhatmatScreen from '../screens/KhatmatScreen';
 import VirtuesScreen from '../screens/VirtuesScreen';
 import QuranMessagesScreen from '../screens/QuranMessagesScreen';
+import TrialsScreen from '../screens/TrialsScreen';
 import HadithLibraryScreen from '../screens/HadithLibraryScreen';
 import HadithDetailScreen from '../screens/HadithDetailScreen';
 import PrivacyScreen from '../screens/PrivacyScreen';
@@ -89,6 +90,7 @@ const AppNavigation = () => {
           <Stack.Screen name="الختمات" component={KhatmatScreen} />
           <Stack.Screen name="الفضائل" component={VirtuesScreen} />
           <Stack.Screen name="رسائل_القرآن" component={QuranMessagesScreen} />
+          <Stack.Screen name="الابتلاءات" component={TrialsScreen} />
           <Stack.Screen name="الأحاديث" component={HadithLibraryScreen} />
           <Stack.Screen name="الحديث" component={HadithDetailScreen} />
           <Stack.Screen name="الخصوصية" component={PrivacyScreen} />

@@ -28,7 +28,8 @@ type Props = { onDone: () => void };
 /**
  * Launch animation shown once over the app after the native splash: a gold mihrab draws
  * itself, light falls onto the prostrating figure from the logo, then the name and the
- * verse appear. The native splash uses the same background, so the hand-off is seamless.
+ * verse appear. It follows the app's light or dark theme; the native splash before it follows
+ * the phone's (app.json, expo-splash-screen), so the two match unless they were set apart.
  * Tapping skips it.
  */
 export const AnimatedSplash = ({ onDone }: Props) => {
@@ -93,7 +94,7 @@ export const AnimatedSplash = ({ onDone }: Props) => {
               </LinearGradient>
             </Defs>
             <AnimatedPath d={OUTER} fill="none" stroke={colors.gold} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" strokeDasharray={`${OUTER_LEN}`} strokeDashoffset={outer} />
-            <AnimatedPath d={INNER} fill="none" stroke="#8a6d22" strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round" strokeDasharray={`${INNER_LEN}`} strokeDashoffset={inner} />
+            <AnimatedPath d={INNER} fill="none" stroke={colors.goldDeep} strokeWidth={1.2} strokeLinecap="round" strokeLinejoin="round" strokeDasharray={`${INNER_LEN}`} strokeDashoffset={inner} />
             <Line x1={26} y1={254} x2={194} y2={254} stroke={colors.gold} strokeWidth={1} opacity={0.5} />
           </Svg>
 
@@ -145,11 +146,11 @@ export const AnimatedSplash = ({ onDone }: Props) => {
 };
 
 const st = themed(() => ({
-  root: { backgroundColor: '#0c0805', zIndex: 100 },
+  root: { backgroundColor: colors.bg, zIndex: 100 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   floor: { position: 'absolute' },
   figure: { position: 'absolute' },
   name: { fontFamily: 'Amiri_700Bold', fontSize: 50, lineHeight: 70, color: colors.gold, marginTop: 10 },
-  verse: { fontFamily: 'Amiri_400Regular', fontSize: 17, color: '#cfc4b2' },
+  verse: { fontFamily: 'Amiri_400Regular', fontSize: 17, color: colors.textMuted },
   rule: { width: 130, height: 1, backgroundColor: colors.gold, marginTop: 18 },
 }));

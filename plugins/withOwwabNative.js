@@ -163,6 +163,7 @@ function withNativePackages(config) {
       `add(${pkg}.AzanPackage())`,
       `add(${pkg}.video.AyahVideoPackage())`,
       `add(${pkg}.prayercheck.PrayerCheckPackage())`,
+      `add(${pkg}.stream.StreamPackage())`,
       `add(${pkg}.OemBatteryPackage())`,
       // Expo's autolinking leaves onnxruntime-react-native out of PackageList (its gradle
       // project is still built), so the recitation model's native module is added here
@@ -208,7 +209,7 @@ function withAzanIntent(config) {
 
   /** Over the lock screen, screen on, kept on: like an alarm clock, for the adhan only. */
   private fun applyAzanWindow(intent: android.content.Intent?) {
-    if (intent?.getBooleanExtra("isAzanTriggered", false) != true) return
+    if (!isFreshAzanIntent(intent)) return
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
       setShowWhenLocked(true)
       setTurnScreenOn(true)
@@ -221,15 +222,26 @@ function withAzanIntent(config) {
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
   }
 
+  /**
+   * The adhan opened the activity just now. Reopening the app from Recents relaunches the task
+   * with the adhan's original intent, so that one is not counted.
+   */
+  private fun isFreshAzanIntent(intent: android.content.Intent?): Boolean {
+    if (intent?.getBooleanExtra("isAzanTriggered", false) != true) return false
+    return (intent.flags and android.content.Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == 0
+  }
+
   private fun checkAzanIntent(intent: android.content.Intent?) {
-    if (intent?.getBooleanExtra("isAzanTriggered", false) == true) {
-      val prayerName = intent.getStringExtra("prayerName") ?: "الصلاة"
+    if (isFreshAzanIntent(intent)) {
+      val prayerName = intent!!.getStringExtra("prayerName") ?: "الصلاة"
       AzanModule.setPendingAzan(prayerName)
       val params = com.facebook.react.bridge.Arguments.createMap()
       params.putString("prayerName", prayerName)
       reactContext?.getJSModule(com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
         ?.emit("onAzanTriggered", params)
     }
+    // handled once: a recreated activity (rotation, theme change) must not raise it again
+    intent?.removeExtra("isAzanTriggered")
   }
 
   // New Architecture (bridgeless) exposes the context through ReactHost; the legacy

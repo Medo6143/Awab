@@ -18,7 +18,7 @@ const ALL_VERSES = QURAN_MESSAGES.flatMap((m, i) => m.verses.map((_, j) => [i, j
  * and a hadith, drawn at random each time the app opens; "رسالة تانية", "آية تانية" and "حديث تاني" draw
  * new ones at random, as many times as the reader likes.
  */
-export const DailyMessageCard = ({ onOpenMessage, onOpenHadith }: { onOpenMessage: (mood: string) => void; onOpenHadith: (id: number) => void }) => {
+export const DailyMessageCard = ({ onOpenMessage, onOpenHadith }: { onOpenMessage: (mood: string, verse: number) => void; onOpenHadith: (id: number) => void }) => {
   const { hadithLibrary } = useDependencies();
   // a fresh verse every time the app opens, not the same one all day
   const [pick, setPick] = useState<readonly [number, number]>(() => ALL_VERSES[Math.floor(Math.random() * ALL_VERSES.length)]);
@@ -45,7 +45,7 @@ export const DailyMessageCard = ({ onOpenMessage, onOpenHadith }: { onOpenMessag
     <View>
       <SectionTitle title="رسالة لك" />
       <Card padding={5}>
-        <TouchableOpacity onPress={() => onOpenMessage(mood.id)} activeOpacity={0.85} accessibilityRole="button">
+        <TouchableOpacity onPress={() => onOpenMessage(mood.id, pick[1])} activeOpacity={0.85} accessibilityRole="button">
           <View style={st.tag}><Text style={st.tagText}>{mood.name}</Text></View>
           {loading ? <ActivityIndicator color={colors.gold} /> : <Text style={st.verse} numberOfLines={5}>﴿ {texts.join(' ')} ﴾</Text>}
           <Text style={st.ref}>{verseLabel(verse)}</Text>

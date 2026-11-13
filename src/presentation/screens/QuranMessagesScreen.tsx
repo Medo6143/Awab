@@ -35,7 +35,15 @@ const shuffled = (n: number) => {
  * opened, then message n takes item n of each list, so nothing repeats until a list runs out.
  */
 type Order = { verses: number[]; hadiths: number[]; duas: number[]; n: number };
-const orderFor = (m: QuranMessage): Order => ({ verses: shuffled(m.verses.length), hadiths: shuffled(m.hadiths.length), duas: shuffled(m.duas.length), n: 0 });
+/** `firstVerse`: the verse to start on (the one the home card showed), then the rest shuffled. */
+const orderFor = (m: QuranMessage, firstVerse?: number): Order => {
+  const verses = shuffled(m.verses.length);
+  if (firstVerse != null && firstVerse >= 0 && firstVerse < m.verses.length) {
+    verses.splice(verses.indexOf(firstVerse), 1);
+    verses.unshift(firstVerse);
+  }
+  return { verses, hadiths: shuffled(m.hadiths.length), duas: shuffled(m.duas.length), n: 0 };
+};
 const at = <T,>(list: readonly T[], order: number[], n: number): T | undefined => (list.length ? list[order[n % order.length]] : undefined);
 
 /**
@@ -48,7 +56,7 @@ const QuranMessagesScreen = ({ navigation, route }: ScreenProps<'رسائل_ال
   const liked = useSelector((s: RootState) => s.favorites?.messageCards ?? []);
   const { playAyah, playSequence } = useAudio();
   const [mood, setMood] = useState<QuranMessage | null>(() => QURAN_MESSAGES.find((m) => m.id === route.params?.mood) ?? null);
-  const [order, setOrder] = useState<Order | null>(() => (mood ? orderFor(mood) : null));
+  const [order, setOrder] = useState<Order | null>(() => (mood ? orderFor(mood, route.params?.verse) : null));
   const [shared, setShared] = useState<Share | null>(null);
   const scroll = useRef<ScrollView>(null);
   const bottom = useSafeAreaInsets().bottom;

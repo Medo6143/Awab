@@ -21,7 +21,7 @@ export type TasmeeParams = {
   voiceMode?: 'correct' | 'mark';
 };
 
-export type SettingsSection = 'prayer' | 'alerts' | 'quran' | 'tasbeeh' | 'look';
+export type SettingsSection = 'prayer' | 'alerts' | 'quran' | 'tasbeeh' | 'look' | 'backup';
 
 /** Stack routes keep their Arabic names; they are used across the app for navigate(). */
 export type RootStackParamList = {
@@ -31,9 +31,11 @@ export type RootStackParamList = {
   'نور_القلب': undefined;
   'الختمات': { mode?: 'reading' | 'hifz' } | undefined;
   'الفضائل': { topic: 'dua' | 'dhikr' };
-  'رسائل_القرآن': { mood?: string } | undefined;
+  /** `verse`: index in the mood's verses to open on (the one a card showed). */
+  'رسائل_القرآن': { mood?: string; verse?: number } | undefined;
   'الأحاديث': { categoryId?: number; favorites?: boolean } | undefined;
   'الحديث': { id: number };
+  'الابتلاءات': undefined;
   'الخصوصية': undefined;
   'عن_التطبيق': undefined;
   'القبلة': undefined;

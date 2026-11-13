@@ -4,6 +4,9 @@ const AR_DIGITS = '٠١٢٣٤٥٦٧٨٩';
 export const toAr = (n: number | string): string =>
   String(n).replace(/[0-9]/g, (d) => AR_DIGITS[+d]);
 
+/** 24-hour time → «٣:٠٥ م». */
+export const clock12 = (h: number, m: number) => `${toAr(((h + 11) % 12) + 1)}:${toAr(String(m).padStart(2, '0'))} ${h < 12 ? 'ص' : 'م'}`;
+
 /** Arabic-Indic digits with thousands separators (used for money). */
 export const toArGrouped = (n: number, fractionDigits = 0): string =>
   toAr(

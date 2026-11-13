@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { ChevronLeft, Flame } from 'lucide-react-native';
+import { ChevronLeft, Flame, Sunrise } from 'lucide-react-native';
+import type { Journey } from '../../../domain/services/returns';
 import { s } from './StatsStyles';
 import { Card, SectionTitle, ProgressBar, StatNumber, arDigits } from '../ui';
 import { colors } from '../../../shared/theme/tokens';
@@ -83,18 +84,38 @@ export const StatusRow = ({ icon, title, sub, last }: { icon: React.ReactNode; t
 export const colorsRef = colors;
 
 /** The streak, with the longest one so far. */
-export const StreakCard = ({ streak, longest, onPress }: { streak: number; longest: number; onPress: () => void }) => (
-  <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={s.streakCard} accessibilityRole="button" accessibilityLabel={`${streak} يوم متتالي، اضغط لعرض التقرير`}>
-    <View style={s.streakIcon}><Flame size={26} color={colors.goldText} /></View>
-    <View style={{ flex: 1 }}>
-      <Text style={s.streakValue}>
-        {arDigits(streak)}<Text style={s.streakUnit}> {streak === 1 ? 'يوم' : 'يوم متتالي'}</Text>
-      </Text>
-      <Text style={s.streakSub}>{longest > streak ? `أطول سلسلة: ${toAr(longest)} يوم` : streak > 1 ? 'أطول سلسلة لك حتى الآن' : 'بداية مباركة، استمر'}</Text>
-    </View>
-    <ChevronLeft size={20} color={colors.gold} />
-  </TouchableOpacity>
-);
+/** «رجعت لربنا ٣ مرات»: the returns are counted as a good thing. */
+const returnsLine = (n: number) => (n === 0 ? '' : n === 1 ? 'رجعت لربنا مرة' : n === 2 ? 'رجعت لربنا مرتين' : `رجعت لربنا ${toAr(n)} مرات`);
+
+/**
+ * The run of days, framed for an أوّاب: a missed day never shows as «٠»; it shows as a door
+ * open to come back, and every comeback is counted.
+ */
+export const StreakCard = ({ journey, onPress }: { journey: Journey; onPress: () => void }) => {
+  const { streak, longest, returns, awayDays, returnedToday } = journey;
+  const away = streak === 0;
+  const sub = away
+    ? (awayDays > 0 ? `غبت ${toAr(awayDays)} يوم، وأي عبادة النهارده بداية رجعة جديدة` : 'أي عبادة النهارده بداية رجعة جديدة')
+    : returnedToday
+      ? `أهلاً بيك تاني، ربنا بيفرح برجوعك. ${returnsLine(returns)}`
+      : [longest > streak ? `أطول سلسلة: ${toAr(longest)} يوم` : streak > 1 ? 'أطول سلسلة لك لحد دلوقتي' : 'بداية مباركة، كمّل', returnsLine(returns)].filter(Boolean).join(' · ');
+  return (
+    <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={s.streakCard} accessibilityRole="button" accessibilityLabel={away ? 'باب الرجوع مفتوح، اضغط لعرض التقرير' : `${streak} يوم متتالي، اضغط لعرض التقرير`}>
+      <View style={s.streakIcon}>{away || returnedToday ? <Sunrise size={26} color={colors.goldText} /> : <Flame size={26} color={colors.goldText} />}</View>
+      <View style={{ flex: 1 }}>
+        {away ? (
+          <Text style={s.streakValue}>الباب مفتوح</Text>
+        ) : (
+          <Text style={s.streakValue}>
+            {arDigits(streak)}<Text style={s.streakUnit}> {streak === 1 ? 'يوم' : 'يوم متتالي'}</Text>
+          </Text>
+        )}
+        <Text style={s.streakSub}>{sub}</Text>
+      </View>
+      <ChevronLeft size={20} color={colors.gold} />
+    </TouchableOpacity>
+  );
+};
 
 const heat = () => [colors.hairline, colors.goldLineSoft, colors.goldLine, colors.gold];
 

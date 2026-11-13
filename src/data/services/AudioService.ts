@@ -2,6 +2,7 @@ import type { AVPlaybackStatus } from 'expo-av';
 import type { Sound } from 'expo-av/build/Audio';
 import TrackPlayer, { Event, State } from 'react-native-track-player';
 import { initializeTrackPlayer } from './TrackPlayerService';
+import { streamNative } from './nativeModules';
 import { AyahKey, AzanSound, IDLE_PLAYBACK, PlaybackStatus, QuranPlayer } from '../../domain/services/Audio';
 import { DEFAULT_RECITER_ID, RECITER_MAP, ayahAudioUrl } from '../../domain/entities/reciters';
 
@@ -11,19 +12,41 @@ import { DEFAULT_RECITER_ID, RECITER_MAP, ayahAudioUrl } from '../../domain/enti
  * request is aborted as soon as they arrive. Falls back to `url` when anything fails.
  */
 const resolveStreamUrl = async (url: string): Promise<string> => {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 8000);
+  // native first: it reads each redirect without following it, so an https → http hop
+  // (radiojar, the Cairo and Saudi radios) is turned back to https instead of being blocked
   try {
-    const res = await fetch(url, { method: 'GET', signal: controller.signal, headers: { Range: 'bytes=0-0' } });
-    const final = res.url || url;
-    controller.abort();
-    return final.replace(/^http:\/\//i, 'https://');
-  } catch {
-    return url;
-  } finally {
-    clearTimeout(timer);
-  }
+    const resolved = await streamNative()?.resolve?.(url);
+    if (resolved) return resolved;
+  } catch {}
+  return resolveWithXhr(url);
 };
+
+const resolveWithXhr = (url: string): Promise<string> =>
+  new Promise((resolve) => {
+    // XHR, not fetch: RN's fetch resolves only when the body is complete, which a live
+    // stream never is, so it sat out the whole timeout before every station
+    const xhr = new XMLHttpRequest();
+    let settled = false;
+    const finish = (final: string | null) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      try { xhr.abort(); } catch {}
+      resolve(final ? final.replace(/^http:\/\//i, 'https://') : url);
+    };
+    const timer = setTimeout(() => finish(null), 6000);
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState >= 2) finish(xhr.responseURL || url); // HEADERS_RECEIVED
+    };
+    xhr.onerror = () => finish(null);
+    try {
+      xhr.open('GET', url);
+      xhr.setRequestHeader('Range', 'bytes=0-0');
+      xhr.send();
+    } catch {
+      finish(null);
+    }
+  });
 
 /**
  * Recitation and the in-app adhan on top of react-native-track-player (whole surahs, with the
@@ -121,7 +144,7 @@ export class ExpoAudioPlayer implements QuranPlayer, AzanSound {
         url: streamUrl,
         title,
         artist: subtitle ?? 'بث مباشر',
-        artwork: require('../../../assets/images/mosque_bg.png'),
+        artwork: require('../../../assets/images/mosque_bg.jpg'),
         isLiveStream: true,
       });
       await TrackPlayer.play();

@@ -42,9 +42,16 @@ export interface PrayerCheckNativeModule {
   schedule?(json: string): Promise<void>;
   cancelAll?(): Promise<void>;
   setDoneToday?(prayerIds: string[]): void;
+  /** 'light' | 'dark' | 'system': the card's colours. */
+  setLook?(mode: string): void;
   /** Shows the «صليت؟» card once (JSON: title, body, prayedLabel, laterLabel); false if not allowed. */
   preview?(json: string): Promise<boolean>;
   takeAnswers?(): Promise<{ prayerId: string; day: string }[]>;
+}
+
+/** StreamModule (native/android/java/stream): a radio stream's final address, read without following http redirects. */
+export interface StreamNativeModule {
+  resolve?(url: string): Promise<string>;
 }
 
 export interface FloatingBubbleNativeModule {
@@ -67,4 +74,5 @@ const androidOnly = <T>(name: string): T | undefined =>
 export const azanNative = () => androidOnly<AzanNativeModule>('AzanModule');
 export const ayahVideoNative = () => androidOnly<AyahVideoNativeModule>('AyahVideo');
 export const prayerCheckNative = () => androidOnly<PrayerCheckNativeModule>('PrayerCheck');
+export const streamNative = () => androidOnly<StreamNativeModule>('OwwabStream');
 export const floatingBubbleNative = () => androidOnly<FloatingBubbleNativeModule>('RNFloatingBubble');
