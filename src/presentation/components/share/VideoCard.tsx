@@ -6,7 +6,7 @@ import type { LayoutWord } from '../../../domain/services/videoLayout';
 import { useShareCardSize } from './shareCardSize';
 import { VideoBackground } from './videoBackgrounds';
 
-const LOGO = require('../../../../assets/icon.png');
+const LOGO = require('../../../../assets/images/logo.jpg');
 
 /**
  * What the card draws. 'preview' is everything (the clip playing, with `page`'s words). The

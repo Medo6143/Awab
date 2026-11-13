@@ -3,7 +3,7 @@ import { Animated, Easing, Pressable, StyleSheet, Text, View, useWindowDimension
 import Svg, { Defs, LinearGradient, Line, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { colors, themed } from '../../../shared/theme/tokens';
 
-const SAJID = require('../../../../assets/images/sajid.png');
+const SAJID = require('../../../../assets/images/sajid.webp');
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
 // arch geometry in a 220×260 box

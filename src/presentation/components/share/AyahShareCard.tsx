@@ -6,7 +6,7 @@ import { useShareCardSize } from './ImageShareModal';
 import { layoutAyahCard } from './ayahCardLayout';
 import { useShareTextMax } from './storyThemes';
 
-const LOGO = require('../../../../assets/icon.png');
+const LOGO = require('../../../../assets/images/logo.jpg');
 
 type Props = { ayahText: string; surahName: string; ayahNumber: number; tafsirName?: string; tafsirExcerpt?: string };
 

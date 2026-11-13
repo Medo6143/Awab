@@ -14,7 +14,7 @@ interface AzanVideoModalProps {
   prayerName: string;
 }
 
-const MOSQUE = require('../../../../assets/images/mosque_bg.png');
+const MOSQUE = require('../../../../assets/images/mosque_bg.jpg');
 
 /** How long the post-adhan dua stays up before the screen closes itself. */
 const DUA_SCREEN_MS = 90 * 1000;

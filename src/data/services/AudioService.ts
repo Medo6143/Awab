@@ -101,7 +101,7 @@ export class ExpoAudioPlayer implements QuranPlayer, AzanSound {
         url: audioUrl,
         title: surahName || `سورة رقم ${surahId}`,
         artist: reciter.name,
-        artwork: require('../../../assets/images/mosque_bg.png'),
+        artwork: require('../../../assets/images/mosque_bg.jpg'),
       });
 
       await TrackPlayer.play();

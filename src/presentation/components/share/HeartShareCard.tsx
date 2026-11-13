@@ -7,7 +7,7 @@ import { toAr } from '../../../shared/utils/format';
 import { night } from '../../../shared/theme/tokens';
 import { useShareCardSize } from './ImageShareModal';
 
-const LOGO = require('../../../../assets/icon.png');
+const LOGO = require('../../../../assets/images/logo.jpg');
 
 type Props = {
   completedSurahs: number[];
