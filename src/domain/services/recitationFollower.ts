@@ -103,13 +103,16 @@ const dropLoops = (words: string[]): string[] => {
  * dropped from what was heard, unless the text around the cursor has them (an-Naml 30).
  */
 const PREAMBLES = ['اعوذ بالله من الشيطان الرجيم', 'بسم الله الرحمن الرحيم'].map((p) => p.split(' ').map(normLetters));
-const dropPreambles = (heard: string[], due: string[]): string[] => {
+const dropPreambles = (heard: string[], due: string[], around: string[]): string[] => {
   const out: string[] = [];
   for (let k = 0; k < heard.length;) {
     let run = 0;
     for (const p of PREAMBLES) {
-      // the text due next IS this preamble (an-Naml 30 has the basmala): nothing to drop
-      if (due.some((d) => same(d, p[0])) && due.some((d) => same(d, p[1]))) continue;
+      // the text here IS this preamble (al-Fatiha's first ayah, an-Naml 30): nothing to drop.
+      // Looked for around the cursor, not only ahead of it: once «بسم الله» of al-Fatiha has
+      // been followed, the rest of its basmala was taken for the one said before a surah and
+      // dropped, and «الرحمن الرحيم» came out as skipped
+      if (around.some((d, k) => same(d, p[0]) && around.slice(k + 1, k + 3).some((x) => same(x, p[1])))) continue;
       // it shares words with the text due («الرحمن الرحيم» before al-Fatiha): only three of its
       // words in order are surely the preamble; otherwise two are enough
       const need = due.some((d) => p.some((w) => same(d, w))) ? 3 : 2;
@@ -210,7 +213,8 @@ export class RecitationFollower {
     // in the middle of a surah their words are the text («فاستعذ بالله من الشيطان الرجيم»)
     const opening = c < 3 || exp.slice(Math.max(0, c - 2), c + 1).some((w) => w.opens);
     const loops = dropLoops(raw.map(normLetters).filter(Boolean));
-    const heard = opening ? dropPreambles(loops, due) : loops;
+    const around = exp.slice(Math.max(0, c - 4), c + LOOKAHEAD).map((w) => w.plain);
+    const heard = opening ? dropPreambles(loops, due, around) : loops;
     const from = Math.max(0, c - BACK);
     const to = Math.min(exp.length, c + heard.length + LOOKAHEAD);
     const pairs = align(heard, exp.slice(from, to).map((w) => w.plain), c - from).map(([k, j]): [number, number] => [k, from + j]);
